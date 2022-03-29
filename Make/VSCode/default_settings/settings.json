@@ -19,35 +19,42 @@
             {
                 "name": "Build Sim Dev",
                 "cwd": "${workspaceFolder}/Make/Linux",
-                "color": "white",
+                "color": "#ff9999",
                 "singleInstance": true,
                 "command": "./compile SimRobot" // This is executed in the terminal.
             },
             {
-                "name": "Run Sim Dev",
-                "cwd": "${workspaceFolder}/Build/Linux/SimRobot/Develop",
-                "color": "white",
-                "singleInstance": true,
-                "command": "./SimRobot" // This is executed in the terminal.
-            },
-            {
                 "name": "Build Sim Release",
                 "cwd": "${workspaceFolder}/Make/Linux",
-                "color": "white",
+                "color": "#ff9999",
                 "singleInstance": true,
                 "command": "./compile SimRobot Release" // This is executed in the terminal.
             },
             {
-                "name": "Run Sim Release",
-                "cwd": "${workspaceFolder}/Build/Linux/SimRobot/Release",
-                "color": "white",
+                "name": "Run Sim Dev",
+                "cwd": "${workspaceFolder}/Build/Linux/SimRobot/Develop",
+                "color": "#33ff33",
                 "singleInstance": true,
                 "command": "./SimRobot" // This is executed in the terminal.
             },
             {
+                "name": "Run Sim Release",
+                "cwd": "${workspaceFolder}/Build/Linux/SimRobot/Release",
+                "color": "#33ff33",
+                "singleInstance": true,
+                "command": "./SimRobot" // This is executed in the terminal.
+            },
+            {
+                "name": "Build Nao Dev",
+                "cwd": "${workspaceFolder}/Make/Linux",
+                "color": "#ff9999",
+                "singleInstance": true,
+                "command": "./compile Nao" // This is executed in the terminal.
+            },
+            {
                 "name": "bush",
                 "cwd": "${workspaceFolder}/Build/Linux/bush/Release",
-                "color": "white",
+                "color": "#000000",
                 "singleInstance": true,
                 "command": "./bush" // This is executed in the terminal.
             }
