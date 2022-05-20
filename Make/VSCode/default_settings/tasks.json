@@ -1,0 +1,66 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build_sim_debug",
+            "type": "shell",
+            "command": "${workspaceFolder}/Make/Linux/compile SimRobot Debug",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build"
+            }
+        },
+
+        {
+            "label": "build_sim_dev",
+            "type": "shell",
+            "command": "${workspaceFolder}/Make/Linux/compile SimRobot Develop",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build"
+            }
+        },
+
+        {
+            "label": "build_sim_release",
+            "type": "shell",
+            "command": "${workspaceFolder}/Make/Linux/compile SimRobot Release",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+
+        {
+            "label": "build_bush",
+            "type": "shell",
+            "command": "${workspaceFolder}/Make/Linux/compile bush Release",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build"
+            }
+        },
+
+        {
+            "label": "bush",
+            "type": "shell",
+            "command": "${workspaceFolder}/Build/Linux/bush/Release/bush",
+            "dependsOn": "build_bush",
+            "problemMatcher": [
+                "$gcc"
+            ],
+        }
+
+    ]
+}

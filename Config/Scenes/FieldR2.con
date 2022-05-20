@@ -1,0 +1,27 @@
+cl Labor
+call Includes/Normal
+call Includes/Views
+
+#dr debugDrawing3d:representation:RobotPose
+
+# Szene zum Trainieren einer 2vs2 Spielsituation bestehend aus
+# - 2 Angreifer (Team 2)
+# - einen Verteidiger sowie Goalie
+
+# Varianten: 
+# - mit Dummies als Hindernissen für den PathPlanner:robot9
+# - Startpostion, so dass man durch die PenaltyZone laufen müßte
+
+# Szene besteht aus 3 Dateien
+
+# Zum Zuweisen der Teams folgende Roboternamen verwenden:
+# robot1 - robot5 -> team 1
+# robot7 - robot11 -> team 2
+
+# all views are defined in another script
+#call Includes/PerceptOracle
+
+# Demo Views
+#vi image Upper
+#vid upper module:PlayersDeeptector:rzwei
+#vid upper module:PlayersDeeptector:image
