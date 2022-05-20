@@ -1,0 +1,5 @@
+#!/bin/bash
+WKDIR=../..
+mkdir -p $WKDIR/.vscode 
+WKDIR=$WKDIR/.vscode
+cp ./default_settings/* $WKDIR
