@@ -120,6 +120,28 @@ public:
    */
   static bool isAbsolute(const char* path);
 
+  /**
+   * @author Jonas Lambing (R2K)
+   * @param path An absolute path to check
+   * 
+   * This method has different implementations based on the target (Nao, Linux, Windows)
+   * and it currently does not have an implementation for Mac.
+   * 
+   * @return A list of directories inside a folder
+   */
+  static std::list<std::string> getSubDirs(std::string path); 
+
+  /**
+   * @author Jonas Lambing (R2K)
+   * @param path An absolute path to check
+   * 
+   * This method has different implementations based on the target (Nao, Linux, Windows)
+   * and it currently does not have an implementation for Mac.
+   * 
+   * @return A list of files inside a directory 
+   */
+  static std::list<std::string> getFiles(std::string path);
+
 private:
   static std::list<std::string> getConfigDirs();
 };
