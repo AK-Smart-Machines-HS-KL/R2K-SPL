@@ -74,6 +74,16 @@ void RobotPose::verify() const
   ASSERT(inv.translation.y() == inversePose.translation.y());
 }
 
+Vector2f RobotPose::toRelative(const Vector2f& abs) const
+{
+    return inversePose * abs;
+}
+
+Vector2f RobotPose::toAbsolute(const Vector2f& rel) const
+{
+    return translation + rel.rotated(rotation);
+}
+
 void RobotPose::draw() const
 {
   Vector2f bodyPoints[4] =
