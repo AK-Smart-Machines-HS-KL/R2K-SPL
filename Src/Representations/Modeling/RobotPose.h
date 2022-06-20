@@ -50,6 +50,11 @@ STREAMABLE_WITH_BASE(RobotPose, Pose2f, COMMA public BHumanMessageParticle<idRob
   /** Draws the robot pose in the color of the team to the field view. */
   void draw() const;
 
+  /** Converts a point from Robot relative coordinates to absolute coordinates. */
+  Vector2f toAbsolute(const Vector2f& relativePoint) const;
+  /** Converts a point from absolute coordinates to Robot relative coordinates. */
+  Vector2f toRelative(const Vector2f& absolutePoint) const;
+
   /**
    * Computes the standard deviation given the covariance matrix.
    * The unit is the same as for the pose: mm
