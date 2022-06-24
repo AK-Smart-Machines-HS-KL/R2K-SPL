@@ -76,10 +76,6 @@ class GoalieCard : public GoalieCardBase
         {
           goto turnToBall;
         }
-        /*else if (theFieldBall.positionRelative.norm() < 150.0f)
-        {
-          goto kickBallIfToClose;
-        }*/
       }
 
       action
@@ -103,8 +99,7 @@ class GoalieCard : public GoalieCardBase
     {
       transition
       {
-        // if the goalie watching ball
-        if (std::abs(theFieldBall.positionRelative.angle()) < theRobotPose.rotation)
+        if (theFieldBall.ballWasSeen())
         {
           goto moveBackwardsToThePenaltyAreaAndWatchForTheBall;
         }
@@ -112,7 +107,7 @@ class GoalieCard : public GoalieCardBase
 
       action
       {
-        //turn 45° --> goalie dont know where the ball is
+        // turn 45° --> goalie dont know where the ball is
         theWalkAtRelativeSpeedSkill(Pose2f(45.0f, 0.0f, 0.0f));
         theLookForwardSkill();
       }
@@ -122,16 +117,16 @@ class GoalieCard : public GoalieCardBase
     {
 
       /*
-      * OWN GOAL   |
-      *            V
-      * -------------------------------------
-      *            |               |
-      *           min y           max Y
-      *           ___ GOALIE.X LINE_
-      * 
-      * 
-      *     X
-      */
+       * OWN GOAL   |
+       *            V
+       * -------------------------------------
+       *            |               |
+       *           min y           max Y
+       *           ___ GOALIE.X LINE_
+       *
+       *
+       *     X
+       */
       Vector2f target((theFieldDimensions.xPosOwnGoalPost + 300.0f), std::max(theFieldDimensions.yPosRightGoal, std::min(theFieldDimensions.yPosLeftGoal, theFieldBall.positionOnField.y())));
       transition
       {
@@ -141,10 +136,10 @@ class GoalieCard : public GoalieCardBase
         {
           goto goToFirstGoalieLine;
         }
-        /*else if (theFieldBall.positionRelative.norm() < 150.0f)
+        else if (theFieldBall.positionRelative.norm() < 470.0f)
         {
           goto kickBallIfToClose;
-        }*/
+        }
       }
 
       action
@@ -203,12 +198,12 @@ class GoalieCard : public GoalieCardBase
       }
     }
 
-    /*state(kickBallIfToClose)
+    state(kickBallIfToClose)
     {
       transition
       {
         // if the ball is closer then 1meter --> move to the goal position
-        if (theFieldBall.positionRelative.norm() > 150.0f)
+        if (theFieldBall.positionRelative.norm() > 470.0f)
         {
           goto moveBackwardsToThePenaltyAreaAndWatchForTheBall;
         }
@@ -216,14 +211,14 @@ class GoalieCard : public GoalieCardBase
 
       action
       {
-        // if the robot isnt at the target position --> he move to this point
-        // if he is already at his position --> he will stand there
-        theGoToBallAndKickSkill();
-
-        // Override these skills with the skills you wish to test
-        theLookForwardSkill(); // Head Motion Request
+        theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::walkForwardsLeft);
       }
-    }*/
+    }
+  }
+
+  Angle calcAngleToGoal() const
+  {
+    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
   }
 };
 
