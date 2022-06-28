@@ -14,6 +14,9 @@
 #include "Representations/Communication/TeamInfo.h"
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Representations/Infrastructure/SensorData/KeyStates.h"
+#include "Representations/Modeling/RobotPose.h"
+#include "Representations/BehaviorControl/FieldBall.h"
+
 #include "Platform/SystemCall.h"
 #include "Tools/Communication/UdpComm.h"
 #include "Tools/Module/Module.h"
@@ -24,6 +27,8 @@ MODULE(GameDataProvider,
   REQUIRES(EnhancedKeyStates),
   REQUIRES(FrameInfo),
   REQUIRES(RobotInfo),
+  // REQUIRES(RobotPose), //Cyclic Dependency Issue
+  // REQUIRES(FieldBall),
   PROVIDES(RobotInfo),
   PROVIDES(OwnTeamInfo),
   PROVIDES(OpponentTeamInfo),
