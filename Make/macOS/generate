@@ -67,11 +67,12 @@ fi
 
 # Temporarily create cmake files for Nao libraries.
 sed <../CMake/asmjit.cmake >../CMake/asmjitNao.cmake \
-  -e 's%asmjit %asmjitNao %g'
+  -e 's%asmjit %asmjitNao %g'\
+  -e 's%BUILD_DESKTOP%FALSE%g'
 sed <../CMake/CompiledNN.cmake >../CMake/CompiledNNNao.cmake \
   -e 's%asmjit%asmjitNao%g' \
   -e 's%CompiledNN %CompiledNNNao %g' \
-  -e 's%HDF5::HDF5%Nao::HDF5::HDF5%g'
+  -e 's%BUILD_DESKTOP%FALSE%g'
 
 # Determine directories that do not directly contain files.
 DIRONLY="$(for dir in $(find ../../Src ../../Util/SimRobot/Src -type d); do \
