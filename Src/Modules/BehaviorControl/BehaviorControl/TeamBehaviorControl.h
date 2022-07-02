@@ -24,6 +24,8 @@ MODULE(TeamBehaviorControl,
   REQUIRES(TeamActivationGraph),
 
   PROVIDES(TeamBehaviorStatus),
+  PROVIDES(TeammateRoles),
+  PROVIDES(PlayerRole),
 
   LOADS_PARAMETERS(
   {,
@@ -64,4 +66,9 @@ private:
 
   TeamSkillRegistry theTeamSkillRegistry; /**< The manager of all skills. */
   TeamCardRegistry theTeamCardRegistry; /**< The manager of all cards. */
+
+    // added: Adrian, R2K
+  void update(TeammateRoles& teammateRoles) override { teammateRoles = theTeamBehaviorStatus.teammateRoles; };
+  void update(PlayerRole& playerRole) override { playerRole = theTeamBehaviorStatus.role; };
+
 };
