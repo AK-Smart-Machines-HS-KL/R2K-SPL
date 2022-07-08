@@ -138,17 +138,16 @@ bool GameDataProvider::sendAliveMessage()
   returnPacket.teamNum = static_cast<std::uint8_t>(Global::getSettings().teamNumber);
   returnPacket.playerNum = static_cast<std::uint8_t>(Global::getSettings().playerNumber);
 
-  // See RoboCupGameControlData.h for array assignments
-  // returnPacket.pose[0] = theRobotPose.translation.x();
-  // returnPacket.pose[1] = theRobotPose.translation.y();
-  // returnPacket.pose[2] = theRobotPose.rotation;
+  //See RoboCupGameControlData.h for array assignments
+  returnPacket.pose[0] = theRobotPose.translation.x();
+  returnPacket.pose[1] = theRobotPose.translation.y();
+  returnPacket.pose[2] = theRobotPose.rotation;
 
-  // returnPacket.ball[0] = theFieldBall.positionRelative.x();
-  // returnPacket.ball[1] = theFieldBall.positionRelative.y();
-  // returnPacket.ballAge = theFieldBall.timeSinceBallWasSeen;
+  returnPacket.ball[0] = theFieldBall.positionRelative.x();
+  returnPacket.ball[1] = theFieldBall.positionRelative.y();
+  returnPacket.ballAge = theFieldBall.timeSinceBallWasSeen;
 
-  //TODO: Add Fallen Time
-  returnPacket.fallen = 0;
+  returnPacket.fallen = theBehaviorStatus.activity == BehaviorStatus::fallen;
 
   return socket.write(reinterpret_cast<char*>(&returnPacket), sizeof(returnPacket));
 }

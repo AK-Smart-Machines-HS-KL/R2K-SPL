@@ -24,11 +24,14 @@
 MODULE(GameDataProvider,
 {,
   USES(BehaviorStatus),
+
+  //GC Return Packet Data
+  USES(RobotPose), 
+  USES(FieldBall),
+
   REQUIRES(EnhancedKeyStates),
   REQUIRES(FrameInfo),
   REQUIRES(RobotInfo),
-  // REQUIRES(RobotPose), //Cyclic Dependency Issue
-  // REQUIRES(FieldBall),
   PROVIDES(RobotInfo),
   PROVIDES(OwnTeamInfo),
   PROVIDES(OpponentTeamInfo),
