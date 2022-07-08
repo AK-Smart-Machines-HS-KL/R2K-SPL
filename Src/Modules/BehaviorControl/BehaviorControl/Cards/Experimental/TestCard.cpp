@@ -57,15 +57,15 @@ class TestCard : public TestCardBase
 
   bool postconditions() const override
   {
-    return false;
+    return true;   // set to true, when used as default card, ie, lowest card on stack
   }
 
   void execute() override
   {
 
     theActivitySkill(BehaviorStatus::testingBehavior);
-    std::string s = "tst";
-    OUTPUT_TEXT(s);
+    // std::string s = "testingBehavior";
+    // OUTPUT_TEXT(s);
 
     // Override these skills with the skills you wish to test
     theLookForwardSkill(); // Head Motion Request
