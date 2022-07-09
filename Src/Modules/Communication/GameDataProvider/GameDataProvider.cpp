@@ -135,9 +135,20 @@ void GameDataProvider::receive(bool setGameCtrlData)
 bool GameDataProvider::sendAliveMessage()
 {
   RoboCup::RoboCupGameControlReturnData returnPacket;
-  returnPacket.team = static_cast<std::uint8_t>(Global::getSettings().teamNumber);
-  returnPacket.player = static_cast<std::uint8_t>(Global::getSettings().playerNumber);
-  returnPacket.message = GAMECONTROLLER_RETURN_MSG_ALIVE;
+  returnPacket.teamNum = static_cast<std::uint8_t>(Global::getSettings().teamNumber);
+  returnPacket.playerNum = static_cast<std::uint8_t>(Global::getSettings().playerNumber);
+
+  //See RoboCupGameControlData.h for array assignments
+  returnPacket.pose[0] = theRobotPose.translation.x();
+  returnPacket.pose[1] = theRobotPose.translation.y();
+  returnPacket.pose[2] = theRobotPose.rotation;
+
+  returnPacket.ball[0] = theFieldBall.positionRelative.x();
+  returnPacket.ball[1] = theFieldBall.positionRelative.y();
+  returnPacket.ballAge = theFieldBall.timeSinceBallWasSeen;
+
+  returnPacket.fallen = theBehaviorStatus.activity == BehaviorStatus::fallen;
+
   return socket.write(reinterpret_cast<char*>(&returnPacket), sizeof(returnPacket));
 }
 

@@ -34,6 +34,8 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanCompressedMessageParticle<Behavior
     codeReleasePositionForKickOff,
 
     calibrationFinished,
+
+    referenceCard,  // R2K
   });
 
   /**
