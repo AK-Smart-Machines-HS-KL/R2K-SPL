@@ -1,7 +1,7 @@
 /**
  * @file DefenseCard.cpp
  * @author Benjamin Veit
- * @version 0.1
+ * @version 1.0
  * @date 2022-06-20
  *
  *
@@ -67,22 +67,12 @@ class DefenseCard : public DefenseCardBase
   
   option
   {
-    theActivitySkill(BehaviorStatus::codeReleaseKickAtGoal);
+    theActivitySkill(BehaviorStatus::defenseCard);
     
     
     initial_state(identifierTimeToReachBall)
     {
-      bool closest = true;
-      float myDist = theFieldBall.positionRelative.norm();
-      
-      for(auto& t : theTeamData.teammates) {
-        if(t.number == 2 || t.number == 3){
-          if(myDist > (t.theRobotPose.translation - theFieldBall.positionOnField).norm()) {
-            closest = false;
-            break;
-          }
-        }
-      }
+      bool closest = checkDistanze();
       
       transition
       {
@@ -102,17 +92,10 @@ class DefenseCard : public DefenseCardBase
     }
     
     state(walkToBallAndKickIt){
-      bool closest = true;
-      float myDist = theFieldBall.positionRelative.norm();
       
-      for(auto& t : theTeamData.teammates) {
-        if(t.number == 2 || t.number == 3){
-          if(myDist > (t.theRobotPose.translation - theFieldBall.positionOnField).norm()) {
-            closest = false;
-            break;
-          }
-        }
-      }
+      //checking if the currentRobot is the closest to the ball
+      bool closest = checkDistanze();
+      
       
       transition{
         if(theFieldBall.positionOnField.x() > 0) {
@@ -125,13 +108,26 @@ class DefenseCard : public DefenseCardBase
       }
       
       action{
-        theGoToBallAndKickSkill((theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle(), KickInfo::walkForwardsRightLong);
+        theGoToBallAndKickSkill((theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle(), KickInfo::forwardFastRightLong);
       }
       
     }
 
   }
+  bool checkDistanze(){
+    float myDist = theFieldBall.positionRelative.norm();
+    
+    for(auto& t : theTeamData.teammates) {
+      if(t.number == 2 || t.number == 3){
+        if(myDist > (t.theRobotPose.translation - theFieldBall.positionOnField).norm()) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  
 };
 
       
-      MAKE_CARD(DefenseCard);
+MAKE_CARD(DefenseCard);
