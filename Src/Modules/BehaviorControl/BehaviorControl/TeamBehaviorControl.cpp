@@ -7,6 +7,8 @@
  */
 
 #include "TeamBehaviorControl.h"
+#include "Representations/BehaviorControl/TeammateRoles.h"
+#include "Representations/BehaviorControl/PlayerRole.h"
 
 MAKE_MODULE(TeamBehaviorControl, behaviorControl, TeamBehaviorControl::getExtModuleInfo);
 
