@@ -26,12 +26,12 @@ STREAMABLE(TeammateRoles,
   int operator[](const size_t i) const;
   int& operator[](const size_t i),
 
-  (std::vector<int>) ({ TeammateRoles::GOALKEEPER,
-                        TeammateRoles::DEFENSE,
-                        TeammateRoles::DEFENSE,
-                        TeammateRoles::OFFENSE,
-                        TeammateRoles::OFFENSE,
-                        TeammateRoles::UNDEFINED })roles, /** The R2K role assignment for all robots in the team */
-  (int)(-1) captain, /**< The number of the robot which calculated this role assignment. */
-  (unsigned)(0) timestamp, /**< The timestamp when this role assignment has been calculated. */
+    (std::vector<int>) ({ TeammateRoles::GOALKEEPER,
+                          TeammateRoles::DEFENSE,
+                          TeammateRoles::DEFENSE,
+                          TeammateRoles::OFFENSE,
+                          TeammateRoles::OFFENSE,
+                          TeammateRoles::UNDEFINED })roles, /** The R2K role assignment for all robots in the team */
+    (int)(-1) captain, /**< The number of the robot which calculated this role assignment. */
+    (unsigned)(0) timestamp, /**< The timestamp when this role assignment has been calculated. */ 
 });
