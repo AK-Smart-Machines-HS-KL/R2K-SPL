@@ -10,6 +10,8 @@
 #include "Representations/BehaviorControl/TeamSkills.h"
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h"
 
+#include "Representations/BehaviorControl/TeammateRoles.h"  // GOALKEEPER, OFFENSE, DEFENSE
+
 TEAM_SKILL_IMPLEMENTATION(TeammateRolesImpl,
 {,
   IMPLEMENTS(TeammateRoles),
