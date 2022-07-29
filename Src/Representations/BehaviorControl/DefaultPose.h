@@ -12,7 +12,9 @@
 
 #pragma once
 #include "Tools/Math/Eigen.h"
+#include "Tools/Math/Pose2f.h"
 #include "Tools/Streams/AutoStreamable.h"
+#include "Tools/Settings.h"
 
 STREAMABLE(DefaultPose,
 {
@@ -20,14 +22,10 @@ STREAMABLE(DefaultPose,
    * @brief This function returns the default position based on the robotnumber in absolute coordinates 
    * 
    */
-  Vector2f getDefaultPosition(const int robotNumber) const,
+  Pose2f getDefaultPosition(const int robotNumber) const,
 
   (bool)(true)                isOnDefaultPosition,
   (bool)(true)                isOnDefaultPose,
-  (Vector2f)(Vector2f::Zero()) defaultPosition,
-  (Vector2f)(Vector2f::Zero()) goalieDefaultPosition,
-  (Vector2f)(Vector2f::Zero()) leftDefensePosition,
-  (Vector2f)(Vector2f::Zero()) rightDefensePosition,
-  (Vector2f)(Vector2f::Zero()) leftOffensePosition,
-  (Vector2f)(Vector2f::Zero()) rightOffensePosition,
+  (Pose2f)(Vector2f::Zero())  ownDefaultPose,
+  (std::vector<Pose2f>) (std::vector<Pose2f>(Settings::highestValidPlayerNumber)) teamDefaultPoses, // Default poses of the team
 });

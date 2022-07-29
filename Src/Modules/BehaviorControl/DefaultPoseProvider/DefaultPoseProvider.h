@@ -46,31 +46,39 @@
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Configuration/GlobalOptions.h"
 #include "Representations/Modeling/RobotPose.h"
-
-
-
-
+#include "Representations/Communication/TeamData.h"
 
 MODULE(DefaultPoseProvider,
 {,
   PROVIDES(DefaultPose),
  
   REQUIRES(FieldDimensions),
-  REQUIRES(GameInfo),
+  REQUIRES(TeammateRoles),
   REQUIRES(GlobalOptions),
   REQUIRES(RobotPose),
   REQUIRES(RobotInfo),
-  REQUIRES(OpponentTeamInfo),
-  REQUIRES(OwnTeamInfo),
+  REQUIRES(TeamData),
   REQUIRES(TeamBehaviorStatus),
 
   LOADS_PARAMETERS(
   {,
-    (Vector2f) goalieMargin,
-    (Vector2f) leftDefenseMargin,
-    (Vector2f) rightDefenseMargin,
-    (Vector2f) leftOffenseMargin,
-    (Vector2f) rightOffenseMargin,
+    (bool) (false) autoScale, // wether or not to scale the values to the current field dimensions
+    
+    // Strategy Offsets
+    (float) offsetOffense,
+    (float) offsetDefense,
+
+    // Poses
+    // #Goalie
+    (Pose2f) goaliePose,
+    // #Offense
+    (Pose2f) offenseMidPose,
+    (Pose2f) offenseLeftPose,
+    (Pose2f) offenseRightPose,
+    // #Defense
+    (Pose2f) defenseMidPose,
+    (Pose2f) defenseLeftPose,
+    (Pose2f) defenseRightPose, 
   }),
 });
 

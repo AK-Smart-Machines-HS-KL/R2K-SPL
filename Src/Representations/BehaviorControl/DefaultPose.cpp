@@ -9,21 +9,7 @@
 
 #include "DefaultPose.h"
 
-Vector2f DefaultPose::getDefaultPosition(const int robotNumber) const
+Pose2f DefaultPose::getDefaultPosition(const int robotNumber) const
 {
-  switch(robotNumber)
-  {
-    case 1:
-    return goalieDefaultPosition;
-    case 2:
-    return leftDefensePosition;
-    case 3:
-    return rightDefensePosition;
-    case 4:
-    return rightOffensePosition;
-    case 5:
-    return leftOffensePosition;
-    default:
-    return Vector2f::Zero();
-  }
+  return teamDefaultPoses[robotNumber - 1];
 }
