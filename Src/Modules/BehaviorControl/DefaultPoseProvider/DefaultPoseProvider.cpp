@@ -32,9 +32,16 @@ void DefaultPoseProvider::update(DefaultPose& defaultPose)
       case TeammateRoles::DEFENSE: defaultPose.teamDefaultPoses[i] = defenseMidPose; break;
       case TeammateRoles::OFFENSE: defaultPose.teamDefaultPoses[i] = offenseMidPose; break;
 
-      // 
       //case TeammateRoles::GOALKEEPER: defaultPose.teamDefaultPoses[i] = goaliePose; break;
-      //case TeammateRoles::GOALKEEPER: defaultPose.teamDefaultPoses[i] = goaliePose; break; 
+      //case TeammateRoles::GOALKEEPER_OFFENSE: defaultPose.teamDefaultPoses[i] = goaliePose; break;
+
+      //case TeammateRoles::LEFT_DEFENSE: defaultPose.teamDefaultPoses[i] = defenseLeftPose; break;
+      //case TeammateRoles::MID_DEFENSE: defaultPose.teamDefaultPoses[i] = defenseMidPose; break;
+      //case TeammateRoles::RIGHT_DEFENSE: defaultPose.teamDefaultPoses[i] = defenseRightPose; break;
+      
+      //case TeammateRoles::LEFT_OFFENSE: defaultPose.teamDefaultPoses[i] = offenseLeftPose; break;
+      //case TeammateRoles::MID_OFFENSE: defaultPose.teamDefaultPoses[i] = offenseMidPose; break;
+      //case TeammateRoles::RIGHT_OFFENSE: defaultPose.teamDefaultPoses[i] = offenseRightPose; break; 
     }
 
     // Apply offset by team Activity
@@ -45,7 +52,7 @@ void DefaultPoseProvider::update(DefaultPose& defaultPose)
       {
         case TeamBehaviorStatus::R2K_DEFENSIVE_GAME : offset = offsetDefense;
         break;
-        case TeamBehaviorStatus::R2K_OFFENSIVE_GAME : offset = offsetDefense;
+        case TeamBehaviorStatus::R2K_OFFENSIVE_GAME : offset = offsetOffense;
         break;
       }
       
@@ -60,11 +67,13 @@ void DefaultPoseProvider::update(DefaultPose& defaultPose)
     }
   }
 
-  // Set Own Pos
+  // Set Own Pose
   defaultPose.ownDefaultPose = defaultPose.teamDefaultPoses[theRobotInfo.number - 1];
 
+  // Check if Robot is on own Position
   defaultPose.isOnDefaultPosition = (defaultPose.ownDefaultPose.translation - theRobotPose.translation).norm() < PositionTolerance;
 
+  // Check if Robot is on Own Pose (i.e. on own position & looking in the correnct direction)
   defaultPose.isOnDefaultPose = 
     defaultPose.isOnDefaultPosition 
     && abs(defaultPose.ownDefaultPose.rotation - theRobotPose.rotation)  < AngleTolerance;
