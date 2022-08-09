@@ -14,6 +14,9 @@
 #include "Representations/Communication/TeamInfo.h"
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Representations/Infrastructure/SensorData/KeyStates.h"
+#include "Representations/Modeling/RobotPose.h"
+#include "Representations/BehaviorControl/FieldBall.h"
+
 #include "Platform/SystemCall.h"
 #include "Tools/Communication/UdpComm.h"
 #include "Tools/Module/Module.h"
@@ -21,6 +24,11 @@
 MODULE(GameDataProvider,
 {,
   USES(BehaviorStatus),
+
+  //GC Return Packet Data
+  USES(RobotPose), 
+  USES(FieldBall),
+
   REQUIRES(EnhancedKeyStates),
   REQUIRES(FrameInfo),
   REQUIRES(RobotInfo),

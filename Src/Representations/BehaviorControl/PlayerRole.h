@@ -13,21 +13,22 @@
 #include <string>
 
 STREAMABLE(PlayerRole,
-{
-  ENUM(RoleType,
-  {,
-    none,
-    goalkeeper,
-    ballPlayer,
+  {
+    ENUM(RoleType,
+    {,
+      none,
+      goalkeeper,
+      ballPlayer,
+      goalkeeperAndBallPlayer,
 
-    // legacy roles from 2019
-    firstSupporterRole,
-    supporter0 = firstSupporterRole,
-    supporter1,
-    supporter2,
-    supporter3,
-    supporter4,
-  });
+      // legacy roles from 2019
+      firstSupporterRole,
+      supporter0 = firstSupporterRole,
+      supporter1,
+      supporter2,
+      supporter3,
+      supporter4,
+    });
 
   /**
    * Compatibility function for 2019 behavior.
@@ -35,16 +36,19 @@ STREAMABLE(PlayerRole,
    */
   bool isGoalkeeper() const
   {
-    return role == goalkeeper;
+    return (role == goalkeeper) || (role == goalkeeperAndBallPlayer);
   }
 
   /**
    * Compatibility function for 2019 behavior.
    * @return Whether the robot plays the ball.
+   * 
+   * 
+   * Adrian, R2K: re-activated for our code base
    */
   bool playsTheBall() const
   {
-    return role == ballPlayer;
+    return (role == ballPlayer) || (role == goalkeeperAndBallPlayer);
   }
 
   /**
