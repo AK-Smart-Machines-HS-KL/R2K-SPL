@@ -1,5 +1,4 @@
 /**
-/**
  * @file ReferenceCard.cpp
  * @author Adrian Müller
  * @version: 1.2
@@ -17,7 +16,6 @@
  * - usage of dynamic role isGoalkeeper()
  * 
  */
-#
 
 // B-Human includes
 #include "Representations/BehaviorControl/FieldBall.h"
@@ -60,12 +58,22 @@ class ReferenceCard : public ReferenceCardBase
 {
   bool preconditions() const override
   {
-    return 
+    return
+      // theRobotPose.isInbeetween(xmin,xmay,ymin,ymax)  // grid -1, +1, -3, +3 == nahe Mittelinie
       thePlayerRole.playsTheBall() &&  // I am the striker
       !thePlayerRole.isGoalkeeper() &&  // only for field players
+      !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) &&  // 
       thePlayerRole.supporterIndex() < thePlayerRole.numOfActiveSupporters && // I am not the right most player
+
       theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_NORMAL_GAME &&
-      theTeammateRoles.roles[theRobotInfo.number-1] == TeammateRoles::OFFENSE;  // my recent R2K strategy dependent role
+
+
+      // note: just use the real robot number for tactic look up
+      theTeammateRoles.isTacticalOffense(theRobotInfo.number); // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
+      // be more specific:
+      theTeammateRoles.roles[theRobotInfo.number-1] == TeammateRoles::OFFENSE_RIGHT;  // my recent R2K strategy dependent role
+
+    // ToDo: OFFENSE_LEFT,  ANY_OFFENSE (l,m,r)
   }
 
   bool postconditions() const override
