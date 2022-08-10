@@ -20,6 +20,7 @@
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/BehaviorControl/FieldBall.h"
+#include "Representations/BehaviorControl/PlayerRole.h"
 
 //#include <filesystem>
 
@@ -35,6 +36,7 @@ CARD(ChaseBallCard,
         REQUIRES(FieldDimensions),
         REQUIRES(RobotInfo),
         REQUIRES(FieldBall),
+        REQUIRES(PlayerRole),
 
         DEFINES_PARAMETERS(
              {,
@@ -61,11 +63,6 @@ class ChaseBallCard : public ChaseBallCardBase
 
   bool preconditions() const override
   {  
-    
-    //Fragt ab ob der Roboter die Rolle Stürmer hat 
-    //Muss noch dynamisch werden
-    bool offense = theRobotInfo.number==3;
-
     //Abfragen Spielerposition
     Vector2f pos = theRobotPose.translation;
     float x_pos = pos.x();
@@ -74,7 +71,7 @@ class ChaseBallCard : public ChaseBallCardBase
     //mit einem threshold damit Stürmer noch teils ins eigene Feld darf
     bool opField = x_pos > 0 - threshold;
 
-    return offense&&opField;
+    return thePlayerRole.playsTheBall()&&opField;
   }
 
   bool postconditions() const override
