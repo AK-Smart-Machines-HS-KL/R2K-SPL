@@ -72,7 +72,7 @@ class DefaultCard : public DefaultCardBase
     Vector2f targetRelative = theRobotPose.toRelative(theDefaultPose.ownDefaultPose.translation);
 
     theLookActiveSkill(); // Head Motion Request
-    theWalkToPointSkill(Pose2f(theDefaultPose.ownDefaultPose.rotation - theRobotPose.rotation, targetRelative), 0.7f, /* rough: */ true);     
+    theWalkToPointSkill(Pose2f(theDefaultPose.ownDefaultPose.rotation - theRobotPose.rotation, targetRelative), 1.0f, true);     
 
   }
 };
