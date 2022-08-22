@@ -55,6 +55,8 @@
 #include "Representations/BehaviorControl/TeamSkills.h"
 #include "Tools/BehaviorControl/Framework/Card/TeamCard.h"
 
+#include <algorithm>  // find
+
 
 // #include "Tools/Debugging/Annotation.h"
 
@@ -152,6 +154,8 @@ class R2K_TeamCard : public R2K_TeamCardBase
 
     };
 
+    // will be used as: r2k_tactics[activeBuddies][tbs - 1][i_pos];
+
     // 2019 code
     // RoboCup::TeamInfo& team = gameCtrlData.teams[gameCtrlData.teams[0].teamNumber == Global::getSettings().teamNumber ? 0 : 1];
     
@@ -215,7 +219,6 @@ class R2K_TeamCard : public R2K_TeamCardBase
 
 
     */ 
-    
     // a) count #active players
     unsigned int activeBuddies = 0;
     std::vector<BotOnField> botsLineUp;
@@ -229,10 +232,10 @@ class R2K_TeamCard : public R2K_TeamCardBase
         botsLineUp.push_back(BotOnField(buddy.number, buddy.theRobotPose.translation.x()));
       }
       // b) is our goalie active ? (ie not penalized)
-      if (1 == buddy.number && !buddy.isPenalized) 
+      if (1 == buddy.number && !buddy.isPenalized)
         goalieIsActive = true;  // This flag will be used below
-    }
 
+    }
     // special case: I am the active goalie
     if (theRobotInfo.number == 1 && theRobotInfo.penalty == PENALTY_NONE) goalieIsActive = true;
  
@@ -243,29 +246,7 @@ class R2K_TeamCard : public R2K_TeamCardBase
     PlayerRole pRole;
     if (1 == theRobotInfo.number) pRole.role = PlayerRole::goalkeeper;
 
-    // default assignments; will be overwritten
-    /*
-    switch (theRobotInfo.number) {
-    case 1:
-      pRole.role = PlayerRole::goalkeeper;
-      break;
-      // 2-5: unused yet
-    case 2:
-      pRole.role = PlayerRole::supporter1;
-      break;
-    case 3:
-      pRole.role = PlayerRole::supporter2;
-      break;
-    case 4:
-      pRole.role = PlayerRole::supporter3;
-      break;
-    case 5:
-      pRole.role = PlayerRole::supporter4;
-      break;
-    default:
-      pRole.role = PlayerRole::none;
-    }
-    */
+   
     pRole.numOfActiveSupporters = activeBuddies;
   
    
@@ -313,7 +294,7 @@ class R2K_TeamCard : public R2K_TeamCardBase
       // OUTPUT_TEXT("robot " << theRobotInfo.number << " on role " << role.supporterIndex);
     }
     
-    // d2: static assignment 
+    // d2: static assignment , only for specific gamestates
 
 
     if (theGameInfo.state == STATE_INITIAL) {
@@ -358,7 +339,8 @@ class R2K_TeamCard : public R2K_TeamCardBase
     else {
       //d3: dynamic assignment
 
-      // botsLineUp misses this bot. So we insert this bot at correct position
+      // botsLineUp misses this bot (size is max 4). 
+      // So we insert this bot at correct position
       auto it = botsLineUp.begin();
 
       for (auto& mate : botsLineUp) {
@@ -369,6 +351,7 @@ class R2K_TeamCard : public R2K_TeamCardBase
         it++;
       }
 
+      // botsLineUp is now [0..4]
 
       // we use roles temporarily to store the robot numbers. 
       // In step d4, we replace these numbers by R2K_TEAM_ROLES
@@ -380,9 +363,10 @@ class R2K_TeamCard : public R2K_TeamCardBase
         teamMateRoles.roles[count++] = mate.number;
       }
       // fill up roles[] for the penalized bots
-      for (int i = activeBuddies + 1; i < 5; i++) teamMateRoles.roles[i] = 0;
+      for (int i = activeBuddies + 1; i < 5; i++) teamMateRoles.roles[i] = UN;
 
       // we don't do dynamic assignment for an active goalie (ie bot #1)
+      // robots by their number, by x-position: [2,3,1,5,4]
       bool shiftRight = false;
       if (goalieIsActive && (teamMateRoles.roles[0] != 1)) // somehow, the goalie ran into the field                      
       {
@@ -392,23 +376,39 @@ class R2K_TeamCard : public R2K_TeamCardBase
         }
         teamMateRoles.roles[0] = 1;
       } // nothing to do wrt. goalie
-
-    // now we have the robots sorted left-to-right in roles[]
-    // eg [1,3,2,4,5]
+      // example now is:        [1,2,3,5,4]
+    // now we have the robot numbers sorted left-to-right in roles[] -> tactical role 
+    // eg [1,3,4,5,2,0] -> [GN,OL,DR,DL,OR,UN] 
     // 
     // r2k_tactics[5][TeamBehaviorStatus::numOfTeamActivities][5] =
     
-      for (int i = 0; i <= 4; i++) {
-        // tbs-1 due to  noTeam in TeamBehaviourStatus
-        // static
-        teamMateRoles.roles[i] = r2k_tactics[activeBuddies][tbs - 1][i];
+
+
+      // make a copy of teamMateRoles.roles[]
+      int sorted_bots[6];
+      for (int i = 0; i <= 5; i++) sorted_bots[i] = teamMateRoles.roles[i];
+      // now is identical to    teamMateRoles.roles[count++] = mate.number;
+
+      for (int i = 0; i <= 5; i++) {
+          
+        // auto itr = std::find(sorted_bots, sorted_bots+n,i);
+        int i_pos;
+        bool found = false;  // flag : i found myself (my robot#)in the list 
+        for (i_pos = 0; i_pos <= 4; i_pos++) {
+          if (i == sorted_bots[i_pos]-1) {  // bots count from 1..5
+            found = true; 
+            break;  // i marks my position
+          }
+        }
+        // OUTPUT_TEXT("i" << i << "i_pos" << i_pos << "found" << found);
+                
+        if (!found) teamMateRoles.roles[i] = UN;
+        else  // look up the team tactic matrix
+        teamMateRoles.roles[i] = r2k_tactics[activeBuddies][tbs - 1][i_pos];
         
-        //dynamic
-        /* teamMateRoles.roles[i] = r2k_tactics[activeBuddies][tbs - 1]
-          [teamMateRoles.roles[i]-1]*/
       }
   
-    } // else: dynamic assignment
+    } // else: dynamic assignment, done
 
     int theCaptain = -1;
 
@@ -445,10 +445,12 @@ class R2K_TeamCard : public R2K_TeamCardBase
 
     minDist = dist;
   
-    // e) find min distance to ball for all bots
+    // e) find min distance to ball for all _active_ bots
+    //     check: if buddy is penalized it doens't cout
     for (const auto& buddy : theTeamData.teammates)
     {  // compute and compare my buddies distance with minimal distance
-      minDist = std::min(minDist, buddyDist = Geometry::distance(theFieldBall.endPositionOnField, buddy.theRobotPose.translation));
+      if(!buddy.isPenalized)
+        minDist = std::min(minDist, buddyDist = Geometry::distance(theFieldBall.endPositionOnField, buddy.theRobotPose.translation));
     } // rof: scan team
       
 
