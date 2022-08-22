@@ -40,17 +40,15 @@
 CARD(DefenseLongShotCard,
   { ,
     CALLS(Activity),
-    CALLS(GoToBallAndKick),
     CALLS(LookForward),
     CALLS(Stand),
-    CALLS(WalkAtRelativeSpeed),
+    CALLS(WalkToBallAndKick),
     REQUIRES(FieldBall),
     REQUIRES(FieldDimensions),
-    REQUIRES(RobotPose),
-    REQUIRES(TeamBehaviorStatus),  // R2K 
-    REQUIRES(TeammateRoles),  // R2K
     REQUIRES(PlayerRole),  // R2K
-    REQUIRES(RobotInfo),      // R2K
+    REQUIRES(RobotInfo),
+    REQUIRES(RobotPose),
+    REQUIRES(TeammateRoles),  // R2K
     DEFINES_PARAMETERS(
     {,
       (float)(0.8f) walkSpeed,
@@ -61,9 +59,9 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
 {
   bool preconditions() const override
   {
-    return 
+    return
       thePlayerRole.playsTheBall() &&  // I am the striker
-      theTeammateRoles.roles[theRobotInfo.number-1] == TeammateRoles::OFFENSE;  // my recent role
+      theTeammateRoles.isTacticalDefense(theRobotInfo.number); // my recent role
   }
 
   bool postconditions() const override
@@ -71,55 +69,17 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
     return !preconditions();
   }
 
-  option
+ 
+  void execute() override
   {
-    theActivitySkill(BehaviorStatus::referenceCard);
 
-    initial_state(start)
-    {
-      transition
-      {
-        if (state_time > initialWaitTime)
-          goto goToBallAndKick;
-      }
-
-      action
-      {
-        theLookForwardSkill();
-        theStandSkill();
-      }
-    }
-
-    state(goToBallAndKick)
-    {
-      transition
-      {
-        if (!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          goto searchForBall;
-      }
-
-      action
-      {
-        theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::walkForwardsLeft);
-      }
-    }
-
-    state(searchForBall)
-    {
-      transition
-      {
-        if (theFieldBall.ballWasSeen())
-          goto goToBallAndKick;
-      }
-
-      action
-      {
-        theLookForwardSkill();
-        theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
-      }
-    }
+    theActivitySkill(BehaviorStatus::defenseLongShotCard);
+ 
+    // Override these skills with the skills you wish to test
+    theLookForwardSkill(); // Head Motion Request
+    // theWalkToBallAndKickSkill(0, , MotionRequest::ObstacleAvoidance());
+    theStandSkill();
   }
-
 };
 
 MAKE_CARD(DefenseLongShotCard);

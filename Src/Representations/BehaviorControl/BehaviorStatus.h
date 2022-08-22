@@ -35,6 +35,7 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanCompressedMessageParticle<Behavior
     codeReleasePositionForKickOff,
     
     defenseCard,
+    defenseLongShotCard,
 
     calibrationFinished,
 
