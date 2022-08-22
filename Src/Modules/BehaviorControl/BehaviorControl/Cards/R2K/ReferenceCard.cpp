@@ -61,8 +61,8 @@ class ReferenceCard : public ReferenceCardBase
     return
       // theRobotPose.isInbeetween(xmin,xmay,ymin,ymax)  // grid -1, +1, -3, +3 == nahe Mittelinie
       thePlayerRole.playsTheBall() &&  // I am the striker
-      !thePlayerRole.isGoalkeeper() &&  // only for field players
-      !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) &&  // 
+      !thePlayerRole.isGoalkeeper() &&  // the real goalie (vs field players)
+      !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) &&  // goalie or substitute goalie
       thePlayerRole.supporterIndex() < thePlayerRole.numOfActiveSupporters && // I am not the right most player
 
       theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_NORMAL_GAME &&
