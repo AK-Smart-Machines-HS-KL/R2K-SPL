@@ -50,6 +50,7 @@ MODULE(DefaultPoseProvider,
     // Poses
     // #Goalie
     (Pose2f) goaliePose,
+    (Pose2f) goalieForwardPose,
     // #Offense
     (Pose2f) offenseMidPose,
     (Pose2f) offenseLeftPose,

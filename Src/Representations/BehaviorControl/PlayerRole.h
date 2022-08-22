@@ -36,7 +36,7 @@ STREAMABLE(PlayerRole,
    */
   bool isGoalkeeper() const
   {
-    return (role == goalkeeper) || (role == goalkeeperAndBallPlayer);
+    return (goalkeeper == role) || (goalkeeperAndBallPlayer == role);
   }
 
   /**
@@ -48,7 +48,7 @@ STREAMABLE(PlayerRole,
    */
   bool playsTheBall() const
   {
-    return (role == ballPlayer) || (role == goalkeeperAndBallPlayer);
+    return (ballPlayer == role) || (goalkeeperAndBallPlayer == role);
   }
 
   /**

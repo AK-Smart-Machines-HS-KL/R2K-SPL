@@ -28,24 +28,24 @@ void DefaultPoseProvider::update(DefaultPose& defaultPose)
     // Assign default poses by role
     switch (theTeammateRoles.roles[i])
     {
-      case TeammateRoles::GOALKEEPER: defaultPose.teamDefaultPoses[i] = goaliePose; break;
-      case TeammateRoles::DEFENSE: defaultPose.teamDefaultPoses[i] = defenseMidPose; break;
-      case TeammateRoles::OFFENSE: defaultPose.teamDefaultPoses[i] = offenseMidPose; break;
+      // case TeammateRoles::GOALKEEPER_NORMAL: defaultPose.teamDefaultPoses[i] = goaliePose; break;
+      // case TeammateRoles::DEFENSE: defaultPose.teamDefaultPoses[i] = defenseMidPose; break;
+      // case TeammateRoles::OFFENSE: defaultPose.teamDefaultPoses[i] = offenseMidPose; break;
 
-      //case TeammateRoles::GOALKEEPER: defaultPose.teamDefaultPoses[i] = goaliePose; break;
-      //case TeammateRoles::GOALKEEPER_OFFENSE: defaultPose.teamDefaultPoses[i] = goaliePose; break;
+      case TeammateRoles::GOALKEEPER_NORMAL: defaultPose.teamDefaultPoses[i] = goaliePose; break;
+      case TeammateRoles::GOALKEEPER_ACTIVE: defaultPose.teamDefaultPoses[i] = goalieForwardPose; break;
 
-      //case TeammateRoles::LEFT_DEFENSE: defaultPose.teamDefaultPoses[i] = defenseLeftPose; break;
-      //case TeammateRoles::MID_DEFENSE: defaultPose.teamDefaultPoses[i] = defenseMidPose; break;
-      //case TeammateRoles::RIGHT_DEFENSE: defaultPose.teamDefaultPoses[i] = defenseRightPose; break;
+      case TeammateRoles::DEFENSE_LEFT: defaultPose.teamDefaultPoses[i] = defenseLeftPose; break;
+      case TeammateRoles::DEFENSE_MIDDLE: defaultPose.teamDefaultPoses[i] = defenseMidPose; break;
+      case TeammateRoles::DEFENSE_RIGHT: defaultPose.teamDefaultPoses[i] = defenseRightPose; break;
       
-      //case TeammateRoles::LEFT_OFFENSE: defaultPose.teamDefaultPoses[i] = offenseLeftPose; break;
-      //case TeammateRoles::MID_OFFENSE: defaultPose.teamDefaultPoses[i] = offenseMidPose; break;
-      //case TeammateRoles::RIGHT_OFFENSE: defaultPose.teamDefaultPoses[i] = offenseRightPose; break; 
+      case TeammateRoles::OFFENSE_LEFT: defaultPose.teamDefaultPoses[i] = offenseLeftPose; break;
+      case TeammateRoles::OFFENSE_MIDDLE: defaultPose.teamDefaultPoses[i] = offenseMidPose; break;
+      case TeammateRoles::OFFENSE_RIGHT: defaultPose.teamDefaultPoses[i] = offenseRightPose; break; 
     }
 
     // Apply offset by team Activity
-    if (theTeammateRoles.roles[i] != TeammateRoles::GOALKEEPER) // Do not apply offset to Goalie
+    if (!theTeammateRoles.isTacticalGoalKeeper(i+1)) // Do not apply offset to Goalie
     {
       float offset = 0; // local offset var for readability
       switch (theTeamBehaviorStatus.teamActivity)
