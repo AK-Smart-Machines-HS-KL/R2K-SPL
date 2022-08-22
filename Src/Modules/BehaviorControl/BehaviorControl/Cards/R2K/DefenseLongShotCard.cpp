@@ -1,21 +1,26 @@
 /**
- * @file ReferenceCard.cpp
- * @author Adrian Müller
- * @version: 1.2
- * @date: 7/2022
+/**
+ * @file DefenseLongShotCard.cpp
+ * @author Nicholas Pfohlmann, Adrian Müller 
+ * @version: 1.0
  *
- * Note: have a look at the pre-conditions ;-) this is reference code
+ * Functions, values, side effects: this card qualifies for the one DEFENSE player only who is closest to the ball
+ * Details: 
+ * Purpose of this card is to clear the own field as fast as possible.
+ * KISS applies ;-) 
+ * Shooting the ball straight (ie keeping the y- axis) to opppent half
+ * After kick:
+ * - a) card exists if role no longer is playsTheBall(), Problem: opponet might interfere 
+ * - b) exit after kick (isDone()) to avoid defenser player chase the ball 
  * 
- * Functions, values, side effects: this card qualifies for the one OFFENSE player only who is closest to the ball
- * Details: actually, this a one2one copy of the CodeReleaseKickAtGoalCard, BUT it is qualified only iff
- * - TeamBehaviorStatus: NORMAL_GAME
- * - PlayerRole: I am the striker(ie playsTheBall() ie. I am closest to the ball
- * - TeammateRoles: I am an OFFENSE player
- * v.1.2 added example code for
- * - usage of supporterIndex()
- * - usage of dynamic role isGoalkeeper()
+ * Note: 
  * 
+ * 
+ * ToDo: 
+ * check for free shoot vector and opt. change y-coordinate
+ * check whether isDone () works correctly 
  */
+#
 
 // B-Human includes
 #include "Representations/BehaviorControl/FieldBall.h"
@@ -32,7 +37,7 @@
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
 
-CARD(ReferenceCard,
+CARD(DefenseLongShotCard,
   { ,
     CALLS(Activity),
     CALLS(GoToBallAndKick),
@@ -49,31 +54,16 @@ CARD(ReferenceCard,
     DEFINES_PARAMETERS(
     {,
       (float)(0.8f) walkSpeed,
-      (int)(1000) initialWaitTime,
-      (int)(7000) ballNotSeenTimeout,
     }),
   });
 
-class ReferenceCard : public ReferenceCardBase
+class DefenseLongShotCard : public DefenseLongShotCardBase
 {
   bool preconditions() const override
   {
-    return
-      // theRobotPose.isInbeetween(xmin,xmay,ymin,ymax)  // grid -1, +1, -3, +3 == nahe Mittelinie
+    return 
       thePlayerRole.playsTheBall() &&  // I am the striker
-      !thePlayerRole.isGoalkeeper() &&  // the real goalie (vs field players)
-      !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) &&  // goalie or substitute goalie
-      thePlayerRole.supporterIndex() < thePlayerRole.numOfActiveSupporters && // I am not the right most player
-
-      theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_NORMAL_GAME &&
-
-
-      // note: just use the real robot number for tactic look up
-      theTeammateRoles.isTacticalOffense(theRobotInfo.number); // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
-      // be more specific:
-      theTeammateRoles.roles[theRobotInfo.number-1] == TeammateRoles::OFFENSE_RIGHT;  // my recent R2K strategy dependent role
-
-    // ToDo: OFFENSE_LEFT,  ANY_OFFENSE (l,m,r)
+      theTeammateRoles.roles[theRobotInfo.number-1] == TeammateRoles::OFFENSE;  // my recent role
   }
 
   bool postconditions() const override
@@ -130,10 +120,6 @@ class ReferenceCard : public ReferenceCardBase
     }
   }
 
-    Angle calcAngleToGoal() const
-  {
-    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
-  }
 };
 
-MAKE_CARD(ReferenceCard);
+MAKE_CARD(DefenseLongShotCard);

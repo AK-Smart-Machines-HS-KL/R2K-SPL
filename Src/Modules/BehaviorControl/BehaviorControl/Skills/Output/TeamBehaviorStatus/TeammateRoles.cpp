@@ -10,12 +10,42 @@
 #include "Representations/BehaviorControl/TeamSkills.h"
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h"
 
+#include "Representations/BehaviorControl/TeammateRoles.h"  // GOALKEEPER, OFFENSE, DEFENSE
+
 TEAM_SKILL_IMPLEMENTATION(TeammateRolesImpl,
 {,
   IMPLEMENTS(TeammateRoles),
   REQUIRES(LibCheck),
   MODIFIES(TeamBehaviorStatus),
 });
+
+
+bool TeammateRoles::isTacticalGoalKeeper(const int robotNumber) const{
+  ASSERT(robotNumber > 0 && robotNumber <= 7);
+  
+  return (
+    roles[robotNumber - 1] == TeammateRoles::GOALKEEPER_NORMAL ||
+    roles[robotNumber - 1] == TeammateRoles::GOALKEEPER_ACTIVE
+  );
+}
+
+bool TeammateRoles::isTacticalDefense(const int robotNumber) const {
+  ASSERT(robotNumber > 0 && robotNumber <= 7);
+  return (
+    roles[robotNumber - 1] == TeammateRoles::DEFENSE_RIGHT ||
+    roles[robotNumber - 1] == TeammateRoles::DEFENSE_MIDDLE ||
+    roles[robotNumber - 1] == TeammateRoles::DEFENSE_LEFT
+  );
+}
+
+bool TeammateRoles::isTacticalOffense(const int robotNumber) const {
+  ASSERT(robotNumber > 0 && robotNumber <= 7);
+  return (
+    roles[robotNumber - 1] == TeammateRoles::OFFENSE_RIGHT ||
+    roles[robotNumber - 1] == TeammateRoles::OFFENSE_MIDDLE ||
+    roles[robotNumber - 1] == TeammateRoles::OFFENSE_LEFT
+    );
+}
 
 class TeammateRolesImpl : public TeammateRolesImplBase
 {
