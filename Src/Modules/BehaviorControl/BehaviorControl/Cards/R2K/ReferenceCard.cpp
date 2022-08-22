@@ -1,21 +1,21 @@
 /**
-/**
  * @file ReferenceCard.cpp
  * @author Adrian Müller
- * @version: 1.0
+ * @version: 1.2
+ * @date: 7/2022
  *
+ * Note: have a look at the pre-conditions ;-) this is reference code
+ * 
  * Functions, values, side effects: this card qualifies for the one OFFENSE player only who is closest to the ball
  * Details: actually, this a one2one copy of the CodeReleaseKickAtGoalCard, BUT it is qualified only iff
  * - TeamBehaviorStatus: NORMAL_GAME
  * - PlayerRole: I am the striker(ie playsTheBall() ie. I am closest to the ball
  * - TeammateRoles: I am an OFFENSE player
- *
- * Note: checkout the pre-conditions ;-) this is reference code
+ * v.1.2 added example code for
+ * - usage of supporterIndex()
+ * - usage of dynamic role isGoalkeeper()
  * 
- * 
- * To Do: 
  */
-#
 
 // B-Human includes
 #include "Representations/BehaviorControl/FieldBall.h"
@@ -58,10 +58,22 @@ class ReferenceCard : public ReferenceCardBase
 {
   bool preconditions() const override
   {
-    return 
+    return
+      // theRobotPose.isInbeetween(xmin,xmay,ymin,ymax)  // grid -1, +1, -3, +3 == nahe Mittelinie
       thePlayerRole.playsTheBall() &&  // I am the striker
+      !thePlayerRole.isGoalkeeper() &&  // only for field players
+      !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) &&  // 
+      thePlayerRole.supporterIndex() < thePlayerRole.numOfActiveSupporters && // I am not the right most player
+
       theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_NORMAL_GAME &&
-      theTeammateRoles.roles[theRobotInfo.number-1] == TeammateRoles::OFFENSE;  // my recent role
+
+
+      // note: just use the real robot number for tactic look up
+      theTeammateRoles.isTacticalOffense(theRobotInfo.number); // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
+      // be more specific:
+      theTeammateRoles.roles[theRobotInfo.number-1] == TeammateRoles::OFFENSE_RIGHT;  // my recent R2K strategy dependent role
+
+    // ToDo: OFFENSE_LEFT,  ANY_OFFENSE (l,m,r)
   }
 
   bool postconditions() const override

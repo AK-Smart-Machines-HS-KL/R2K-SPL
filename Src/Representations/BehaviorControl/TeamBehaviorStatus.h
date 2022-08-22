@@ -23,6 +23,7 @@ STREAMABLE(TeamBehaviorStatus, COMMA public BHumanCompressedMessageParticle<Team
     R2K_NORMAL_GAME,
     R2K_DEFENSIVE_GAME,
     R2K_OFFENSIVE_GAME,
+    R2K_SPARSE_GAME,
   });
   static constexpr TeamActivity numOfTeamActivities = numOfTeamActivitys,
 
