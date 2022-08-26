@@ -1,7 +1,7 @@
 /**
  * @file GoalieLongShotCard.cpp
  * @author Nicholas Pfohlmann, Adrian Müller
- * @version: 1.0
+ * @version: 1.1
  *
  * Functions, values, side effects:
  * - this card qualifies for the GOALIE player if the balls x-Pos is below the 
@@ -18,6 +18,9 @@
  *             causing the skill to "freeze"
  * - goalie will not go beyond circumcenter x-Pos
  *
+ * 
+ * v1.1: changed limit for goalie to xPosOwnPenaltyMark
+ * 
  * After kick:
  * - a) card exists if role no longer is playsTheBall()
  * - b) exit after kick (isDone()) to avoid goalie player chase the ball
@@ -35,6 +38,7 @@
  * 
  * read default Positions from DefualtPoseProvider
  * provide max opp distance as LOAD_PARAMETERS
+ *
  */
 
  // B-Human includes
@@ -56,26 +60,25 @@
 #include "Representations/Communication/RobotInfo.h"
 
 CARD(GoalieLongShotCard,
-  { ,
-    CALLS(Activity),
-    CALLS(GoToBallAndKick),
-    REQUIRES(FieldBall),
-    REQUIRES(FieldDimensions),
-    REQUIRES(PlayerRole),  // R2K
-    REQUIRES(ObstacleModel),
-    REQUIRES(RobotInfo),
-    REQUIRES(RobotPose),
-    REQUIRES(TeamBehaviorStatus),
-    REQUIRES(TeammateRoles),  // R2K
+{ ,
+  CALLS(Activity),
+  CALLS(GoToBallAndKick),
+  REQUIRES(FieldBall),
+  REQUIRES(FieldDimensions),
+  REQUIRES(PlayerRole),  // R2K
+  REQUIRES(ObstacleModel),
+  REQUIRES(RobotInfo),
+  REQUIRES(RobotPose),
+  REQUIRES(TeamBehaviorStatus),
+  REQUIRES(TeammateRoles),  // R2K
 
-    DEFINES_PARAMETERS(
+  DEFINES_PARAMETERS(
     {,
-      (float)(-2000) circumcenterPosX,
       (float)(1000) minOppDistance,
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
     }),
-  });
+});
 
 class GoalieLongShotCard : public GoalieLongShotCardBase
 {
@@ -87,9 +90,8 @@ class GoalieLongShotCard : public GoalieLongShotCardBase
       theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) &&// my recent role
 
       //don't go beyond the circumcenter of triangle formed by the default poses of GL, DL, DR
-      (
-        theFieldBall.positionOnField.x() <= circumcenterPosX //Circumcenter X-Coord 
-      );
+      theFieldBall.positionOnField.x() <= theFieldDimensions.xPosOwnPenaltyMark &&   //don't go to far way out
+      theFieldBall.positionOnField.x() >= theFieldDimensions.xPosOwnGroundLine;  // don't leave the field
   }
 
   bool postconditions() const override
@@ -100,7 +102,6 @@ class GoalieLongShotCard : public GoalieLongShotCardBase
 
   void execute() override
   {
-
     theActivitySkill(BehaviorStatus::goalieLongShotCard);
 
     if (!footIsSelected) {  // select only once

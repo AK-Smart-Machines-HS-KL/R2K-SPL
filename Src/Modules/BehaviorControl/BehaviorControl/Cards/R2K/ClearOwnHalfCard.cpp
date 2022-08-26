@@ -1,38 +1,37 @@
 /**
- * @file DefenseLongShotCard.cpp
- * @author Nicholas Pfohlmann, Adrian Müller 
+ * @file ClearOwnHalfCard.cpp
+ * @author  Adrian Müller 
  * @version: 1.0
  *
  * Functions, values, side effects: 
- * - this card qualifies for the one DEFENSE player only who is closest to the ball
- * - it will take its time to make a long kick if no opppenent is too close 
+ * any TACTICAL_GOALIE and ...DEFENSE with playsTheBall()
+ * no other card qualifies for 
+ * - ball is in own half
+ * - there is not enough time to do a long shot (see ....LongShotCards), 
+ *  -so bot does a fast kick (walkForwardsRight,walkForwardsLeft), in his walking direction 
  *
  * Details: 
  * Purpose of this card is to clear the own field by a long shot.
- * - opponent is not to close (otherwise see ClearOwnHalf)
+ * - opponent is to close (otherwise see ClearOwnHalf)
  * - isPlayBall()
- * - long shot to opponent goal, using correct foot: 
+ * - quick using correct foot: 
  *   - left or right is computed once, when the card is called for the first time
  *   - reason: while approaching the ball, the relative y-position might vary (for only a few centimeters),
  *             causing the skill to "freeze"
- * - defense will not  leaf own half, unless we are in OFFENSIVE or SPARSE Mode
+ * - bot will not leaf own half,
  * 
- * After kick:
- * - a) card exists if role no longer is playsTheBall()
- * - b) exit after kick (isDone()) to avoid defenser player chase the ball 
+
  * 
  * Note: 
- * - because this is a long shot, the flag "playsTheBall" typicall is re-set after the shot, as a side effect.
+ * - because this is a short shot, the flag "playsTheBall" may not re-set after the shot, 
  * - However, if the ball is stuck, the flag may still be set, and the player will follow the ball
- * - This behavior is ok in OFFENSIVE and SPARSE mode
+ * - This behavior is ok if not in SPARSE mode
+ * - minOppDistance must be maintained with the ...LongShotCards
  * 
  * 
- * ToDo: 
- * check for free shoot vector and opt. change y-coordinate
- * check whether isDone () works correctly 
- * check for GoToBallAndKick options (eg "precisey") for better pormance 
- * 
- * provide max opp distance as LOAD_PARAMETERS
+ * ToDo:
+ * - we need a better shooting direction!! 
+ * - maybe add OFFENSIVE mode as a blocker?
  */
 
 
@@ -54,7 +53,7 @@
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
 
-CARD(DefenseLongShotCard,
+CARD(ClearOwnHalfCard,
   { ,
     CALLS(Activity),
     CALLS(GoToBallAndKick),
@@ -75,21 +74,16 @@ CARD(DefenseLongShotCard,
     }),
   });
 
-class DefenseLongShotCard : public DefenseLongShotCardBase
+class ClearOwnHalfCard : public ClearOwnHalfCardBase
 {
   bool preconditions() const override
   {
     return
       thePlayerRole.playsTheBall() &&  // I am the striker
-      !opponentIsTooClose() &&  // see below: distace is minOppDistance
-      theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
-
-      //don't leaf own half, unless we are in OFFENSIVE or SPARSE Mode)
-      (
-        theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_OFFENSIVE_GAME ||
-        theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME ||
-        theFieldBall.endPositionOnField.x() < 0
-      );
+      opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
+      !theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
+      theFieldBall.endPositionOnField.x() < 0 && 
+      !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME);
   }
 
   bool postconditions() const override
@@ -108,23 +102,19 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
       leftFoot = theFieldBall.positionRelative.y() < 0;
     }
     if(leftFoot)
-      theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::forwardFastLeftLong);
+      theGoToBallAndKickSkill(0, KickInfo::walkForwardsLeft);
     else
-      theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::forwardFastRightLong);
+      theGoToBallAndKickSkill(0, KickInfo::walkForwardsRight);
   }
 
-  Angle calcAngleToGoal() const
-  {
-    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
-  }
 
-  bool opponentIsTooClose() const{
+  bool opponentIsClose() const{
     for (const Obstacle& ob : theObstacleModel.obstacles)
-    {if (ob.isOpponent()) //tbd: check for teammate, add sector wheel)
-      return ob.center.norm() < minOppDistance;
+    {if (ob.isOpponent()) 
+      return ob.center.norm() <= minOppDistance;
     }
     return false;
   }
 };
 
-MAKE_CARD(DefenseLongShotCard);
+MAKE_CARD(ClearOwnHalfCard);
