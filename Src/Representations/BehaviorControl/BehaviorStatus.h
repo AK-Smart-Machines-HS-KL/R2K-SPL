@@ -37,6 +37,8 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanCompressedMessageParticle<Behavior
     defenseCard,
     defenseLongShotCard,
 
+    goalieLongShotCard,
+    
     calibrationFinished,
 
     referenceCard,  // R2K
