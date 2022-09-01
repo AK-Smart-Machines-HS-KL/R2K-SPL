@@ -7,7 +7,7 @@
  * v1.0
  * functions, values set:
  * - TeamBehaviorStatus::R2K_NORMAL_GAME;  default settings
- * - TeammateRoles: just the default values, ie., for 1..5: goalie, defense, defense, offense, offense
+ * - TeammateRfoutppoles: just the default values, ie., for 1..5: goalie, defense, defense, offense, offense
  * - playsTheBall() (ie who is the striker)
  * - isGoalkeeper() (wether he playsTheBall() or not)
  *   - theCaptain stores the robot number, who is currently acting as goalkeeper
@@ -400,7 +400,7 @@ class R2K_TeamCard : public R2K_TeamCardBase
             break;  // i marks my position
           }
         }
-        // OUTPUT_TEXT("i" << i << "i_pos" << i_pos << "found" << found);
+        // OUTPUT_TEXT("i " << i << "i_pos " << i_pos << "found" << found);
                 
         if (!found) teamMateRoles.roles[i] = UN;
         else  // look up the team tactic matrix

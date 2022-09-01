@@ -1,19 +1,21 @@
 /**
  * @file ReferenceCard.cpp
  * @author Adrian Müller
- * @version: 1.2
- * @date: 7/2022
+ * @version: 1.3
+ * @date: 8/2022
  *
  * Note: have a look at the pre-conditions ;-) this is reference code
  * 
  * Functions, values, side effects: this card qualifies for the one OFFENSE player only who is closest to the ball
  * Details: actually, this a one2one copy of the CodeReleaseKickAtGoalCard, BUT it is qualified only iff
- * - TeamBehaviorStatus: NORMAL_GAME
+ * - TeamBehaviorStatus: !SPARSE_GAME (ie NORMAL, OFFENSIVE,DEFENSIVE)
  * - PlayerRole: I am the striker(ie playsTheBall() ie. I am closest to the ball
  * - TeammateRoles: I am an OFFENSE player
  * v.1.2 added example code for
  * - usage of supporterIndex()
  * - usage of dynamic role isGoalkeeper()
+ * 
+ * v1.3: changed TeamBehaviorStatus to not SPARSE_MODE
  * 
  */
 
@@ -65,7 +67,7 @@ class ReferenceCard : public ReferenceCardBase
       !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) &&  // goalie or substitute goalie
       thePlayerRole.supporterIndex() < thePlayerRole.numOfActiveSupporters && // I am not the right most player
 
-      theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_NORMAL_GAME &&
+      !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME) &&
 
 
       // note: just use the real robot number for tactic look up
