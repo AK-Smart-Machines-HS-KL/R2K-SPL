@@ -236,6 +236,7 @@ class R2K_TeamCard : public R2K_TeamCardBase
         goalieIsActive = true;  // This flag will be used below
 
     }
+    botsLineUp.push_back(BotOnField(theRobotInfo.number, theRobotPose.translation.x()));
     // special case: I am the active goalie
     if (theRobotInfo.number == 1 && theRobotInfo.penalty == PENALTY_NONE) goalieIsActive = true;
  
@@ -272,6 +273,7 @@ class R2K_TeamCard : public R2K_TeamCardBase
           case 1: pRole.role = PlayerRole::supporter1;   break;
           case 2: pRole.role = PlayerRole::supporter2;   break;
           case 3: pRole.role = PlayerRole::supporter3;   break;
+          case 4: pRole.role = PlayerRole::supporter4;   break;
           default: pRole.role = PlayerRole::none; OUTPUT_TEXT("default count: " << count);
           }
           break;
@@ -280,6 +282,8 @@ class R2K_TeamCard : public R2K_TeamCardBase
 
       // for unknown reasons, the code block above does not assign a role for the right most bot.
       // this patch is at least correct: it only runs for the right most bot 
+      
+      /*
       if (pRole.role == PlayerRole::none) {
         switch (activeBuddies) {
         case 0: pRole.role = PlayerRole::supporter0;   break;
@@ -290,6 +294,7 @@ class R2K_TeamCard : public R2K_TeamCardBase
         default: break;
         }
       }
+      */
       // ASSERT(role.supporterIndex() - firstSupporterRole <= activeBuddies);  // we are in range supporter0 
       // OUTPUT_TEXT("robot " << theRobotInfo.number << " on role " << role.supporterIndex);
     }
@@ -338,20 +343,6 @@ class R2K_TeamCard : public R2K_TeamCardBase
     }
     else {
       //d3: dynamic assignment
-
-      // botsLineUp misses this bot (size is max 4). 
-      // So we insert this bot at correct position
-      auto it = botsLineUp.begin();
-
-      for (auto& mate : botsLineUp) {
-        if (theRobotPose.translation.x() < mate.xPos) {
-          botsLineUp.insert(it, BotOnField(theRobotInfo.number, theRobotPose.translation.x()));
-          break;
-        }
-        it++;
-      }
-
-      // botsLineUp is now [0..4]
 
       // we use roles temporarily to store the robot numbers. 
       // In step d4, we replace these numbers by R2K_TEAM_ROLES
