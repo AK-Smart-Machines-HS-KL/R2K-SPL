@@ -2,18 +2,18 @@
  * @file ChaseBallCard.cpp
  * @author Niklas Schmidts, Adrian Müller   
  * @brief Allows Offenseplayer to chase the Ball and kick to goal
- * @version 1.0
- * @date 2022-09-25
+ * @version 1.1
+ * @date 2022-09-7
  * 
  * Functions, values, side effects: 
  * OffensePlayer tries to catch the ball (ie ´walks in this direction) if
- * - ball is nearer to opponent goal as his x postion
+ * - ball is nearer to opponent goal as his x postion (minus threshold)
  * - player is in range from middle line - threshold, or closer to opp. goal
  * - ignores thePlayerRole.playsTheBall()
  * 
  * 
  * Details
- * if bot is closest to ball (playsTheBall()) card ShootAtGoal will take over
+ * if bot is closest to ball (playsTheBall()) card ShootAtGoalCard will take over
  * * 
  * 
  * ToDo
@@ -36,7 +36,6 @@
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/BehaviorControl/TeammateRoles.h"
 
-//#include <filesystem>
 
 CARD(ChaseBallCard,
      {
@@ -59,15 +58,6 @@ CARD(ChaseBallCard,
                 (int)(1000) threshold,
              }),
 
-        /*
-        //Optionally, Load Config params here. DEFINES and LOADS can not be used together
-        LOADS_PARAMETERS(
-             {,
-                //Load Params here
-             }),
-             
-        */
-
      });
 
 class ChaseBallCard : public ChaseBallCardBase
@@ -83,7 +73,7 @@ class ChaseBallCard : public ChaseBallCardBase
     return 
       theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
       theRobotPose.translation.x() > (0 - threshold) &&
-      theFieldBall.positionOnField.x() >= theRobotPose.translation.x();
+      theFieldBall.positionOnField.x() >= theRobotPose.translation.x() - threshold;
   }
 
   bool postconditions() const override
