@@ -1,7 +1,8 @@
 /**
  * @file R2K_TeamCard.cpp
  * @author Adrian Müller
- * @version: 1.1
+ * @version: 1.3
+ * @date: 9/2022
  * 
  * 
  * v1.0
@@ -10,7 +11,7 @@
  * - TeammateRfoutppoles: just the default values, ie., for 1..5: goalie, defense, defense, offense, offense
  * - playsTheBall() (ie who is the striker)
  * - isGoalkeeper() (wether he playsTheBall() or not)
- *   - theCaptain stores the robot number, who is currently acting as goalkeeper
+ *   - theCaptain stores the robot number, who is currently acting as goalkeeper (this will be changed in v13)
  * 
  * Notes:
  * - timeToReachBall is computed per bot - the resulting time frame ist NOT synced - BUT:
@@ -41,14 +42,18 @@
  *  - else: dynamic (re-)assignment for 8 TeammateRoles  
  * - provide wrapper functions (see TeammateRoles)
  *
- * 
- * 
+ * v1.3 
+ * - new, different update policies for  PlayerRole, TimeToReachBall and TeammateRoles
+ * - TeammateRoles: triggered by changes in GameInfo.state, TeamBehaviorStatus, numOfActiveSupporters (eg penalized, fallen),
+ * - PlayerRole, TimeToReachBall: if the striker changes, only this information gets updated. Update frequency is limited to 2secs
+ *      
+ *
+
  * ToDo
  * - EBC: broadcast, when striker changes etc.
- *  - TeaMatesRole: PLAYING enter/leave OR own,opppenalized on/off  OR Tactic change  freeze
+
  * - read real field dimensions from config
  *  - static assignement for state FINISHED
- * -   10sec: delay before change: 10sec
  *
 */
 
@@ -71,6 +76,7 @@
 #include "Tools/BehaviorControl/Framework/Card/TeamCard.h"
 #include "Representations/Communication/GameInfo.h"  // to sync time inbetween bots
 
+
 // roles 
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
@@ -79,6 +85,21 @@
 #include <algorithm>  // min()
 #include "Representations/BehaviorControl/TeammateRoles.h"  // GOALKEEPER, DEFENSE,...
 #include "Representations/Communication/TeamInfo.h"         // access scores, OwnTeamInfo, OppTeamInfo
+
+
+#define GN TeammateRoles::GOALKEEPER_NORMAL
+#define GA TeammateRoles::GOALKEEPER_ACTIVE
+
+#define DL TeammateRoles::DEFENSE_LEFT
+#define DM TeammateRoles::DEFENSE_MIDDLE
+#define DR TeammateRoles::DEFENSE_RIGHT
+
+#define OL TeammateRoles::OFFENSE_LEFT
+#define OM TeammateRoles::OFFENSE_MIDDLE
+#define OR TeammateRoles::OFFENSE_RIGHT
+
+#define UN TeammateRoles::UNDEFINED
+
 
 TEAM_CARD(R2K_TeamCard,
   { ,
@@ -101,6 +122,14 @@ TEAM_CARD(R2K_TeamCard,
                 {
                   ,
                   // (unsigned)(std::numeric_limits<unsigned>::max())offsetToFrameTimeThisBot,
+                  (bool)    (true)                     refreshAllData, // true so first computation is triggered
+                  (unsigned) (STATE_INITIAL)           lastGameSate,
+                  (int)(-1)                            lastTeamBehaviorStatus, // -1 means: not set yet
+                  (int)(2000)                          decayPlaysTheBall,
+                  (unsigned)(0)                        playsTheBallHasChangedFrame,   // store the frame when this bot claims to be playing the ball
+                  (TeammateRoles)(TeammateRoles())     lastTeammateRoles,
+                  (TimeToReachBall)(TimeToReachBall()) lastTimeToReachBall,
+                  (PlayerRole)(PlayerRole())           lastPlayerRole,
     }),
 
 });
@@ -117,25 +146,11 @@ class R2K_TeamCard : public R2K_TeamCardBase
     return false;
   }
 
+
   void execute() override
   {
 
-
-#define GN TeammateRoles::GOALKEEPER_NORMAL
-#define GA TeammateRoles::GOALKEEPER_ACTIVE
-
-#define DL TeammateRoles::DEFENSE_LEFT
-#define DM TeammateRoles::DEFENSE_MIDDLE
-#define DR TeammateRoles::DEFENSE_RIGHT
-
-#define OL TeammateRoles::OFFENSE_LEFT
-#define OM TeammateRoles::OFFENSE_MIDDLE
-#define OR TeammateRoles::OFFENSE_RIGHT
-
-#define UN TeammateRoles::UNDEFINED
-
-
-    // this tactic table is used in step d4 below
+   // this tactic table is used in step d4 below
     //         nr of active players x team tactic x 5 TeamMate roles[]
     int r2k_tactics[5][TeamBehaviorStatus::numOfTeamActivities][5] =
     {
@@ -146,15 +161,15 @@ class R2K_TeamCard : public R2K_TeamCardBase
         // 2 player
             { {GN,DM,UN,UN,UN}, {GN,DM,UN,UN,UN}, {GN,DM,UN,UN,UN}, {GN,OM,UN,UN,UN} },
             // 3 player
-                { {GN,DM,OM,UN,UN}, {GN,DL,DR,UN,UN}, {GA,DM,OM,UN,UN}, {GN,OL,OR,UN,UN} },
+                { {GN,DM,OM,UN,UN}, {GN,DR,DL,UN,UN}, {GA,DM,OM,UN,UN}, {GN,OR,OM,UN,UN} },
                 // 4 player
-                    { {GN,DL,DR,OM,UN}, {GN,DL,DM,DR,UN}, {GA,DM,OL,OR,UN}, {UN,UN,UN,UN,UN} },
+                    { {GN,DR,DL,OM,UN}, {GN,DR,DM,DL,UN}, {GA,DM,OR,OM,UN}, {UN,UN,UN,UN,UN} },
                     // 5 player
-                        { {GN,DL,DR,OL,OR}, {GN,DL,DM,DR,OM}, {GA,DM,OL,OM,OR}, {UN,UN,UN,UN,UN} }
+                        { {GN,DR,DL,OR,OL}, {GN,DR,DM,DL,OM}, {GA,DM,OR,OM,OL}, {UN,UN,UN,UN,UN} }
 
     };
 
-    // will be used as: r2k_tactics[activeBuddies][tbs - 1][i_pos];
+    // will be used as: r2k_tactics[activeBuddies][teamBehaviorStatus - 1][i_pos];
 
     // 2019 code
     // RoboCup::TeamInfo& team = gameCtrlData.teams[gameCtrlData.teams[0].teamNumber == Global::getSettings().teamNumber ? 0 : 1];
@@ -180,26 +195,26 @@ class R2K_TeamCard : public R2K_TeamCardBase
 
     // to do: who is active - loop supp. index, number active
     // what if substitute goalie?
-    int tbs; // patch due to update errors
+    int teamBehaviorStatus; // patch due to update errors
     if (opp_penalties > 2 || (own_penalties >= 1 && opp_penalties >= 2)) {
    
       theTeamActivitySkill(TeamBehaviorStatus::R2K_SPARSE_GAME);
-      tbs = TeamBehaviorStatus::R2K_SPARSE_GAME;
+      teamBehaviorStatus = TeamBehaviorStatus::R2K_SPARSE_GAME;
     }
     else {
       if (own_score == opp_score) { //default
         theTeamActivitySkill(TeamBehaviorStatus::R2K_NORMAL_GAME); 
-        tbs = TeamBehaviorStatus::R2K_NORMAL_GAME;
+        teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME;
       }  
       if (own_score < opp_score) { 
         theTeamActivitySkill(TeamBehaviorStatus::R2K_OFFENSIVE_GAME); 
-        tbs = TeamBehaviorStatus::R2K_OFFENSIVE_GAME;
+        teamBehaviorStatus = TeamBehaviorStatus::R2K_OFFENSIVE_GAME;
       }
 
       // to do: add time limit, so we will not spoil our leadership in the last n minutes
       if (own_score > opp_score) { 
         theTeamActivitySkill(TeamBehaviorStatus::R2K_DEFENSIVE_GAME); 
-        tbs = TeamBehaviorStatus::R2K_DEFENSIVE_GAME;
+        teamBehaviorStatus = TeamBehaviorStatus::R2K_DEFENSIVE_GAME;
       }
     }
  
@@ -212,11 +227,12 @@ class R2K_TeamCard : public R2K_TeamCardBase
     d2) TeammateRoles:: static assignment for STATE_INITIAL else 
     d3) TeammateRoles: dynamic assignment
     d4) Use tactic table for assignments of active bots
-      
+          
     e) find min distance to ball for all bots
     f) who plays the ball?
     g) bot#1 is  penalized?
 
+    h) since version 1.3: check for triggers, whether team relevant data should be updated (and send) or not
 
     */ 
     // a) count #active players
@@ -280,23 +296,8 @@ class R2K_TeamCard : public R2K_TeamCardBase
         }
       }
 
-      // for unknown reasons, the code block above does not assign a role for the right most bot.
-      // this patch is at least correct: it only runs for the right most bot 
-      
-      /*
-      if (pRole.role == PlayerRole::none) {
-        switch (activeBuddies) {
-        case 0: pRole.role = PlayerRole::supporter0;   break;
-        case 1: pRole.role = PlayerRole::supporter1;   break;
-        case 2: pRole.role = PlayerRole::supporter2;   break;
-        case 3: pRole.role = PlayerRole::supporter3;   break;
-        case 4: pRole.role = PlayerRole::supporter4;   break;
-        default: break;
-        }
-      }
-      */
       // ASSERT(role.supporterIndex() - firstSupporterRole <= activeBuddies);  // we are in range supporter0 
-      // OUTPUT_TEXT("robot " << theRobotInfo.number << " on role " << role.supporterIndex);
+
     }
     
     // d2: static assignment , only for specific gamestates
@@ -304,7 +305,7 @@ class R2K_TeamCard : public R2K_TeamCardBase
 
     if (theGameInfo.state == STATE_INITIAL) {
       // switch (theTeamBehaviorStatus.teamActivity) {
-      switch (tbs) {
+      switch (teamBehaviorStatus) {
       case(TeamBehaviorStatus::R2K_DEFENSIVE_GAME):
         teamMateRoles.roles = { TeammateRoles::GOALKEEPER_NORMAL,
                                TeammateRoles::DEFENSE_LEFT,
@@ -374,11 +375,11 @@ class R2K_TeamCard : public R2K_TeamCardBase
     // r2k_tactics[5][TeamBehaviorStatus::numOfTeamActivities][5] =
     
 
-
+      // d4
       // make a copy of teamMateRoles.roles[]
       int sorted_bots[6];
       for (int i = 0; i <= 5; i++) sorted_bots[i] = teamMateRoles.roles[i];
-      // now is identical to    teamMateRoles.roles[count++] = mate.number;
+      // now this is identical to    teamMateRoles.roles[count++] = mate.number;
 
       for (int i = 0; i <= 5; i++) {
           
@@ -395,28 +396,24 @@ class R2K_TeamCard : public R2K_TeamCardBase
                 
         if (!found) teamMateRoles.roles[i] = UN;
         else  // look up the team tactic matrix
-        teamMateRoles.roles[i] = r2k_tactics[activeBuddies][tbs - 1][i_pos];
+        teamMateRoles.roles[i] = r2k_tactics[activeBuddies][teamBehaviorStatus - 1][i_pos];
         
       }
   
     } // else: dynamic assignment, done
 
-    int theCaptain = -1;
-
-    // f) goalie plays the ball?
+     // f) goalie plays the ball?
     if (goalieIsActive && 1 == theRobotInfo.number)  // the regular case
     {
       pRole.role = PlayerRole::goalkeeper;  //check wether goalkeeperAndBallPlayer comes below
       if (pRole.playsTheBall()) PlayerRole::goalkeeperAndBallPlayer;
-      theCaptain = 1;
-    }
+     }
     else  // g) bot#1 is penalized 
     {
       // set the goalie dynamically: choose left-most player. Note: gets dynamically re-computed
       if (!goalieIsActive && PlayerRole::supporter0 == pRole.role)
       {
         pRole.role = PlayerRole::goalkeeper;
-        theCaptain = theRobotInfo.number;
         // OUTPUT_TEXT("assigning goalie to" << theRobotInfo.number);
       }
     }
@@ -430,6 +427,7 @@ class R2K_TeamCard : public R2K_TeamCardBase
     if (theFieldBall.ballWasSeen())  // to be on the safe side
       dist = Geometry::distance(theFieldBall.endPositionRelative, Vector2f(0, 0));
     
+
     TimeToReachBall timeToReachBall;
     // this code fragment does NOT sync teamwiese
     timeToReachBall.timeWhenReachBall = dist + theFrameInfo.time; // +offsetToFrameTimeThisBot;
@@ -443,22 +441,69 @@ class R2K_TeamCard : public R2K_TeamCardBase
       if(!buddy.isPenalized)
         minDist = std::min(minDist, buddyDist = Geometry::distance(theFieldBall.endPositionOnField, buddy.theRobotPose.translation));
     } // rof: scan team
-      
+   
 
-    // ToDo EBC: code to check for striker change, then broadcast
-    // f) who plays the ball?    
-    if (minDist == dist) {
-      if (pRole.isGoalkeeper()) pRole.role = PlayerRole::goalkeeperAndBallPlayer;
-      else pRole.role = PlayerRole::ballPlayer;
+    // f) who plays the ball? 
+    // decayed update of captain (striker), 
+    // we use "captain" to store the bot who plays the ball
+    
+    // is one of my buddies the striker?
+    // OUTPUT_TEXT("time " << theFrameInfo.getTimeSince(playsTheBallHasChanged));
+    
+    if (theFrameInfo.getTimeSince(playsTheBallHasChangedFrame) < decayPlaysTheBall) 
+      teamMateRoles.captain = lastTeammateRoles.captain;  // nothing changed
+    else {
+      for (const auto& buddy : theTeamData.teammates)
+      {  // compute and compare my buddies distance with minimal distance
+        buddyDist = Geometry::distance(theFieldBall.endPositionOnField, buddy.theRobotPose.translation);
+        if (buddyDist == minDist) teamMateRoles.captain = buddy.number;
+      } // rof: who plays the ball
 
-      timeToReachBall.timeWhenReachBallStriker = timeToReachBall.timeWhenReachBall;  // to: get sync working
- 
+      // or am I the striker?
+      if (minDist == dist) {  // i am the striker
+        teamMateRoles.captain = theRobotInfo.number;
+        if (pRole.isGoalkeeper()) pRole.role = PlayerRole::goalkeeperAndBallPlayer;
+        else pRole.role = PlayerRole::ballPlayer;
+
+        timeToReachBall.timeWhenReachBallStriker = timeToReachBall.timeWhenReachBall;  // to: get sync working
+      }
+    }  // fi: decay time 
+
+    if (teamMateRoles.captain != lastTeammateRoles.captain)
+    {  // another bot is playing the ball
+      playsTheBallHasChangedFrame = theFrameInfo.time;  // reset timer
+      // OUTPUT_TEXT(" new cap." << teamMateRoles.captain << " by " << theRobotInfo.number);
     }
 
-    theRoleSkill(pRole);
-    // if (5 == theRobotInfo.number) OUTPUT_TEXT("sI(): " << pRole.supporterIndex());
-    theTimeToReachBallSkill(timeToReachBall);
-    theTeammateRolesSkill(teamMateRoles);
+    // h)  do we need to update?
+    if (  // full update
+      lastGameSate != theGameInfo.state ||
+      lastPlayerRole.numOfActiveSupporters != pRole.numOfActiveSupporters||
+      lastTeamBehaviorStatus != teamBehaviorStatus 
+     )
+      refreshAllData = true;
+
+
+    if (refreshAllData) {
+      // OUTPUT_TEXT("team data are refreshed.");
+      lastGameSate = theGameInfo.state;
+      lastTeamBehaviorStatus = teamBehaviorStatus;
+      lastPlayerRole = pRole;
+      lastTimeToReachBall = timeToReachBall;
+      lastTeammateRoles = teamMateRoles;
+      refreshAllData = false; 
+    }
+
+    // partial update
+    if (lastTeammateRoles.captain != teamMateRoles.captain) {
+      lastTeammateRoles.captain = teamMateRoles.captain;
+      lastPlayerRole = pRole;
+    }
+
+    theRoleSkill(lastPlayerRole);
+    theTimeToReachBallSkill(lastTimeToReachBall);
+    theTeammateRolesSkill(lastTeammateRoles);
+
 
   }  // execute
 
