@@ -108,9 +108,10 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
   }
 
 
+  // need to clarify: opponent detection
   bool opponentIsClose() const{
     for (const Obstacle& ob : theObstacleModel.obstacles)
-    {if (ob.isOpponent()) 
+    {if (ob.isOpponent() || ob.isTeammate())
       return ob.center.norm() <= minOppDistance;
     }
     return false;
