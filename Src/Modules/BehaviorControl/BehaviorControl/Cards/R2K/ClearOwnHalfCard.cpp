@@ -20,7 +20,7 @@
  *             causing the skill to "freeze"
  * - bot will not leaf own half,
  * 
-
+ * v.1.1: increased minOppDistance to 2000
  * 
  * Note: 
  * - because this is a short shot, the flag "playsTheBall" may not re-set after the shot, 

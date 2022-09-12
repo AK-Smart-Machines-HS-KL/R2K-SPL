@@ -47,7 +47,8 @@
  * - TeammateRoles: triggered by changes in GameInfo.state, TeamBehaviorStatus, numOfActiveSupporters (eg penalized, fallen),
  * - PlayerRole, TimeToReachBall: if the striker changes, only this information gets updated. Update frequency is limited to 2secs
  *      
- *
+ * v.1.4
+  - PlayerRole  goalkeeper,ballPlayer, goalkeeperAndBallPlayer vanished, TeammateRoles captain is used (stores strikers number)
 
  * ToDo
  * - EBC: broadcast, when striker changes etc.
