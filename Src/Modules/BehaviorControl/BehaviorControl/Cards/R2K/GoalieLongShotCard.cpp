@@ -72,8 +72,8 @@ CARD(GoalieLongShotCard,
 
   DEFINES_PARAMETERS(
     {,
-      (float)(1000) minOppDistance,
-      (float)(2000) preciseKickDistance,
+      (float)(1500) minOppDistance,
+      (float)(2500) preciseKickDistance,
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
     }),
@@ -131,9 +131,16 @@ class GoalieLongShotCard : public GoalieLongShotCardBase
 
     for (const Obstacle& ob : theObstacleModel.obstacles)
     {
-      if (ob.isOpponent()) { //tbd: check for teammate, add sector wheel)
+
+      // need to clarify: opponent detection
+
+      if (ob.isOpponent() || ob.isTeammate()) { //tbd: check for teammate, add sector wheel)
         float distanceOpponentToBall = (ob.center - theFieldBall.positionRelative).norm();
 
+
+
+        //       (float)(1500) minOppDistance,
+        //       (float)(2500) preciseKickDistance,
         //is any opponent closer to ball than me or is too close to ball
         if (distanceToBall >= distanceOpponentToBall || distanceOpponentToBall <= minOppDistance) {
           return 0;

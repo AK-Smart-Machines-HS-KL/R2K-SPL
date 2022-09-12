@@ -45,6 +45,7 @@ STREAMABLE(PlayerRole,
    * 
    * 
    * Adrian, R2K: re-activated for our code base
+   * Since v1.3 we store the number of the bot in "captain"
    */
   bool playsTheBall() const
   {
