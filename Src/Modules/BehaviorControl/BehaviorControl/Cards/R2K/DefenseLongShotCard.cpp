@@ -135,9 +135,7 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
 
     for (const Obstacle& ob : theObstacleModel.obstacles)
     {
-
-      //  // need to clarify: opponent detection
-      if (ob.isOpponent() || ob.isTeammate()) { //tbd: check for teammate, add sector wheel)
+      if (ob.isOpponent()) { //tbd: check for teammate, add sector wheel)
         float distanceOpponentToBall = (ob.center - theFieldBall.positionRelative).norm();
 
         //is any opponent closer to ball than me or is too close to ball
