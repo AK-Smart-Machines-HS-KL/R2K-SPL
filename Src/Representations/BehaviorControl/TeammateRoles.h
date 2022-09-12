@@ -34,6 +34,7 @@ STREAMABLE(TeammateRoles,
   bool isTacticalGoalKeeper(const int robotNumber) const;
   bool isTacticalOffense(const int robotNumber) const;
   bool isTacticalDefense(const int robotNumber) const;
+  bool playsTheBall(const int robotNumber) const;
 
   int operator[](const size_t i) const;
   int& operator[](const size_t i),

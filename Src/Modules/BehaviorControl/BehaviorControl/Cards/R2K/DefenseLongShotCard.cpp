@@ -83,7 +83,7 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
   bool preconditions() const override
   {
     return
-      thePlayerRole.playsTheBall() &&  // I am the striker
+      theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
       opponentIsTooClose() != 0 &&  // see below: min distance is minOppDistance
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
 

@@ -68,7 +68,7 @@ CARD(ClearOwnHalfCard,
 
     DEFINES_PARAMETERS(
     {,
-      (float)(1500) minOppDistance,
+      (float)(2000) minOppDistance,
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
     }),
@@ -79,8 +79,8 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
   bool preconditions() const override
   {
     return
-      thePlayerRole.playsTheBall() &&  // I am the striker
-      opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
+      theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
+      // opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       !theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
       theFieldBall.endPositionOnField.x() < 0 && 
       !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME);

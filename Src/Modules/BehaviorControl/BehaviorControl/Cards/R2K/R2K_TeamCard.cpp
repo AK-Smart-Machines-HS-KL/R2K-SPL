@@ -124,6 +124,7 @@ TEAM_CARD(R2K_TeamCard,
                   // (unsigned)(std::numeric_limits<unsigned>::max())offsetToFrameTimeThisBot,
                   (bool)    (true)                     refreshAllData, // true so first computation is triggered
                   (unsigned) (STATE_INITIAL)           lastGameSate,
+                  (unsigned) (SET_PLAY_NONE)           lastGamePhase,
                   (int)(-1)                            lastTeamBehaviorStatus, // -1 means: not set yet
                   (int)(2000)                          decayPlaysTheBall,
                   (unsigned)(0)                        playsTheBallHasChangedFrame,   // store the frame when this bot claims to be playing the ball
@@ -254,14 +255,16 @@ class R2K_TeamCard : public R2K_TeamCardBase
     }
     botsLineUp.push_back(BotOnField(theRobotInfo.number, theRobotPose.translation.x()));
     // special case: I am the active goalie
-    if (theRobotInfo.number == 1 && theRobotInfo.penalty == PENALTY_NONE) goalieIsActive = true;
+    if (theRobotInfo.number == 1 && theRobotInfo.penalty == PENALTY_NONE) 
+      goalieIsActive = true;
  
   
     // c) make a sorted, lean copy of relevant data (helper class BotOnField)
     std::sort(botsLineUp.begin(), botsLineUp.end());
   
     PlayerRole pRole;
-    if (1 == theRobotInfo.number) pRole.role = PlayerRole::goalkeeper;
+    // deprecated
+    // if (1 == theRobotInfo.number) pRole.role = PlayerRole::goalkeeper;
 
    
     pRole.numOfActiveSupporters = activeBuddies;
@@ -271,31 +274,24 @@ class R2K_TeamCard : public R2K_TeamCardBase
     /// tbd pRole.supporterIndex = activeBuddies;  // initally assuming we are righmost bot
     int count = -1;             // so, we start with goali =  supporterIndex[0]
 
-    // if (theRobotInfo.number == 5) OUTPUT_TEXT("buddies" << botsLineUp.size());
-
+   
     for (auto& mate : botsLineUp)
     {
       count++;
-
-      if (!pRole.playsTheBall() && !pRole.isGoalkeeper()) {  // do not overwrite this two roles
-        // if (theRobotInfo.number == 5) OUTPUT_TEXT("count: " << count);
-
-        if (theRobotPose.translation.x() <= mate.xPos)  // we are more left than rightmost
-        {
-          // pRole.role = PlayerRole::supporter4;
-          // pRole.role = static_cast<PlayerRole> (static_cast<int>(PlayerRole::firstSupporterRole) + count);
-          switch (count) {
-          case 0: pRole.role = PlayerRole::supporter0;   break;
-          case 1: pRole.role = PlayerRole::supporter1;   break;
-          case 2: pRole.role = PlayerRole::supporter2;   break;
-          case 3: pRole.role = PlayerRole::supporter3;   break;
-          case 4: pRole.role = PlayerRole::supporter4;   break;
-          default: pRole.role = PlayerRole::none; OUTPUT_TEXT("default count: " << count);
-          }
-          break;
+      if (theRobotPose.translation.x() <= mate.xPos)  // we are more left than rightmost
+      {
+        // pRole.role = PlayerRole::supporter4;
+        // pRole.role = static_cast<PlayerRole> (static_cast<int>(PlayerRole::firstSupporterRole) + count);
+        switch (count) {
+        case 0: pRole.role = PlayerRole::supporter0;   break;
+        case 1: pRole.role = PlayerRole::supporter1;   break;
+        case 2: pRole.role = PlayerRole::supporter2;   break;
+        case 3: pRole.role = PlayerRole::supporter3;   break;
+        case 4: pRole.role = PlayerRole::supporter4;   break;
+        default: pRole.role = PlayerRole::none; OUTPUT_TEXT("default count: " << count);
         }
+        break;
       }
-
       // ASSERT(role.supporterIndex() - firstSupporterRole <= activeBuddies);  // we are in range supporter0 
 
     }
@@ -405,19 +401,25 @@ class R2K_TeamCard : public R2K_TeamCardBase
      // f) goalie plays the ball?
     if (goalieIsActive && 1 == theRobotInfo.number)  // the regular case
     {
+      // deprecated
+      /*
       pRole.role = PlayerRole::goalkeeper;  //check wether goalkeeperAndBallPlayer comes below
       if (pRole.playsTheBall()) PlayerRole::goalkeeperAndBallPlayer;
+      */
      }
     else  // g) bot#1 is penalized 
     {
       // set the goalie dynamically: choose left-most player. Note: gets dynamically re-computed
       if (!goalieIsActive && PlayerRole::supporter0 == pRole.role)
       {
+        // deprecated
+        /*
         pRole.role = PlayerRole::goalkeeper;
+        */
         // OUTPUT_TEXT("assigning goalie to" << theRobotInfo.number);
       }
     }
-
+ 
     // get min distance, set playsTheBall(); updates per frame 
     auto dist = 9000;  // max - real field dimensions should be read from config
     auto minDist = 0;
@@ -462,8 +464,10 @@ class R2K_TeamCard : public R2K_TeamCardBase
       // or am I the striker?
       if (minDist == dist) {  // i am the striker
         teamMateRoles.captain = theRobotInfo.number;
+        /* 
         if (pRole.isGoalkeeper()) pRole.role = PlayerRole::goalkeeperAndBallPlayer;
-        else pRole.role = PlayerRole::ballPlayer;
+        else pRole.role = PlayerRole::ballPlayer
+        */
 
         timeToReachBall.timeWhenReachBallStriker = timeToReachBall.timeWhenReachBall;  // to: get sync working
       }
@@ -478,6 +482,7 @@ class R2K_TeamCard : public R2K_TeamCardBase
     // h)  do we need to update?
     if (  // full update
       lastGameSate != theGameInfo.state ||
+      lastGamePhase !=  theGameInfo.gamePhase ||
       lastPlayerRole.numOfActiveSupporters != pRole.numOfActiveSupporters||
       lastTeamBehaviorStatus != teamBehaviorStatus 
      )
@@ -487,6 +492,7 @@ class R2K_TeamCard : public R2K_TeamCardBase
     if (refreshAllData) {
       // OUTPUT_TEXT("team data are refreshed.");
       lastGameSate = theGameInfo.state;
+      lastGamePhase = theGameInfo.gamePhase;
       lastTeamBehaviorStatus = teamBehaviorStatus;
       lastPlayerRole = pRole;
       lastTimeToReachBall = timeToReachBall;
@@ -497,7 +503,7 @@ class R2K_TeamCard : public R2K_TeamCardBase
     // partial update
     if (lastTeammateRoles.captain != teamMateRoles.captain) {
       lastTeammateRoles.captain = teamMateRoles.captain;
-      lastPlayerRole = pRole;
+      // lastPlayerRole = pRole;
     }
 
     theRoleSkill(lastPlayerRole);

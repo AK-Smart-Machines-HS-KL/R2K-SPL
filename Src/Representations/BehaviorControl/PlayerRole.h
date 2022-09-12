@@ -4,6 +4,8 @@
  * This file declares a representation of a player's role.
  *
  * @author Arne Hasselbring
+ * @version 1.2 Adrian, R2K: removed  goalkeeper, ballPlayer, goalkeeperAndBallPlayer 
+ * striker is now stored as "captain" in TeammateRoles.h
  */
 
 #pragma once
@@ -17,10 +19,6 @@ STREAMABLE(PlayerRole,
     ENUM(RoleType,
     {,
       none,
-      goalkeeper,
-      ballPlayer,
-      goalkeeperAndBallPlayer,
-
       // legacy roles from 2019
       firstSupporterRole,
       supporter0 = firstSupporterRole,
@@ -36,7 +34,8 @@ STREAMABLE(PlayerRole,
    */
   bool isGoalkeeper() const
   {
-    return (goalkeeper == role) || (goalkeeperAndBallPlayer == role);
+    //ASSERT(false); // deprecated function
+    return false;
   }
 
   /**
@@ -49,7 +48,8 @@ STREAMABLE(PlayerRole,
    */
   bool playsTheBall() const
   {
-    return (ballPlayer == role) || (goalkeeperAndBallPlayer == role);
+    //ASSERT(false); // deprecated function
+    return false;
   }
 
   /**

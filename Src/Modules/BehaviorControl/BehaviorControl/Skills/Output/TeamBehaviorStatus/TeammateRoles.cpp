@@ -47,6 +47,13 @@ bool TeammateRoles::isTacticalOffense(const int robotNumber) const {
     );
 }
 
+bool TeammateRoles::playsTheBall(int robotNumber) const {
+  ASSERT(robotNumber > 0 && robotNumber <= 7);
+
+  return (captain == robotNumber);
+}
+
+
 class TeammateRolesImpl : public TeammateRolesImplBase
 {
   void execute(const TeammateRoles& p) override
