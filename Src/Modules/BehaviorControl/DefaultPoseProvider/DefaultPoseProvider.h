@@ -27,10 +27,13 @@
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/TeamData.h"
 
+#include "Representations/BehaviorControl/FieldBall.h"  // dynamic adjustment 
+
 MODULE(DefaultPoseProvider,
 {,
   PROVIDES(DefaultPose),
  
+  REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(TeammateRoles),
   REQUIRES(GlobalOptions),

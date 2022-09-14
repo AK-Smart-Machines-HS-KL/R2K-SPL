@@ -70,7 +70,7 @@ void DefaultPoseProvider::update(DefaultPose& defaultPose)
   // Set Own Pose
   defaultPose.ownDefaultPose = defaultPose.teamDefaultPoses[theRobotInfo.number - 1];
 
-  // Check if Robot is on own Position
+   // Check if Robot is on own Position
   defaultPose.isOnDefaultPosition = (defaultPose.ownDefaultPose.translation - theRobotPose.translation).norm() < PositionTolerance;
 
   // Check if Robot is on Own Pose (i.e. on own position & looking in the correnct direction)
