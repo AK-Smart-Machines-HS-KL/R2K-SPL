@@ -59,6 +59,9 @@ void DefaultPoseProvider::update(DefaultPose& defaultPose)
       defaultPose.teamDefaultPoses[i].translation.x() = defaultPose.teamDefaultPoses[i].translation.x() + offset;
     }
     
+    defaultPose.teamDefaultPoses[i].translation.y() = defaultPose.teamDefaultPoses[i].translation.y() + 
+        (theFieldBall.endPositionOnField.y() * percentageBallAdaption);
+
     // Scale Translation by scaleFactor
     if (autoScale)
     {
