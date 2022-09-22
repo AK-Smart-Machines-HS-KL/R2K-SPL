@@ -1,12 +1,12 @@
 /**
- * @file ClearOwnHalfCard.cpp
+ * @file ClearOwnHalfCardGoalie.cpp
  * @author  Adrian Müller 
  * @version: 1.0
  *
  * Functions, values, side effects: 
- * any TACTICAL_GOALIE and ...DEFENSE with playsTheBall()
+ * any TACTICAL_GOALIE  with playsTheBall()
  * no other card qualifies for 
- * - ball is in own half
+ * - ball is in own half, near goalbox
  * - there is not enough time to do a long shot (see ....LongShotCards), 
  *  -so bot does a fast kick (walkForwardsRight,walkForwardsLeft), in his walking direction 
  *
@@ -21,8 +21,9 @@
  * - bot will not leaf own half,
  * 
  * v.1.1: increased minOppDistance to 2000
- * v1.2. added setPlay==SET_PLAY_NONE to prevent bots go for CORNER_KICK
- *       changed to theTeammateRoles.isTacticalDefense : goalie must not leave the goal box
+ * v1.2. added setPlay==SET_PLAY_NONE to prevent goalie be activated for CORNER_KICK
+ *       changed to theTeammateRoles.isTacticalGoalkeeper
+         goalie must not leave the goal box + maxDistanceFromGoalArea
  * 
  * Note: 
  * - because this is a short shot, the flag "playsTheBall" may not re-set after the shot, 
@@ -55,10 +56,8 @@
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/GameInfo.h"
-#include "Representations/Communication/TeamData.h"
 
-
-CARD(ClearOwnHalfCard,
+CARD(ClearOwnHalfCardGoalie,
   { ,
     CALLS(Activity),
     CALLS(GoToBallAndKick),
@@ -70,28 +69,27 @@ CARD(ClearOwnHalfCard,
     REQUIRES(RobotInfo),
     REQUIRES(RobotPose),
     REQUIRES(TeamBehaviorStatus),
-    REQUIRES(TeamData),
     REQUIRES(TeammateRoles),  // R2K
 
     DEFINES_PARAMETERS(
     {,
-      (float)(2500) minOppDistance,
+      (float)(1500) minOppDistance,
+      (float)(500) maxDistanceFromGoalArea,  // how far  goalie will leave the goal box
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
     }),
   });
 
-class ClearOwnHalfCard : public ClearOwnHalfCardBase
+class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
 {
   bool preconditions() const override
   {
     return
       theGameInfo.setPlay == SET_PLAY_NONE &&
-      !aBuddyIsClearingOwnHalf() &&
       //theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
-      opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
-      theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
-      theFieldBall.endPositionOnField.x() < 0 && 
+      // opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
+      theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) && // my recent role
+      theFieldBall.endPositionOnField.x() <= theFieldDimensions.xPosOwnGoalArea + maxDistanceFromGoalArea &&
       !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME);
   }
 
@@ -104,7 +102,7 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
   void execute() override
   {
 
-    theActivitySkill(BehaviorStatus::clearOwnHalfCard);
+    theActivitySkill(BehaviorStatus::clearOwnHalfCardGoalie);
 
     if (!footIsSelected) {  // select only once
       footIsSelected = true;
@@ -125,17 +123,6 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
     }
     return false;
   }
-
-  bool aBuddyIsClearingOwnHalf() const
-  {
-    for (const auto& buddy : theTeamData.teammates)
-    {
-      if (buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie) 
-        return true;
-    }
-    return false;
-  }
 };
 
-MAKE_CARD(ClearOwnHalfCard);
+MAKE_CARD(ClearOwnHalfCardGoalie);

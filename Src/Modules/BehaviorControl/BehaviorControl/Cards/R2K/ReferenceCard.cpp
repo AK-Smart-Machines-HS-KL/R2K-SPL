@@ -33,6 +33,7 @@
 #include "Representations/BehaviorControl/TeammateRoles.h"
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Representations/Communication/GameInfo.h"   // eg theGameInfo.setPlay == SET_PLAY_NONE, SET_PLAY_CORNER_KICK etc.
 
 CARD(ReferenceCard,
   { ,
@@ -41,6 +42,7 @@ CARD(ReferenceCard,
     CALLS(LookForward),
     CALLS(Stand),
     CALLS(WalkAtRelativeSpeed),
+    USES(GameInfo),
     REQUIRES(FieldBall),
     REQUIRES(FieldDimensions),
     REQUIRES(RobotPose),
@@ -61,6 +63,7 @@ class ReferenceCard : public ReferenceCardBase
   bool preconditions() const override
   {
     return
+      theGameInfo.setPlay == SET_PLAY_NONE && // normal play - not SET_PLAY_CORNER_KICK etc
       // theRobotPose.isInbeetween(xmin,xmay,ymin,ymax)  // grid -1, +1, -3, +3 == nahe Mittelinie
       theTeammateRoles.playsTheBall(theRobotInfo.number)&&  // I am the striker
       !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) &&  // goalie or substitute goalie
@@ -72,7 +75,7 @@ class ReferenceCard : public ReferenceCardBase
       // note: just use the real robot number for tactic look up
       theTeammateRoles.isTacticalOffense(theRobotInfo.number); // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
       // be more specific:
-      theTeammateRoles.roles[theRobotInfo.number-1] == TeammateRoles::OFFENSE_RIGHT;  // my recent R2K strategy dependent role
+      // theTeammateRoles.roles[theRobotInfo.number-1] == TeammateRoles::OFFENSE_RIGHT;  // my recent R2K strategy dependent role
 
     // ToDo: OFFENSE_LEFT,  ANY_OFFENSE (l,m,r)
   }

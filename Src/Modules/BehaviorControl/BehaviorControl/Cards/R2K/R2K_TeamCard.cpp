@@ -77,6 +77,9 @@
 #include "Tools/BehaviorControl/Framework/Card/TeamCard.h"
 #include "Representations/Communication/GameInfo.h"  // to sync time inbetween bots
 
+#include "Representations/Communication/EventBasedCommunicationData.h"
+
+
 
 // roles 
 #include "Representations/BehaviorControl/PlayerRole.h"
@@ -118,13 +121,14 @@ TEAM_CARD(R2K_TeamCard,
     CALLS(TeamActivity),
     REQUIRES(OwnTeamInfo),    // score, penalty
     REQUIRES(OpponentTeamInfo),  // score, penalty
+    REQUIRES(EventBasedCommunicationData),  // R2K EBC handling
 
     DEFINES_PARAMETERS(
                 {
                   ,
                   // (unsigned)(std::numeric_limits<unsigned>::max())offsetToFrameTimeThisBot,
                   (bool)    (true)                     refreshAllData, // true so first computation is triggered
-                  (unsigned) (STATE_INITIAL)           lastGameSate,
+                  (unsigned) (STATE_INITIAL)           lastGameState,
                   (unsigned) (SET_PLAY_NONE)           lastGamePhase,
                   (int)(-1)                            lastTeamBehaviorStatus, // -1 means: not set yet
                   (int)(2000)                          decayPlaysTheBall,
@@ -148,11 +152,13 @@ class R2K_TeamCard : public R2K_TeamCardBase
     return false;
   }
 
+private:
+  int myEbcWrites = 0;  // tnmp. hack for tracing ebc
 
   void execute() override
   {
 
-   // this tactic table is used in step d4 below
+   // this tactic table is used in step d4 below. It becomes active for STATE_PLAYING
     //         nr of active players x team tactic x 5 TeamMate roles[]
     int r2k_tactics[5][TeamBehaviorStatus::numOfTeamActivities][5] =
     {
@@ -161,13 +167,13 @@ class R2K_TeamCard : public R2K_TeamCardBase
       // 1 player
         { {GN,UN,UN,UN,UN}, {GN,UN,UN,UN,UN}, {GN,UN,UN,UN,UN}, {OM,UN,UN,UN,UN} },
         // 2 player
-            { {GN,DM,UN,UN,UN}, {GN,DM,UN,UN,UN}, {GN,DM,UN,UN,UN}, {GN,OM,UN,UN,UN} },
+            { {GN,DM,UN,UN,UN}, {GN,DM,UN,UN,UN}, {GN,DM,UN,UN,UN}, {DM,OM,UN,UN,UN} },
             // 3 player
                 { {GN,DM,OM,UN,UN}, {GN,DR,DL,UN,UN}, {GA,DM,OM,UN,UN}, {GN,OR,OM,UN,UN} },
                 // 4 player
-                    { {GN,DR,DL,OM,UN}, {GN,DR,DM,DL,UN}, {GA,DM,OR,OM,UN}, {UN,UN,UN,UN,UN} },
+                    { {GN,DR,DL,OM,UN}, {GN,DR,DM,DL,UN}, {GA,DM,OR,OM,UN}, {GN,DM,OR,OM,UN} },
                     // 5 player
-                        { {GN,DR,DL,OR,OL}, {GN,DR,DM,DL,OM}, {GA,DM,OR,OM,OL}, {UN,UN,UN,UN,UN} }
+                        { {GN,DR,DL,OR,OL}, {GN,DR,DM,DL,OM}, {GA,DM,OR,OM,OL}, {GN,DM,OR,OM,OL} }
 
     };
 
@@ -305,16 +311,16 @@ class R2K_TeamCard : public R2K_TeamCardBase
       switch (teamBehaviorStatus) {
       case(TeamBehaviorStatus::R2K_DEFENSIVE_GAME):
         teamMateRoles.roles = { TeammateRoles::GOALKEEPER_NORMAL,
-                               TeammateRoles::DEFENSE_LEFT,
-                               TeammateRoles::DEFENSE_MIDDLE,
                                TeammateRoles::DEFENSE_RIGHT,
+                               TeammateRoles::DEFENSE_MIDDLE,
+                               TeammateRoles::DEFENSE_LEFT,
                                TeammateRoles::OFFENSE_MIDDLE,
                                TeammateRoles::UNDEFINED };
         break;
       case(TeamBehaviorStatus::R2K_NORMAL_GAME):
         teamMateRoles.roles = { TeammateRoles::GOALKEEPER_NORMAL,
-                              TeammateRoles::DEFENSE_LEFT,
                               TeammateRoles::DEFENSE_RIGHT,
+                              TeammateRoles::DEFENSE_LEFT,
                               TeammateRoles::OFFENSE_LEFT,
                               TeammateRoles::OFFENSE_RIGHT,
                               TeammateRoles::UNDEFINED };
@@ -340,6 +346,7 @@ class R2K_TeamCard : public R2K_TeamCardBase
       }
     }
     else {
+
       //d3: dynamic assignment
 
       // we use roles temporarily to store the robot numbers. 
@@ -433,7 +440,8 @@ class R2K_TeamCard : public R2K_TeamCardBase
 
     TimeToReachBall timeToReachBall;
     // this code fragment does NOT sync teamwiese
-    timeToReachBall.timeWhenReachBall = dist + theFrameInfo.time; // +offsetToFrameTimeThisBot;
+    // timeToReachBall.timeWhenReachBall = dist + theFrameInfo.time; // +offsetToFrameTimeThisBot;
+    timeToReachBall.timeWhenReachBall = myEbcWrites;
 
     minDist = dist;
   
@@ -470,7 +478,9 @@ class R2K_TeamCard : public R2K_TeamCardBase
         else pRole.role = PlayerRole::ballPlayer
         */
 
-        timeToReachBall.timeWhenReachBallStriker = timeToReachBall.timeWhenReachBall;  // to: get sync working
+
+        // tmp. disabled for EBC testing
+        // timeToReachBall.timeWhenReachBallStriker = timeToReachBall.timeWhenReachBall;  // to: get sync working
       }
     }  // fi: decay time 
 
@@ -482,35 +492,45 @@ class R2K_TeamCard : public R2K_TeamCardBase
 
     // h)  do we need to update?
     if (  // full update
-      lastGameSate != theGameInfo.state ||
+      lastGameState != theGameInfo.state ||
       lastGamePhase !=  theGameInfo.gamePhase ||
       lastPlayerRole.numOfActiveSupporters != pRole.numOfActiveSupporters||
-      lastTeamBehaviorStatus != teamBehaviorStatus 
+      lastTeamBehaviorStatus != teamBehaviorStatus || 
+      lastTeammateRoles.roles != teamMateRoles.roles
      )
       refreshAllData = true;
 
 
+    //unsure, wether we need this 
+    if (1 >= pRole.numOfActiveSupporters) refreshAllData = false; // might happen, when comm. frequence is too low due to EBC
+
     if (refreshAllData) {
       // OUTPUT_TEXT("team data are refreshed.");
-      lastGameSate = theGameInfo.state;
+      lastGameState = theGameInfo.state;
       lastGamePhase = theGameInfo.gamePhase;
       lastTeamBehaviorStatus = teamBehaviorStatus;
       lastPlayerRole = pRole;
       lastTimeToReachBall = timeToReachBall;
       lastTeammateRoles = teamMateRoles;
-      refreshAllData = false; 
     }
 
     // partial update
-    if (lastTeammateRoles.captain != teamMateRoles.captain) {
+    if (1 <= pRole.numOfActiveSupporters && lastTeammateRoles.captain != teamMateRoles.captain) {
       lastTeammateRoles.captain = teamMateRoles.captain;
       // lastPlayerRole = pRole;
+      refreshAllData = true;
+    }
+
+    if (refreshAllData) {
+      myEbcWrites = theEventBasedCommunicationData.ebcSendMessageImportant();
+      // OUTPUT_TEXT("Nr: " << theRobotInfo.number << " : R2K TeamCard ebc  update");
+      refreshAllData = false;
     }
 
     theRoleSkill(lastPlayerRole);
     theTimeToReachBallSkill(lastTimeToReachBall);
     theTeammateRolesSkill(lastTeammateRoles);
-
+   
 
   }  // execute
 
