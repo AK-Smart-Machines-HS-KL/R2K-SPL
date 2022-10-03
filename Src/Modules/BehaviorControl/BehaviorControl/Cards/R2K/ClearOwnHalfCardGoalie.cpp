@@ -87,7 +87,7 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
     return
       theGameInfo.setPlay == SET_PLAY_NONE &&
       //theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
-      // opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
+      opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) && // my recent role
       theFieldBall.endPositionOnField.x() <= theFieldDimensions.xPosOwnGoalArea + maxDistanceFromGoalArea &&
       !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME);

@@ -105,7 +105,7 @@ private:
 
   const unsigned int EBCMaxLevel = 100;                                       //Max ebc level to be reached before a message can be send
   const int EBCCountUp = EBCMaxLevel / 40;                                    //incremental increase for ebcount until a message will be sent
-  const int EBCCountBoost = EBCCountUp / 2;                                   //Boost for start and VERY important states
+  const int EBCCountBoost = EBCCountUp / 2;                                   //the result is: 1 Boost for start and VERY important states
   const int EBCReset = 0;                                                     //constant used to reset ebc back to 0 if a message was send
   unsigned int frameTimeStart = 0;                                            //Used for the beginning of a game so that each nao sends a message
   // bool ebc_dribbling_active = false;                                          //Check that dribbling is active, if so, send message now

@@ -73,8 +73,8 @@ class OffenseFastGoalKick : public OffenseFastGoalKickBase
   {
     return
       theTeammateRoles.playsTheBall(theRobotInfo.number) &&   // I am the striker
-      theTeammateRoles.isTacticalOffense(theRobotInfo.number)&& // my recent role
-      (theFieldDimensions.xPosOpponentGoal - theFieldBall.endPositionOnField.x()) < minGoalDist;
+      theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
+      theFieldBall.endPositionOnField.x() >= theFieldDimensions.xPosOpponentGoalArea;
   }
 
   bool postconditions() const override

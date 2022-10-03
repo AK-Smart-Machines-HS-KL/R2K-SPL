@@ -55,17 +55,18 @@ void EventBasedCommunicationHandler::ebcLevelRestart(){
 }
 
 //Here start functions, which are respinsible for any ebc related tasks
-void EventBasedCommunicationHandler::ebcLevelMonitor(){ 
+void EventBasedCommunicationHandler::ebcLevelMonitor(){
   if (theFrameInfo.time == frameTimeStart) {  // called once at startup, i.e., GAMESTATE = INIT
-    ebcImportantMessageSend(); // get things started
-    ebc_last_activity = theBehaviorStatus.activity;  // deprecated
-  }  
-
-  // OUTPUT_TEXT(" theGameInfo.state == STATE_PLAYING)" << theGameInfo.secsRemaining);
-
-  if(theGameInfo.state == STATE_PLAYING){
-    if(theGameInfo.secsRemaining > ebcBoostTime){
-      ebc_my_level+=EBCCountBoost;
+     ebcImportantMessageSend(); // get things started
+   ebc_last_activity = BehaviorStatus::initial;  // deprecated
+   }
+ 
+   // OUTPUT_TEXT(" theGameInfo.state == STATE_PLAYING)" << theGameInfo.secsRemaining);
+ 
+  // counts up by "1" per frame
+   if(theGameInfo.state == STATE_PLAYING){
+     if(theGameInfo.secsRemaining > ebcBoostTime){
+       ebc_my_level+=EBCCountBoost;
     }
     
     // Have message count up happen, while slowing it down based on the number of robots in the game, only send messages in specific states
@@ -77,6 +78,7 @@ void EventBasedCommunicationHandler::ebcLevelMonitor(){
     
     if(ebc_last_activity != theBehaviorStatus.activity){ 
       ebcImportantMessageSend();  // this is an important event - send asap
+      OUTPUT_TEXT("robot nr:" << theRobotInfo.number << ": msg: my behavior has changed.");
       ebc_last_activity = theBehaviorStatus.activity; ///
       if(ebcDebugMessages){
         OUTPUT_TEXT("robot nr:" << theRobotInfo.number << ": msg: my behavior has changed.");
