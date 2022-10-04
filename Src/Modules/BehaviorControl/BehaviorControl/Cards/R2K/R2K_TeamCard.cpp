@@ -47,7 +47,8 @@
  * - TeammateRoles: triggered by changes in GameInfo.state, TeamBehaviorStatus, numOfActiveSupporters (eg penalized, fallen),
  * - PlayerRole, TimeToReachBall: if the striker changes, only this information gets updated. Update frequency is limited to 2secs
  *      
- *
+ * v.1.4
+  - PlayerRole  goalkeeper,ballPlayer, goalkeeperAndBallPlayer vanished, TeammateRoles captain is used (stores strikers number)
 
  * ToDo
  * - EBC: broadcast, when striker changes etc.
@@ -75,6 +76,9 @@
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Tools/BehaviorControl/Framework/Card/TeamCard.h"
 #include "Representations/Communication/GameInfo.h"  // to sync time inbetween bots
+
+#include "Representations/Communication/EventBasedCommunicationData.h"
+
 
 
 // roles 
@@ -117,13 +121,15 @@ TEAM_CARD(R2K_TeamCard,
     CALLS(TeamActivity),
     REQUIRES(OwnTeamInfo),    // score, penalty
     REQUIRES(OpponentTeamInfo),  // score, penalty
+    REQUIRES(EventBasedCommunicationData),  // R2K EBC handling
 
     DEFINES_PARAMETERS(
                 {
                   ,
                   // (unsigned)(std::numeric_limits<unsigned>::max())offsetToFrameTimeThisBot,
                   (bool)    (true)                     refreshAllData, // true so first computation is triggered
-                  (unsigned) (STATE_INITIAL)           lastGameSate,
+                  (unsigned) (STATE_INITIAL)           lastGameState,
+                  (unsigned) (SET_PLAY_NONE)           lastGamePhase,
                   (int)(-1)                            lastTeamBehaviorStatus, // -1 means: not set yet
                   (int)(2000)                          decayPlaysTheBall,
                   (unsigned)(0)                        playsTheBallHasChangedFrame,   // store the frame when this bot claims to be playing the ball
@@ -146,11 +152,13 @@ class R2K_TeamCard : public R2K_TeamCardBase
     return false;
   }
 
+private:
+  int myEbcWrites = 0;  // tnmp. hack for tracing ebc
 
   void execute() override
   {
 
-   // this tactic table is used in step d4 below
+   // this tactic table is used in step d4 below. It becomes active for STATE_PLAYING
     //         nr of active players x team tactic x 5 TeamMate roles[]
     int r2k_tactics[5][TeamBehaviorStatus::numOfTeamActivities][5] =
     {
@@ -159,13 +167,13 @@ class R2K_TeamCard : public R2K_TeamCardBase
       // 1 player
         { {GN,UN,UN,UN,UN}, {GN,UN,UN,UN,UN}, {GN,UN,UN,UN,UN}, {OM,UN,UN,UN,UN} },
         // 2 player
-            { {GN,DM,UN,UN,UN}, {GN,DM,UN,UN,UN}, {GN,DM,UN,UN,UN}, {GN,OM,UN,UN,UN} },
+            { {GN,DM,UN,UN,UN}, {GN,DM,UN,UN,UN}, {GN,DM,UN,UN,UN}, {DM,OM,UN,UN,UN} },
             // 3 player
                 { {GN,DM,OM,UN,UN}, {GN,DR,DL,UN,UN}, {GA,DM,OM,UN,UN}, {GN,OR,OM,UN,UN} },
                 // 4 player
-                    { {GN,DR,DL,OM,UN}, {GN,DR,DM,DL,UN}, {GA,DM,OR,OM,UN}, {UN,UN,UN,UN,UN} },
+                    { {GN,DR,DL,OM,UN}, {GN,DR,DM,DL,UN}, {GA,DM,OR,OM,UN}, {GN,DM,OR,OM,UN} },
                     // 5 player
-                        { {GN,DR,DL,OR,OL}, {GN,DR,DM,DL,OM}, {GA,DM,OR,OM,OL}, {UN,UN,UN,UN,UN} }
+                        { {GN,DR,DL,OR,OL}, {GN,DR,DM,DL,OM}, {GA,DM,OR,OM,OL}, {GN,DM,OR,OM,OL} }
 
     };
 
@@ -254,14 +262,16 @@ class R2K_TeamCard : public R2K_TeamCardBase
     }
     botsLineUp.push_back(BotOnField(theRobotInfo.number, theRobotPose.translation.x()));
     // special case: I am the active goalie
-    if (theRobotInfo.number == 1 && theRobotInfo.penalty == PENALTY_NONE) goalieIsActive = true;
+    if (theRobotInfo.number == 1 && theRobotInfo.penalty == PENALTY_NONE) 
+      goalieIsActive = true;
  
   
     // c) make a sorted, lean copy of relevant data (helper class BotOnField)
     std::sort(botsLineUp.begin(), botsLineUp.end());
   
     PlayerRole pRole;
-    if (1 == theRobotInfo.number) pRole.role = PlayerRole::goalkeeper;
+    // deprecated
+    // if (1 == theRobotInfo.number) pRole.role = PlayerRole::goalkeeper;
 
    
     pRole.numOfActiveSupporters = activeBuddies;
@@ -271,31 +281,24 @@ class R2K_TeamCard : public R2K_TeamCardBase
     /// tbd pRole.supporterIndex = activeBuddies;  // initally assuming we are righmost bot
     int count = -1;             // so, we start with goali =  supporterIndex[0]
 
-    // if (theRobotInfo.number == 5) OUTPUT_TEXT("buddies" << botsLineUp.size());
-
+   
     for (auto& mate : botsLineUp)
     {
       count++;
-
-      if (!pRole.playsTheBall() && !pRole.isGoalkeeper()) {  // do not overwrite this two roles
-        // if (theRobotInfo.number == 5) OUTPUT_TEXT("count: " << count);
-
-        if (theRobotPose.translation.x() <= mate.xPos)  // we are more left than rightmost
-        {
-          // pRole.role = PlayerRole::supporter4;
-          // pRole.role = static_cast<PlayerRole> (static_cast<int>(PlayerRole::firstSupporterRole) + count);
-          switch (count) {
-          case 0: pRole.role = PlayerRole::supporter0;   break;
-          case 1: pRole.role = PlayerRole::supporter1;   break;
-          case 2: pRole.role = PlayerRole::supporter2;   break;
-          case 3: pRole.role = PlayerRole::supporter3;   break;
-          case 4: pRole.role = PlayerRole::supporter4;   break;
-          default: pRole.role = PlayerRole::none; OUTPUT_TEXT("default count: " << count);
-          }
-          break;
+      if (theRobotPose.translation.x() <= mate.xPos)  // we are more left than rightmost
+      {
+        // pRole.role = PlayerRole::supporter4;
+        // pRole.role = static_cast<PlayerRole> (static_cast<int>(PlayerRole::firstSupporterRole) + count);
+        switch (count) {
+        case 0: pRole.role = PlayerRole::supporter0;   break;
+        case 1: pRole.role = PlayerRole::supporter1;   break;
+        case 2: pRole.role = PlayerRole::supporter2;   break;
+        case 3: pRole.role = PlayerRole::supporter3;   break;
+        case 4: pRole.role = PlayerRole::supporter4;   break;
+        default: pRole.role = PlayerRole::none; OUTPUT_TEXT("default count: " << count);
         }
+        break;
       }
-
       // ASSERT(role.supporterIndex() - firstSupporterRole <= activeBuddies);  // we are in range supporter0 
 
     }
@@ -308,16 +311,16 @@ class R2K_TeamCard : public R2K_TeamCardBase
       switch (teamBehaviorStatus) {
       case(TeamBehaviorStatus::R2K_DEFENSIVE_GAME):
         teamMateRoles.roles = { TeammateRoles::GOALKEEPER_NORMAL,
-                               TeammateRoles::DEFENSE_LEFT,
-                               TeammateRoles::DEFENSE_MIDDLE,
                                TeammateRoles::DEFENSE_RIGHT,
+                               TeammateRoles::DEFENSE_MIDDLE,
+                               TeammateRoles::DEFENSE_LEFT,
                                TeammateRoles::OFFENSE_MIDDLE,
                                TeammateRoles::UNDEFINED };
         break;
       case(TeamBehaviorStatus::R2K_NORMAL_GAME):
         teamMateRoles.roles = { TeammateRoles::GOALKEEPER_NORMAL,
-                              TeammateRoles::DEFENSE_LEFT,
                               TeammateRoles::DEFENSE_RIGHT,
+                              TeammateRoles::DEFENSE_LEFT,
                               TeammateRoles::OFFENSE_LEFT,
                               TeammateRoles::OFFENSE_RIGHT,
                               TeammateRoles::UNDEFINED };
@@ -343,6 +346,7 @@ class R2K_TeamCard : public R2K_TeamCardBase
       }
     }
     else {
+
       //d3: dynamic assignment
 
       // we use roles temporarily to store the robot numbers. 
@@ -405,19 +409,25 @@ class R2K_TeamCard : public R2K_TeamCardBase
      // f) goalie plays the ball?
     if (goalieIsActive && 1 == theRobotInfo.number)  // the regular case
     {
+      // deprecated
+      /*
       pRole.role = PlayerRole::goalkeeper;  //check wether goalkeeperAndBallPlayer comes below
       if (pRole.playsTheBall()) PlayerRole::goalkeeperAndBallPlayer;
+      */
      }
     else  // g) bot#1 is penalized 
     {
       // set the goalie dynamically: choose left-most player. Note: gets dynamically re-computed
       if (!goalieIsActive && PlayerRole::supporter0 == pRole.role)
       {
+        // deprecated
+        /*
         pRole.role = PlayerRole::goalkeeper;
+        */
         // OUTPUT_TEXT("assigning goalie to" << theRobotInfo.number);
       }
     }
-
+ 
     // get min distance, set playsTheBall(); updates per frame 
     auto dist = 9000;  // max - real field dimensions should be read from config
     auto minDist = 0;
@@ -430,7 +440,8 @@ class R2K_TeamCard : public R2K_TeamCardBase
 
     TimeToReachBall timeToReachBall;
     // this code fragment does NOT sync teamwiese
-    timeToReachBall.timeWhenReachBall = dist + theFrameInfo.time; // +offsetToFrameTimeThisBot;
+    // timeToReachBall.timeWhenReachBall = dist + theFrameInfo.time; // +offsetToFrameTimeThisBot;
+    timeToReachBall.timeWhenReachBall = myEbcWrites;
 
     minDist = dist;
   
@@ -462,10 +473,14 @@ class R2K_TeamCard : public R2K_TeamCardBase
       // or am I the striker?
       if (minDist == dist) {  // i am the striker
         teamMateRoles.captain = theRobotInfo.number;
+        /* 
         if (pRole.isGoalkeeper()) pRole.role = PlayerRole::goalkeeperAndBallPlayer;
-        else pRole.role = PlayerRole::ballPlayer;
+        else pRole.role = PlayerRole::ballPlayer
+        */
 
-        timeToReachBall.timeWhenReachBallStriker = timeToReachBall.timeWhenReachBall;  // to: get sync working
+
+        // tmp. disabled for EBC testing
+        // timeToReachBall.timeWhenReachBallStriker = timeToReachBall.timeWhenReachBall;  // to: get sync working
       }
     }  // fi: decay time 
 
@@ -477,33 +492,45 @@ class R2K_TeamCard : public R2K_TeamCardBase
 
     // h)  do we need to update?
     if (  // full update
-      lastGameSate != theGameInfo.state ||
+      lastGameState != theGameInfo.state ||
+      lastGamePhase !=  theGameInfo.gamePhase ||
       lastPlayerRole.numOfActiveSupporters != pRole.numOfActiveSupporters||
-      lastTeamBehaviorStatus != teamBehaviorStatus 
+      lastTeamBehaviorStatus != teamBehaviorStatus || 
+      lastTeammateRoles.roles != teamMateRoles.roles
      )
       refreshAllData = true;
 
 
+    //unsure, wether we need this 
+    if (1 >= pRole.numOfActiveSupporters) refreshAllData = false; // might happen, when comm. frequence is too low due to EBC
+
     if (refreshAllData) {
       // OUTPUT_TEXT("team data are refreshed.");
-      lastGameSate = theGameInfo.state;
+      lastGameState = theGameInfo.state;
+      lastGamePhase = theGameInfo.gamePhase;
       lastTeamBehaviorStatus = teamBehaviorStatus;
       lastPlayerRole = pRole;
       lastTimeToReachBall = timeToReachBall;
       lastTeammateRoles = teamMateRoles;
-      refreshAllData = false; 
     }
 
     // partial update
-    if (lastTeammateRoles.captain != teamMateRoles.captain) {
+    if (1 <= pRole.numOfActiveSupporters && lastTeammateRoles.captain != teamMateRoles.captain) {
       lastTeammateRoles.captain = teamMateRoles.captain;
-      lastPlayerRole = pRole;
+      // lastPlayerRole = pRole;
+      refreshAllData = true;
+    }
+
+    if (refreshAllData) {
+      myEbcWrites = theEventBasedCommunicationData.ebcSendMessageImportant();
+      // OUTPUT_TEXT("Nr: " << theRobotInfo.number << " : R2K TeamCard ebc  update");
+      refreshAllData = false;
     }
 
     theRoleSkill(lastPlayerRole);
     theTimeToReachBallSkill(lastTimeToReachBall);
     theTeammateRolesSkill(lastTeammateRoles);
-
+   
 
   }  // execute
 

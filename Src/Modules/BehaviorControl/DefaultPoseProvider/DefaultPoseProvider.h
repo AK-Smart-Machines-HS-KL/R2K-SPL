@@ -1,6 +1,6 @@
 /**
  * @file DefaultPoseProvider.h
- * @author Jonas Lambing (R2K), Adrian Müller (R2K), Andy Hobelsberger
+ * @author Jonas Lambing (R2K), Adrian Müller (R2K), Andy Hobelsberger (R2)
  * @brief Module for providing default scenario poses
  * 
  * This Module Loads Default Poses from defaultPoseProvider.cfg and Assigns them to robots based on their Roles.
@@ -13,8 +13,11 @@
  * the update method of this module gets called before the card using it gets executed
  * by the robot. 
  * 
- * @version 2.0
- * @date 2022-03-16
+ * @version 2.1
+ * @date 2022-09-14
+ * - in 2.1: added percentageBallAdaption = 0.33; This is the percentage for the y-axis, i.e., the default y positions changes a little,
+ * - adaption dynamically to the FieldBalls y-positions. Set to 0 in the .cfg, if you prefer static positions. 
+ *
  */
 
 #pragma once
@@ -27,10 +30,13 @@
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/TeamData.h"
 
+#include "Representations/BehaviorControl/FieldBall.h"  // dynamic adjustment 
+
 MODULE(DefaultPoseProvider,
 {,
   PROVIDES(DefaultPose),
  
+  REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(TeammateRoles),
   REQUIRES(GlobalOptions),
@@ -46,6 +52,7 @@ MODULE(DefaultPoseProvider,
     // Strategy Offsets
     (float) offsetOffense,
     (float) offsetDefense,
+    (float) percentageBallAdaption,
 
     // Poses
     // #Goalie

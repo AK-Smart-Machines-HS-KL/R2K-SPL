@@ -59,6 +59,9 @@ void DefaultPoseProvider::update(DefaultPose& defaultPose)
       defaultPose.teamDefaultPoses[i].translation.x() = defaultPose.teamDefaultPoses[i].translation.x() + offset;
     }
     
+    defaultPose.teamDefaultPoses[i].translation.y() = defaultPose.teamDefaultPoses[i].translation.y() + 
+        (theFieldBall.endPositionOnField.y() * percentageBallAdaption);
+
     // Scale Translation by scaleFactor
     if (autoScale)
     {
@@ -70,7 +73,7 @@ void DefaultPoseProvider::update(DefaultPose& defaultPose)
   // Set Own Pose
   defaultPose.ownDefaultPose = defaultPose.teamDefaultPoses[theRobotInfo.number - 1];
 
-  // Check if Robot is on own Position
+   // Check if Robot is on own Position
   defaultPose.isOnDefaultPosition = (defaultPose.ownDefaultPose.translation - theRobotPose.translation).norm() < PositionTolerance;
 
   // Check if Robot is on Own Pose (i.e. on own position & looking in the correnct direction)

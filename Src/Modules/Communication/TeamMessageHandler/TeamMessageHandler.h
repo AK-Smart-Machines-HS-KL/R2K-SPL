@@ -33,6 +33,7 @@
 #include "Tools/Communication/BNTP.h"
 #include "Tools/Communication/CompressedTeamCommunicationStreams.h"
 #include "Tools/Communication/RobotStatus.h"
+#include "Representations/Communication/EventBasedCommunicationData.h"
 
 MODULE(TeamMessageHandler,
 {,
@@ -64,12 +65,15 @@ MODULE(TeamMessageHandler,
   PROVIDES(BHumanMessageOutputGenerator),
   PROVIDES(TeamData),
 
+  REQUIRES(EventBasedCommunicationData),  // R2K EBC handling
+  
   LOADS_PARAMETERS(
   {,
     (int) sendInterval, /**<  Time in ms between two messages that are sent to the teammates */
     (int) networkTimeout, /**< Time in ms after which teammates are considered as unconnected */
     (int) minTimeBetween2RejectSounds, /**< Time in ms after which another sound output is allowed */
-    (bool) sendMirroredRobotPose, /**< Whether to send the robot pose mirrored (useful for one vs one demos such that keeper and striker can share their ball positions). */
+    (bool)sendMirroredRobotPose, /**< Whether to send the robot pose mirrored (useful for one vs one demos such that keeper and striker can share their ball positions). */
+    (bool) ebcEnable,            /* true R2Ke event based commmunication handler, responsible for regulating messages based on events and other factors */
   }),
 });
 

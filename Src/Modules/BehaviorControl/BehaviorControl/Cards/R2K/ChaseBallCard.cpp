@@ -16,8 +16,9 @@
  * if bot is closest to ball (playsTheBall()) card ShootAtGoalCard will take over
  * * 
  * 
- * ToDo
- * - How to avoid that our two offense struggle for ball. Idee: loop over buddies -> exit this card 
+ * v1.1. avoid that our  offense bots struggle for ball. loop over buddies -> 
+ *      if BehaviorStatus::chaseBallCard or clearOwnHalfCard or clearOwnHalfCardGoalie exit this card
+    
  * - Check: ShootAtGoal has higher priority and takes over close to opp.goal
  */
 
@@ -34,6 +35,7 @@
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/BehaviorControl/PlayerRole.h"
+#include "Representations/Communication/TeamData.h"
 #include "Representations/BehaviorControl/TeammateRoles.h"
 
 
@@ -48,6 +50,7 @@ CARD(ChaseBallCard,
         REQUIRES(RobotInfo),
         REQUIRES(FieldBall),
         REQUIRES(FieldDimensions),
+        REQUIRES(TeamData),   // check behavior
         REQUIRES(TeammateRoles),
 
         DEFINES_PARAMETERS(
@@ -71,6 +74,7 @@ class ChaseBallCard : public ChaseBallCardBase
     //mit einem threshold damit Stürmer noch teils ins eigene Feld darf
   
     return 
+      !aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
       theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
       theRobotPose.translation.x() > (0 - threshold) &&
       theFieldBall.positionOnField.x() >= theRobotPose.translation.x() - threshold;
@@ -127,6 +131,18 @@ class ChaseBallCard : public ChaseBallCardBase
   {
     return (theRobotPose.inversePose * Vector2f(theFieldBall.endPositionOnField.x(), theFieldBall.endPositionOnField.y())).angle();
   }
+
+    bool aBuddyIsChasingOrClearing() const
+    {
+      for (const auto& buddy : theTeamData.teammates) 
+      {
+        if (buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie) 
+          return true;
+      }
+      return false;
+    }
 };
 
 MAKE_CARD(ChaseBallCard);
