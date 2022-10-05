@@ -78,7 +78,6 @@ void EventBasedCommunicationHandler::ebcLevelMonitor(){
     
     if(ebc_last_activity != theBehaviorStatus.activity){ 
       ebcImportantMessageSend();  // this is an important event - send asap
-      OUTPUT_TEXT("robot nr:" << theRobotInfo.number << ": msg: my behavior has changed.");
       ebc_last_activity = theBehaviorStatus.activity; ///
       if(ebcDebugMessages){
         OUTPUT_TEXT("robot nr:" << theRobotInfo.number << ": msg: my behavior has changed.");

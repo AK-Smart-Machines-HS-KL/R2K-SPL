@@ -134,7 +134,7 @@ class GoalieLongShotCard : public GoalieLongShotCardBase
 
       // need to clarify: opponent detection
 
-      if (ob.isOpponent() || ob.isTeammate()) { //tbd: check for teammate, add sector wheel)
+      if (ob.isOpponent()) { //tbd: check for teammate, add sector wheel)
         float distanceOpponentToBall = (ob.center - theFieldBall.positionRelative).norm();
 
 
