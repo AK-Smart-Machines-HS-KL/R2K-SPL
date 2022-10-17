@@ -1,7 +1,7 @@
 /**
  * @file DefenseLongShotCard.cpp
  * @author Nicholas Pfohlmann, Adrian Müller 
- * @version: 1.1
+ * @version: 1.2
  *
  * Functions, values, side effects: 
  * - this card qualifies for the one DEFENSE player only who is closest to the ball
@@ -21,6 +21,7 @@
  * 
  * v1.1: added kick variations (precise and unprecise) and now using opponent-ball as distance
  *       and check if I am closer to ball than opponent
+ * V1.2: uses new enum LongShotType in KickInfo.h for precise and fast longshot
  * 
  * After kick:
  * - a) card exists if role no longer is playsTheBall()
@@ -84,10 +85,10 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
   {
     return
       theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
-      opponentIsTooClose() != 0 &&  // see below: min distance is minOppDistance
+      opponentIsTooClose() != KickInfo::LongShotType::noKick &&  // see below: min distance is minOppDistance
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
 
-      //don't leaf own half, unless we are in OFFENSIVE or SPARSE Mode)
+      //don't leave own half, unless we are in OFFENSIVE or SPARSE Mode)
       (
         theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_OFFENSIVE_GAME ||
         theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME ||
@@ -110,13 +111,13 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
       footIsSelected = true;
       leftFoot = theFieldBall.positionRelative.y() < 0;
     }
-    KickInfo::KickType longShotKickType = leftFoot ? KickInfo::forwardFastLeftLong : KickInfo::forwardFastRightLong;
+    KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeftLong : KickInfo::forwardFastRightLong;
     
     switch (opponentIsTooClose())
     {
-      case(1): theGoToBallAndKickSkill(calcAngleToGoal(), longShotKickType, false); break;
-      case(2): theGoToBallAndKickSkill(calcAngleToGoal(), longShotKickType, true); break;
-      default: theGoToBallAndKickSkill(calcAngleToGoal(), longShotKickType); break;
+      case(KickInfo::LongShotType::fast): theGoToBallAndKickSkill(calcAngleToGoal(), kickType, false); break;
+      case(KickInfo::LongShotType::precise): theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true); break;
+      default: theGoToBallAndKickSkill(calcAngleToGoal(), kickType); break;
     }
   }
 
@@ -126,27 +127,24 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
   }
 
   //returns an int value depending on how far the ball is away from the opponent
-  //0: opponent is too close or is closer at ball than me
-  //1: close  -> fast, unprecise kick
-  //2: far    -> precise kick
-  int opponentIsTooClose() const {
-    int lowestProximityIndex = 2;
+  KickInfo::LongShotType opponentIsTooClose() const {
+    KickInfo::LongShotType lowestProximityIndex = KickInfo::LongShotType::precise;
     float distanceToBall = theFieldBall.positionRelative.norm();
 
     for (const Obstacle& ob : theObstacleModel.obstacles)
     {
 
-      //  // need to clarify: opponent detection
+      //need to clarify: opponent detection
       if (ob.isOpponent() ) { //tbd: check for teammate, add sector wheel)
         float distanceOpponentToBall = (ob.center - theFieldBall.positionRelative).norm();
 
         //is any opponent closer to ball than me or is too close to ball
         if (distanceToBall >= distanceOpponentToBall || distanceOpponentToBall <= minOppDistance) {
-          return 0; 
+          return KickInfo::LongShotType::noKick; 
         }
 
         if (distanceOpponentToBall <= preciseKickDistance) { //close enemy found
-          lowestProximityIndex = 1;
+          lowestProximityIndex = KickInfo::LongShotType::fast;
         }
       }
     }

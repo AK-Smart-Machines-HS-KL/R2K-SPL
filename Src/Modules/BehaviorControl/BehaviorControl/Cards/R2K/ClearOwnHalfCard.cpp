@@ -75,7 +75,7 @@ CARD(ClearOwnHalfCard,
 
     DEFINES_PARAMETERS(
     {,
-      (float)(2500) minOppDistance,
+      (float)(2000) minOppDistance,
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
     }),
