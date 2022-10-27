@@ -75,7 +75,6 @@ CARD(ClearOwnHalfCard,
 
     DEFINES_PARAMETERS(
     {,
-      (float)(2500) minOppDistance,
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
     }),
@@ -89,7 +88,7 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
       theGameInfo.setPlay == SET_PLAY_NONE &&
       !aBuddyIsClearingOwnHalf() &&
       //theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
-      opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
+      theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
       theFieldBall.endPositionOnField.x() < 0 && 
       !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME);
@@ -114,16 +113,6 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
       theGoToBallAndKickSkill(0, KickInfo::walkForwardsLeft);
     else
       theGoToBallAndKickSkill(0, KickInfo::walkForwardsRight);
-  }
-
-
-  // need to clarify: opponent detection
-  bool opponentIsClose() const{
-    for (const Obstacle& ob : theObstacleModel.obstacles)
-    {if (ob.isOpponent()) // || ob.isTeammate())
-      return ob.center.norm() <= minOppDistance;
-    }
-    return false;
   }
 
   bool aBuddyIsClearingOwnHalf() const

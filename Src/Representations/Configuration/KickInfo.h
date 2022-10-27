@@ -3,6 +3,9 @@
  * Declaration of a representation that contains information about the available kicks
  * @author jeff
  * @author Lukas Post
+ * 
+ * @author Nicholas Pfohlmann
+ * Note: Added Enum LongShotType for **LongShotCards
  */
 
 #pragma once
@@ -44,6 +47,13 @@ STREAMABLE(KickInfo,
 
     // kicks up to here are used by the KickView
     newKick,
+  });
+
+  ENUM(LongShotType,
+  {,
+    noKick,
+    fast,
+    precise,
   });
 
   STREAMABLE(Kick,
