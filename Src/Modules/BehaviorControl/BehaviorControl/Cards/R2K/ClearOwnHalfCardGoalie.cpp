@@ -73,7 +73,6 @@ CARD(ClearOwnHalfCardGoalie,
 
     DEFINES_PARAMETERS(
     {,
-      (float)(1500) minOppDistance,
       (float)(500) maxDistanceFromGoalArea,  // how far  goalie will leave the goal box
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
@@ -87,7 +86,7 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
     return
       theGameInfo.setPlay == SET_PLAY_NONE &&
       //theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
-      opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
+      theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) && // my recent role
       theFieldBall.endPositionOnField.x() <= theFieldDimensions.xPosOwnGoalArea + maxDistanceFromGoalArea &&
       !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME);
@@ -113,16 +112,7 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
     else
       theGoToBallAndKickSkill(0, KickInfo::walkForwardsRight);
   }
-
-
-  // need to clarify: opponent detection
-  bool opponentIsClose() const{
-    for (const Obstacle& ob : theObstacleModel.obstacles)
-    {if (ob.isOpponent()) // || ob.isTeammate())
-      return ob.center.norm() <= minOppDistance;
-    }
-    return false;
-  }
+  
 };
 
 MAKE_CARD(ClearOwnHalfCardGoalie);

@@ -73,8 +73,6 @@ CARD(GoalieLongShotCard,
 
   DEFINES_PARAMETERS(
     {,
-      (float)(1500) minOppDistance,
-      (float)(2500) preciseKickDistance,
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
     }),
@@ -86,7 +84,7 @@ class GoalieLongShotCard : public GoalieLongShotCardBase
   {
     return
       theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
-      opponentIsTooClose() != KickInfo::LongShotType::noKick &&  // see below: distace is minOppDistance
+      theObstacleModel.opponentIsTooClose(theFieldBall.positionRelative) != KickInfo::LongShotType::noKick &&  // see below: distace is minOppDistance
       theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) &&// my recent role
 
       theFieldBall.positionOnField.x() <= theFieldDimensions.xPosOwnPenaltyMark &&   //don't go to far way out
@@ -109,7 +107,7 @@ class GoalieLongShotCard : public GoalieLongShotCardBase
     }
     KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeftLong : KickInfo::forwardFastRightLong;
 
-    switch (opponentIsTooClose())
+    switch (theObstacleModel.opponentIsTooClose(theFieldBall.positionRelative))
     {
       case(KickInfo::LongShotType::fast): theGoToBallAndKickSkill(calcAngleToGoal(), kickType, false); break;
       case(KickInfo::LongShotType::precise): theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true); break;
@@ -120,36 +118,6 @@ class GoalieLongShotCard : public GoalieLongShotCardBase
   Angle calcAngleToGoal() const
   {
     return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
-  }
-
-  //returns an int value depending on how far the ball is away from the opponent
-  KickInfo::LongShotType opponentIsTooClose() const {
-    KickInfo::LongShotType lowestProximityIndex = KickInfo::LongShotType::precise;
-    float distanceToBall = theFieldBall.positionRelative.norm();
-
-    for (const Obstacle& ob : theObstacleModel.obstacles)
-    {
-
-      // need to clarify: opponent detection
-
-      if (ob.isOpponent()) { //tbd: check for teammate, add sector wheel)
-        float distanceOpponentToBall = (ob.center - theFieldBall.positionRelative).norm();
-
-
-
-        //       (float)(1500) minOppDistance,
-        //       (float)(2500) preciseKickDistance,
-        //is any opponent closer to ball than me or is too close to ball
-        if (distanceToBall >= distanceOpponentToBall || distanceOpponentToBall <= minOppDistance) {
-          return KickInfo::LongShotType::noKick;
-        }
-
-        if (distanceOpponentToBall <= preciseKickDistance) { //close enemy found
-          lowestProximityIndex = KickInfo::LongShotType::fast;
-        }
-      }
-    }
-    return lowestProximityIndex;
   }
 };
 
