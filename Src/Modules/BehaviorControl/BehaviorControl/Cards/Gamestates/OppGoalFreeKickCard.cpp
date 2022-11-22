@@ -74,7 +74,11 @@ class OppGoalFreeKickCard : public OppGoalFreeKickCardBase
       action
       {
         theLookForwardSkill();
-				thePathToTargetSkill(theGlobalOptions.walkSpeed, Pose2f(theFieldBall.positionRelative.angle(), theDefaultPose.defaultPosition));
+				//thePathToTargetSkill(theGlobalOptions.walkSpeed, Pose2f(theFieldBall.positionRelative.angle(), theDefaultPose.defaultPosition));
+        
+        theStandSkill();
+        /*TODO: target location, walk speed, motion request for avoid obstacles :
+        theWalkToPoseSkill(Pose2f target, Pose2f speed, Motionrequest::ObstacleAvoidance);*/
       }
     }
 

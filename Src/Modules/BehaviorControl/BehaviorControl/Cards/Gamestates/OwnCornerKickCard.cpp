@@ -11,15 +11,22 @@
  * V1.1 Card migrated (Nicholas)
  */
 
-#include "Representations/BehaviorControl/Skills.h"
-#include "Representations/Communication/GameInfo.h"
-#include "Representations/Communication/TeamInfo.h"
-#include "Representations/BehaviorControl/TeamBehaviorStatus.h"
-
-#include "Tools/Math/Geometry.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
+
+#include "Representations/BehaviorControl/Skills.h"
+#include "Representations/BehaviorControl/FieldBall.h"
+#include "Representations/BehaviorControl/TeamBehaviorStatus.h"
+
+#include "Representations/Configuration/FieldDimensions.h"
+
+#include "Representations/Communication/GameInfo.h"
+#include "Representations/Communication/TeamInfo.h"
 #include "Representations/Communication/RobotInfo.h"
+
+#include "Representations/Modeling/RobotPose.h"
+
+#include "Tools/Math/Geometry.h"
 
 
 CARD(OwnCornerKickCard,
@@ -27,12 +34,16 @@ CARD(OwnCornerKickCard,
   CALLS(Stand),
   CALLS(Activity),
   CALLS(LookForward),
-  CALLS(WalkToBallAndKickAtGoal),
+  CALLS(GoToBallAndKick),
 
+  REQUIRES(FieldBall),
+  REQUIRES(RobotPose),
+  REQUIRES(RobotInfo),
+  REQUIRES(FieldDimensions),
   REQUIRES(OwnTeamInfo),
   REQUIRES(GameInfo),
   REQUIRES(TeamBehaviorStatus),
-  REQUIRES(RobotInfo),
+  REQUIRES(TeammateRoles),
 });
 
 class OwnCornerKickCard : public OwnCornerKickCardBase
@@ -42,7 +53,8 @@ class OwnCornerKickCard : public OwnCornerKickCardBase
    */
   bool preconditions() const override
   {
-		return theTeamBehaviorStatus.role.playBall
+		return /*deprecated theTeamBehaviorStatus.role.playBall*/
+        theTeammateRoles.playsTheBall(theRobotInfo.number)
         && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
         && theGameInfo.setPlay == SET_PLAY_CORNER_KICK;
   }
@@ -70,8 +82,11 @@ class OwnCornerKickCard : public OwnCornerKickCardBase
       action
       {
         theLookForwardSkill();
+
         // theStandSkill();
-				theWalkToBallAndKickAtGoalSkill();
+        bool leftFoot = theFieldBall.positionRelative.y() < 0;
+        KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
+        theGoToBallAndKickSkill(calcAngleToGoal(), kickType);
       }
     }
 
@@ -100,6 +115,11 @@ class OwnCornerKickCard : public OwnCornerKickCardBase
         
       }
     }
+  }
+
+  Angle calcAngleToGoal() const
+  {
+    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
   }
 };
 

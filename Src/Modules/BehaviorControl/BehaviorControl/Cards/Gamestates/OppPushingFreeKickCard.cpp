@@ -12,13 +12,21 @@
  * V1.1 Card migrated (Nicholas)
  */
 
-#include "Representations/BehaviorControl/Skills.h"
-#include "Representations/Communication/GameInfo.h"
-#include "Representations/Communication/TeamInfo.h"
-
-#include "Tools/Math/Geometry.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
+
+#include "Representations/BehaviorControl/Skills.h"
+#include "Representations/BehaviorControl/TeamBehaviorStatus.h"
+
+#include "Representations/Configuration/FieldDimensions.h"
+
+#include "Representations/Communication/GameInfo.h"
+#include "Representations/Communication/TeamInfo.h"
+#include "Representations/Communication/RobotInfo.h"
+
+#include "Representations/Modeling/RobotPose.h"
+
+#include "Tools/Math/Geometry.h"
 
 // default actions for GORE2022
 #include "Representations/BehaviorControl/FieldBall.h"
@@ -32,13 +40,19 @@ CARD(OppPushingFreeKickCard,
   CALLS(Stand),
   CALLS(Activity),
   CALLS(LookForward),
-  CALLS(PathToTarget),
+  CALLS(GoToBallAndDribble),
 
   REQUIRES(DefaultPose),
+  REQUIRES(GlobalOptions),
+
   REQUIRES(FieldBall),
+  REQUIRES(RobotPose),
+  REQUIRES(RobotInfo),
+  REQUIRES(FieldDimensions),
   REQUIRES(OwnTeamInfo),
   REQUIRES(GameInfo),
-  REQUIRES(GlobalOptions),
+  REQUIRES(TeamBehaviorStatus),
+  REQUIRES(TeammateRoles),
 });
 
 class OppPushingFreeKickCard : public OppPushingFreeKickCardBase
@@ -75,7 +89,9 @@ class OppPushingFreeKickCard : public OppPushingFreeKickCardBase
       action
       {
         theLookForwardSkill();
-				thePathToTargetSkill(theGlobalOptions.walkSpeed, Pose2f(theFieldBall.positionRelative.angle(), theDefaultPose.defaultPosition));
+
+        //thePathToTargetSkill(theGlobalOptions.walkSpeed, Pose2f(blockingPos));
+      theStandSkill();
       }
     }
 
@@ -104,6 +120,11 @@ class OppPushingFreeKickCard : public OppPushingFreeKickCardBase
         
       }
     }
+  }
+  
+  Angle calcAngleToGoal() const
+  {
+    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
   }
 };
 

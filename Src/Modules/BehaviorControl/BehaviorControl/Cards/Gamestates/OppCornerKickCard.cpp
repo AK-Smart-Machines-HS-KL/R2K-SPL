@@ -14,7 +14,7 @@
  * V1.2 Card migrated (Nicholas)
  */
 
-#include "Representations/BehaviorControl/Skills.h"  //Path2Target
+#include "Representations/BehaviorControl/Skills.h"  //Path2Target missing
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/TeamInfo.h"
 #include "Representations/Configuration/GlobalOptions.h"
@@ -34,7 +34,7 @@ CARD(OppCornerKickCard,
   CALLS(Stand),
   CALLS(Activity),
   CALLS(LookForward),
-	CALLS(PathToTarget),
+  CALLS(WalkToPose),
 
   REQUIRES(DefaultPose),
 	REQUIRES(GlobalOptions),
@@ -78,7 +78,11 @@ class OppCornerKickCard : public OppCornerKickCardBase
       action
       {
         theLookForwardSkill();
-				thePathToTargetSkill(theGlobalOptions.walkSpeed, Pose2f(theFieldBall.positionRelative.angle(), theDefaultPose.defaultPosition));
+				//deprecated thePathToTargetSkill(theGlobalOptions.walkSpeed, Pose2f(theFieldBall.positionRelative.angle(), theDefaultPose.defaultPosition));
+        theStandSkill();
+
+        /*TODO: target location, walk speed, motion request for avoid obstacles :
+        theWalkToPoseSkill(Pose2f target, Pose2f speed, Motionrequest::ObstacleAvoidance);*/
       }
     }
 

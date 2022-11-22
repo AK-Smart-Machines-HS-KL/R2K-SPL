@@ -10,16 +10,22 @@
  * V1.1 Card migrated (Nicholas)
  */
 
-#include "Representations/BehaviorControl/Skills.h"
-#include "Representations/Communication/GameInfo.h"
-#include "Representations/Communication/TeamInfo.h"
-
-#include "Tools/Math/Geometry.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
-#include "Representations/BehaviorControl/TeamBehaviorStatus.h"
-#include "Representations/Communication/RobotInfo.h"
+
+#include "Representations/BehaviorControl/Skills.h"
 #include "Representations/BehaviorControl/FieldBall.h"
+#include "Representations/BehaviorControl/TeamBehaviorStatus.h"
+
+#include "Representations/Configuration/FieldDimensions.h"
+
+#include "Representations/Communication/GameInfo.h"
+#include "Representations/Communication/TeamInfo.h"
+#include "Representations/Communication/RobotInfo.h"
+
+#include "Representations/Modeling/RobotPose.h"
+
+#include "Tools/Math/Geometry.h"
 
 
 CARD(OppKickoffCard,
@@ -27,12 +33,17 @@ CARD(OppKickoffCard,
   CALLS(Stand),
   CALLS(Activity),
   CALLS(LookForward),
+  CALLS(GoToBallAndKick),
 
+  REQUIRES(FieldBall),
+  REQUIRES(RobotPose),
+  REQUIRES(RobotInfo),
+  REQUIRES(FieldDimensions),
   REQUIRES(OwnTeamInfo),
   REQUIRES(GameInfo),
   REQUIRES(TeamBehaviorStatus),
-  REQUIRES(RobotInfo),
-  REQUIRES(FieldBall),
+  REQUIRES(TeammateRoles),
+
   DEFINES_PARAMETERS(
   {,
     (float)(200.0f) ballKickedThreshold,
@@ -52,10 +63,10 @@ class OppKickoffCard : public OppKickoffCardBase
   bool preconditions() const override
   {
     return theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
-        && theGameInfo.secsRemaining >= 590
-        && theGameInfo.state == STATE_PLAYING
-        && theFieldBall.positionOnField.norm() < ballKickedThreshold
-        && !theTeamBehaviorStatus.isGoalie(theRobotInfo.number);
+      && theGameInfo.secsRemaining >= 590
+      && theGameInfo.state == STATE_PLAYING
+      && theFieldBall.positionOnField.norm() < ballKickedThreshold
+      && !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number);
   }
 
   /**
@@ -74,9 +85,9 @@ class OppKickoffCard : public OppKickoffCardBase
     {
       transition
       {
-        if (theTeamBehaviorStatus.isOffense(theRobotInfo.number)) {
+        if (theTeammateRoles.isTacticalOffense(theRobotInfo.number)) {
           goto forward;
-        } else if (theTeamBehaviorStatus.isDefense(theRobotInfo.number)) {
+        } else if (theTeammateRoles.isTacticalDefense(theRobotInfo.number)) {
           goto back;
         }
       }

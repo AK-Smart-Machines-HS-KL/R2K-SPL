@@ -45,8 +45,16 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanCompressedMessageParticle<Behavior
 
     goalieLongShotCard, 
     offenseFastGoalKick, 
-    // end R2K stuff
     
+    //Game States
+    ownFreeKick,
+    oppFreeKick,
+
+    ownKickoff,
+    oppKickoff,
+
+    // end R2K stuff
+
     calibrationFinished,
 
     referenceCard,      // R2K

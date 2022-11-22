@@ -7,16 +7,26 @@
  *   
  * Covers the Free Kick: Own Team has Kick in
  * added (Adrian): pre-condition: triggers for role.playBall, action: WalkToBallAndKickAtGoal
- * V1.1 Card migrated (Nicholas)
+ * V1.1 Card migrated; uses goToBallAndKickAtGoal (Nicholas) 
  */
 
-#include "Representations/BehaviorControl/Skills.h"
-#include "Representations/Communication/GameInfo.h"
-#include "Representations/BehaviorControl/TeamBehaviorStatus.h"
-#include "Representations/Communication/TeamInfo.h"
-#include "Tools/Math/Geometry.h"
+
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
+
+#include "Representations/BehaviorControl/Skills.h"
+#include "Representations/BehaviorControl/FieldBall.h"
+#include "Representations/BehaviorControl/TeamBehaviorStatus.h"
+
+#include "Representations/Configuration/FieldDimensions.h"
+
+#include "Representations/Communication/GameInfo.h"
+#include "Representations/Communication/TeamInfo.h"
+#include "Representations/Communication/RobotInfo.h"
+
+#include "Representations/Modeling/RobotPose.h"
+
+#include "Tools/Math/Geometry.h"
 
 
 CARD(OwnKickInCard,
@@ -24,10 +34,16 @@ CARD(OwnKickInCard,
   CALLS(Stand),
   CALLS(Activity),
   CALLS(LookForward),
-  CALLS(WalkToBallAndKickAtGoal),
+  CALLS(GoToBallAndKick),
+
+  REQUIRES(FieldBall),
+  REQUIRES(RobotPose),
+  REQUIRES(RobotInfo),
+  REQUIRES(FieldDimensions),
   REQUIRES(OwnTeamInfo),
   REQUIRES(GameInfo),
   REQUIRES(TeamBehaviorStatus),
+  REQUIRES(TeammateRoles),
 });
 
 class OwnKickInCard : public OwnKickInCardBase
@@ -37,7 +53,8 @@ class OwnKickInCard : public OwnKickInCardBase
    */
   bool preconditions() const override
   {
-		return theTeamBehaviorStatus.role.playBall
+    return /*deprecated: theTeamBehaviorStatus.role.playBall*/
+        theTeammateRoles.playsTheBall(theRobotInfo.number)
         && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
         && theGameInfo.setPlay == SET_PLAY_KICK_IN;
   }
@@ -65,8 +82,10 @@ class OwnKickInCard : public OwnKickInCardBase
       action
       {
         theLookForwardSkill();
-        // theStandSkill
-				theWalkToBallAndKickAtGoalSkill();
+
+        bool leftFoot = theFieldBall.positionRelative.y() < 0;
+        KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
+        theGoToBallAndKickSkill(calcAngleToGoal(), kickType);
       }
     }
 
@@ -95,6 +114,11 @@ class OwnKickInCard : public OwnKickInCardBase
         
       }
     }
+  }
+
+  Angle calcAngleToGoal() const
+  {
+    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
   }
 };
 

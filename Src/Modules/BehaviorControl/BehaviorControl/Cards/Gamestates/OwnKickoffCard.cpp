@@ -10,15 +10,22 @@
  * V1.1 Card migrated (Nicholas)
  */
 
+#include "Tools/BehaviorControl/Framework/Card/Card.h"
+#include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
+
 #include "Representations/BehaviorControl/Skills.h"
+#include "Representations/BehaviorControl/FieldBall.h"
+#include "Representations/BehaviorControl/TeamBehaviorStatus.h"
+
+#include "Representations/Configuration/FieldDimensions.h"
+
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/TeamInfo.h"
 #include "Representations/Communication/RobotInfo.h"
 
+#include "Representations/Modeling/RobotPose.h"
+
 #include "Tools/Math/Geometry.h"
-#include "Tools/BehaviorControl/Framework/Card/Card.h"
-#include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
-#include "Representations/BehaviorControl/TeamBehaviorStatus.h"
 
 
 
@@ -27,12 +34,16 @@ CARD(OwnKickoffCard,
   CALLS(Stand),
   CALLS(Activity),
   CALLS(LookForward),
-  CALLS(GoAndKickAtTarget),
+  CALLS(GoToBallAndKick),
 
+  REQUIRES(FieldBall),
+  REQUIRES(RobotPose),
+  REQUIRES(RobotInfo),
+  REQUIRES(FieldDimensions),
   REQUIRES(OwnTeamInfo),
   REQUIRES(GameInfo),
-  REQUIRES(RobotInfo),
-	REQUIRES(TeamBehaviorStatus),
+  REQUIRES(TeamBehaviorStatus),
+  REQUIRES(TeammateRoles),
 
   DEFINES_PARAMETERS(
   {,
@@ -96,9 +107,17 @@ class OwnKickoffCard : public OwnKickoffCardBase
       action
       {
         theLookForwardSkill();
-        theGoAndKickAtTargetSkill(kickTarget);
+
+        bool leftFoot = theFieldBall.positionRelative.y() < 0;
+        KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
+        theGoToBallAndKickSkill(calcAngleToTarget(), kickType);
       }
     }
+  }
+
+  Angle calcAngleToTarget() const
+  {
+    return (theRobotPose.inversePose * kickTarget).angle();
   }
 };
 
