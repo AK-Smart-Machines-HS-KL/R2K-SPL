@@ -81,9 +81,10 @@ class OppCornerKickCard : public OppCornerKickCardBase
       {
         theLookForwardSkill();
 				
+        Pose2f speed = Pose2f(theGlobalOptions.walkSpeed, theGlobalOptions.walkSpeed, theGlobalOptions.walkSpeed);
         Pose2f blockingPos = Pose2f(theFieldBall.positionRelative.angle(), theDefaultPose.ownDefaultPose.translation);
         auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(blockingPos, true, false);
-        theWalkToPoseSkill(blockingPos, theGlobalOptions.walkSpeed, obstacleAvoidance, true);
+        theWalkToPoseSkill(blockingPos, speed, obstacleAvoidance, true);
       }
     }
 

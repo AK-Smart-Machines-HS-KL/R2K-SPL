@@ -136,8 +136,9 @@ class OppKickInCard : public OppKickInCardBase
       {
         theLookForwardSkill();
 
+        Pose2f speed = Pose2f(theGlobalOptions.walkSpeed, theGlobalOptions.walkSpeed, theGlobalOptions.walkSpeed);
         auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(blockingPos, true, false);
-        theWalkToPoseSkill(blockingPos, theGlobalOptions.walkSpeed, obstacleAvoidance, true);
+        theWalkToPoseSkill(blockingPos, speed, obstacleAvoidance, true);
       }
     }
 
@@ -152,8 +153,9 @@ class OppKickInCard : public OppKickInCardBase
       { 
         theLookForwardSkill();
 
+        Pose2f speed = Pose2f(theGlobalOptions.walkSpeed, theGlobalOptions.walkSpeed, theGlobalOptions.walkSpeed);
         auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(theDefaultPose.ownDefaultPose, true, false);
-        theWalkToPoseSkill(theDefaultPose.ownDefaultPose, theGlobalOptions.walkSpeed, obstacleAvoidance, true);
+        theWalkToPoseSkill(theDefaultPose.ownDefaultPose, speed, obstacleAvoidance, true);
       }
     }
   }
