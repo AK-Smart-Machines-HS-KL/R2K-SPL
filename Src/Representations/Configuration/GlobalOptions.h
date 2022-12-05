@@ -14,4 +14,5 @@
 STREAMABLE(GlobalOptions,
 {,
   (bool)(false) slowWalk, /**< Use the slow walking parameters for all robots. */
+  (Pose2f)(1f,1f,1f) walkSpeed, /*walking speed for Gamestate cards*/
 });

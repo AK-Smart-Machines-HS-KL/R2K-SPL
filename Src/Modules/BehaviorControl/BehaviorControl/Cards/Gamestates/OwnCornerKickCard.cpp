@@ -83,7 +83,6 @@ class OwnCornerKickCard : public OwnCornerKickCardBase
       {
         theLookForwardSkill();
 
-        // theStandSkill();
         bool leftFoot = theFieldBall.positionRelative.y() < 0;
         KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
         theGoToBallAndKickSkill(calcAngleToGoal(), kickType);

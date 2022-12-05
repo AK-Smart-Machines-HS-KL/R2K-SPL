@@ -15,6 +15,7 @@
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 
+#include "Representations/BehaviorControl/Libraries/LibWalk.h"
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h"
 
@@ -41,16 +42,17 @@ CARD(OppPushingFreeKickCard,
   CALLS(Activity),
   CALLS(LookForward),
   CALLS(GoToBallAndDribble),
+  CALLS(WalkToPose),
 
   REQUIRES(DefaultPose),
-  REQUIRES(GlobalOptions),
-
   REQUIRES(FieldBall),
+  REQUIRES(FieldDimensions),
+  REQUIRES(GameInfo),
+  REQUIRES(GlobalOptions),
   REQUIRES(RobotPose),
   REQUIRES(RobotInfo),
-  REQUIRES(FieldDimensions),
+  REQUIRES(LibWalk),
   REQUIRES(OwnTeamInfo),
-  REQUIRES(GameInfo),
   REQUIRES(TeamBehaviorStatus),
   REQUIRES(TeammateRoles),
 });
@@ -90,8 +92,9 @@ class OppPushingFreeKickCard : public OppPushingFreeKickCardBase
       {
         theLookForwardSkill();
 
-        //thePathToTargetSkill(theGlobalOptions.walkSpeed, Pose2f(blockingPos));
-      theStandSkill();
+        Pose2f blockingPos = Pose2f(theFieldBall.positionRelative.angle(), theDefaultPose.ownDefaultPose.translation);
+        auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(blockingPos, true, false);
+        theWalkToPoseSkill(blockingPos, theGlobalOptions.walkSpeed, obstacleAvoidance, true);
       }
     }
 

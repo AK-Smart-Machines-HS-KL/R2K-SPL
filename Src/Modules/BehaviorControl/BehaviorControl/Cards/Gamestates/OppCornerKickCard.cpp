@@ -11,10 +11,11 @@
  * Notes 1.0
  * - PathToTarget default position is implemented. Will be called in R2KDefensive mode.
  * 
- * V1.2 Card migrated (Nicholas)
+ * V1.2 Card migrated (Nicholas), uses WalkToPose instead of PathToTarget skill -> WalkToPose has obstacle avoidance
  */
 
-#include "Representations/BehaviorControl/Skills.h"  //Path2Target missing
+#include "Representations/BehaviorControl/Libraries/LibWalk.h"
+#include "Representations/BehaviorControl/Skills.h" 
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/TeamInfo.h"
 #include "Representations/Configuration/GlobalOptions.h"
@@ -37,10 +38,11 @@ CARD(OppCornerKickCard,
   CALLS(WalkToPose),
 
   REQUIRES(DefaultPose),
-	REQUIRES(GlobalOptions),
-  REQUIRES(OwnTeamInfo),
-  REQUIRES(GameInfo),
 	REQUIRES(FieldBall),
+  REQUIRES(GameInfo),
+	REQUIRES(GlobalOptions),
+  REQUIRES(LibWalk),
+  REQUIRES(OwnTeamInfo),
 });
 
 class OppCornerKickCard : public OppCornerKickCardBase
@@ -78,11 +80,10 @@ class OppCornerKickCard : public OppCornerKickCardBase
       action
       {
         theLookForwardSkill();
-				//deprecated thePathToTargetSkill(theGlobalOptions.walkSpeed, Pose2f(theFieldBall.positionRelative.angle(), theDefaultPose.defaultPosition));
-        theStandSkill();
-
-        /*TODO: target location, walk speed, motion request for avoid obstacles :
-        theWalkToPoseSkill(Pose2f target, Pose2f speed, Motionrequest::ObstacleAvoidance);*/
+				
+        Pose2f blockingPos = Pose2f(theFieldBall.positionRelative.angle(), theDefaultPose.ownDefaultPose.translation);
+        auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(blockingPos, true, false);
+        theWalkToPoseSkill(blockingPos, theGlobalOptions.walkSpeed, obstacleAvoidance, true);
       }
     }
 

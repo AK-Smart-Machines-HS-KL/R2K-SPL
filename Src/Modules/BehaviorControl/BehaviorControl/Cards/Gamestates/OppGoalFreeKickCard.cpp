@@ -12,6 +12,7 @@
  * V1.1 Card migrated (Nicholas)
  */
 
+#include "Representations/BehaviorControl/Libraries/LibWalk.h"
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/TeamInfo.h"
@@ -30,14 +31,14 @@ CARD(OppGoalFreeKickCard,
   CALLS(Stand),
   CALLS(Activity),
   CALLS(LookForward),
-  CALLS(PathToTarget),
+  CALLS(WalkToPose),
 
-  REQUIRES(GameInfo),
 	REQUIRES(DefaultPose),
 	REQUIRES(FieldBall), 
+  REQUIRES(GameInfo),
   REQUIRES(GlobalOptions),
+  REQUIRES(LibWalk),
   REQUIRES(OwnTeamInfo),
-
 });
 
 class OppGoalFreeKickCard : public OppGoalFreeKickCardBase
@@ -74,11 +75,10 @@ class OppGoalFreeKickCard : public OppGoalFreeKickCardBase
       action
       {
         theLookForwardSkill();
-				//thePathToTargetSkill(theGlobalOptions.walkSpeed, Pose2f(theFieldBall.positionRelative.angle(), theDefaultPose.defaultPosition));
-        
-        theStandSkill();
-        /*TODO: target location, walk speed, motion request for avoid obstacles :
-        theWalkToPoseSkill(Pose2f target, Pose2f speed, Motionrequest::ObstacleAvoidance);*/
+
+        Pose2f blockingPos = Pose2f(theFieldBall.positionRelative.angle(), theDefaultPose.ownDefaultPose.translation);
+        auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(blockingPos, true, false);
+        theWalkToPoseSkill(blockingPos, theGlobalOptions.walkSpeed, obstacleAvoidance, true);
       }
     }
 

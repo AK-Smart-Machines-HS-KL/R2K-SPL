@@ -17,6 +17,7 @@
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 
+#include "Representations/BehaviorControl/Libraries/LibWalk.h"
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h"
@@ -43,16 +44,17 @@ CARD(OppKickInCard,
   CALLS(Activity),
   CALLS(LookForward),
   CALLS(GoToBallAndDribble),
-  CALLS(CameraSweep),
+  CALLS(WalkToPose),
 
-  REQUIRES(OwnTeamInfo),
   REQUIRES(DefaultPose),
-  REQUIRES(GlobalOptions),
-  REQUIRES(GameInfo),
-  REQUIRES(TeamData),
   REQUIRES(FieldBall),
-  REQUIRES(RobotPose),
   REQUIRES(FieldDimensions),
+  REQUIRES(GameInfo),
+  REQUIRES(GlobalOptions),
+  REQUIRES(LibWalk),
+  REQUIRES(OwnTeamInfo),
+  REQUIRES(RobotPose),
+  REQUIRES(TeamData),
 
   DEFINES_PARAMETERS(
     {,
@@ -132,13 +134,10 @@ class OppKickInCard : public OppKickInCardBase
 
       action
       {
-        //thePathToTargetSkill(theGlobalOptions.walkSpeed, Pose2f(blockingPos));
-        theStandSkill();
-
-        /*TODO: target location, walk speed, motion request for avoid obstacles :
-        theWalkToPoseSkill(Pose2f target, Pose2f speed, Motionrequest::ObstacleAvoidance);*/
-
         theLookForwardSkill();
+
+        auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(blockingPos, true, false);
+        theWalkToPoseSkill(blockingPos, theGlobalOptions.walkSpeed, obstacleAvoidance, true);
       }
     }
 
@@ -150,14 +149,11 @@ class OppKickInCard : public OppKickInCardBase
       }
 
       action
-      {
-        //thePathToTargetSkill(theGlobalOptions.walkSpeed, Pose2f(theDefaultPose.defaultPosition));
-        theStandSkill();
-
-        /*TODO: target location, walk speed, motion request for avoid obstacles :
-        theWalkToPoseSkill(Pose2f target, Pose2f speed, Motionrequest::ObstacleAvoidance);*/
-        
+      { 
         theLookForwardSkill();
+
+        auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(theDefaultPose.ownDefaultPose, true, false);
+        theWalkToPoseSkill(theDefaultPose.ownDefaultPose, theGlobalOptions.walkSpeed, obstacleAvoidance, true);
       }
     }
   }

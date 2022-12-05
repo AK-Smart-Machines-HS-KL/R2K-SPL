@@ -26,7 +26,6 @@ CARD(OwnPushingFreeKickCard,
   CALLS(Stand),
   CALLS(Activity),
   CALLS(LookForward),
-
   REQUIRES(OwnTeamInfo),
   REQUIRES(GameInfo),
 });
