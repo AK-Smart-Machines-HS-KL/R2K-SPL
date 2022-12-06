@@ -60,14 +60,31 @@ void TeamMessageHandler::update(BHumanMessageOutputGenerator& outputGenerator)
   DEBUG_RESPONSE_ONCE("module:TeamMessageHandler:generateTCMPluginClass")
     teamCommunicationTypeRegistry.generateTCMPluginClass("BHumanStandardMessage.java", static_cast<const CompressedTeamCommunication::RecordType*>(teamMessageType));
 
-  outputGenerator.sendThisFrame =
+  if (ebcEnable) {
+    bool ebcSendThisFrame = theEventBasedCommunicationData.sendThisFrame();
+    if(ebcSendThisFrame) theEventBasedCommunicationData.ebcMessageMonitor();
+
+    outputGenerator.sendThisFrame =
 #ifndef SITTING_TEST
 #ifdef TARGET_ROBOT
-    theMotionRequest.motion != MotionRequest::playDead &&
-    theMotionInfo.executedPhase != MotionPhase::playDead &&
+      theMotionRequest.motion != MotionRequest::playDead &&
+      theMotionInfo.executedPhase != MotionPhase::playDead &&
 #endif
 #endif // !SITTING_TEST
-    (theFrameInfo.getTimeSince(timeLastSent) >= sendInterval || theFrameInfo.time < timeLastSent);
+
+      ebcSendThisFrame;
+  }
+  else {
+
+    outputGenerator.sendThisFrame =
+#ifndef SITTING_TEST
+#ifdef TARGET_ROBOT
+      theMotionRequest.motion != MotionRequest::playDead &&
+      theMotionInfo.executedPhase != MotionPhase::playDead &&
+#endif
+#endif // !SITTING_TEST
+      (theFrameInfo.getTimeSince(timeLastSent) >= sendInterval || theFrameInfo.time < timeLastSent);
+  }
 
   theRobotStatus.hasGroundContact = theGroundContactState.contact && theMotionInfo.executedPhase != MotionPhase::getUp && theMotionRequest.motion != MotionRequest::getUp;
   theRobotStatus.isUpright = theFallDownState.state == FallDownState::upright || theFallDownState.state == FallDownState::staggering || theFallDownState.state == FallDownState::squatting;

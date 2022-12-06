@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug SimRobot(DEV)",
+            "name": "Debug Robot",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/Build/Linux/SimRobot/Develop/SimRobot",
@@ -22,7 +22,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "build_sim_dev",
+            "preLaunchTask": "build sim dev",
             "miDebuggerPath": "/usr/bin/gdb"
         },
 
@@ -44,7 +44,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "build_sim_debug",
+            "preLaunchTask": "build sim debug",
             "miDebuggerPath": "/usr/bin/gdb"
         },
     ]

@@ -29,11 +29,27 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanCompressedMessageParticle<Behavior
     set,
 
     testingBehavior,
+    defaultBehavior,
 
     codeReleaseKickAtGoal,
     codeReleasePositionForKickOff,
+    
 
+    // R2K stuff
+    chaseBallCard,      
+    offenseForwardPassCard, 
+    clearOwnHalfCard,  
+    clearOwnHalfCardGoalie,
+    defenseCard,        
+    defenseLongShotCard,
+
+    goalieLongShotCard, 
+    offenseFastGoalKick, 
+    // end R2K stuff
+    
     calibrationFinished,
+
+    referenceCard,      // R2K
   });
 
   /**

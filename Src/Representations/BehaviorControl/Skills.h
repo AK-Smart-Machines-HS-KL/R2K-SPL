@@ -3,7 +3,13 @@
  *
  * This file declares all skills that are used by the current behavior.
  *
- * @author Probably many people who will not add themselves to this declaration.
+ * @author Probably many people who will not add themselves to this declaration. <- Yes (Check .cpp files)
+ * 
+ * Annotations: 
+ * XX SKILL -     Labelled Skills are usable in a Card / other Skills
+ * ACTION SKILL - A Skill that does something like move the body or the head
+ * DEBUG SKILL -  Usable for printing information / or relaying information to the user
+ * COM SKILL -    Sets Information for communication with other robots (i.e. Behavior status etc.)
  */
 
 #pragma once
@@ -33,25 +39,31 @@ namespace Skills
   SKILL_INTERFACE(PlayDead);
 
   /**
+   * ACTION SKILL
    * This skill makes the robot stand.
    * @param high Whether the knees should be stretched
    */
   SKILL_INTERFACE(Stand, (bool)(false) high);
 
   /**
+   * ACTION SKILL
    * This skill walks with a specified speed.
    * @param speed The walking speed in radians/s for the rotation and mm/s for the translation
    */
   SKILL_INTERFACE(WalkAtAbsoluteSpeed, (const Pose2f&) speed);
 
   /**
-   * This skill walks with a specified speed relative to the configured maximum.
+   * ACTION SKILL
+   * This skill walks with a specified speed relative to the configured maximum. 
+   * Maximums set in Config/Robots/Default/walkingEngine.cfg 
    * @param speed The walking speed as ratio of the maximum speed in [0, 1]
    */
   SKILL_INTERFACE(WalkAtRelativeSpeed, (const Pose2f&) speed);
 
   /**
+   * ACTION SKILL
    * This skill walks to a (relative) target.
+   * Note: No Obstacle Avoidance, Use GoTo Skills for obstacle avoidance
    * @param target The target pose in robot-relative coordinates
    * @param speed The walking speed as ratio of the maximum speed in [0, 1]
    * @param obstacleAvoidance The obstacle avoidance request
@@ -61,6 +73,7 @@ namespace Skills
 
   /**
    * This skill walks to the ball and kicks it.
+   * Note: use GoToBallAndKick
    * @param targetDirection The (robot-relative) direction in which the ball should go
    * @param kickType The type of kick that should be used
    * @param alignPrecisely Whether the robot should align more precisely than usual
@@ -75,6 +88,7 @@ namespace Skills
 
   /**
    * This skill dribbles the ball.
+   * Note: Use GoToBallAndDribble
    * @param targetDirection The (robot-relative) direction in which the ball should go
    * @param speed The walking speed as ratio of the maximum speed in [0, 1]
    * @param obstacleAvoidance The obstacle avoidance request
@@ -112,12 +126,14 @@ namespace Skills
   SKILL_INTERFACE(KeyFrameSingleArm, (ArmKeyFrameRequest::ArmKeyFrameId) motion, (Arms::Arm) arm, (bool)(false) fast);
 
   /**
+   * ACTION SKILL
    * This skill lets one arm point at some point.
    * @param localPoint The point in robot-relative coordinates
    */
   SKILL_INTERFACE(PointAt, (const Vector3f&) localPoint);
 
   /**
+   * ACTION SKILL
    * This skill lets a specific arm point at some point.
    * @param localPoint The point in robot-relative coordinates
    * @param arm The arm that shall be used for pointing
@@ -143,7 +159,9 @@ namespace Skills
   SKILL_INTERFACE(ArmObstacleAvoidanceSingleArm, (Arms::Arm) arm);
 
   /**
+   * ACTION SKILL
    * This skill moves the head to look at interesting points
+   * Note: No idea how this works, but it does well
    * @param withBall Whether the ball must be in the image
    * @param ignoreBall Whether the ball should be completely ignored
    * @param onlyOwnBall Whether to use only the own ball model and not the team ball model
@@ -152,16 +170,19 @@ namespace Skills
   SKILL_INTERFACE(LookActive, (bool)(false) withBall, (bool)(false) ignoreBall, (bool)(false) onlyOwnBall, (bool)(false) fixTilt);
 
   /**
-   * This skill moves the head so that a camera looks at specified angles.
+   * ACTION SKILL
+   * This skill moves the head so that a camera looks at specified angles. 
+   * Note: Is not dynamic. If you want the camera to be dynamic, you must checnge the input angles  
    * @param pan The target pan angle
    * @param tilt The target tilt angle
-   * @param speed The speed with which to move the head
+   * @param speed The speed with which to move the head, in radians/sec
    * @param camera The camera which should have the specified angles
    * @param calibrationMode Whether to set the mode to calibrationMode instead of panAndTiltMode, which disables clipping and interpolation of angles.
    */
   SKILL_INTERFACE(LookAtAngles, (Angle) pan, (Angle) tilt, (float)(180_deg) speed, (HeadMotionRequest::CameraControlMode)(HeadMotionRequest::autoCamera) camera, (bool)(false) calibrationMode);
 
   /**
+   * ACTION SKILL
    * This skill moves the head so that the ball is focused by one camera.
    * @param mirrored Whether to look at the mirrored (about the center of the field) ball position
    * @param forceOwnEstimate Whether to use only the own ball model and not the team ball model
@@ -169,23 +190,29 @@ namespace Skills
   SKILL_INTERFACE(LookAtBall, (bool)(false) mirrored, (bool)(false) forceOwnEstimate);
 
   /**
+   * ACTION SKILL
    * This skill moves the head so that the team ball is focused by one camera.
    * @param mirrored Whether to look at the mirrored (about the center of the field) ball position
    */
   SKILL_INTERFACE(LookAtGlobalBall, (bool)(false) mirrored);
 
   /**
+   * ACTION SKILL
    * This skill moves the head such that a specified (robot-relative) point is focused by one camera.
    * @param target The point to look at in robot-relative coordinates
    * @param camera The camera which should look at the point
-   * @param speed The speed with which to move the head
+   * @param speed The speed with which to move the head, in radians/sec
    */
   SKILL_INTERFACE(LookAtPoint, (const Vector3f&) target, (HeadMotionRequest::CameraControlMode)(HeadMotionRequest::autoCamera) camera, (Angle)(180_deg) speed);
 
-  /** This skill moves the head so that it looks forward.  */
+  /** 
+   * ACTION SKILL
+   * This skill moves the head so that it looks forward.  
+   */
   SKILL_INTERFACE(LookForward);
 
   /**
+   * ACTION SKILL
    * This skill moves the head alternately to the left and to the right
    * @param startLeft Whether to look left first (otherwise right)
    * @param maxPan The maximum pan angle
@@ -195,17 +222,20 @@ namespace Skills
   SKILL_INTERFACE(LookLeftAndRight, (bool)(true) startLeft, (Angle)(50_deg) maxPan, (Angle)(23_deg) tilt, (Angle)(100_deg) speed);
 
   /**
+   * BROKEN SKILL?
+   * HeadOrientation Class does not have a good public, non-constexpr constructor
    * This skill moves the head in steps between the maximum pan and tilt, relative to the current orientation.
-   * @param originalPan
-   * @param originalTilt
-   * @param maxPan The maximum absolute (left and right) horizontal deviation from the original orientation.
-   * @param maxTilt The maximum absolute (up and down) vertical deviation form the original orientation.
-   * @param panStep
-   * @param tiltStep
+   * Note: Pan = Horizontal | Tilt = vertical
+   * @param original starting orientation 
+   * @param maximum maximum deviation from starting orientation (Construct with HeadOrientation(pan, tilt)
+   * @param panStep Pan step angle
+   * @param tiltStep Tilt step angle
+   * @param waitInPosition Time to wait in each position, in ms
    */
   SKILL_INTERFACE(PanAndTiltGrid, (const HeadOrientation&) original, (const HeadOrientation&) maximum, (const Angle&) panStep, (const Angle&) tiltStep, (int) waitInPosition, (Angle)(100_deg) speed);
 
   /**
+   * COM SKILL
    * This skill sets the passTarget member of the BehaviorStatus.
    * Caution: If the passTarget is set to -1, the ballTarget Vector is often used to communicate good angles instead of a position
    * @param passTarget The passTarget to set
@@ -214,41 +244,58 @@ namespace Skills
   SKILL_INTERFACE(PassTarget, (int) passTarget, (const Vector2f&)(Vector2f::Zero()) ballTarget);
 
   /**
+   * COM SKILL
+   * DEBUG SKILL
    * This skill sets the activity member of the BehaviorStatus.
    * @param activity The activity to set
    */
   SKILL_INTERFACE(Activity, (BehaviorStatus::Activity) activity);
 
   /**
+   * DEBUG SKILL
+   * Note: Great for Debugging
    * This skill adds an annotation if it differs from the one that has been added in the last frame.
+   * The Annotation is printed in the behavior stack section of SimRobot
    * @param annotation The annotation message
    */
   SKILL_INTERFACE(Annotation, (const std::string&) annotation);
 
   /**
+   * DEBUG SKILL
    * This skill plays a sound file if it differs from the one that has been played in the last frame.
    * @param name The name of the sound file
    */
   SKILL_INTERFACE(PlaySound, (const std::string&) name);
 
   /**
+   * DEBUG SKILL
    * This skill makes the Nao say something if it differs from what was said in the last frame.
    * @param name The text to be synthesized and pronounced
    * @param speed Use speed < 1 to talk slower and speed > 1 to talk faster.
    */
   SKILL_INTERFACE(Say, (const std::string&) text, (float)(1.f) speed);
+
+  /**
+   * DEBUG SKILL
+   * Skill used by GameplayCard System card
+   * Says the seconds remaining in the Half
+   */
   SKILL_INTERFACE(CountDownHalfTime);
 
   /**
+   * DEBUG SKILL
    * This skill makes the whole team say something at the same time
    * if it differs from what was said in the last frame.
    * @param name The text to be synthesized and pronounced
    */
   SKILL_INTERFACE(TeamSpeaker);
+
+  // Helpers for Team Talk Sync
   SKILL_INTERFACE(TeamPropagator, (const char&)(-1) index, (const unsigned int&)(0) timestamp);
   SKILL_INTERFACE(TeamCountdown, (const int&)(0) stateTime);
 
   /**
+   * ACTION SKILL
    * This skill controls the head for a robot that walks to the ball.
    * @param distanceToTarget The distance to the kick pose (from which the ball can be kicked).
    * @param lookAtKickTarget Whether the robot is allowed to look at the kick target.
@@ -262,6 +309,7 @@ namespace Skills
   SKILL_INTERFACE(ReplayWalk);
 
   /**
+   * ACTION SKILL
    * This skill walks to a target using intelligent path planning.
    * @param target The target pose in robot-relative coordinates
    * @param speed The walking speed as ratio of the maximum speed in [0, 1]
@@ -286,12 +334,15 @@ namespace Skills
   SKILL_INTERFACE(WalkPotentialField, (const Vector2f&) target, (int) playerNumber, (bool)(false) straight, (float)(0.5f) ballFactor, (bool)(false) useRotation, (float)(0.f) rotation);
 
   /**
+   * ACTION SKILL
    * This skill walks to a kickoff pose (i.e. in the ready state).
+   * Has Precise Alignment and ensures standing still before Kickoff
    * @param target The target pose in absolute field coordinates
    */
   SKILL_INTERFACE(WalkToKickoffPose, (const Pose2f&) target);
 
   /**
+   * ACTION SKILL
    * This skill turns the robot on the spot by a specified angle.
    * @param angle The angle relative to the rotation that the robot had when the skill started
    * @param margin The tolerance for the skill to be done
@@ -299,13 +350,16 @@ namespace Skills
   SKILL_INTERFACE(TurnAngle, (Angle) angle, (Angle)(5_deg) margin);
 
   /**
+   * ACTION SKILL
    * This skill turns the robot to look forward at a target.
+   * Does not move head
    * @param target The position in robot relative coordinates to turn to
    * @param margin The tolerance for the skill to be done
    */
   SKILL_INTERFACE(TurnToPoint, (const Vector2f&) target, (Angle)(5_deg) margin);
 
   /**
+   * ACTION SKILL
    * This skill walks to the ball and dribbles it from there.
    * @param targetDirection The direction to which the ball should be dribbled in robot-relative coordinates
    * @param alignPrecisely Whether the robot should align more precisely than usual
@@ -317,7 +371,9 @@ namespace Skills
   SKILL_INTERFACE(GoToBallAndDribble, (Angle) targetDirection, (bool)(false) alignPrecisely, (float)(1.f) kickPower, (bool)(true) preStepAllowed, (bool)(true) turnKickAllowed, (const Rangea&)(Rangea(0_deg, 0_deg)) directionPrecision);
 
   /**
+   * ACTION SKILL
    * This skill walks to the ball and executes a kick there.
+   * Can be used to execute more Powerful or Custom Kicks
    * @param targetDirection The direction to which the ball should be kicked in robot-relative coordinates
    * @param kickType The kick type that should be executed there
    * @param alignPrecisely Whether the robot should align more precisely than usual
@@ -330,7 +386,9 @@ namespace Skills
   SKILL_INTERFACE(GoToBallAndKick, (Angle) targetDirection, (KickInfo::KickType) kickType, (bool)(true) alignPrecisely, (float)(std::numeric_limits<float>::max()) length, (bool)(true) preStepAllowed, (bool)(true) turnKickAllowed, (const Pose2f&)(Pose2f(1.f, 1.f, 1.f)) speed, (const Rangea&)(Rangea(0_deg, 0_deg)) directionPrecision);
 
   /**
+   * ACTION SKILL
    * This skill walks very carefully to a kick pose and executes a kick there.
+   * Specifically made for penalty kicks
    * @param kickPose The pose at which the kick should be executed in robot-relative coordinates
    * @param kickType The kick type that should be executed there
    * @param walkSpeed The walking speed as ratio of the maximum speed in [0, 1]
@@ -352,7 +410,10 @@ namespace Skills
   SKILL_INTERFACE(AfterInterceptBall, (bool)(true) allowGetUp);
 
   /**
+   * COM SKILL
+   * DEBUG SKILL
    * This skill records the walkingTo target and desired speed in the BehaviorStatus.
+   * Can be used to draw Walk target on World State
    * @param target The target the robot is walking towards.
    * @param speed The desired relative speed.
    */

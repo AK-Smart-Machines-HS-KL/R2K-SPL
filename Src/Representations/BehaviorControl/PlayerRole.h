@@ -4,6 +4,8 @@
  * This file declares a representation of a player's role.
  *
  * @author Arne Hasselbring
+ * @version 1.2 Adrian, R2K: removed  goalkeeper, ballPlayer, goalkeeperAndBallPlayer 
+ * striker is now stored as "captain" in TeammateRoles.h
  */
 
 #pragma once
@@ -13,21 +15,18 @@
 #include <string>
 
 STREAMABLE(PlayerRole,
-{
-  ENUM(RoleType,
-  {,
-    none,
-    goalkeeper,
-    ballPlayer,
-
-    // legacy roles from 2019
-    firstSupporterRole,
-    supporter0 = firstSupporterRole,
-    supporter1,
-    supporter2,
-    supporter3,
-    supporter4,
-  });
+  {
+    ENUM(RoleType,
+    {,
+      none,
+      // legacy roles from 2019
+      firstSupporterRole,
+      supporter0 = firstSupporterRole,
+      supporter1,
+      supporter2,
+      supporter3,
+      supporter4,
+    });
 
   /**
    * Compatibility function for 2019 behavior.
@@ -35,16 +34,22 @@ STREAMABLE(PlayerRole,
    */
   bool isGoalkeeper() const
   {
-    return role == goalkeeper;
+    //ASSERT(false); // deprecated function
+    return false;
   }
 
   /**
    * Compatibility function for 2019 behavior.
    * @return Whether the robot plays the ball.
+   * 
+   * 
+   * Adrian, R2K: re-activated for our code base
+   * Since v1.3 we store the number of the bot in "captain"
    */
   bool playsTheBall() const
   {
-    return role == ballPlayer;
+    //ASSERT(false); // deprecated function
+    return false;
   }
 
   /**

@@ -20,6 +20,45 @@ void ObstacleModel::operator<<(const BHumanMessage& m)
   Streaming::streamIt(*m.theBHumanStandardMessage.in, "theObstacleModel",  *this);
 }
 
+// need to clarify: opponent detection
+bool ObstacleModel::opponentIsClose(float min) const{
+  for (const Obstacle& ob : obstacles)
+  {if (ob.isOpponent()) // || ob.isTeammate())
+    return ob.center.norm() <= min;
+  }
+  return false;
+}
+
+//returns an int value depending on how far the ball is away from the opponent
+  KickInfo::LongShotType ObstacleModel::opponentIsTooClose(Vector2f ballPosRelative, float min, float preciseMin) const {
+    KickInfo::LongShotType lowestProximityIndex = KickInfo::LongShotType::precise;
+    float distanceToBall = ballPosRelative.norm();
+
+    for (const Obstacle& ob : obstacles)
+    {
+
+      // need to clarify: opponent detection
+
+      if (ob.isOpponent()) { //tbd: check for teammate, add sector wheel)
+        float distanceOpponentToBall = (ob.center - ballPosRelative).norm();
+
+
+
+        //       (float)(1500) minOppDistance,
+        //       (float)(2500) preciseKickDistance,
+        //is any opponent closer to ball than me or is too close to ball
+        if (distanceToBall >= distanceOpponentToBall || distanceOpponentToBall <= min) {
+          return KickInfo::LongShotType::noKick;
+        }
+
+        if (distanceOpponentToBall <= preciseMin) { //close enemy found
+          lowestProximityIndex = KickInfo::LongShotType::fast;
+        }
+      }
+    }
+    return lowestProximityIndex;
+  }
+
 void ObstacleModel::verify() const
 {
   DECLARE_DEBUG_RESPONSE("representation:ObstacleModel:verify");

@@ -1,5 +1,5 @@
 /**
- * @file TestCard.cpp
+ * @file DefaultCard.cpp
  * @author Andy Hobelsberger    
  * @brief This card's preconditions are always true. 
  *        Edit it for testing
@@ -17,18 +17,22 @@
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 
 // Representations
-#include "Representations/BehaviorControl/FieldBall.h"
+#include "Representations/BehaviorControl/DefaultPose.h"
+#include "Representations/Modeling/RobotPose.h"
 
 //#include <filesystem>
 
 // Modify this card but don't commit changes to keep it clean for other developers
 // Also don't forget to put this card at the top of your Card Stack!
-CARD(TestCard,
+CARD(DefaultCard,
      {
         ,
         CALLS(Activity),
-        CALLS(LookForward),
-        CALLS(Stand),
+        CALLS(LookActive),
+        CALLS(WalkToPoint),
+
+        REQUIRES(DefaultPose),
+        REQUIRES(RobotPose),
 
         DEFINES_PARAMETERS(
              {,
@@ -46,7 +50,7 @@ CARD(TestCard,
 
      });
 
-class TestCard : public TestCardBase
+class DefaultCard : public DefaultCardBase
 {
 
   //always active
@@ -57,21 +61,20 @@ class TestCard : public TestCardBase
 
   bool postconditions() const override
   {
-    return true;   // set to true, when used as default card, ie, lowest card on stack
+    return false; 
   }
 
   void execute() override
   {
 
-    theActivitySkill(BehaviorStatus::testingBehavior);
-    // std::string s = "testingBehavior";
-    // OUTPUT_TEXT(s);
+    theActivitySkill(BehaviorStatus::defaultBehavior);
+    
+    Vector2f targetRelative = theRobotPose.toRelative(theDefaultPose.ownDefaultPose.translation);
 
-    // Override these skills with the skills you wish to test
-    theLookForwardSkill(); // Head Motion Request
-    theStandSkill(); // Standard Motion Request
+    theLookActiveSkill(); // Head Motion Request
+    theWalkToPointSkill(Pose2f(theDefaultPose.ownDefaultPose.rotation - theRobotPose.rotation, targetRelative), 1.0f, true);     
 
   }
 };
 
-MAKE_CARD(TestCard);
+MAKE_CARD(DefaultCard);
