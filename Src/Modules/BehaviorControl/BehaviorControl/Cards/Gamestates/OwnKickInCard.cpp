@@ -19,7 +19,6 @@
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h"
 
 #include "Representations/Configuration/FieldDimensions.h"
-
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/TeamInfo.h"
 #include "Representations/Communication/RobotInfo.h"
@@ -48,12 +47,15 @@ CARD(OwnKickInCard,
 
 class OwnKickInCard : public OwnKickInCardBase
 {
+  KickInfo::KickType kickType;
+
+
   /**
    * @brief The condition that needs to be met to execute this card
    */
   bool preconditions() const override
   {
-    return /*deprecated: theTeamBehaviorStatus.role.playBall*/
+    return
         theTeammateRoles.playsTheBall(theRobotInfo.number)
         && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
         && theGameInfo.setPlay == SET_PLAY_KICK_IN;
@@ -70,22 +72,19 @@ class OwnKickInCard : public OwnKickInCardBase
   option
   {
     theActivitySkill(BehaviorStatus::ownFreeKick);
-    
     initial_state(init)
     {
 
       transition
       {
-        
+        bool leftFoot = theFieldBall.positionRelative.y() < 0;
+        kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
+        goto active;
       }
 
       action
       {
-        theLookForwardSkill();
-
-        bool leftFoot = theFieldBall.positionRelative.y() < 0;
-        KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
-        theGoToBallAndKickSkill(calcAngleToGoal(), kickType);
+        
       }
     }
 
@@ -98,7 +97,7 @@ class OwnKickInCard : public OwnKickInCardBase
 
       action
       {
-
+        theGoToBallAndKickSkill(calcAngleToGoal(), kickType);
       }
     }
 

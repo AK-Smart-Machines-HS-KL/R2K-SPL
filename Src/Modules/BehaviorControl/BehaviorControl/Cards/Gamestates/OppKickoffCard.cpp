@@ -16,9 +16,8 @@
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h"
-
+#include "Representations/Infrastructure/FrameInfo.h"
 #include "Representations/Configuration/FieldDimensions.h"
-
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/TeamInfo.h"
 #include "Representations/Communication/RobotInfo.h"
@@ -37,6 +36,7 @@ CARD(OppKickoffCard,
 
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
+  REQUIRES(FrameInfo),
   REQUIRES(GameInfo),
   REQUIRES(RobotInfo),
   REQUIRES(RobotPose),
@@ -63,7 +63,7 @@ class OppKickoffCard : public OppKickoffCardBase
   bool preconditions() const override
   {
     return theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
-      && theGameInfo.secsRemaining >= 590
+      && theFrameInfo.getTimeSince(theGameInfo.timeLastStateChange) <= 1000*10
       && theGameInfo.state == STATE_PLAYING
       && theFieldBall.positionOnField.norm() < ballKickedThreshold
       && !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number);

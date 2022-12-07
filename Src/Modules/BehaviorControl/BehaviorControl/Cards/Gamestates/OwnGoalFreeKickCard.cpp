@@ -55,9 +55,13 @@ CARD(OwnGoalFreeKickCard,
 
 class OwnGoalFreeKickCard : public OwnGoalFreeKickCardBase
 {
+
+  KickInfo::KickType kickType;
+
   /**
    * @brief The condition that needs to be met to execute this card
    */
+
   bool preconditions() const override
   {
 		return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber 
@@ -82,16 +86,13 @@ class OwnGoalFreeKickCard : public OwnGoalFreeKickCardBase
 
       transition
       {
-        
+        bool leftFoot = theFieldBall.positionRelative.y() < 0;
+        kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
+        goto active;
       }
 
       action
       {
-        theLookForwardSkill();
-				
-        bool leftFoot = theFieldBall.positionRelative.y() < 0;
-        KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
-        theGoToBallAndKickSkill(calcAngleToTarget(), kickType);
       }
     }
 
@@ -104,7 +105,8 @@ class OwnGoalFreeKickCard : public OwnGoalFreeKickCardBase
 
       action
       {
-
+        theLookForwardSkill();
+        theGoToBallAndKickSkill(calcAngleToTarget(), kickType);
       }
     }
 

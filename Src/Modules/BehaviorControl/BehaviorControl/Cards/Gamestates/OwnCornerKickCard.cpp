@@ -48,6 +48,7 @@ CARD(OwnCornerKickCard,
 
 class OwnCornerKickCard : public OwnCornerKickCardBase
 {
+  KickInfo::KickType kickType;
   /**
    * @brief The condition that needs to be met to execute this card
    */
@@ -76,16 +77,15 @@ class OwnCornerKickCard : public OwnCornerKickCardBase
 
       transition
       {
-        
+        bool leftFoot = theFieldBall.positionRelative.y() < 0;
+        kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
+        goto active;
       }
 
       action
       {
-        theLookForwardSkill();
-
-        bool leftFoot = theFieldBall.positionRelative.y() < 0;
-        KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
-        theGoToBallAndKickSkill(calcAngleToGoal(), kickType);
+        
+        
       }
     }
 
@@ -98,7 +98,8 @@ class OwnCornerKickCard : public OwnCornerKickCardBase
 
       action
       {
-
+        theLookForwardSkill();
+        theGoToBallAndKickSkill(calcAngleToGoal(), kickType);
       }
     }
 

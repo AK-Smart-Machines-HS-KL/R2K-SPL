@@ -16,13 +16,11 @@
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h"
-
+#include "Representations/Infrastructure/FrameInfo.h"
 #include "Representations/Configuration/FieldDimensions.h"
-
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/TeamInfo.h"
 #include "Representations/Communication/RobotInfo.h"
-
 #include "Representations/Modeling/RobotPose.h"
 
 #include "Tools/Math/Geometry.h"
@@ -40,6 +38,7 @@ CARD(OwnKickoffCard,
   REQUIRES(RobotPose),
   REQUIRES(RobotInfo),
   REQUIRES(FieldDimensions),
+  REQUIRES(FrameInfo),
   REQUIRES(OwnTeamInfo),
   REQUIRES(GameInfo),
   REQUIRES(TeamBehaviorStatus),
@@ -53,20 +52,22 @@ CARD(OwnKickoffCard,
 
 class OwnKickoffCard : public OwnKickoffCardBase
 {
+  KickInfo::KickType kickType;
+
   /**
    * @brief The condition that needs to be met to execute this card
    */
   bool preconditions() const override
   {  
     return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber 
-           && theGameInfo.secsRemaining >= 590 
+           && theFrameInfo.getTimeSince(theGameInfo.timeLastStateChange) <= 1000*10
            && theGameInfo.state == STATE_PLAYING 
            && ((4 == theRobotInfo.number 
                && !std::strcmp(theRobotInfo.getPenaltyAsString().c_str(), "None") 
                && theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_DEFENSIVE_GAME
                ) 
               || 
-              (5 == theRobotInfo.number 
+              (5 == theRobotInfo.number
                && theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_NORMAL_GAME
               ));
   }
@@ -87,6 +88,9 @@ class OwnKickoffCard : public OwnKickoffCardBase
     {
       transition
       {
+
+        bool leftFoot = theFieldBall.positionRelative.y() < 0;
+        kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
         goto kick;
       }
 
@@ -106,10 +110,6 @@ class OwnKickoffCard : public OwnKickoffCardBase
 
       action
       {
-        theLookForwardSkill();
-
-        bool leftFoot = theFieldBall.positionRelative.y() < 0;
-        KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
         theGoToBallAndKickSkill(calcAngleToTarget(), kickType);
       }
     }

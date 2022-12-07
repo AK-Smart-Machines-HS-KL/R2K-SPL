@@ -19,6 +19,7 @@ private:
 
 public:
   unsigned timeLastPacketReceived = 0;
+  unsigned timeLastStateChange = 0;
 
   GameInfo();
 

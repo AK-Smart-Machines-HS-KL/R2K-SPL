@@ -226,6 +226,7 @@ void GameInfo::read(In& stream)
   STREAM(secsRemaining); // estimate of number of seconds remaining in the half.
   STREAM(secondaryTime);
   STREAM(timeLastPacketReceived); // used to decide whether a gameController is running
+  STREAM(timeLastStateChange); // used for kickoff
 }
 
 void GameInfo::write(Out& stream) const
@@ -241,6 +242,7 @@ void GameInfo::write(Out& stream) const
   STREAM(secsRemaining); // estimate of number of seconds remaining in the half.
   STREAM(secondaryTime);
   STREAM(timeLastPacketReceived); // used to decide whether a gameController is running
+  STREAM(timeLastStateChange); // used for kickoff
 }
 
 void GameInfo::reg()
@@ -258,4 +260,5 @@ void GameInfo::reg()
   REG(secsRemaining);
   REG(secondaryTime);
   REG(timeLastPacketReceived);
+  REG(timeLastStateChange);
 }

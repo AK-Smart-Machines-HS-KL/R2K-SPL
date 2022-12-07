@@ -69,7 +69,6 @@ class ReadyOppKickoffCard : public ReadyOppKickoffCardBase
 
       theLookActiveSkill(); // Head Motion Request
       theWalkToPointSkill(Pose2f(theDefaultPose.ownDefaultPose.rotation - theRobotPose.rotation, targetRelative), 1.0f, true);
-
     }
 };
 
