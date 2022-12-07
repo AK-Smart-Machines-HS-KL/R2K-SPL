@@ -52,6 +52,7 @@
 // this is the R2K specific stuff
 
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h" 
+#include "Representations/Communication/TeamData.h"
 #include "Representations/BehaviorControl/TeammateRoles.h"
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
@@ -69,6 +70,7 @@ CARD(ClearOwnHalfCardGoalie,
     REQUIRES(RobotInfo),
     REQUIRES(RobotPose),
     REQUIRES(TeamBehaviorStatus),
+    REQUIRES(TeamData),
     REQUIRES(TeammateRoles),  // R2K
 
     DEFINES_PARAMETERS(
@@ -76,6 +78,7 @@ CARD(ClearOwnHalfCardGoalie,
       (float)(500) maxDistanceFromGoalArea,  // how far  goalie will leave the goal box
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
+      (bool)(true) shootAngleIsZero,
     }),
   });
 
@@ -86,6 +89,7 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
     return
       theGameInfo.setPlay == SET_PLAY_NONE &&
       //theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
+      !aBuddyIsClearingOwnHalf() &&
       theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) && // my recent role
       theFieldBall.endPositionOnField.x() <= theFieldDimensions.xPosOwnGoalArea + maxDistanceFromGoalArea &&
@@ -106,11 +110,33 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
     if (!footIsSelected) {  // select only once
       footIsSelected = true;
       leftFoot = theFieldBall.positionRelative.y() < 0;
+      if (theRobotPose.translation.x() <= theFieldBall.positionOnField.x())
+        shootAngleIsZero = false; // take some time not too shoot at own goal or into own side 
+      else
+        shootAngleIsZero = true; // bot is  closer to goal than ball,  quick shot
     }
-    if(leftFoot)
-      theGoToBallAndKickSkill(0, KickInfo::walkForwardsLeft);
+    if (leftFoot) {
+      if (shootAngleIsZero)
+        theGoToBallAndKickSkill(0, KickInfo::walkForwardsLeft);
+      else
+        theGoToBallAndKickSkill(-theRobotPose.rotation, KickInfo::walkForwardsLeft);
+
+    }
     else
-      theGoToBallAndKickSkill(0, KickInfo::walkForwardsRight);
+      if (shootAngleIsZero)
+        theGoToBallAndKickSkill(0, KickInfo::walkForwardsRight);
+      else
+        theGoToBallAndKickSkill(-theRobotPose.rotation, KickInfo::walkForwardsRight);
+  }
+  bool aBuddyIsClearingOwnHalf() const
+  {
+    for (const auto& buddy : theTeamData.teammates)
+    {
+      if (buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie)
+        return true;
+    }
+    return false;
   }
   
 };
