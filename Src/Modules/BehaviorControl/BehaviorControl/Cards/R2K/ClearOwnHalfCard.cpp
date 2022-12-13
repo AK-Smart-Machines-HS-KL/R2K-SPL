@@ -77,6 +77,7 @@ CARD(ClearOwnHalfCard,
     {,
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
+      (bool)(true) shootAngleIsZero,
     }),
   });
 
@@ -86,8 +87,8 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
   {
     return
       theGameInfo.setPlay == SET_PLAY_NONE &&
-      !aBuddyIsClearingOwnHalf() &&
-      //theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
+      // !aBuddyIsClearingOwnHalf() &&
+      theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
       theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
       theFieldBall.endPositionOnField.x() < 0 && 
@@ -102,17 +103,29 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
  
   void execute() override
   {
-
+   
     theActivitySkill(BehaviorStatus::clearOwnHalfCard);
 
     if (!footIsSelected) {  // select only once
       footIsSelected = true;
       leftFoot = theFieldBall.positionRelative.y() < 0;
+      if (theRobotPose.translation.x() > theFieldBall.positionOnField.x())
+        shootAngleIsZero = false; // take some time not too shoot at own goal or into own side 
+      else
+        shootAngleIsZero = true; // bot is  closer to goal than ball,  quick shot
     }
-    if(leftFoot)
-      theGoToBallAndKickSkill(0, KickInfo::walkForwardsLeft);
+    if(leftFoot) {
+      if (shootAngleIsZero)  
+        theGoToBallAndKickSkill(0, KickInfo::walkForwardsLeft);
+      else
+        theGoToBallAndKickSkill(-theRobotPose.rotation, KickInfo::walkForwardsLeft);
+        
+    }
     else
-      theGoToBallAndKickSkill(0, KickInfo::walkForwardsRight);
+      if (shootAngleIsZero)
+        theGoToBallAndKickSkill(0, KickInfo::walkForwardsRight);
+      else
+        theGoToBallAndKickSkill(-theRobotPose.rotation, KickInfo::walkForwardsRight);
   }
 
   bool aBuddyIsClearingOwnHalf() const
