@@ -14,4 +14,5 @@
 STREAMABLE(GlobalOptions,
 {,
   (bool)(false) slowWalk, /**< Use the slow walking parameters for all robots. */
+  (float)(0.8f) walkSpeed, /* RZWEI - Constant indicating the robots walkspeed */
 });

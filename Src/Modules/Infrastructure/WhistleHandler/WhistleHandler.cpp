@@ -32,6 +32,7 @@ void WhistleHandler::update(GameInfo& theGameInfo)
                             ? ignoreWhistleAfterPenaltyKick : ignoreWhistleAfterKickOff);
     if(theRawGameInfo.gamePhase != GAME_PHASE_PENALTYSHOOT || theRawGameInfo.setPlay == SET_PLAY_PENALTY_KICK)
       SystemCall::say("Kickoff");
+    theGameInfo.timeLastStateChange = timeOfLastStateChange;
   }
 
   // Switching to READY (not in penalty shootout):
