@@ -23,8 +23,9 @@ void ObstacleModel::operator<<(const BHumanMessage& m)
 // need to clarify: opponent detection
 bool ObstacleModel::opponentIsClose(float min) const{
   for (const Obstacle& ob : obstacles)
-  {if (ob.isOpponent()) // || ob.isTeammate())
-    return ob.center.norm() <= min;
+  {
+    if (ob.isOpponent()) // || ob.isTeammate())
+      if (ob.center.norm() <= min) return true;
   }
   return false;
 }
