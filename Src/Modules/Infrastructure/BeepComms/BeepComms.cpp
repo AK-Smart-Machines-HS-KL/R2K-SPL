@@ -1,9 +1,6 @@
 /**
  * @file BeepComms.cpp
- * This file implements a module that provides audio samples.
- * @author Thomas Röfer
- * @author Lukas Post
- * @author Lukas Plecher
+ * This file implements a module that provides the sending part of the audio communication system.
  */
 
 #include "BeepComms.h"

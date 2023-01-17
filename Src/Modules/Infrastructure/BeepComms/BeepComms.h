@@ -1,8 +1,6 @@
 /**
  * @file BeepComms.h
- * This file declares a module that provides audio samples.
- * @author Thomas Röfer
- * @author Lukas Plecher
+ * This file declares a module that provides the sending part of the audio communication system.
  */
 
 #pragma once
