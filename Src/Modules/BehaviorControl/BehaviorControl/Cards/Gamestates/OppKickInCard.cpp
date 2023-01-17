@@ -44,7 +44,7 @@ CARD(OppKickInCard,
   CALLS(Activity),
   CALLS(LookForward),
   CALLS(GoToBallAndDribble),
-  CALLS(WalkToPose),
+  CALLS(WalkToPoint),
 
   REQUIRES(DefaultPose),
   REQUIRES(FieldBall),
@@ -89,7 +89,7 @@ class OppKickInCard : public OppKickInCardBase
   option
   {
     theActivitySkill(BehaviorStatus::oppFreeKick);
-    
+
     initial_state(init)
     {
       isBlocking = true;
@@ -101,12 +101,6 @@ class OppKickInCard : public OppKickInCardBase
           isBlocking = false;
           break;
         }
-      }
-
-      if (isBlocking) {
-        Vector2f ownGoalPos = Vector2f(theFieldDimensions.xPosOwnGoal, theFieldDimensions.yPosCenterGoal);
-        Vector2f ballToGoal = (ownGoalPos - theFieldBall.positionOnField).normalized(); 
-        blockingPos = theFieldBall.positionOnField + ballToGoal * blockingDistance;
       }
 
       transition
@@ -136,9 +130,12 @@ class OppKickInCard : public OppKickInCardBase
       {
         theLookForwardSkill();
 
-        Pose2f speed = Pose2f(theGlobalOptions.walkSpeed, theGlobalOptions.walkSpeed, theGlobalOptions.walkSpeed);
-        auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(blockingPos, true, false);
-        theWalkToPoseSkill(blockingPos, speed, obstacleAvoidance, true);
+        Vector2f ownGoalPos = Vector2f(theFieldDimensions.xPosOwnGoal, theFieldDimensions.yPosCenterGoal);
+        Vector2f ballToGoal = (ownGoalPos - theFieldBall.positionOnField).normalized();
+        //Translation for walking
+        blockingPos = theRobotPose.toRelative(theFieldBall.positionOnField + ballToGoal * blockingDistance);
+        //Walk closer to blockingPos and face ball
+        theWalkToPointSkill(Pose2f(theFieldBall.positionRelative.angle(), blockingPos));
       }
     }
 
@@ -152,10 +149,8 @@ class OppKickInCard : public OppKickInCardBase
       action
       { 
         theLookForwardSkill();
-
-        Pose2f speed = Pose2f(theGlobalOptions.walkSpeed, theGlobalOptions.walkSpeed, theGlobalOptions.walkSpeed);
-        auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(theDefaultPose.ownDefaultPose, true, false);
-        theWalkToPoseSkill(theDefaultPose.ownDefaultPose, speed, obstacleAvoidance, true);
+        Vector2f targetRelative = theRobotPose.toRelative(theDefaultPose.ownDefaultPose.translation);
+        theWalkToPointSkill(targetRelative);
       }
     }
   }

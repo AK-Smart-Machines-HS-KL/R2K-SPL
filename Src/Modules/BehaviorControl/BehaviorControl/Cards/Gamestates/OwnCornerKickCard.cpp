@@ -98,7 +98,6 @@ class OwnCornerKickCard : public OwnCornerKickCardBase
 
       action
       {
-        theLookForwardSkill();
         theGoToBallAndKickSkill(calcAngleToGoal(), kickType);
       }
     }

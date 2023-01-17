@@ -105,7 +105,6 @@ class OwnGoalFreeKickCard : public OwnGoalFreeKickCardBase
 
       action
       {
-        theLookForwardSkill();
         theGoToBallAndKickSkill(calcAngleToTarget(), kickType);
       }
     }
