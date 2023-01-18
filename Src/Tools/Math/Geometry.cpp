@@ -547,3 +547,103 @@ Vector2f Geometry::getOrthogonalProjectionOfPointOnLine(const Vector2f& base, co
   const float l = (point.x() - base.x()) * dir.x() + (point.y() - base.y()) * dir.y();
   return base + (dir * l);
 }
+
+/**
+ * @brief Conputes tangent points from a line to a Circle. 
+ * 
+ * @param point 
+ * @param circle 
+ * @param tp1 
+ * @param tp2 
+ * @return true if the point is outside the circle
+ * @return false if the point is inside the circle
+ */
+bool Geometry::getTangentPoints(const Vector2f& point, const Circle& circle, Vector2f& tp1, Vector2f& tp2) {
+  float pDist = (point - circle.center).norm();
+  if(pDist <= circle.radius) {
+    return false;
+  }
+
+  float th = acos(circle.radius / (point - circle.center).norm());
+  float d = atan2(point.y() - circle.center.y(), point.x() - circle.center.x());  //direction angle of point P from C
+  float d1 = d + th;  // direction angle of point T1 from C
+  float d2 = d - th;  // direction angle of point T2 from C
+
+  tp1.x() = circle.center.x() + circle.radius * cos(d1);
+  tp1.y() = circle.center.y() + circle.radius * sin(d1);
+  
+  tp2.x() = circle.center.x() + circle.radius * cos(d2);
+  tp2.y() = circle.center.y() + circle.radius * sin(d2);
+  return true;
+}
+
+// Helper for raycast
+float magCrossProduct(Vector2f a, Vector2f b) {
+    return a.x() * b.y() - a.y() * b.x();
+}
+
+bool Geometry::raycastSegment(const Vector2f& segmentP1, const Vector2f& segmentP2, const Vector2f& rayBase, const Vector2f& rayDirection, Vector2f& result) {
+  Vector2f segmentDirection = segmentP2 - segmentP1;
+  Vector2f baseDiff = (rayBase - segmentP1);
+  float directionCross = magCrossProduct(segmentDirection, rayDirection);
+
+  float t = magCrossProduct(baseDiff, (rayDirection)) / directionCross;
+  if (t < 1 && t >= 0) { // only intersects on the line segment
+    float u = magCrossProduct(baseDiff, (segmentDirection)) / directionCross;
+    if (u > 0) // no intersects behind the ray
+    {
+        Vector2f newIntersect = segmentP1 + segmentDirection * t;
+        result = segmentP1 + segmentDirection * t;
+        return true;
+    }       
+  }
+  return false;
+}
+
+bool Geometry::raycastPolygon(const std::vector<Vector2f>& polygon, const Vector2f& rayBase, const Vector2f& rayDirection, Vector2f& result) {
+  result = rayBase;
+  const Vector2f* prev = &polygon.back();
+  size_t idx = polygon.size() - 1;
+  bool found = false;
+  Vector2f newIntersect;
+  for (auto iter = polygon.begin(); iter != polygon.end(); iter++)
+  {
+      if (raycastSegment(*prev, *iter, rayBase, rayDirection, newIntersect)) {
+        if ((rayBase - newIntersect).norm() < (rayBase - result).norm()) { // new Intersect is closer than old one
+          found = true;
+          result = newIntersect;
+        } 
+      }
+    prev = &*iter;
+    idx++;
+  }        
+  return found;
+}
+
+// https://www.bluebill.net/circle_ray_intersection.html
+int Geometry::raycastCircle(const Circle& circle, const Vector2f& rayBase, const Vector2f& rayDirection, Vector2f& result1, Vector2f& result2) {
+  Vector2f u = circle.center - rayBase;
+  Vector2f u1 = rayDirection * u.dot(rayDirection);
+  Vector2f u2 = u - u1;
+  float h = u2.norm();
+  if (h > circle.radius) { // no intersect
+    return 0;
+  } else if (h == circle.radius) // tangent
+  {
+    result1 = rayBase + u - u2;
+    result2 = result1;
+    return 1;
+  }
+
+  float m = sqrt(sqr(circle.radius) - sqr(h));
+  Vector2f unitDir = rayDirection.normalized();
+  if (u.norm() > circle.radius) {
+    result1 = rayBase + u1 + unitDir * m;
+    result2 = rayBase + u1 - unitDir * m;
+  } else { // ray begins inside circle, so only one instersect
+    result1 = rayBase + u1 + unitDir * m;
+  }
+}
+
+
+

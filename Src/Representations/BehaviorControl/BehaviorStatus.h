@@ -29,8 +29,8 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanCompressedMessageParticle<Behavior
     set,
 
     testingBehavior,
+    goalShot,
     defaultBehavior,
-
     codeReleaseKickAtGoal,
     codeReleasePositionForKickOff,
     
