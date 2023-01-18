@@ -84,6 +84,16 @@ Vector2f RobotPose::toAbsolute(const Vector2f& rel) const
     return translation + rel.rotated(rotation);
 }
 
+Pose2f RobotPose::toRelative(const Pose2f& abs) const
+{
+    return Pose2f(abs.rotation - rotation, toRelative(abs.translation));
+}
+
+Pose2f RobotPose::toAbsolute(const Pose2f& rel) const
+{
+    return Pose2f(rel.rotation + rotation, toRelative(rel.translation));
+}
+
 void RobotPose::draw() const
 {
   Vector2f bodyPoints[4] =
