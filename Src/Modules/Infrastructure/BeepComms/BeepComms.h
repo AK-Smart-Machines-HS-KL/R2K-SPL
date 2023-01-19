@@ -25,7 +25,6 @@ class BeepComms : public BeepCommsBase
 {
 private:
   bool test = true;
-  int running = 0;
   std::thread beepThread;
 #ifdef TARGET_ROBOT
   snd_pcm_t* handle;

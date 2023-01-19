@@ -37,22 +37,11 @@ void BeepComms::update(BeepCommData& audioData)
     test = false;
     OUTPUT_TEXT("Text");
   }
-  try
-  {
-    if (running==0)
-    {
-      beepThread.join();
-    }
-  }
-  catch (const std::exception&)
-  {
-  }
   
 }
 
 //play 5 sine waves simultaneously
 void BeepComms::playMultipleFrequencies(int robot,int frequency1, int frequency2, int frequency3, int frequency4, int frequency5, float duration, int volume){
-    running = 1;
     int add = robot * 1000;
     int freq1 = frequency1;
     int freq2 = frequency2;
@@ -98,7 +87,7 @@ void BeepComms::playMultipleFrequencies(int robot,int frequency1, int frequency2
     for (int i = 0; i < dur * 44100 / 512; i++){
         snd_pcm_writei(handle, buf, 512);
     }
-    running = 0;
+    
 };
 
 
@@ -106,21 +95,39 @@ void BeepComms::playMultipleFrequencies(int robot,int frequency1, int frequency2
 void BeepComms::PlayerOpen(int robot, int volume){
     std::thread beepThread(&BeepComms::playMultipleFrequencies, this, robot, 100, 0, 0, 0, 0, 1, volume);
 
-    beepThread.detach();
+    if (beepThread.joinable())
+    {
+        //wait for 1 second
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+        beepThread.join();
+    }
+
 };
 
 //Check if facing the wrong direction
 void BeepComms::CheckFacing(int robot, int volume){
     std::thread beepThread(&BeepComms::playMultipleFrequencies, this, robot, 100, 200, 0, 0, 0, 1, volume);
 
-    beepThread.detach();
+    if (beepThread.joinable())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+        beepThread.join();
+    }
+
 };
 
 //Team has lost the ball
 void BeepComms::BallLost(int robot, int volume){
     std::thread beepThread(&BeepComms::playMultipleFrequencies, this, robot, 100, 200, 400, 0, 0, 1, volume);
 
-    beepThread.detach();
+    if (beepThread.joinable())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+        beepThread.join();
+    }
 };
 
 
