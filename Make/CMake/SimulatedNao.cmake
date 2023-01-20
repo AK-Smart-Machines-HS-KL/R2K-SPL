@@ -46,7 +46,6 @@ target_link_libraries(SimulatedNao PRIVATE $<$<PLATFORM_ID:Linux>:flite::flite_c
 target_link_libraries(SimulatedNao PRIVATE $<$<PLATFORM_ID:Linux>:ALSA::ALSA>)
 target_link_libraries(SimulatedNao PRIVATE GameController::GameController)
 target_link_libraries(SimulatedNao PRIVATE Controller)
-target_link_libraries(SimulatedNao PRIVATE rapidcsv)
 if(${PLATFORM} STREQUAL macOSarm64)
   target_link_libraries(SimulatedNao PRIVATE ONNXRuntime::ONNXRuntime)
 else()

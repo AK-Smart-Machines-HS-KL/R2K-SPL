@@ -8,7 +8,7 @@
  * - WorldData: Contains multiple World Models, and a copy to the last one in the list being the trigger point.
  * 
  * - PlaybackAction: A single action of the playback system, such as walkToBall and it's parameters, if needed
- * - PlaybackSequence: A series of playback actions that constitute a playback recording 
+ * - PlaybackData: A series of playback actions that constitute a playback recording 
  * 
  * @version 1.0
  * @date 2022-01-21
@@ -84,9 +84,10 @@ STREAMABLE(playbackAction,
       Default,
       Stand,
       WalkAtRelativeSpeed,
-	  WalkToTarget,
-      KickAtGoal,
-      WalkToBall,
+      WalkToPoint,
+      GoToBallAndKick,
+      GoToBallAndDribble,
+      
     }),
 
   (playbackAction::Skills) skill,    // Enum value of Skill to execute
@@ -101,14 +102,14 @@ STREAMABLE(playbackAction,
   (std::string) stringParam,
 });
 
-STREAMABLE(PlaybackSequence, 
+STREAMABLE(PlaybackData,
 {
-  PlaybackSequence() = default;
-  PlaybackSequence(std::string, bool isRelative = true);
+  PlaybackData() = default;
+  PlaybackData(std::string, bool isRelative = true);
   void clear();
   void save(std::string path);
-  
   ,
+  
   (std::string)                   fileName,   // Name of the file on disk
   (std::vector<playbackAction>)   actions,    // vector of all actions in the file
 });

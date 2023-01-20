@@ -1,53 +1,53 @@
 /**
- * @file TIPlaybackCard.cpp
+ * @file TI_Collection.cpp
  * @author Jonas Lambing
  * @brief This card executes skills from a playback sequence
- * 
+ *
  * This card executes skills with parameters specified by a playback sequence.
  * The execution happens on a per-action basis.
  * That means, that the next action will trigger as soon as the current action
  * is either finished (isDone()) or exceeded the maximum time specified in the playback file.
- * 
+ *
  * MaxTime is calculated during the teach in process.
- * 
+ *
  * This card is a collection for all available teach in cards.
  *
  * @version 1.0
  * @date 2021-08-26
  *
- * Changes for 
+ * Changes for
  * @version 2.0
  * @date 2022-01-24
- * 
+ *
  * @author Adrian Müller
  * Major revision: Works now together with the enhanced TIPlaybackProvider and TIExecute:
  * a) pre-cond checks wether at least on card playback000x.csv is qualified (the sequence in it triggers)
  * b) indexOfBestTeachInScore() loops over all cards, ie. all available playback sequences (ie., playback0001 ... playback000MAX), MAX >=1.
- *    Selects sequence with best trigger point, registered in parameter card_index 
+ *    Selects sequence with best trigger point, registered in parameter card_index
  * c) set_next_action() loops over actions 0 .. size-1, stores it in actionIndex
  *    So we have: currentAction = theTIPlayback.data[cardIndex].actions[actionIndex];
  * d) generic call for each action with theTIExecuteSkill(currentAction);
  *	  Next action: either time limit is exceeded OR skill.isDone()
  * e) post-condition: -1 == actionIndex : set_next_action() reached end of actions
  *
- * Notes: 
+ * Notes:
  *    Register all skills in playback000x.scv in Execute.cpp  MAP_EXPLICIT, MAP, MAP_ISDONE, and add CALLS() here
  *    b) is a control mechanism for game tactics
  *    d) time limit might come in to early
  *    d) skill.isDone() does not work properly on all skills, eg theWalkToTargetSkill() is buggy with this respect
- * 
- * 
+ *
+ *
  * @version 2.1
  * @date 2022-01-24
  * @author Adrian Müller
  * - change semantics of trigger points: any robot close to the point of recording will trigger
- * 
+ *
  * ToDo:
  *	include generic map for head movements
  */
 
 #include "Representations/BehaviorControl/Skills.h"
-#include "Representations/BehaviorControl/TI/TIPlaybackData.h"
+#include "Representations/BehaviorControl/TIPlayback.h"
 #include "Representations/Configuration/GlobalOptions.h" 
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Modeling/RobotPose.h"
@@ -55,41 +55,43 @@
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/Math/Geometry.h"
 
-CARD(TIPlaybackCard,
-{,
-  CALLS(Activity),
-  CALLS(LookForward),
-  CALLS(Stand),
-  CALLS(TIExecute),
+CARD(TI_Collection,
+	{ ,
+	  CALLS(Activity),
+	  CALLS(LookForward),
+	  CALLS(Stand),
+	  CALLS(TIExecute), 
+	  CALLS(WalkToPoint),
+	  CALLS(WalkAtRelativeSpeed),
 
-	REQUIRES(GlobalOptions),
-	REQUIRES(RobotInfo),
-	REQUIRES(RobotPose),
-  REQUIRES(TIPlaybackSequences),
+	  REQUIRES(GlobalOptions),
+	  REQUIRES(RobotInfo),
+	  REQUIRES(RobotPose),
+	  REQUIRES(TIPlayback),
 
-    DEFINES_PARAMETERS(
-    {,
-					 (int)(0)startTime,              // Time when the action was started
-					 (int)(-1)cardIndex,             // Index of the card inside the stack of worldmodels (and playbacks resp.)
-					 (int)(-1)actionIndex,            // Index of the action inside the card, ie., which playback action is active
-					 (playbackAction)currentAction,  // A copy of the action-data
-					 (bool)(false)action_changed,    // used as flag: action is called the first time in execute(); reset after First usage, set again in setNextAction()
-																					 // so we can set information like the robots starting position, only once, before action starts
-					 // (Pose2f)(0) destPos,	// not yet
-    }),
-});
+		DEFINES_PARAMETERS(
+		{,
+						 (int)(0)startTime,              // Time when the action was started
+						 (int)(-1)cardIndex,             // Index of the card inside the stack of worldmodels (and playbacks resp.)
+						 (int)(-1)actionIndex,            // Index of the action inside the card, ie., which playback action is active
+						 (playbackAction)currentAction,  // A copy of the action-data
+						 (bool)(false)action_changed,    // used as flag: action is called the first time in execute(); reset after First usage, set again in setNextAction()
+																						 // so we can set information like the robots starting position, only once, before action starts
+						 
+		}),
+	});
 
 
 // TODO: mapping of isDone()
-class TIPlaybackCard : public TIPlaybackCardBase
+class TI_Collection : public TI_CollectionBase
 {
 	bool preconditions() const override
 	{
 
 
 		// Dont execute if the card stack is empty
-		return (!theTIPlaybackSequences.models.empty() && teachInScoreReached(theRobotInfo.number));
-			// return (teachInScoreReached(theRobotInfo.number));
+		return (!theTIPlayback.models.empty() && teachInScoreReached(theRobotInfo.number));
+		// return (teachInScoreReached(theRobotInfo.number));
 	}
 
 	bool postconditions() const override
@@ -101,18 +103,18 @@ class TIPlaybackCard : public TIPlaybackCardBase
 	void execute() override
 	{
 
-		theActivitySkill(BehaviorStatus::testingBehavior);
+		theActivitySkill(BehaviorStatus::TI_Collection);
 		// OUTPUT_TEXT("ti started");
 
 		// called only one
-		if(!startTime) cardIndex = indexOfBestTeachInScore(theRobotInfo.number); // selects best sequence in playback0001.csv, plaback0002.csv,...
+		if (!startTime) cardIndex = indexOfBestTeachInScore(theRobotInfo.number); // selects best sequence in playback0001.csv, plaback0002.csv,...
 		ASSERT(-1 != cardIndex); // at least one model must qualify, since teachInScoreReached() is called in pre-cond
 
 		// Figure out which action to play; sets startTime 
 		setNextAction();
 
 		// Playback reached the end (OR no model found, which should not happen) -> stand still
-		if(actionIndex == -1)
+		if (actionIndex == -1)
 		{
 			theLookForwardSkill();
 			theStandSkill();
@@ -127,22 +129,22 @@ class TIPlaybackCard : public TIPlaybackCardBase
 	void setNextAction()
 	{
 
-		if(!startTime)
-		// set for first action now
+		if (!startTime)
+			// set for first action now
 		{
-			startTime      = state_time;
+			startTime = state_time;
 			action_changed = true;
-			actionIndex    = 0;
+			actionIndex = 0;
 		}
 		// Replay is finished, nothing more to do.
-		if(-1 == actionIndex) return;
+		if (-1 == actionIndex) return;
 
 
-		
+
 		// Switch to next action if maxTime was exceeded OR skillIsDone
 		// OUTPUT_TEXT("start" << startTime << " state " << state_time);
 
-		if(((state_time - startTime) > currentAction.maxTime) ) // || theTIExecuteSkill.isDone())
+		if (((state_time - startTime) > currentAction.maxTime)) // || theTIExecuteSkill.isDone())
 		{
 			actionIndex++;
 			action_changed = true; // flag for one-time setups below
@@ -150,76 +152,76 @@ class TIPlaybackCard : public TIPlaybackCardBase
 		}
 
 		// check: this next action is out of bounds -> we reached the end
-		if(static_cast<size_t>(actionIndex) >= theTIPlaybackSequences.data[cardIndex].actions.size())
+		if (static_cast<size_t>(actionIndex) >= theTIPlayback.data[cardIndex].actions.size())
 		{
 			OUTPUT_TEXT("Reached end of playback sequence");
 			currentAction = {};
-			actionIndex   = -1;  // set post condition
+			actionIndex = -1;  // set post condition
 			return;
 		}
 
 		// ok: we are inbetween o .. #actions-1
-		currentAction = theTIPlaybackSequences.data[cardIndex].actions[actionIndex];
-		if(action_changed)  // do setups for the new action
+		currentAction = theTIPlayback.data[cardIndex].actions[actionIndex];
+		if (action_changed)  // do setups for the new action
 		{
 			action_changed = false;
-			startTime      = state_time;
+			startTime = state_time;
 			// OUTPUT_TEXT("Action: " + std::to_string(actionIndex));
-			// OUTPUT_TEXT("playback000" << cardIndex + 1 << " action Index and Name: " << actionIndex << " " << TypeRegistry::getEnumName(theTIPlaybackSequences.data[cardIndex].actions[actionIndex].skill));
+			// OUTPUT_TEXT("playback000" << cardIndex + 1 << " action Index and Name: " << actionIndex << " " << TypeRegistry::getEnumName(theTIPlayback.data[cardIndex].actions[actionIndex].skill));
 			// OUTPUT_TEXT("remaining time" << diff);
 
 
 			// obsolete code
 			// prepare check for isDone(): set exit criterion
-			// destPos = theRobotPose * theTIPlaybackSequences.data[cardIndex].actions[actionIndex].poseParam;
+			// destPos = theRobotPose * theTIPlayback.data[cardIndex].actions[actionIndex].poseParam;
 		}
 	}
 
 	bool teachInScoreReached(int Number) const
 	{
 
-	  ASSERT(!theTIPlaybackSequences.models.empty());  // has been checked in the pre-condition
-	  // OUTPUT_TEXT("checking trigger for robot " << Number  );
-	  for(WorldData data : theTIPlaybackSequences.models)
-			{
-				WorldModel& model = data.trigger;
-				if(//model.robotNumber == Number && // when this is disabled, any robot close to the point of recording will trigger
-					 (Geometry::distance(theRobotPose.translation, model.robotPose.translation) <= 500))  // this is a trigger point
-					return true;
-				
-			}
-		
+		ASSERT(!theTIPlayback.models.empty());  // has been checked in the pre-condition
+		// OUTPUT_TEXT("checking trigger for robot " << Number  );
+		for (WorldData data : theTIPlayback.models)
+		{
+			WorldModel& model = data.trigger;
+			if (//model.robotNumber == Number && // when this is disabled, any robot close to the point of recording will trigger
+				(Geometry::distance(theRobotPose.translation, model.robotPose.translation) <= theGlobalOptions.positionThreshold))  // this is a trigger point
+				return true;
+			
+		}
+
 		return false;
 	}
 
-	
+
 	int indexOfBestTeachInScore(int Number)
 	{
-		float minimal_distance          = 500.0f;
-		int world_model_index           = -1;  // start counting at 0
+		float minimal_distance = theGlobalOptions.positionThreshold;
+		int world_model_index = -1;  // start counting at 0
 		int current_bestWorldModelIndex = -1;
 
 		// OUTPUT_TEXT("Computing indexOfBestTeachInScore");
 
-		for(WorldData data : theTIPlaybackSequences.models)
+		for (WorldData data : theTIPlayback.models)
+		{
+			WorldModel& model = data.trigger;
+			world_model_index++;
+			// OUTPUT_TEXT(model.fileName);
+			if ( //model.robotNumber == Number && // when this is disabled, any robot close to the point of recording will trigger
+				(Geometry::distance(theRobotPose.translation, model.robotPose.translation) <= minimal_distance)) // this is the first OR a better trigger point
 			{
-				WorldModel& model = data.trigger;
-				world_model_index++;
-				// OUTPUT_TEXT(model.fileName);
-				if( //model.robotNumber == Number && // when this is disabled, any robot close to the point of recording will trigger
-					 (Geometry::distance(theRobotPose.translation, model.robotPose.translation) <= minimal_distance)) // this is the first OR a better trigger point
-				{
-					current_bestWorldModelIndex = world_model_index;
-					minimal_distance            = Geometry::distance(theRobotPose.translation, model.robotPose.translation);  // new minimum
-				}
-			}  // rof: scan all world models
+				current_bestWorldModelIndex = world_model_index;
+				minimal_distance = Geometry::distance(theRobotPose.translation, model.robotPose.translation);  // new minimum
+			}
+		}  // rof: scan all world models
 
-			ASSERT(current_bestWorldModelIndex >= 0);  // there must be at least one trigger point, because teachInScoreReached() was true in the pre-condition
-			OUTPUT_TEXT("trigger became active for robot " << Number << " from file " << theTIPlaybackSequences.models[current_bestWorldModelIndex].fileName);
-			
-		return current_bestWorldModelIndex;	
+		ASSERT(current_bestWorldModelIndex >= 0);  // there must be at least one trigger point, because teachInScoreReached() was true in the pre-condition
+		OUTPUT_TEXT("trigger became active for robot " << Number << " from file " << theTIPlayback.models[current_bestWorldModelIndex].fileName);
+
+		return current_bestWorldModelIndex;
 	};
 };
 
 
-MAKE_CARD(TIPlaybackCard);
+MAKE_CARD(TI_Collection);

@@ -9,9 +9,9 @@
  */
 
 #include "Representations/BehaviorControl/Skills.h"
-#include "Representations/BehaviorControl/TI/TIData.h"
+#include "Representations/BehaviorControl/TIData.h"
 #include "Representations/Infrastructure/FrameInfo.h"
-#include "Tools/Streams/TypeRegistry.h"
+#include "Representations/Configuration/FieldDimensions.h"
 #include <functional>
 
 struct SkillMapping {
@@ -43,14 +43,20 @@ SKILL_IMPLEMENTATION(TIExecuteImpl,
 {,
   IMPLEMENTS(TIExecute),
   REQUIRES(FrameInfo),
+  REQUIRES(FieldDimensions),
   CALLS(Stand),
   CALLS(WalkAtRelativeSpeed),
+  CALLS(WalkToPoint),
+  CALLS(GoToBallAndKick),
+  CALLS(GoToBallAndDribble),
 });
 
 class TIExecuteImpl : public TIExecuteImplBase
 {
   public:
 	std::vector<SkillMapping> mappings;
+  const playbackAction* lastAction;
+  unsigned int startTime;
 
   TIExecuteImpl() {
 		mappings.resize(playbackAction::numOfSkillss);
@@ -61,23 +67,22 @@ class TIExecuteImpl : public TIExecuteImplBase
     MAP_EXPLICIT(playbackAction::Skills::Stand, theStandSkill, {theStandSkill();});
 
     MAP(playbackAction::Skills::WalkAtRelativeSpeed, theWalkAtRelativeSpeedSkill, (action.poseParam));
-    // MAP(playbackAction::Skills::KickAtGoal, theWalkToBallAndKickAtGoalSkill, ());
-    // MAP(playbackAction::Skills::WalkToBall, theWalkToBallSkill, ());
-
-    // MAP(playbackAction::Skills::WalkToTarget, theWalkToTargetSkill, (Pose2f(180_deg, 1000.0f, 1000.0f), action.poseParam));
-    // MAP_DONE(playbackAction::Skills::WalkToTarget, {return false;});
+    MAP(playbackAction::Skills::GoToBallAndKick, theGoToBallAndKickSkill, ((action.poseParam* Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle(), KickInfo::forwardFastRight));     
+    MAP(playbackAction::Skills::WalkToPoint, theWalkToPointSkill, (action.poseParam));
+    MAP(playbackAction::Skills::GoToBallAndDribble, theGoToBallAndDribbleSkill, ((action.poseParam * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle()));
 
     for(size_t i = 0; i < mappings.size(); i++) {
-      //ASSERT(mappings[i].mapped); // If this Trips, A function of the Enum playbackAction::Skills has no mapping. Add it above
-      
-      if (!mappings[i].mapped) {
-        mappings[i] = mappings[playbackAction::Default];
-        OUTPUT_TEXT("Warning: TI Skill `" << std::string(TypeRegistry::getEnumName(typeid(playbackAction::Skills).name(), int(i))) << "` is not mapped. It has been remapped to Default");
-      }
+      ASSERT(mappings[i].mapped); // If this Trips, A function of the Enum playbackAction::Skills has no mapping. Add it above
     }  
   }
 
   void execute(const TIExecute& p) override{
+    // Check if last action is the same as current one and reset timer if not
+    if(lastAction != &p.action) {
+      lastAction = &p.action;
+      startTime = theFrameInfo.time;
+    }
+    
     mappings[p.action.skill].call(p.action);
   }
 
