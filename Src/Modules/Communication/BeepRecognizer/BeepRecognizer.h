@@ -53,19 +53,14 @@ class BeepRecognizer : public BeepRecognizerBase
     (std::vector<Vector2d>) spectrum, /**< The spectrum recorded. */
   });
 
-  std::vector<Signature> signatures; /**< All whistle signatures. */
+  size_t spectrumSize;
+  size_t samplesSize;
   std::vector<RingBuffer<AudioData::Sample>> buffers; /**< Sample buffers for all channels. */
-  bool soundWasPlaying = false; /**< Was sound played back recently? */
-  bool hasRecorded = false; /**< Was audio recorded in the previous cycle? */
   int samplesRequired = 0; /** The number of new samples required. */
   size_t sampleIndex = 0; /** Index of next sample to process for subsampling. */
   double* samples; /**< The samples after normalization. */
   fftw_complex* spectrum; /**< The spectrum of the samples. */
-  double* correlation; /**< The correlation with the signature. */
   fftw_plan fft; /**< The plan to compute the FFT. */
-  fftw_plan ifft; /**< The plan to compute the inverse FFT. */
-  float bestCorrelation = 1.f; /**< The best correlation since the last network packet was sent twice. */
-  bool bestUpdated = false; /**< Was the best correlation updated since the last network packet was sent? */
   Image<PixelTypes::Edge2Pixel> canvas; /**< Canvas for drawing spectra. */
 
   /**
@@ -76,15 +71,14 @@ class BeepRecognizer : public BeepRecognizerBase
 
   /**
    * Correlate the samples recorded with a signature spectrum.
-   * @param signature The spectrum of a recorded whistle.
    * @param buffer The samples recorded.
-   * @param record Record into the parameter "signature" instead of correlating with it.
    * @return The correlation between signature and buffer. 0 if the volume was too low.
    */
-  float correlate(std::vector<Vector2d>& signature, const RingBuffer<AudioData::Sample>& buffer,
-                  bool record = false);
+  bool decode(const RingBuffer<AudioData::Sample>& buffer);
 
 public:
   BeepRecognizer();
   ~BeepRecognizer();
 };
+
+double getAmplitude(fftw_complex& value);
