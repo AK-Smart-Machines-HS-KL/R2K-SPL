@@ -73,28 +73,25 @@ void BeepRecognizer::update(Beep &theBeep){
   if(buffers[firstBuffer].full() && samplesRequired <= 0)
   {
     int defects = 0; // Number of defect channels
-    for(size_t i = 0; i < buffers.size(); ++i){
+    for(size_t i = 1; i < buffers.size(); ++i){
       if(theDamageConfigurationHead.audioChannelsDefect[i] || !buffers[i].full()) {
         ++defects;
         continue;
       }
-
-      if (decode(buffers[i])) {
-        OUTPUT_TEXT("Decoded!");
-      }
-      
+      auto data = decode(buffers[i]);
     }
 
     
     // Reset Samples Required 
     samplesRequired = static_cast<unsigned>(bufferSize * newSampleRatio);
   }
-
-  SEND_DEBUG_IMAGE("module:BeepRecognizer:spectra", canvas, PixelTypes::Edge2);
 }
 
-bool BeepRecognizer::decode(const RingBuffer<AudioData::Sample>& buffer)
+std::vector<long> BeepRecognizer::decode(const RingBuffer<AudioData::Sample>& buffer)
 {
+  // Create new empty data vector
+  std::vector<long> data(numBands, 0);
+
   // Compute volume of samples.
   float volume = 0;
   for(AudioData::Sample sample : buffer)
@@ -102,7 +99,7 @@ bool BeepRecognizer::decode(const RingBuffer<AudioData::Sample>& buffer)
 
   // Abort if not loud enough.
   if(volume == 0 || volume < (std::is_same<AudioData::Sample, short>::value ? std::numeric_limits<short>::max() : 1) * minVolume)
-    return false;
+    return data;
 
   // Copy samples to FFTW input and normalize them.
   const double factor = 1.0 / volume;
@@ -112,18 +109,42 @@ bool BeepRecognizer::decode(const RingBuffer<AudioData::Sample>& buffer)
   // samples -> spectrum
   fftw_execute(fft);
 
-  float targetFrequency = 500;
-  int bucket = targetFrequency * samplesSize / sampleRate;
+  // Calculate Amplitudes of FFT Spectrum
+  std::vector<double> amplitudes(spectrumSize);
+  for (size_t i = 0; i < amplitudes.size(); i++)
+  {
+    amplitudes[i] = getAmplitude(spectrum[i]);
+  }
 
-  size_t maxAmpBucket = 0;
-  for(size_t i = 0; i < spectrumSize; ++i)
+  // Decode Data from audio spectrum to data vector
+  for (size_t band = 0; band < numBands; band++)
+  {
+    for (size_t bit = 0; bit < encodedBits; bit++)
     {
-      if (getAmplitude(spectrum[maxAmpBucket]) < getAmplitude(spectrum[i])){
-        maxAmpBucket = i;
+      // Calculate in which bucket a specific bit would be
+      float frequencyOffset = (band * encodedBits + bit) * signalWidth;
+      float targetFrequency = baseFrequency + frequencyOffset;
+      int bucket = targetFrequency * samplesSize / sampleRate;
+
+      // Check if bucket is above this peak 
+      if (amplitudes[bucket] > signalBaseline) {
+        data[band] = data[band] | 1 << bit;
       }
     }
+  }
 
-  return getAmplitude(spectrum[bucket]) > 1.0;
+  // Note: I cannot get this to work I have tried so many things - Andy
+  COMPLEX_IMAGE("module:BeepRecognizer")
+  {
+    Image<PixelTypes::RGBPixel> image;
+
+    image.setResolution(spectrumSize, spectrumSize / 2);
+    memset(image[0], 0, image.height * image.width * sizeof(PixelTypes::RGBPixel));
+    
+    SEND_DEBUG_IMAGE("module:BeepRecognizer", image);
+  }
+
+  return data;
 }
 
 double getAmplitude(fftw_complex& value) {

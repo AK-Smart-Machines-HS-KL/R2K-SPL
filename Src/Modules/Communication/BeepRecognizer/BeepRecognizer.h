@@ -39,8 +39,12 @@ MODULE(BeepRecognizer,
     (unsigned) sampleRate, /**< The sample rate actually used. */
     (float) newSampleRatio, /**< The ratio of new samples buffered before recognition is tried again (0..1). */
     (float) minVolume, /**< The minimum volume that must be reached for accepting a whistle [0..1). */
-    (float) minCorrelation, /**< The ratio between the selfCorrelation and the current correlation that is accepted ]0..1]. */
-    (int) minAnnotationDelay, /**< The minimum time between annotations announcing a detected whistle. */
+
+    (int) numBands,
+    (int) encodedBits,
+    (float) signalBaseline,
+    (float) baseFrequency,
+    (float) signalWidth,
   }),
 });
 
@@ -74,7 +78,7 @@ class BeepRecognizer : public BeepRecognizerBase
    * @param buffer The samples recorded.
    * @return The correlation between signature and buffer. 0 if the volume was too low.
    */
-  bool decode(const RingBuffer<AudioData::Sample>& buffer);
+  std::vector<long> decode(const RingBuffer<AudioData::Sample>& buffer);
 
 public:
   BeepRecognizer();
