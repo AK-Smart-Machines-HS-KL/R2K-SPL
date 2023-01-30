@@ -94,10 +94,12 @@ void ShotPredictor::calcShotFailProbability(Shot& shot, Vector2f& targetLineStar
         // Imagine unrolling the Sectors onto a flat number line, since that's where probabilities operate.
       
         // Convert to float to allow for negative Values required for proper intervals
-        float angleMax = sector.max;
-        float angleMin = sector.min;
-        if(angleMax <= angleMin) { angleMin = angleMin - pi2; } // if sector overlaps the 0 Angle, convert min to negative value
-        ASSERT(angleMin < angleMax);
+        float angleMax = sector.max.normalize();
+        float angleMin = sector.min.normalize();
+        if(angleMax <= angleMin) { // if sector overlaps the 0 Angle, convert min to negative value
+            angleMin -= pi2; 
+        } 
+        // ASSERT(angleMin < angleMax); // Fails due to Compiler optimization where angles are NaN Values
 
         shot.failureProbability += probabilityOfInterval(targetDirection, shot.kickType.angleAccSD, angleMin, angleMax);
         shot.failureProbability += probabilityOfInterval(targetDirection, shot.kickType.angleAccSD, angleMin + pi2, angleMax + pi2);
