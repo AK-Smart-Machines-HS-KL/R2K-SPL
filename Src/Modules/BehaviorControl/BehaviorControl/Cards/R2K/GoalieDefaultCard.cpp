@@ -77,8 +77,6 @@ class GoalieDefaultCard : public GoalieDefaultCardBase
 
   option
   {
-    
-
     initial_state(init)
     {
       // Calculate parameters for blocking positioning
@@ -88,8 +86,11 @@ class GoalieDefaultCard : public GoalieDefaultCardBase
       upperBlockingArcLimit = (Vector2f(theFieldDimensions.xPosOwnGoalPost, theFieldDimensions.yPosLeftGoal - 200) - blockingArcCenter).angle();
 
       ballPosLost = false;
-      
-      goto findBall;
+
+      transition
+      {
+        goto findBall;
+      }
 
       action {
         theActivitySkill(BehaviorStatus::defaultBehavior);
@@ -126,6 +127,7 @@ class GoalieDefaultCard : public GoalieDefaultCardBase
         }
 
         theLookActiveSkill();
+        theActivitySkill(BehaviorStatus::searchingForBall);
       }
     }
 
@@ -148,9 +150,9 @@ class GoalieDefaultCard : public GoalieDefaultCardBase
         theLookAtBallSkill();
         
         if (blockingPosRelative.norm() > 100) {
-          theWalkAtRelativeSpeedSkill(Pose2f(Angle::normalize(theFieldBall.endPositionRelative.angle()), blockingPosRelative.normalized())); // Walk to blockingPos AND turn to ball
-        } else if (Angle::normalize(theFieldBall.endPositionRelative.angle()) > 5_deg) {
-          theWalkAtRelativeSpeedSkill(Pose2f(Angle::normalize(theFieldBall.endPositionRelative.angle()))); // Just turn to ball
+          theWalkAtRelativeSpeedSkill(Pose2f(Angle::normalize(theFieldBall.positionRelative.angle()), blockingPosRelative.normalized())); // Walk to blockingPos AND turn to ball
+        } else if (Angle::normalize(theFieldBall.positionRelative.angle()) > 5_deg) {
+          theWalkAtRelativeSpeedSkill(Pose2f(Angle::normalize(theFieldBall.positionRelative.angle()))); // Just turn to ball
         } else {
           theStandSkill();
         }
