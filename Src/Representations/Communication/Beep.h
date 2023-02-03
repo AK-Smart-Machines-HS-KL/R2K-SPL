@@ -12,4 +12,5 @@
 
 STREAMABLE(Beep,
 {,
+    (std::vector<int>) messages,
 });

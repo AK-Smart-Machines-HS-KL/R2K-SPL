@@ -1,8 +1,7 @@
 /**
  * @file BeepRecognizer.cpp
  *
- * This file implements a module that identifies the sound of a beep by
- * correlating with a number of templates.
+ * This file implements a module that identifies the sound of a beep
  *
  * @author Wilhelm Simus
  */
@@ -23,6 +22,8 @@ static DECLARE_SYNC;
 
 BeepRecognizer::BeepRecognizer()
 {
+  signalWidth = bandWidth / encodedBits;
+
   canvas.setResolution(bufferSize + 1, bufferSize * 2 / 3);
 
   samplesSize = bufferSize * 2;
@@ -48,11 +49,15 @@ BeepRecognizer::~BeepRecognizer()
 
 void BeepRecognizer::update(Beep &theBeep){
 
+  if (theBeep.messages.size() != numBands) {
+    theBeep.messages.resize(numBands);
+  }
+
   // Adapt number of channels to audio data.
   buffers.resize(theAudioData.channels);
-  for(auto& buffer : buffers)
+  for(auto& buffer : buffers){
     buffer.reserve(bufferSize);
-
+  }
   // Append current samples to buffers and sample down if necessary
   // Sample down is necessary only if sample rate is different between audio provider and this module
   ASSERT(theAudioData.sampleRate % sampleRate == 0);
@@ -73,15 +78,23 @@ void BeepRecognizer::update(Beep &theBeep){
   if(buffers[firstBuffer].full() && samplesRequired <= 0)
   {
     int defects = 0; // Number of defect channels
-    for(size_t i = 1; i < buffers.size(); ++i){
-      if(theDamageConfigurationHead.audioChannelsDefect[i] || !buffers[i].full()) {
+    for(size_t channel = 1; channel < buffers.size(); ++channel){
+      if(theDamageConfigurationHead.audioChannelsDefect[channel] || !buffers[channel].full()) {
         ++defects;
         continue;
       }
-      auto data = decode(buffers[i]);
+      std::vector<long> data = decode(buffers[channel]);
+
+      for (size_t band = 0; band < data.size(); band++)
+      {
+        if (data[band] != 0) {
+          theBeep.messages[band] = 1;
+        } else {
+          theBeep.messages[band] = 0;
+        }
+      }
     }
 
-    
     // Reset Samples Required 
     samplesRequired = static_cast<unsigned>(bufferSize * newSampleRatio);
   }
@@ -134,15 +147,15 @@ std::vector<long> BeepRecognizer::decode(const RingBuffer<AudioData::Sample>& bu
   }
 
   // Note: I cannot get this to work I have tried so many things - Andy
-  COMPLEX_IMAGE("module:BeepRecognizer")
-  {
-    Image<PixelTypes::RGBPixel> image;
+  // COMPLEX_IMAGE("module:BeepRecognizer")
+  // {
+  //   Image<PixelTypes::RGBPixel> image;
 
-    image.setResolution(spectrumSize, spectrumSize / 2);
-    memset(image[0], 0, image.height * image.width * sizeof(PixelTypes::RGBPixel));
+  //   image.setResolution(spectrumSize, spectrumSize / 2);
+  //   memset(image[0], 0, image.height * image.width * sizeof(PixelTypes::RGBPixel));
     
-    SEND_DEBUG_IMAGE("module:BeepRecognizer", image);
-  }
+  //   SEND_DEBUG_IMAGE("module:BeepRecognizer", image);
+  // }
 
   return data;
 }

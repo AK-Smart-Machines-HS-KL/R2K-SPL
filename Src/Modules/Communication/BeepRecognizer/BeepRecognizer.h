@@ -44,18 +44,13 @@ MODULE(BeepRecognizer,
     (int) encodedBits,
     (float) signalBaseline,
     (float) baseFrequency,
-    (float) signalWidth,
+    (float) bandWidth,
   }),
 });
 
 class BeepRecognizer : public BeepRecognizerBase
 {
-  STREAMABLE(Signature,
-  {,
-    (std::string) name, /**< The name of the whistle. */
-    (float)(0.f) selfCorrelation, /**< The self correlation of the spectrum. */
-    (std::vector<Vector2d>) spectrum, /**< The spectrum recorded. */
-  });
+  float signalWidth;
 
   size_t spectrumSize;
   size_t samplesSize;
