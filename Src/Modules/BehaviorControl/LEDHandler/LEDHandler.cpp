@@ -27,7 +27,7 @@ void LEDHandler::update(LEDRequest& ledRequest)
   setHead(ledRequest);
   for (size_t band = 0; band < theBeep.messages.size(); band++)
   {
-    if (theBeep.messages[band] == 1) 
+    if (theBeep.messages[band] != 0) 
     {
       switch (band)
       {

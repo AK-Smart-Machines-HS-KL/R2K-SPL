@@ -45,13 +45,16 @@ MODULE(BeepRecognizer,
     (float) signalBaseline,
     (float) baseFrequency,
     (float) bandWidth,
+    (int) averagingBufferSize,
+    (int) averagingThreshold,
   }),
 });
 
 class BeepRecognizer : public BeepRecognizerBase
 {
   float signalWidth;
-
+  std::vector<RingBuffer<long>> averagingBuffers;
+  std::vector<std::vector<int>> averageActivations; 
   size_t spectrumSize;
   size_t samplesSize;
   std::vector<RingBuffer<AudioData::Sample>> buffers; /**< Sample buffers for all channels. */

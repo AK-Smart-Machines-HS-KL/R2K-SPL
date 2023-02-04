@@ -22,6 +22,9 @@ static DECLARE_SYNC;
 
 BeepRecognizer::BeepRecognizer()
 {
+  averagingBuffers = std::vector<RingBuffer<long>> (numBands, RingBuffer<long>(averagingBufferSize));
+  averageActivations = std::vector<std::vector<int>> (numBands, std::vector<int>(encodedBits, 0));
+
   signalWidth = bandWidth / encodedBits;
 
   canvas.setResolution(bufferSize + 1, bufferSize * 2 / 3);
@@ -77,6 +80,22 @@ void BeepRecognizer::update(Beep &theBeep){
   // Correlate all channels with all signatures or only one if selectedName matches a whistle.
   if(buffers[firstBuffer].full() && samplesRequired <= 0)
   {
+
+    // Adjust averages for oldest data that is about to be removed
+    if (averagingBuffers[0].full())
+    {
+      for (size_t band = 0; band < numBands; band++)
+      {
+        for (size_t bit = 0; bit < encodedBits; bit++)
+        {
+          if ((averagingBuffers[band].back() & (1 << bit)) > 0)
+          {
+            averageActivations[band][bit]--;
+          }
+        }
+      }
+    }    
+
     int defects = 0; // Number of defect channels
     for(size_t channel = 1; channel < buffers.size(); ++channel){
       if(theDamageConfigurationHead.audioChannelsDefect[channel] || !buffers[channel].full()) {
@@ -84,13 +103,25 @@ void BeepRecognizer::update(Beep &theBeep){
         continue;
       }
       std::vector<long> data = decode(buffers[channel]);
-
       for (size_t band = 0; band < data.size(); band++)
       {
-        if (data[band] != 0) {
-          theBeep.messages[band] = 1;
-        } else {
-          theBeep.messages[band] = 0;
+        averagingBuffers[band].push_front(data[band]);
+      }
+    }
+
+    // Adjust averages for new data
+    for (size_t band = 0; band < numBands; band++)
+    {
+      theBeep.messages[band] = 0;
+      for (size_t bit = 0; bit < encodedBits; bit++)
+      {
+        if ((averagingBuffers[band].front() & (1 << bit)) > 0)
+        {
+          averageActivations[band][bit]++;
+        }
+        if (averageActivations[band][bit] >= averagingThreshold)
+        {
+          theBeep.messages[band] |= (1 << bit);
         }
       }
     }
@@ -98,6 +129,24 @@ void BeepRecognizer::update(Beep &theBeep){
     // Reset Samples Required 
     samplesRequired = static_cast<unsigned>(bufferSize * newSampleRatio);
   }
+
+  // Note: I cannot get this to work I have tried so many things - Andy
+  // The idea is to draw the spectrum like the Whistle Recognizer does
+  // COMPLEX_IMAGE("module:BeepRecognizer")
+  // {
+  //   Image<PixelTypes::YUYVPixel> image;
+
+  //   image.setResolution(spectrumSize, spectrumSize / 2);
+  //   memset(image[0], 0, image.height * image.width * sizeof(PixelTypes::RGBPixel));
+  //   for (size_t y = 0; y < image.height; y++)
+  //   {
+  //     for (size_t x = 0; x < image.width; x++)
+  //     {
+  //       image[y][x].color = 1; 
+  //     }
+  //   }
+  //   SEND_DEBUG_IMAGE("module:BeepRecognizer", image);
+  // }
 }
 
 std::vector<long> BeepRecognizer::decode(const RingBuffer<AudioData::Sample>& buffer)
@@ -132,6 +181,7 @@ std::vector<long> BeepRecognizer::decode(const RingBuffer<AudioData::Sample>& bu
   // Decode Data from audio spectrum to data vector
   for (size_t band = 0; band < numBands; band++)
   {
+
     for (size_t bit = 0; bit < encodedBits; bit++)
     {
       // Calculate in which bucket a specific bit would be
@@ -145,17 +195,6 @@ std::vector<long> BeepRecognizer::decode(const RingBuffer<AudioData::Sample>& bu
       }
     }
   }
-
-  // Note: I cannot get this to work I have tried so many things - Andy
-  // COMPLEX_IMAGE("module:BeepRecognizer")
-  // {
-  //   Image<PixelTypes::RGBPixel> image;
-
-  //   image.setResolution(spectrumSize, spectrumSize / 2);
-  //   memset(image[0], 0, image.height * image.width * sizeof(PixelTypes::RGBPixel));
-    
-  //   SEND_DEBUG_IMAGE("module:BeepRecognizer", image);
-  // }
 
   return data;
 }
