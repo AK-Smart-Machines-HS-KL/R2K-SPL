@@ -37,14 +37,15 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanCompressedMessageParticle<Behavior
 
     // R2K stuff
     chaseBallCard,      
-    offenseForwardPassCard, 
     clearOwnHalfCard,  
     clearOwnHalfCardGoalie,
     defenseCard,        
     defenseLongShotCard,
 
     goalieLongShotCard, 
-    offenseFastGoalKick, 
+    offenseFastGoalKick,
+    offenseForwardPassCard,
+    offenseReceivePassCard,
     
     //Game States
     ownFreeKick,
