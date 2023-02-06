@@ -265,7 +265,7 @@ private:
 
     if (own_penalties != lastNrOwnPenalties) {
       recomputeLineUp = true;
-      OUTPUT_TEXT("recomputeLineUp  " << lastNrOwnPenalties << " " << own_penalties);
+      // OUTPUT_TEXT("recomputeLineUp  " << lastNrOwnPenalties << " " << own_penalties);
       lastNrOwnPenalties = own_penalties;
     }
 
@@ -411,7 +411,7 @@ private:
       bool shiftRight = false;
       if (goalieIsActive && (teamMateRoles.roles[0] != 1)) // somehow, the goalie ran into the field                      
       {
-        OUTPUT_TEXT("goalie is out of zone");
+        // OUTPUT_TEXT("goalie is out of zone");
         for (int i = 5; i > 0; i--) {  // search for goalie
           if (1 == teamMateRoles.roles[i]) shiftRight = true;  // "i" is the goalies' offset 
           if (shiftRight) teamMateRoles.roles[i] = teamMateRoles.roles[i-1]; // shift right
