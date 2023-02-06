@@ -12,21 +12,22 @@
 #pragma once
 
 #include "Tools/Streams/AutoStreamable.h"
+#include "Tools/Settings.h"
 #include <vector>
 
 STREAMABLE(TeammateRoles,
 {
  ENUM(R2K_TEAM_ROLES,
   {,
-    UNDEFINED,
-    GOALKEEPER_NORMAL,
+    GOALKEEPER_NORMAL,  // 0
     GOALKEEPER_ACTIVE,
-    DEFENSE_LEFT,
+    DEFENSE_LEFT,       // 2
     DEFENSE_MIDDLE,
     DEFENSE_RIGHT,
-    OFFENSE_LEFT,
+    OFFENSE_LEFT,       // 5
     OFFENSE_MIDDLE,
-    OFFENSE_RIGHT,
+    OFFENSE_RIGHT,      // 7
+    UNDEFINED,
   });
 
 
@@ -39,12 +40,7 @@ STREAMABLE(TeammateRoles,
   int operator[](const size_t i) const;
   int& operator[](const size_t i),
 
-    (std::vector<int>) ({ TeammateRoles::GOALKEEPER_NORMAL,
-                          TeammateRoles::DEFENSE_LEFT,
-                          TeammateRoles::DEFENSE_RIGHT,
-                          TeammateRoles::OFFENSE_LEFT,
-                          TeammateRoles::OFFENSE_RIGHT,
-                          TeammateRoles::UNDEFINED })roles, /** The R2K role assignment for all robots in the team */
+    (std::vector<int>) (std::vector<int>(Settings::highestValidPlayerNumber))roles, /** The R2K role assignment for all robots in the team */
     (int)(-1) captain, /**< The number of the robot which calculated this role assignment. */
     (unsigned)(0) timestamp, /**< The timestamp when this role assignment has been calculated. */ 
 });
