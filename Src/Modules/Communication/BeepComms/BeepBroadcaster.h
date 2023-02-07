@@ -15,6 +15,7 @@
 #include "Representations/Infrastructure/BeepCommData.h"
 #include "Representations/Infrastructure/SensorData/KeyStates.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Representations/Communication/Beep.h"
 #include <string>
 #include <condition_variable>
 
@@ -23,12 +24,14 @@ MODULE(BeepBroadcaster,
   PROVIDES(BeepCommData),
   REQUIRES(EnhancedKeyStates),
   REQUIRES(RobotInfo),
+  REQUIRES(Beep),
   LOADS_PARAMETERS(
   {,
     (int) numBands,
     (int) encodedBits,
     (float) baseFrequency,
     (float) bandWidth,
+    (int) headButtonMessage,
   }),
 });
 
@@ -42,6 +45,8 @@ class BeepBroadcaster : public BeepBroadcasterBase
 {
 private:
   bool buttonToggle = true;
+  bool responseToggle = true;
+
 
   // Async
   std::mutex mtx;

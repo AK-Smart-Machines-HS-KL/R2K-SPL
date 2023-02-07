@@ -41,17 +41,35 @@ BeepBroadcaster::~BeepBroadcaster()
 
 void BeepBroadcaster::update(BeepCommData& beepCommData)
 {
+    // Handle Head Button
     if (theEnhancedKeyStates.isPressedFor(KeyStates::headFront, 100u))
     {
         if (buttonToggle)   
         {
             buttonToggle = false; 
             //requestMultipleFrequencies(1000, 0.5, {500, 600});
-            beepCommData.broadcastQueue.push_back(2);
+            beepCommData.broadcastQueue.push_back(headButtonMessage);
         } 
     } else {
         buttonToggle = true;
     }
+
+    // Handle Response to 1
+    if (theRobotInfo.number != 1)
+    {
+        if (theBeep.messages[0] > 0) {
+            if (responseToggle) 
+            {
+                responseToggle = false;
+                beepCommData.broadcastQueue.push_back(1);
+            }
+            
+        } else {
+            responseToggle = true;
+        }
+        
+    }
+    
 
     float ownBaseFrequency = baseFrequency + (theRobotInfo.number - 1) * bandWidth;
     while (!beepCommData.broadcastQueue.empty())
