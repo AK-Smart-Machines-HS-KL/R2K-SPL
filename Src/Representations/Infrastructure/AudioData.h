@@ -18,5 +18,5 @@ STREAMABLE(AudioData,
 
   (unsigned)(2) channels,
   (unsigned)(48000) sampleRate,
-  (std::vector<Sample>) samples, /**< Samples are interleaved. */
+  (std::vector<Sample>) samples, /**< Samples are interleaved. This means For 3 Channels, A, B and C Audio Samples look like this: [A0,B0,C0,A1,B1,C1,A2,B2,C2,...] i.e. the samples are together in a single array */
 });

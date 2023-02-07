@@ -7,6 +7,7 @@
 #pragma once
 
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h"
+#include "Representations/Communication/Beep.h"
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/TeamData.h"
@@ -30,6 +31,7 @@ MODULE(LEDHandler,
   REQUIRES(JointSensorData),
   REQUIRES(OwnTeamInfo),
   REQUIRES(RobotInfo),
+  REQUIRES(Beep),
   USES(RobotHealth),
   REQUIRES(SystemSensorData),
   REQUIRES(TeamBehaviorStatus),

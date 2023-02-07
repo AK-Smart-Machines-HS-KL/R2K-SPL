@@ -25,6 +25,32 @@ void LEDHandler::update(LEDRequest& ledRequest)
   setRightEar(ledRequest);
   setLeftEar(ledRequest);
   setHead(ledRequest);
+  for (size_t band = 0; band < theBeep.messages.size(); band++)
+  {
+    if (theBeep.messages[band] != 0) 
+    {
+      switch (band)
+      {
+      case 0:
+        ledRequest.ledStates[LEDRequest::faceLeftGreen0Deg] = LEDRequest::on;
+        break;
+      case 1:
+        ledRequest.ledStates[LEDRequest::faceLeftGreen45Deg] = LEDRequest::on;
+        break;
+      case 2:
+        ledRequest.ledStates[LEDRequest::faceLeftGreen90Deg] = LEDRequest::on;
+        break;
+      case 3:
+        ledRequest.ledStates[LEDRequest::faceLeftGreen135Deg] = LEDRequest::on;
+        break;
+      case 4:
+        ledRequest.ledStates[LEDRequest::faceLeftGreen180Deg] = LEDRequest::on;
+        break;
+      }
+    }
+    
+  }
+  
 }
 
 void LEDHandler::setRightEar(LEDRequest& ledRequest)
