@@ -54,6 +54,9 @@ void BeepBroadcaster::update(BeepCommData& beepCommData)
         buttonToggle = true;
     }
 
+    DEBUG_RESPONSE_ONCE("module:BeepComms:broadcast:1") 
+        requestMessageBroadcast(1000, 0.5, 1);
+
     // Handle Response to 1
     if (theRobotInfo.number != 1)
     {
@@ -71,21 +74,11 @@ void BeepBroadcaster::update(BeepCommData& beepCommData)
     }
     
 
-    float ownBaseFrequency = baseFrequency + (theRobotInfo.number - 1) * bandWidth;
     while (!beepCommData.broadcastQueue.empty())
     {
         int message = beepCommData.broadcastQueue.back();
         beepCommData.broadcastQueue.pop_back();
-
-        std::vector<float> frequencies;
-        for (size_t bit = 0; bit < encodedBits; bit++)
-        {
-            if ((message & (1 << bit)) != 0) {
-                frequencies.push_back(ownBaseFrequency + bit * (bandWidth / encodedBits));
-                OUTPUT_TEXT("Broadcasting " << frequencies.back());
-            }
-        }
-        requestMultipleFrequencies(1000, 0.5, frequencies);
+        requestMessageBroadcast(1000, 0.5, message);
     }
     
 }
@@ -99,6 +92,18 @@ void BeepBroadcaster::requestMultipleFrequencies(float duration, float volume, s
    std::lock_guard lock(mtx); // aquire lock to write to request queue
    requestQueue.push_back(request); // qrite request to queue
    workerSignal.notify_one(); // notify worker of new request
+}
+void BeepBroadcaster::requestMessageBroadcast(float duration, float volume, int message){
+    float ownBaseFrequency = baseFrequency + (theRobotInfo.number - 1) * bandWidth;
+    std::vector<float> frequencies;
+    for (size_t bit = 0; bit < encodedBits; bit++)
+    {
+        if ((message & (1 << bit)) != 0) {
+            frequencies.push_back(ownBaseFrequency + bit * (bandWidth / encodedBits));
+            OUTPUT_TEXT("Broadcasting " << frequencies.back());
+        }
+    }
+    requestMultipleFrequencies(1000, 0.5, frequencies);
 };
 
 void BeepBroadcaster::startWorkers()

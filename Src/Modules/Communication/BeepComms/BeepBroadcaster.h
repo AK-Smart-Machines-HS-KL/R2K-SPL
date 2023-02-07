@@ -57,6 +57,7 @@ private:
 
   void update(BeepCommData& audioData) override;
   void requestMultipleFrequencies(float duration, float volume, std::vector<float> frequencies);
+  void requestMessageBroadcast(float duration, float volume, int message);
   void stopWorkers();
   void startWorkers();
   void init_pcm();
