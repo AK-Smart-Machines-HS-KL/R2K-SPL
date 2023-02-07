@@ -1,9 +1,10 @@
 /**
- * @file BeepComms.cpp
+ * @file BeepBroadcaster.cpp
  * This file implements a module that provides the sending part of the audio communication system.
+ * @author Nicolas Fortune, Andy Hobelsberger
  */
 
-#include "BeepComms.h"
+#include "BeepBroadcaster.h"
 #include "Platform/SystemCall.h"
 #include "Platform/Thread.h"
 #include <mutex>
@@ -15,7 +16,7 @@
 #define BUFFER_SIZE SAMPLE_RATE
 #define VOLUME_MULTIPLIER 16000
 
-MAKE_MODULE(BeepComms, infrastructure);
+MAKE_MODULE(BeepBroadcaster, infrastructure);
 
 
 #ifdef TARGET_ROBOT
@@ -26,19 +27,19 @@ MAKE_MODULE(BeepComms, infrastructure);
 
 typedef short sample_t;
 
-BeepComms::BeepComms()
+BeepBroadcaster::BeepBroadcaster()
 {
   init_pcm();
   startWorkers();
 }
 
-BeepComms::~BeepComms()
+BeepBroadcaster::~BeepBroadcaster()
 {
     stopWorkers();
     snd_pcm_close(pcm_handle);
 }
 
-void BeepComms::update(BeepCommData& audioData)
+void BeepBroadcaster::update(BeepCommData& audioData)
 {
     if (theEnhancedKeyStates.isPressedFor(KeyStates::headFront, 100u))
     {
@@ -53,7 +54,7 @@ void BeepComms::update(BeepCommData& audioData)
 }
 
 //play 5 sine waves simultaneously
-void BeepComms::requestMultipleFrequencies(float duration, float volume, std::vector<float> frequencies){
+void BeepBroadcaster::requestMultipleFrequencies(float duration, float volume, std::vector<float> frequencies){
    BeepRequest request;
    request.duration = duration;
    request.volume = volume;
@@ -63,12 +64,12 @@ void BeepComms::requestMultipleFrequencies(float duration, float volume, std::ve
    workerSignal.notify_one(); // notify worker of new request
 };
 
-void BeepComms::startWorkers()
+void BeepBroadcaster::startWorkers()
 {
-    workerThread = std::thread(&BeepComms::handleBeepRequests, this);
+    workerThread = std::thread(&BeepBroadcaster::handleBeepRequests, this);
 }
 
-void BeepComms::init_pcm()
+void BeepBroadcaster::init_pcm()
 {
     //open the audio device
     snd_pcm_open(&pcm_handle, "default", SND_PCM_STREAM_PLAYBACK, 0);
@@ -90,14 +91,14 @@ void BeepComms::init_pcm()
 
 }
 
-void BeepComms::stopWorkers()
+void BeepBroadcaster::stopWorkers()
 {
     shutdownWorkers = true;
     workerSignal.notify_all();
     workerThread.join();
 }
 
-void BeepComms::handleBeepRequests()
+void BeepBroadcaster::handleBeepRequests()
 {
     std::unique_lock lock(mtx); // aquire mutex lock
     while (true)
@@ -137,8 +138,8 @@ void BeepComms::handleBeepRequests()
 
 #else // !defined TARGET_ROBOT
 
-BeepComms::BeepComms() {}
-BeepComms::~BeepComms() {}
-void BeepComms::update(BeepCommData&) {}
+BeepBroadcaster::BeepBroadcaster() {}
+BeepBroadcaster::~BeepBroadcaster() {}
+void BeepBroadcaster::update(BeepCommData&) {}
 
 #endif

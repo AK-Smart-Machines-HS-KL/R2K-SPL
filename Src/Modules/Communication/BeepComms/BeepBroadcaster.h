@@ -1,6 +1,8 @@
 /**
- * @file BeepComms.h
+ * @file BeepBroadcaster.h
  * This file declares a module that provides the sending part of the audio communication system.
+ * 
+ * @author Nicolas Fortune, Andy Hobelsberger
  */
 
 #pragma once
@@ -15,7 +17,7 @@
 #include <string>
 #include <condition_variable>
 
-MODULE(BeepComms,
+MODULE(BeepBroadcaster,
 {,
   PROVIDES(BeepCommData),
   REQUIRES(EnhancedKeyStates),
@@ -28,7 +30,7 @@ struct BeepRequest {
   std::vector<float> frequencies;
 };
 
-class BeepComms : public BeepCommsBase
+class BeepBroadcaster : public BeepCommsBase
 {
 private:
   bool buttonToggle = true;
@@ -52,10 +54,10 @@ public:
   /**
    * Default constructor
    */
-  BeepComms();
+  BeepBroadcaster();
 
   /**
    * Destructor.
    */
-  ~BeepComms();
+  ~BeepBroadcaster();
 };
