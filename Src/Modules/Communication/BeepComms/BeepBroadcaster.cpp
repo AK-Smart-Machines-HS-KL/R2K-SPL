@@ -16,7 +16,7 @@
 #define BUFFER_SIZE SAMPLE_RATE
 #define VOLUME_MULTIPLIER 16000
 
-MAKE_MODULE(BeepBroadcaster, infrastructure);
+MAKE_MODULE(BeepBroadcaster, communication);
 
 
 #ifdef TARGET_ROBOT
@@ -39,21 +39,40 @@ BeepBroadcaster::~BeepBroadcaster()
     snd_pcm_close(pcm_handle);
 }
 
-void BeepBroadcaster::update(BeepCommData& audioData)
+void BeepBroadcaster::update(BeepCommData& beepCommData)
 {
     if (theEnhancedKeyStates.isPressedFor(KeyStates::headFront, 100u))
     {
         if (buttonToggle)   
         {
             buttonToggle = false; 
-            requestMultipleFrequencies(1000, 0.5, {500, 600});
+            //requestMultipleFrequencies(1000, 0.5, {500, 600});
+            beepCommData.broadcastQueue.push_back(2);
         } 
     } else {
         buttonToggle = true;
     }
+
+    float ownBaseFrequency = baseFrequency + (theRobotInfo.number - 1) * bandWidth;
+    while (!beepCommData.broadcastQueue.empty())
+    {
+        int message = beepCommData.broadcastQueue.back();
+        beepCommData.broadcastQueue.pop_back();
+
+        std::vector<float> frequencies;
+        for (size_t bit = 0; bit < encodedBits; bit++)
+        {
+            if ((message & (1 << bit)) != 0) {
+                frequencies.push_back(ownBaseFrequency + bit * (bandWidth / encodedBits));
+                OUTPUT_TEXT("Broadcasting " << frequencies.back());
+            }
+        }
+        requestMultipleFrequencies(1000, 0.5, frequencies);
+    }
+    
 }
 
-//play 5 sine waves simultaneously
+//play sine waves simultaneously
 void BeepBroadcaster::requestMultipleFrequencies(float duration, float volume, std::vector<float> frequencies){
    BeepRequest request;
    request.duration = duration;

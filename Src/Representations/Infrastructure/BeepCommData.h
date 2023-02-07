@@ -14,6 +14,6 @@
 #include "Tools/Streams/AutoStreamable.h"
 
 STREAMABLE(BeepCommData,
-{
-,
+{,
+    (std::vector<int>) broadcastQueue,
 });

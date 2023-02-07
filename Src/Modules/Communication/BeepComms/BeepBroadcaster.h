@@ -14,6 +14,7 @@
 #include "Platform/Thread.h"
 #include "Representations/Infrastructure/BeepCommData.h"
 #include "Representations/Infrastructure/SensorData/KeyStates.h"
+#include "Representations/Communication/RobotInfo.h"
 #include <string>
 #include <condition_variable>
 
@@ -21,7 +22,14 @@ MODULE(BeepBroadcaster,
 {,
   PROVIDES(BeepCommData),
   REQUIRES(EnhancedKeyStates),
-
+  REQUIRES(RobotInfo),
+  LOADS_PARAMETERS(
+  {,
+    (int) numBands,
+    (int) encodedBits,
+    (float) baseFrequency,
+    (float) bandWidth,
+  }),
 });
 
 struct BeepRequest {
@@ -30,7 +38,7 @@ struct BeepRequest {
   std::vector<float> frequencies;
 };
 
-class BeepBroadcaster : public BeepCommsBase
+class BeepBroadcaster : public BeepBroadcasterBase
 {
 private:
   bool buttonToggle = true;
