@@ -92,7 +92,7 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
       !aBuddyIsClearingOwnHalf() &&
       theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) && // my recent role
-      theFieldBall.endPositionOnField.x() <= theFieldDimensions.xPosOwnGoalArea + maxDistanceFromGoalArea &&
+      theFieldBall.positionOnField.x() <= theFieldDimensions.xPosOwnGoalArea + maxDistanceFromGoalArea &&
       !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME);
   }
 
