@@ -13,6 +13,7 @@
 #include "Representations/Infrastructure/BeepCommData.h"
 #include "Representations/Infrastructure/SensorData/KeyStates.h"
 #include <string>
+#include <condition_variable>
 
 MODULE(BeepComms,
 {,
@@ -21,19 +22,31 @@ MODULE(BeepComms,
 
 });
 
+struct BeepRequest {
+  float duration;
+  float volume;
+  std::vector<float> frequencies;
+};
+
 class BeepComms : public BeepCommsBase
 {
 private:
-  bool test = true;
-  std::thread beepThread;
-#ifdef TARGET_ROBOT
-  snd_pcm_t* handle;
-#endif
+  bool buttonToggle = true;
+
+  // Async
+  std::mutex mtx;
+  std::thread workerThread;
+  std::list<BeepRequest> requestQueue;
+  std::condition_variable workerSignal;
+  bool shutdownWorkers = false;
+
   void update(BeepCommData& audioData) override;
-  void playMultipleFrequencies(int robot, int frequency1, int frequency2, int frequency3, int frequency4, int frequency5, float duration, int volume);
-  void PlayerOpen(int robot, int volume);
-  void CheckFacing(int robot, int volume);
-  void BallLost(int robot, int volume);
+  void requestMultipleFrequencies(float duration, float volume, std::vector<float> frequencies);
+  void stopWorkers();
+  void startWorkers();
+  void init_pcm();
+  void handleBeepRequests();
+
 
 public:
   /**

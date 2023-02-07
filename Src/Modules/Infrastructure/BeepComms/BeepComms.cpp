@@ -6,131 +6,134 @@
 #include "BeepComms.h"
 #include "Platform/SystemCall.h"
 #include "Platform/Thread.h"
+#include <mutex>
+#include <condition_variable>
 #include <type_traits>
+#include <algorithm>
+
+#define SAMPLE_RATE 44100
+#define BUFFER_SIZE SAMPLE_RATE
+#define VOLUME_MULTIPLIER 16000
 
 MAKE_MODULE(BeepComms, infrastructure);
 
 
 #ifdef TARGET_ROBOT
 
+#ifdef TARGET_ROBOT
+  snd_pcm_t* pcm_handle;
+#endif
+
+typedef short sample_t;
 
 BeepComms::BeepComms()
 {
-  //open the audio device
-  snd_pcm_open(&handle, "default", SND_PCM_STREAM_PLAYBACK, 0);
-
-  //set the audio format
-  snd_pcm_set_params(handle, SND_PCM_FORMAT_S16_LE, SND_PCM_ACCESS_RW_INTERLEAVED, 1, 44100, 1, 500000);
-  
+  init_pcm();
+  startWorkers();
 }
 
 BeepComms::~BeepComms()
 {
-  snd_pcm_close(handle);
+    stopWorkers();
+    snd_pcm_close(pcm_handle);
 }
 
 void BeepComms::update(BeepCommData& audioData)
 {
-  if (theEnhancedKeyStates.isPressedFor(KeyStates::headFront, 100u))
-  {
-    BallLost(1, 2000);
-    test = false;
-    OUTPUT_TEXT("Text");
-  }
-  
+    if (theEnhancedKeyStates.isPressedFor(KeyStates::headFront, 100u))
+    {
+        if (buttonToggle)   
+        {
+            buttonToggle = false; 
+            requestMultipleFrequencies(1000, 0.5, {500, 600});
+        } 
+    } else {
+        buttonToggle = true;
+    }
 }
 
 //play 5 sine waves simultaneously
-void BeepComms::playMultipleFrequencies(int robot,int frequency1, int frequency2, int frequency3, int frequency4, int frequency5, float duration, int volume){
-    int add = robot * 1000;
-    int freq1 = frequency1;
-    int freq2 = frequency2;
-    int freq3 = frequency3;
-    int freq4 = frequency4;
-    int freq5 = frequency5;
-    float dur = duration;
-    int vol = volume;
-
-    //assigning robot 
-    if (freq1 != 0)
-    {
-        freq1 = freq1 + add;
-    }
-    if (freq2 != 0)
-    {
-        freq2 = freq2 + add;
-    }
-    if (freq3 != 0)
-    {
-        freq3 = freq3 + add;
-    }
-    if (freq4 != 0)
-    {
-        freq4 = freq4 + add;
-    }
-    if (freq5 != 0)
-    {
-        freq5 = freq5 + add;
-    }
-
-    //generate the sine wave
-    int buf[44100];
-    for (int i = 0; i < 44100; i++){
-        buf[i] = vol * sin(2 * M_PI * freq1 * i / 44100);
-        buf[i] = buf[i] + vol * sin(2 * M_PI * freq2 * i / 44100);
-        buf[i] = buf[i] + vol * sin(2 * M_PI * freq3 * i / 44100);
-        buf[i] = buf[i] + vol * sin(2 * M_PI * freq4 * i / 44100);
-        buf[i] = buf[i] + vol * sin(2 * M_PI * freq5 * i / 44100);
-    }
-
-    //play the sine wave
-    for (int i = 0; i < dur * 44100 / 512; i++){
-        snd_pcm_writei(handle, buf, 512);
-    }
-    
+void BeepComms::requestMultipleFrequencies(float duration, float volume, std::vector<float> frequencies){
+   BeepRequest request;
+   request.duration = duration;
+   request.volume = volume;
+   request.frequencies = frequencies;
+   std::lock_guard lock(mtx); // aquire lock to write to request queue
+   requestQueue.push_back(request); // qrite request to queue
+   workerSignal.notify_one(); // notify worker of new request
 };
 
+void BeepComms::startWorkers()
+{
+    workerThread = std::thread(&BeepComms::handleBeepRequests, this);
+}
 
-//Player is open
-void BeepComms::PlayerOpen(int robot, int volume){
-    std::thread beepThread(&BeepComms::playMultipleFrequencies, this, robot, 100, 0, 0, 0, 0, 1, volume);
+void BeepComms::init_pcm()
+{
+    //open the audio device
+    snd_pcm_open(&pcm_handle, "default", SND_PCM_STREAM_PLAYBACK, 0);
 
-    if (beepThread.joinable())
+    snd_pcm_hw_params_t *hw_params;
+    snd_pcm_hw_params_alloca(&hw_params);
+
+    snd_pcm_hw_params_any(pcm_handle, hw_params);
+    snd_pcm_hw_params_set_buffer_size(pcm_handle, hw_params, 1152);
+    snd_pcm_hw_params_set_access(pcm_handle, hw_params, SND_PCM_ACCESS_RW_INTERLEAVED);
+    snd_pcm_hw_params_set_format(pcm_handle, hw_params, SND_PCM_FORMAT_S32_LE);
+    snd_pcm_hw_params_set_channels(pcm_handle, hw_params, 1);
+    snd_pcm_hw_params_set_rate(pcm_handle, hw_params, SAMPLE_RATE, 0);
+    snd_pcm_hw_params_set_periods(pcm_handle, hw_params, 10, 0);
+    snd_pcm_hw_params_set_period_time(pcm_handle, hw_params, 100000, 0); // 0.1 seconds
+
+    //snd_pcm_hw_params(pcm_handle, hw_params);
+    snd_pcm_set_params(pcm_handle, SND_PCM_FORMAT_S16_LE, SND_PCM_ACCESS_RW_INTERLEAVED, 1, SAMPLE_RATE, 1, 500000);
+
+}
+
+void BeepComms::stopWorkers()
+{
+    shutdownWorkers = true;
+    workerSignal.notify_all();
+    workerThread.join();
+}
+
+void BeepComms::handleBeepRequests()
+{
+    std::unique_lock lock(mtx); // aquire mutex lock
+    while (true)
     {
-        //wait for 1 second
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        workerSignal.wait(lock); // release lock and wait for signal from main thread
+        if (shutdownWorkers) break; // exit loop. lock auto releases when function exits
+        BeepRequest request = requestQueue.front();
+        requestQueue.pop_front();
+        lock.unlock(); // signal signature moved to this thread, release for other workers
+        
+        //generate superimposed sine waves as signals
+        sample_t buf[BUFFER_SIZE] = {0}; // signal buffer
+        int signalSize = (int) (SAMPLE_RATE * request.duration / 1000); // total size of signal in samples
+        
+        do {
+            int toGenerate = std::min(signalSize, BUFFER_SIZE);
+            for (int i = 0; i < toGenerate; i++) {
+                buf[i] = 0;
+                for (float& frequency : request.frequencies) {
+                    buf[i] += (sample_t) (VOLUME_MULTIPLIER * (request.volume * sin(frequency * M_PI * 2 * i / SAMPLE_RATE)));
+                }
+            }
+            signalSize -= toGenerate;
+            
+            snd_pcm_sframes_t n = snd_pcm_writei(pcm_handle, &buf, toGenerate); // write data to audio buffer
+            if (n < 0) {
+                printf("Audio Stream Lost (%s) Recovering...\n", snd_strerror(int(n)));
+                snd_pcm_recover(pcm_handle, int(n), 1);
+                n = snd_pcm_writei(pcm_handle, &buf, toGenerate); // write data to audio buffer
+            }
+        } while (signalSize > 0);
+        
 
-        beepThread.join();
+        lock.lock();
     }
-
-};
-
-//Check if facing the wrong direction
-void BeepComms::CheckFacing(int robot, int volume){
-    std::thread beepThread(&BeepComms::playMultipleFrequencies, this, robot, 100, 200, 0, 0, 0, 1, volume);
-
-    if (beepThread.joinable())
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-        beepThread.join();
-    }
-
-};
-
-//Team has lost the ball
-void BeepComms::BallLost(int robot, int volume){
-    std::thread beepThread(&BeepComms::playMultipleFrequencies, this, robot, 100, 200, 400, 0, 0, 1, volume);
-
-    if (beepThread.joinable())
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-        beepThread.join();
-    }
-};
-
-
+}
 
 #else // !defined TARGET_ROBOT
 
