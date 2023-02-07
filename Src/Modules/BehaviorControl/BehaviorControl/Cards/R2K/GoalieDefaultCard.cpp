@@ -107,18 +107,8 @@ class GoalieDefaultCard : public GoalieDefaultCardBase
       }
 
       action
-      {
-        Vector2f estimatedBallPos; 
-        if (ballPosLost) { // Use Team Ball Position
-          estimatedBallPos = theFieldBall.teamPositionRelative;
-        } else {
-          estimatedBallPos = theFieldBall.positionRelative;
-        }
-        
-        Angle angleToBallEstimate = Angle::normalize(estimatedBallPos.angle());
-        if (angleToBallEstimate < 5_deg) {
-          ballPosLost = true;
-        }
+      {        
+        Angle angleToBallEstimate = Angle::normalize(theFieldBall.recentBallPositionRelative().angle());
         
         if (angleToBallEstimate < 5_deg) {
           theStandSkill();
