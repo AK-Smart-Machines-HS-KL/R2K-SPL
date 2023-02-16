@@ -14,5 +14,4 @@
 STREAMABLE(GlobalOptions,
 {,
   (bool)(false) slowWalk, /**< Use the slow walking parameters for all robots. */
-  (float)(100.0f) positionThreshold,  /* RZWEI - Threshold to determine if a certain position is reached. */
 });

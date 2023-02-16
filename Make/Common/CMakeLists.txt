@@ -184,6 +184,12 @@ target_link_options(Flags::Default INTERFACE
     $<${_is_msvc}:$<$<NOT:$<CONFIG:Debug>>:/INCREMENTAL:NO>>
     $<$<AND:${_not_mac},${_is_clang}>:$<$<CONFIG:Release>:-s>>)
 
+add_library(rapidcsv STATIC 
+    ${BHUMAN_PREFIX}/Util/rapidcsv/rapidcsv.h
+)
+set_target_properties(rapidcsv PROPERTIES LINKER_LANGUAGE CXX)
+target_include_directories(rapidcsv INTERFACE ${BHUMAN_PREFIX}/Util/rapidcsv)
+
 if(BUILD_DESKTOP)
   include("${SIMROBOT_PREFIX}/Make/Common/Box2D.cmake")
   include("${SIMROBOT_PREFIX}/Make/Common/ODE.cmake")

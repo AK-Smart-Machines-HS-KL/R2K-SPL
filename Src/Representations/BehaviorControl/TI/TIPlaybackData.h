@@ -1,5 +1,5 @@
 /**
- * @file TIPlayback.h
+ * @file TIPlaybackData.h
  * @author Jonas Lambing (R2K)
  * @brief This file contains memory representations of worldmodel and their corresponding playback files.
  * @version 1.0
@@ -20,9 +20,11 @@
 #include "TIData.h"
 
 // Both vectors most be valid for each item, otherwise both will be discarded (checkParity() in TIPlaybackProvider.cpp)
-STREAMABLE(TIPlayback,
+STREAMABLE(TIPlaybackSequences,
 {,
+  (bool) (false) loaded,
   (int) maxIdx,                       // Highest Index used by the system. used for saving new ones.
-  (std::vector<PlaybackData>) data,   // all loaded playbacks
+  (std::vector<PlaybackSequence>) data,   // all loaded playbacks
   (std::vector<WorldData>)   models,  // all loaded worldmodels
+  (int) activePlayback,
 });

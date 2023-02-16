@@ -22,6 +22,7 @@
 #include "Representations/MotionControl/HeadMotionRequest.h"
 #include "Representations/MotionControl/KeyframeMotionRequest.h"
 #include "Representations/MotionControl/MotionRequest.h"
+#include "Representations/BehaviorControl/TI/TIData.h"
 #include "Tools/BehaviorControl/Framework/Skill/Skill.h"
 #include "Tools/BehaviorControl/Interception.h"
 #include "Tools/Math/Angle.h"
@@ -29,7 +30,6 @@
 #include "Tools/Range.h"
 #include "Tools/Math/Pose2f.h"
 #include "Tools/RobotParts/Arms.h"
-#include "Representations/BehaviorControl/TIData.h"
 #include <limits>
 #include <string>
 
@@ -430,9 +430,14 @@ namespace Skills
   SKILL_INTERFACE(ReloadJointCalibration);
 
   /**
-  * @brief This Skill executes the subskill as defined by the action given
-  * @param action Skill and parameters to be executed
-  */
-  SKILL_INTERFACE(TIExecute, (const playbackAction&)action);
+   * @brief This Skill executes the subskill as defined by the action given
+   * @param action Skill and parameters to be executed
+   */
+	SKILL_INTERFACE(TIExecute, (const playbackAction&) action);
 
+  /**
+   * @brief 
+   * @param idx
+   */
+	SKILL_INTERFACE(TIPlayback, (int) idx, (bool)(false) reset);
 }

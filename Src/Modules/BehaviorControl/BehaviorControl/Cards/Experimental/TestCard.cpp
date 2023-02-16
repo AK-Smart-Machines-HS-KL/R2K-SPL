@@ -18,7 +18,6 @@
 
 // Representations
 #include "Representations/BehaviorControl/FieldBall.h"
-#include "Representations/Modeling/RobotPose.h"
 
 //#include <filesystem>
 
@@ -30,8 +29,6 @@ CARD(TestCard,
         CALLS(Activity),
         CALLS(LookForward),
         CALLS(Stand),
-        CALLS(WalkToPoint),
-        REQUIRES(RobotPose),
 
         DEFINES_PARAMETERS(
              {,
@@ -70,13 +67,10 @@ class TestCard : public TestCardBase
     // std::string s = "testingBehavior";
     // OUTPUT_TEXT(s);
 
-    Vector2f target = Vector2f(2000, 2000);
-    Vector2f targetRelative = theRobotPose.toRelative(target);
-
     // Override these skills with the skills you wish to test
     theLookForwardSkill(); // Head Motion Request
-    //theStandSkill(); // Standard Motion Request
-    theWalkToPointSkill(targetRelative);
+    theStandSkill(); // Standard Motion Request
+
   }
 };
 

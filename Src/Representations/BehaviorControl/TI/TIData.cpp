@@ -1,19 +1,19 @@
 /**
  * @file TIData.cpp
  * @author Andy Hobelsberger
- * @brief Implements methods of Objects in TIData.h (Such as PlaybackData)
+ * @brief Implements methods of Objects in TIData.h (Such as PlaybackSequence)
  * @version 0.1
  * @date 2022-01-14
  * 
  */
 
 #include "TIData.h"
-#include <Tools/rapidcsv/rapidcsv.h>
+#include <rapidcsv.h>
 #include "Tools/Debugging/Debugging.h"
 #include "Tools/Streams/AutoStreamable.h"
 #include "Tools/Streams/Enum.h"
 
-PlaybackData::PlaybackData(std::string file, bool isRelative) {
+PlaybackSequence::PlaybackSequence(std::string file, bool isRelative) {
     try
     {
         if(isRelative) {
@@ -52,7 +52,7 @@ PlaybackData::PlaybackData(std::string file, bool isRelative) {
     }
 }
 
-void PlaybackData::save(std::string path){
+void PlaybackSequence::save(std::string path){
 
     if(actions.empty()) {
         OUTPUT_WARNING("No Playback Data to save!");
@@ -119,7 +119,7 @@ void PlaybackData::save(std::string path){
     }
 }
 
-void PlaybackData::clear() {
+void PlaybackSequence::clear() {
     fileName = "";
     actions.clear();
 }

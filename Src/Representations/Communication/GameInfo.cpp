@@ -213,14 +213,6 @@ std::string GameInfo::getStateAsString() const
   }
 }
 
-int GameInfo::getState()const {
-  return state;
-}
-
-int GameInfo::getPlay()const {
-  return setPlay;
-}
-
 void GameInfo::read(In& stream)
 {
   STREAM(packetNumber);

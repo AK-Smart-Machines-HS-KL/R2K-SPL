@@ -26,8 +26,6 @@ public:
   void draw() const;
 
   std::string getStateAsString() const;
-  int getState() const;
-  int getPlay() const;
 
   friend class NaoProvider; // access to packetNumber
 
