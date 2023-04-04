@@ -1,8 +1,8 @@
 /**
  * @file OffenseForwardPassCard.cpp
- * @author Niklas Schmidts
- * @version 1.0
- * @date 2022-09-04
+ * @author Niklas Schmidts, Adrian Müller
+ * @version 1.1
+ * @date 2023-001-006
  *
  *
  * Functions, values, side effects:
@@ -12,7 +12,7 @@
  * Purpose of this card is to walk to the ball and kick it to the front teammate.
  * Only the the second player from the front beginning can activate this card.
  *
-
+ * v.1.1: increased the shoot strength from KickInfo::walkForwardsLeft to   KickInfo::walkForwardsLeftLong);
  *
  * Note:
  *
@@ -58,8 +58,6 @@ CARD(OffenseForwardPassCard,
     DEFINES_PARAMETERS(
                        {,
                            (float)(0.8f) walkSpeed,
-                           (int)(1000) initialWaitTime,
-                           (int)(7000) ballNotSeenTimeout,
                        }),
     
     /*
@@ -78,17 +76,11 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
     
     bool preconditions() const override
     {
-        //OUTPUT_TEXT(thePlayerRole.playsTheBall());
-        OUTPUT_TEXT(theRobotInfo.number);
-        OUTPUT_TEXT(thePlayerRole.supporterIndex());
-        OUTPUT_TEXT(thePlayerRole.numOfActiveSupporters - 1);
-        OUTPUT_TEXT("-------------------------------");
         
-        return true;
-        //thePlayerRole.playsTheBall() &&  // I am the striker
-        //thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1;
-        
-        //theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_NORMAL_GAME;
+      return theTeammateRoles.playsTheBall(theRobotInfo.number) &&   // I am the striker
+        theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
+        thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1 &&
+        theTeamBehaviorStatus.teamActivity != TeamBehaviorStatus::R2K_SPARSE_GAME;
         
     }
     
@@ -119,8 +111,8 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
             }
         }
 
-        theGoToBallAndKickSkill(calcAngleToOffense(x,y), KickInfo::walkForwardsLeft);
-        
+        // theGoToBallAndKickSkill(calcAngleToOffense(x,y), KickInfo::walkForwardsLeft);
+        theGoToBallAndKickSkill(calcAngleToOffense(x, y), KickInfo::walkForwardsLeftLong);
     }
     
     Angle calcAngleToOffense(float xPos, float yPos) const

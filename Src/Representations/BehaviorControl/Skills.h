@@ -22,6 +22,7 @@
 #include "Representations/MotionControl/HeadMotionRequest.h"
 #include "Representations/MotionControl/KeyframeMotionRequest.h"
 #include "Representations/MotionControl/MotionRequest.h"
+#include "Representations/BehaviorControl/TI/TIData.h"
 #include "Tools/BehaviorControl/Framework/Skill/Skill.h"
 #include "Tools/BehaviorControl/Interception.h"
 #include "Tools/Math/Angle.h"
@@ -427,4 +428,16 @@ namespace Skills
    * This skill can be used to request a reload of the jointCalibration.cfg.
    */
   SKILL_INTERFACE(ReloadJointCalibration);
+
+  /**
+   * @brief This Skill executes the subskill as defined by the action given
+   * @param pAction Skill and parameters to be executed
+   */
+	SKILL_INTERFACE(TIExecute, (const PlaybackAction&) pAction);
+
+  /**
+   * @brief 
+   * @param idx
+   */
+	SKILL_INTERFACE(TIPlayback, (int) idx, (bool)(false) reset);
 }
