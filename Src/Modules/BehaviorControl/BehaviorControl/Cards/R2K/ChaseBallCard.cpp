@@ -2,8 +2,8 @@
  * @file ChaseBallCard.cpp
  * @author Niklas Schmidts, Adrian Müller   
  * @brief Allows Offenseplayer to chase the Ball and kick to goal
- * @version 1.1
- * @date 2022-09-7
+ * @version 1.2
+ * @date 2023-01-06
  * 
  * Functions, values, side effects: 
  * OffensePlayer tries to catch the ball (ie ´walks in this direction) if
@@ -18,8 +18,10 @@
  * 
  * v1.1. avoid that our  offense bots struggle for ball. loop over buddies -> 
  *      if BehaviorStatus::chaseBallCard or clearOwnHalfCard or clearOwnHalfCardGoalie exit this card
+ * 
+ * v.1.2 card now checks wether there is an passing event active (OffenseForwardPassCard, OffenseReceivePassCard)
     
- * - Check: ShootAtGoal has higher priority and takes over close to opp.goal
+ * - Check: GoalShot has higher priority and takes over close to opp.goal
  */
 
 // Skills - Must be included BEFORE Card Base
@@ -138,7 +140,9 @@ class ChaseBallCard : public ChaseBallCardBase
       {
         if (buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie) 
+          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
           return true;
       }
       return false;

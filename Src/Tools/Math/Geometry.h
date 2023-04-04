@@ -168,4 +168,12 @@ namespace Geometry
    * @return A point on the line
    */
   Vector2f getOrthogonalProjectionOfPointOnLine(const Vector2f& base, const Vector2f& dir, const Vector2f& point);
+
+  bool getTangentPoints(const Vector2f& point, const Circle& circle, Vector2f& tp1, Vector2f& tp2);
+
+  bool raycastSegment(const Vector2f& lineP1, const Vector2f& lineP2, const Vector2f& rayBase, const Vector2f& rayDirection, Vector2f& result);
+
+  bool raycastPolygon(const std::vector<Vector2f>& polygon, const Vector2f& rayBase, const Vector2f& rayDirection, Vector2f& result);
+
+  int raycastCircle(const Circle& circle, const Vector2f& rayBase, const Vector2f& rayDirection, Vector2f& result1, Vector2f& result2);
 };
