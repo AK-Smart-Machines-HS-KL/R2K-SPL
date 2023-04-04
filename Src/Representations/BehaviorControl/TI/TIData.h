@@ -62,34 +62,34 @@ STREAMABLE(WorldData,
 // Design playback columns: per datatype, assuming most skills will only use few params
 // Pro: csv has a homogenous column signature
 // If more params are needed -> append new column
-STREAMABLE(playbackAction,
+STREAMABLE(PlaybackAction,
 {
   /** Supported TI Skills
    * If you add a new Skill to this Enum, add it's mapping in Execute.cpp 
   */
   enum Skills : unsigned char;
 
-  playbackAction& setSkill(playbackAction::Skills);
-  playbackAction& setAngle1(const Angle&);
-  playbackAction& setAngle2(const Angle&);
-  playbackAction& setPose(const Pose2f&);
-  playbackAction& setVector(const Vector3f&);
-  playbackAction& setBool(bool);
-  playbackAction& setFloat(float);
-  playbackAction& setInt(int);
-  playbackAction& setString(const std::string&);
+  PlaybackAction& setSkill(PlaybackAction::Skills);
+  PlaybackAction& setAngle1(const Angle&);
+  PlaybackAction& setAngle2(const Angle&);
+  PlaybackAction& setPose(const Pose2f&);
+  PlaybackAction& setVector(const Vector3f&);
+  PlaybackAction& setBool(bool);
+  PlaybackAction& setFloat(float);
+  PlaybackAction& setInt(int);
+  PlaybackAction& setString(const std::string&);
 
   ENUM(Skills, 
     {,
       Default,
       Stand,
       WalkAtRelativeSpeed,
-	  WalkToTarget,
+	    WalkToTarget,
       KickAtGoal,
       WalkToBall,
     }),
 
-  (playbackAction::Skills) skill,    // Enum value of Skill to execute
+  (PlaybackAction::Skills) skill,    // Enum value of Skill to execute
   (int)         maxTime,      // how long the skill is allowed to execute for
   (Angle)       angleParam1,  // this and the following members are parameters to use when executing the skill
   (Angle)       angleParam2,  
@@ -110,5 +110,5 @@ STREAMABLE(PlaybackSequence,
   
   ,
   (std::string)                   fileName,   // Name of the file on disk
-  (std::vector<playbackAction>)   actions,    // vector of all actions in the file
+  (std::vector<PlaybackAction>)   actions,    // vector of all actions in the file
 });

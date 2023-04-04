@@ -29,7 +29,7 @@ class TIPlaybackImpl : public TIPlaybackImplBase
     int lastSeqIdx = 0;
     bool _reset = false;
     unsigned int actStartTime = 0;
-    std::vector<playbackAction>::const_iterator actIter;
+    std::vector<PlaybackAction>::const_iterator actIter;
 
     option(TIPlayback)
     {         

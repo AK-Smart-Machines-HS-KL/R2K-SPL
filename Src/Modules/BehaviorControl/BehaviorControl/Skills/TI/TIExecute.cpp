@@ -16,7 +16,7 @@
 
 struct SkillMapping {
   bool mapped = false;
-  std::function<void(const playbackAction& action)> call;
+  std::function<void(const PlaybackAction& action)> call;
   std::function<bool()> isDone;
   std::function<bool()> isAborted;
 };
@@ -28,7 +28,7 @@ struct SkillMapping {
 #define MAP(_ENUM, _SKILL, _ARGS) MAP_EXPLICIT(_ENUM, _SKILL, {_SKILL _ARGS;})
 
 #define MAP_EXPLICIT(_ENUM, _SKILL, _CALL) \
-  mappings[_ENUM].call = [&](const playbackAction& action)->void _CALL; \
+  mappings[_ENUM].call = [&](const PlaybackAction& action)->void _CALL; \
   mappings[_ENUM].isDone = [&]()->bool {return _SKILL.isDone();}; \
   mappings[_ENUM].isAborted = [&]()->bool {return _SKILL.isAborted();}; \
   mappings[_ENUM].mapped = true
@@ -53,26 +53,26 @@ class TIExecuteImpl : public TIExecuteImplBase
 	std::vector<SkillMapping> mappings;
 
   TIExecuteImpl() {
-		mappings.resize(playbackAction::numOfSkillss);
+		mappings.resize(PlaybackAction::numOfSkillss);
     
     // Mappings for Skills defined in TIData.h
-    MAP_EXPLICIT(playbackAction::Skills::Default, theStandSkill, {theStandSkill();});
+    MAP_EXPLICIT(PlaybackAction::Skills::Default, theStandSkill, {theStandSkill();});
 
-    MAP_EXPLICIT(playbackAction::Skills::Stand, theStandSkill, {theStandSkill();});
+    MAP_EXPLICIT(PlaybackAction::Skills::Stand, theStandSkill, {theStandSkill();});
 
-    MAP(playbackAction::Skills::WalkAtRelativeSpeed, theWalkAtRelativeSpeedSkill, (action.poseParam));
-    // MAP(playbackAction::Skills::KickAtGoal, theWalkToBallAndKickAtGoalSkill, ());
-    // MAP(playbackAction::Skills::WalkToBall, theWalkToBallSkill, ());
+    MAP(PlaybackAction::Skills::WalkAtRelativeSpeed, theWalkAtRelativeSpeedSkill, (action.poseParam));
+    // MAP(PlaybackAction::Skills::KickAtGoal, theWalkToBallAndKickAtGoalSkill, ());
+    // MAP(PlaybackAction::Skills::WalkToBall, theWalkToBallSkill, ());
 
-    // MAP(playbackAction::Skills::WalkToTarget, theWalkToTargetSkill, (Pose2f(180_deg, 1000.0f, 1000.0f), action.poseParam));
-    // MAP_DONE(playbackAction::Skills::WalkToTarget, {return false;});
+    // MAP(PlaybackAction::Skills::WalkToTarget, theWalkToTargetSkill, (Pose2f(180_deg, 1000.0f, 1000.0f), action.poseParam));
+    // MAP_DONE(PlaybackAction::Skills::WalkToTarget, {return false;});
 
     for(size_t i = 0; i < mappings.size(); i++) {
-      //ASSERT(mappings[i].mapped); // If this Trips, A function of the Enum playbackAction::Skills has no mapping. Add it above
+      //ASSERT(mappings[i].mapped); // If this Trips, A function of the Enum PlaybackAction::Skills has no mapping. Add it above
       
       if (!mappings[i].mapped) {
-        mappings[i] = mappings[playbackAction::Default];
-        OUTPUT_TEXT("Warning: TI Skill `" << std::string(TypeRegistry::getEnumName(typeid(playbackAction::Skills).name(), int(i))) << "` is not mapped. It has been remapped to Default");
+        mappings[i] = mappings[PlaybackAction::Default];
+        OUTPUT_TEXT("Warning: TI Skill `" << std::string(TypeRegistry::getEnumName(typeid(PlaybackAction::Skills).name(), int(i))) << "` is not mapped. It has been remapped to Default");
       }
     }  
   }

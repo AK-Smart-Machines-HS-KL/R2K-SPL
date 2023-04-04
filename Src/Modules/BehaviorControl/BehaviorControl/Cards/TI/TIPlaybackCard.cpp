@@ -72,7 +72,7 @@ CARD(TIPlaybackCard,
 					 (int)(0)startTime,              // Time when the action was started
 					 (int)(-1)cardIndex,             // Index of the card inside the stack of worldmodels (and playbacks resp.)
 					 (int)(-1)actionIndex,            // Index of the action inside the card, ie., which playback action is active
-					 (playbackAction)currentAction,  // A copy of the action-data
+					 (PlaybackAction)currentAction,  // A copy of the action-data
 					 (bool)(false)action_changed,    // used as flag: action is called the first time in execute(); reset after First usage, set again in setNextAction()
 																					 // so we can set information like the robots starting position, only once, before action starts
 					 // (Pose2f)(0) destPos,	// not yet

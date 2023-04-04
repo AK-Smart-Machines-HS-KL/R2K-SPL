@@ -27,8 +27,8 @@ PlaybackSequence::PlaybackSequence(std::string file, bool isRelative) {
         // Parse the actions row by row
         for(size_t i = 0; i < doc.GetRowCount(); i++)
         {
-            playbackAction act;
-            act.skill = (playbackAction::Skills) TypeRegistry::getEnumValue(typeid(playbackAction::Skills).name(), doc.GetCell<std::string>("skillName", i));            
+            PlaybackAction act;
+            act.skill = (PlaybackAction::Skills) TypeRegistry::getEnumValue(typeid(PlaybackAction::Skills).name(), doc.GetCell<std::string>("skillName", i));            
             act.maxTime = doc.GetCell<int>("maxTime", i);
             act.angleParam1 = doc.GetCell<float>("angleParam1", i);
             act.angleParam2 = doc.GetCell<float>("angleParam2", i);
@@ -89,7 +89,7 @@ void PlaybackSequence::save(std::string path){
         for(auto act : actions)
         {
             // NOTE: Data must be converted to basic C++ datatypes. Not even C strings are supported
-            doc.SetCell(0, i, (std::string) TypeRegistry::getEnumName(typeid(playbackAction::Skills).name(), act.skill));
+            doc.SetCell(0, i, (std::string) TypeRegistry::getEnumName(typeid(PlaybackAction::Skills).name(), act.skill));
             doc.SetCell(1, i, act.maxTime);
             doc.SetCell(2, i, (float) act.angleParam1);
             doc.SetCell(3, i, (float) act.angleParam2);
@@ -301,12 +301,12 @@ void WorldData::clear() {
 }
 
 // Chainable Setters
-playbackAction& playbackAction::setSkill(playbackAction::Skills val) {skill = val; return *this;}
-playbackAction& playbackAction::setAngle1(const Angle& val) {angleParam1 = val; return *this;}
-playbackAction& playbackAction::setAngle2(const Angle& val) {angleParam2 = val; return *this;}
-playbackAction& playbackAction::setPose(const Pose2f& val) {poseParam = val; return *this;}
-playbackAction& playbackAction::setVector(const Vector3f& val) {vector3Param = val; return *this;}
-playbackAction& playbackAction::setBool(bool val) {boolParam = val; return *this;}
-playbackAction& playbackAction::setFloat(float val) {floatParam = val; return *this;}
-playbackAction& playbackAction::setInt(int val) {intParam = val; return *this;}
-playbackAction& playbackAction::setString(const std::string& val) {stringParam = val; return *this;}
+PlaybackAction& PlaybackAction::setSkill(PlaybackAction::Skills val) {skill = val; return *this;}
+PlaybackAction& PlaybackAction::setAngle1(const Angle& val) {angleParam1 = val; return *this;}
+PlaybackAction& PlaybackAction::setAngle2(const Angle& val) {angleParam2 = val; return *this;}
+PlaybackAction& PlaybackAction::setPose(const Pose2f& val) {poseParam = val; return *this;}
+PlaybackAction& PlaybackAction::setVector(const Vector3f& val) {vector3Param = val; return *this;}
+PlaybackAction& PlaybackAction::setBool(bool val) {boolParam = val; return *this;}
+PlaybackAction& PlaybackAction::setFloat(float val) {floatParam = val; return *this;}
+PlaybackAction& PlaybackAction::setInt(int val) {intParam = val; return *this;}
+PlaybackAction& PlaybackAction::setString(const std::string& val) {stringParam = val; return *this;}
