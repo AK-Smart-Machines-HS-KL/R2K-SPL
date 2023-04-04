@@ -78,15 +78,15 @@ class TIExecuteImpl : public TIExecuteImplBase
   }
 
   void execute(const TIExecute& p) override{
-    mappings[p.action.skill].call(p.action);
+    mappings[p.pAction.skill].call(p.pAction);
   }
 
   bool isDone(const TIExecute& p) const override{
-    return mappings[p.action.skill].isDone();
+    return mappings[p.pAction.skill].isDone();
   }
 
   bool isAborted(const TIExecute& p) const override{
-    return mappings[p.action.skill].isAborted();
+    return mappings[p.pAction.skill].isAborted();
   }
 };
 

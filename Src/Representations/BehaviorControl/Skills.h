@@ -431,9 +431,9 @@ namespace Skills
 
   /**
    * @brief This Skill executes the subskill as defined by the action given
-   * @param action Skill and parameters to be executed
+   * @param pAction Skill and parameters to be executed
    */
-	SKILL_INTERFACE(TIExecute, (const PlaybackAction&) action);
+	SKILL_INTERFACE(TIExecute, (const PlaybackAction&) pAction);
 
   /**
    * @brief 
