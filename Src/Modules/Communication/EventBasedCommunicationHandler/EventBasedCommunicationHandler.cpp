@@ -24,7 +24,6 @@
 MAKE_MODULE(EventBasedCommunicationHandler, communication);
 
 void EventBasedCommunicationHandler::update(EventBasedCommunicationData& ebc){    
-  ebc.ebc_messages_remaining = ebcMaxAvailableMessage - ebc_my_writes - ebc_my_receives;
   
   if(!ebc.ebcMessageMonitor){
     ebc.ebcMessageMonitor = [&] () {ebcMessageMonitor(ebc);};
@@ -155,7 +154,7 @@ void EventBasedCommunicationHandler::ebcLevelMonitor(){
 
 
 void EventBasedCommunicationHandler::ebcMessageMonitor(const EventBasedCommunicationData& ebc){
-  if(ebc.ebc_messages_remaining > 0){
+  if(theOwnTeamInfo.messageBudget > 0){
     ebc_my_writes++;
     /*
     if(ebcDebugMessages){
@@ -163,7 +162,7 @@ void EventBasedCommunicationHandler::ebcMessageMonitor(const EventBasedCommunica
       OUTPUT_TEXT("theRobotInfo.number:" << theRobotInfo.number);
       OUTPUT_TEXT("frame last send: " << timeLastSent);
       OUTPUT_TEXT("secs remaining: " << theGameInfo.secsRemaining);  // 10m * 60sec = 1200 msg
-      OUTPUT_TEXT("avail messages: " << ebc.ebc_messages_remaining);
+      OUTPUT_TEXT("avail messages: " << theOwnTeamInfo.messageBudget);
       OUTPUT_TEXT("my_writes: "  << ebc_my_writes);
       OUTPUT_TEXT("Bandwidth: " << ebc_flexibleInterval);
     }
@@ -179,7 +178,7 @@ void EventBasedCommunicationHandler::ebcMessageReceiveCheck(){
 }
 
 void EventBasedCommunicationHandler::ebcMessageIntervalAdjust(const EventBasedCommunicationData& ebc){
-  ebc_flexibleInterval = (theGameInfo.secsRemaining * 1000) / ebc.ebc_messages_remaining;
+  ebc_flexibleInterval = (theGameInfo.secsRemaining * 1000) / theOwnTeamInfo.messageBudget;
 
   if(theGameInfo.state == STATE_READY || theGameInfo.state == STATE_SET){
     ebc_flexibleInterval = ebcSendInterval * 2;
@@ -201,7 +200,7 @@ bool EventBasedCommunicationHandler::ebcSendThisFrame(const EventBasedCommunicat
     ebc_gameFinish = true;
     if (ebcDebugMessages) {
       OUTPUT_TEXT("GAME FINISHED");
-      OUTPUT_TEXT("EBC Messages Remaining: " << ebc.ebc_messages_remaining);
+      OUTPUT_TEXT("EBC Messages Remaining: " << theOwnTeamInfo.messageBudget);
       OUTPUT_TEXT("Robot Nr: " << theRobotInfo.number << ": Messages Sent: " << ebc_my_writes);
       
     }
@@ -210,7 +209,7 @@ bool EventBasedCommunicationHandler::ebcSendThisFrame(const EventBasedCommunicat
     ebc_gameFinish = false;
   }
   //Has the minimum available messages been met? Stop sending messages then
-  if(ebc.ebc_messages_remaining <= ebcMinAvailableMsgs){
+  if(theOwnTeamInfo.messageBudget <= ebcMinAvailableMsgs){
     return false;
   } 
   //Mode 0: Burst Mode: All robots send a message every ebcSendInterval msecs all at once: sendInterval: see .cfg
@@ -225,7 +224,7 @@ bool EventBasedCommunicationHandler::ebcSendThisFrame(const EventBasedCommunicat
       if(ebcDebugMessagesFull){
         OUTPUT_TEXT("Nr: " << theRobotInfo.number 
           << ": Messages Sent: " << ebc_my_writes 
-          << ": Messages Left: " << ebc.ebc_messages_remaining
+          << ": Messages Left: " << theOwnTeamInfo.messageBudget
           << ": Bandwidth: " << ebc_flexibleInterval);
       }
       return true;
@@ -244,7 +243,7 @@ bool EventBasedCommunicationHandler::ebcSendThisFrame(const EventBasedCommunicat
         if (ebcDebugMessagesFull) {
           OUTPUT_TEXT("Nr: " << theRobotInfo.number
             << ": Messages Sent: " << ebc_my_writes
-            << ": Messages Left: " << ebc.ebc_messages_remaining
+            << ": Messages Left: " << theOwnTeamInfo.messageBudget
             << ": Bandwidth: " << ebc_flexibleInterval);
         }
         return true;
@@ -268,7 +267,7 @@ bool EventBasedCommunicationHandler::ebcSendThisFrame(const EventBasedCommunicat
         ebcMessageIntervalAdjust(ebc);
         // OUTPUT_TEXT("Nr: " << theRobotInfo.number << ": Time Sent: " << theGameInfo.secsRemaining);
         // OUTPUT_TEXT("Nr: " << theRobotInfo.number << ": Messages Sent: " << ebc_my_writes);
-        // OUTPUT_TEXT("Nr: " << theRobotInfo.number << ": Messages Left: " << ebc.ebc_messages_remaining);
+        // OUTPUT_TEXT("Nr: " << theRobotInfo.number << ": Messages Left: " << theOwnTeamInfo.messageBudget);
         // OUTPUT_TEXT("Nr: " << theRobotInfo.number << ": Bandwidth: " << ebc_flexibleInterval);
 
         // OUTPUT_TEXT("GC Messages Remaining: " << theOwnTeamInfo.messageBudget);
