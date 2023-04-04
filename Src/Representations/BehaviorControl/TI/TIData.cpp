@@ -9,6 +9,8 @@
 
 #include "TIData.h"
 #include <rapidcsv.h>
+#include <iostream>
+#include <fstream>
 #include "Tools/Debugging/Debugging.h"
 #include "Tools/Streams/AutoStreamable.h"
 #include "Tools/Streams/Enum.h"
