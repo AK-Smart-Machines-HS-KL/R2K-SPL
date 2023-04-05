@@ -315,7 +315,7 @@ public:
      * protocolls the actions of the controller to the playback storage
      * @param playbackAction struct encapsulating all relevant playback data 
      */
-		void protocol(struct playbackAction* playbackAction);
+		void protocol(struct PlaybackAction* playbackAction);
 
     /**
      * the playback to .csv file format using rapidCSV
