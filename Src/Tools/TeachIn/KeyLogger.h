@@ -30,8 +30,6 @@
 //#include "Column.h" - ToDo remove
 //#include "Tools/RZWEI/RZWEI_Constant.h" - ToDo remove
 
-struct playbackAction;
-
 namespace Keys
 {
 #if defined(MACOS) || defined(WINDOWS)
@@ -315,7 +313,7 @@ public:
      * protocolls the actions of the controller to the playback storage
      * @param playbackAction struct encapsulating all relevant playback data 
      */
-		void protocol(struct playbackAction* playbackAction);
+		void protocol(struct PlaybackAction* playbackAction);
 
     /**
      * the playback to .csv file format using rapidCSV
