@@ -18,17 +18,17 @@
 STREAMABLE(TIRecorder, 
 {
     void clear() {
-        data.clear();
+        sequence.clear();
         worldData.clear();
     }
 
     FUNCTION(void()) start;
     FUNCTION(void()) stop;
-    FUNCTION(void(playbackAction& action)) changeAction;
+    FUNCTION(void(PlaybackAction& pAction)) changeAction;
     FUNCTION(void()) save;
     ,
 
     (WorldData) worldData,
-    (PlaybackData) data, 
+    (PlaybackSequence) sequence, 
     (bool) (false) recording, 
 });
