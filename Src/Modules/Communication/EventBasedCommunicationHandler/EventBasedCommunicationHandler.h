@@ -1,7 +1,7 @@
 /**
  * @file EventBasedCommunicationHandler.h
  * @author Connor Lismore (2022.02.13)
- * @brief Module Header for the Event Based Communication. Responsible for ensuring messages are send by checking for events and other changes. Reduces the amount of messages put out.
+ * @brief Module Hemaxader for the Event Based Communication. Responsible for ensuring messages are send by checking for events and other changes. Reduces the amount of messages put out.
  * @version 0.3
  * @date 
  * 
@@ -11,12 +11,21 @@
  * Changelog: Added Adjusting sendinterval for message delay bandwidth. Now adjusts based on time remaining vs message remaining
  * added whistleHeard and dribbleGame priority message sending
  * 
+ * * 4/23, Adrian
+ * a) added getOwnTeamInfoMessageBudget() to patch a defect in SimRobot (which returns messageBudget = 0 all the time) 
+*     We now have
+ *    - a rough estimation of the budget in SimRobot
+ *    - true messageBudget from OwnTeamInfo during game
+ *    The function replaces several, redundant code fragments in EventBasedCommunicationHandler.cpp
+ *    Reduced minMessageBudget (was: ebcMinAvailableMsg )  from 20 to 6, 
+ *      since we now are safe in ebcSendThisFrame():  if(getOwnTeamInfoMessageBudget() <= minMessageBudget) return false;
  * 
- * ToDo:
- * - ebcModeSwitch
- * - num_of_robots
- * - check and tune ebc_flexibleInterval
- * - ebcMaxAvailableMessage per messages? distribute even?
+ * b) improved ebcMessageIntervalAdjust(); dynamic burn-down rate now is:  (time left / budget left) * defaultFlexibleInterval  (which is ~4000msec)
+ *    the result of the computation is stored in variable flexibleInterval
+ * 
+ * c) refactored variable names a lot; re-organized .cfg
+ * 
+ * d) added theGameInfo.state == STATE_FINISHED when to block sending messages 
  */
 
 
@@ -41,7 +50,6 @@
 #include "Tools/Module/Module.h"
 #include "Representations/Communication/BHumanMessage.h"
 #include "Representations/Communication/TeamData.h"
-
 #include "Tools/Communication/BNTP.h"
 #include "Tools/Communication/RoboCupGameControlData.h"
 #include "Representations/Communication/TeamInfo.h"
@@ -67,16 +75,17 @@ MODULE(EventBasedCommunicationHandler,
 
   LOADS_PARAMETERS(
   {,
-    (int) ebcSendInterval,               /* 1000 When ebc is enabled, replaces the sendInterval from teamMessageHandler */
-    (int) ebcSendIntervalMax,            /* 2400 When ebc is enabled, upper limit for bandwith (see ebc_flexibleInterval) */
-    (int) ebcModeSwitch,                 /* 2 = Mode: 20% Message Reduction (Burst Mode), 1 = Round Robin mode, 2 = ebc classic is on */
-    (bool) ebcDebugMessages,             /* true Wether to enable messaging such as messageReceived, ballNotSeen, etc. */
-    (bool)ebcDebugMessagesFull,          /* false Wether to enable messaging per bot */
-    (int) num_of_robots,                 /* 5 needed to check for the number of robots, need to check wether more robots on the field get more messages per game */
-    (int) ebcMaxAvailableMessage,         /* 1200 chose, according to rules*/
-    (int) ebcMinAvailableMsgs,           /* 20 If minimum is reached, currently stops messaging, later to reduce messages being send */
-    (int) ebcBoostTime,                  /* 585 Time for boost, when timer reaches number, boost will stop */
-    (bool) ebcIsStriker,                 // did striker change?
+    (int) sendInterval,               /* 2000msec When ebc is enabled, replaces the sendInterval from teamMessageHandler */
+    (int) defaultFlexibleInterval,    // default: 4000, ie., 4000 msec between two messages per bot
+    (int) messageBudget,              /* 1200 chose, according to rules*/
+    (int) minMessageBudget,           /* 6 If minimum is reached, currently stops messaging, later to reduce messages being send */
+    (int) ebcModeSwitch,              /* 2 = Mode: 20% Message Reduction (Burst Mode), 1 = Round Robin mode, 2 = ebc classic is on */
+    (bool)ebcDebugMessages,           /* true Wether to enable messaging such as messageReceived, ballNotSeen, etc. */
+    (bool)ebcDebugMessagesFull,       /* false Wether to enable messaging per bot */
+    (int) activeRobots,              /* 5 needed to check for the number of robots, need to check wether more robots on the field get more messages per game */
+    
+    (int) ebcBoostTime,               /* 585 Time for boost, when timer reaches number, boost will stop */
+    (bool)ebcIsStriker,               // did striker change?
   }),
 });
 
@@ -96,12 +105,12 @@ private:
   mutable unsigned timeLastSent = 0;                                          //used with theFrameInfo.timeLastSent
   
   // event based communications: the monitors 
-  unsigned int ebc_my_level = 0;                                              //Current ebc level, counts up during game through time and events, when 100, sends a message
-  unsigned int ebc_my_writes = 0;                                             //Amount of messages a nao has send
-  unsigned int ebc_my_receives = 0;                                           //Amount of messages a nao has received
-  BehaviorStatus::Activity ebc_last_activity;                                 //Used to check if nao current behavior has changed
+  unsigned int myUrgencyLevel = 0;                                              //Current ebc level, counts up during game through time and events, when 100, sends a message
+  unsigned int sendCount = 0;                                             //Amount of messages a nao has send
+  unsigned int receiveCount = 0;                                           //Amount of messages a nao has received
+  BehaviorStatus::Activity lastBehavior;                                 //Used to check if nao current behavior has changed
  
-  const unsigned int thisRobotTurnToSend = ebcSendInterval / num_of_robots;  //Utilized for round robin, checks which robots turn it is to send
+  const unsigned int thisRobotTurnToSend = sendInterval / activeRobots;  //Utilized for round robin, checks which robots turn it is to send
 
   const unsigned int EBCMaxLevel = 100;                                       //Max ebc level to be reached before a message can be send
   const int EBCCountUp = EBCMaxLevel / 40;                                    //incremental increase for ebcount until a message will be sent
@@ -109,10 +118,10 @@ private:
   const int EBCReset = 0;                                                     //constant used to reset ebc back to 0 if a message was send
   unsigned int frameTimeStart = 0;                                            //Used for the beginning of a game so that each nao sends a message
   // bool ebc_dribbling_active = false;                                          //Check that dribbling is active, if so, send message now
-  bool ebc_whistle_detected = false;
+  bool whistleDetected = false;
 
-  int ebc_flexibleInterval = ebcSendInterval;                                 // decrease bandwith by increasing send intervall by ebc_flexibleInterval 
-  bool ebc_gameFinish = false;
+  int flexibleInterval = sendInterval;                                 // decrease bandwith by increasing send intervall by ebc_flexibleInterval 
+  bool gameIsFinished = false;
   
   void update(EventBasedCommunicationData& ebc);                              //update method
   int  ebcImportantMessageSend();                                             //Function to raise ebcLevel to 100%, therefore sending message instantly
@@ -124,4 +133,18 @@ private:
   void ebcMessageIntervalAdjust(const EventBasedCommunicationData& ebc);      //
   
   bool ebcSendThisFrame(const EventBasedCommunicationData& ebc);              //bool utilized to check wether frame should be send over at the teammessagehandler
+  int getOwnTeamInfoMessageBudget();                                 // this function patches the fact theOwnTeamInfo.messageBudget == 0 in SimRobot
+  unsigned int getTotalSecsRemaining();                                       // counting down 1200 .. 0 
+};
+
+ int EventBasedCommunicationHandler::getOwnTeamInfoMessageBudget() {
+   // this is a ROUGH estimation
+   // to be replaced by theOwnTeamInfo.messageBudget
+  return messageBudget - sendCount * activeRobots;
+}
+
+unsigned int EventBasedCommunicationHandler::getTotalSecsRemaining() {
+  if (theGameInfo.firstHalf == 1) return 600 + theGameInfo.secsRemaining;
+  else return theGameInfo.secsRemaining;
+  
 };
