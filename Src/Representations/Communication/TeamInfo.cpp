@@ -83,6 +83,7 @@ void TeamInfo::read(In& stream)
   STREAM(teamColor); // TEAM_BLUE, TEAM_RED, TEAM_YELLOW, TEAM_BLACK, ...
   STREAM(score); // team's score
   STREAM(players); // the team's players
+  STREAM(messageBudget); // the team's remaining messages
 }
 
 void TeamInfo::write(Out& stream) const
@@ -93,6 +94,7 @@ void TeamInfo::write(Out& stream) const
   STREAM(teamColor); // TEAM_BLUE, TEAM_RED, TEAM_YELLOW, TEAM_BLACK, ...
   STREAM(score); // team's score
   STREAM(players); // the team's players
+  STREAM(messageBudget); // the team's remaining messages
 }
 
 void TeamInfo::reg()
@@ -103,6 +105,7 @@ void TeamInfo::reg()
   REG(teamColor);
   REG(score);
   REG(PlayerInfo(&)[MAX_NUM_PLAYERS], players);
+  REG(messageBudget);
 }
 
 static void drawDigit(int digit, const Vector3f& pos, float size, int teamColor)
