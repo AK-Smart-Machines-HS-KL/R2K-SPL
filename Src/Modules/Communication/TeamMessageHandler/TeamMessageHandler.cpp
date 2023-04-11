@@ -62,7 +62,6 @@ void TeamMessageHandler::update(BHumanMessageOutputGenerator& outputGenerator)
 
   if (ebcEnable) {
     bool ebcSendThisFrame = theEventBasedCommunicationData.sendThisFrame();
-    if(ebcSendThisFrame) theEventBasedCommunicationData.ebcMessageMonitor();
 
     outputGenerator.sendThisFrame =
 #ifndef SITTING_TEST

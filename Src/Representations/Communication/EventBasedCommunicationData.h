@@ -19,7 +19,5 @@
 STREAMABLE(EventBasedCommunicationData,
 { 
   FUNCTION(bool()) sendThisFrame;             //custom sendThisFrame, used when ebc is enabled
-  FUNCTION(void()) ebcMessageMonitor;         //Message Monitoring and how many available messages are left
-  FUNCTION(void()) ebcMessageReceiveCheck;    //Check that messages are received proper per robot
   FUNCTION(int()) ebcSendMessageImportant;,  // tmp return int = ebc #writes
 });

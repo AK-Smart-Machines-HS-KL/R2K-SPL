@@ -24,14 +24,6 @@
 MAKE_MODULE(EventBasedCommunicationHandler, communication);
 
 void EventBasedCommunicationHandler::update(EventBasedCommunicationData& ebc){    
-  
-  if(!ebc.ebcMessageMonitor){
-    ebc.ebcMessageMonitor = [&] () {ebcMessageMonitor(ebc);};
-  }
-
-  if(!ebc.ebcMessageReceiveCheck){
-    ebc.ebcMessageReceiveCheck = [&] () {ebcMessageReceiveCheck();};
-  }
 
   if(!ebc.sendThisFrame){
     ebc.sendThisFrame = [&] () {return ebcSendThisFrame(ebc);};
@@ -56,9 +48,9 @@ void EventBasedCommunicationHandler::ebcLevelRestart(){
 //Here start functions, which are respinsible for any ebc related tasks
 void EventBasedCommunicationHandler::ebcLevelMonitor(){
   if (theFrameInfo.time == frameTimeStart) {  // called once at startup, i.e., GAMESTATE = INIT
-     ebcImportantMessageSend(); // get things started
-   ebc_last_activity = BehaviorStatus::initial;  // deprecated
-   }
+    ebcImportantMessageSend(); // get things started
+    ebc_last_activity = BehaviorStatus::initial;  // deprecated
+  }
  
    // OUTPUT_TEXT(" theGameInfo.state == STATE_PLAYING)" << theGameInfo.secsRemaining);
  
@@ -140,41 +132,6 @@ void EventBasedCommunicationHandler::ebcLevelMonitor(){
 
   // Ball is not seen: state change: send message
   // // Has robot fallen? send message
-}
-
-  
-    
-  
-
-  
-
-  
-
-  
-
-
-void EventBasedCommunicationHandler::ebcMessageMonitor(const EventBasedCommunicationData& ebc){
-  if(theOwnTeamInfo.messageBudget > 0){
-    ebc_my_writes++;
-    /*
-    if(ebcDebugMessages){
-      OUTPUT_TEXT("================");
-      OUTPUT_TEXT("theRobotInfo.number:" << theRobotInfo.number);
-      OUTPUT_TEXT("frame last send: " << timeLastSent);
-      OUTPUT_TEXT("secs remaining: " << theGameInfo.secsRemaining);  // 10m * 60sec = 1200 msg
-      OUTPUT_TEXT("avail messages: " << theOwnTeamInfo.messageBudget);
-      OUTPUT_TEXT("my_writes: "  << ebc_my_writes);
-      OUTPUT_TEXT("Bandwidth: " << ebc_flexibleInterval);
-    }
-    */
-  }
-}
-
-void EventBasedCommunicationHandler::ebcMessageReceiveCheck(){
-    ebc_my_receives++; 
-    if(ebcDebugMessages){
-	    OUTPUT_TEXT("robo: " << theRobotInfo.number << " my receives: " << ebc_my_receives);
-    }
 }
 
 void EventBasedCommunicationHandler::ebcMessageIntervalAdjust(const EventBasedCommunicationData& ebc){
