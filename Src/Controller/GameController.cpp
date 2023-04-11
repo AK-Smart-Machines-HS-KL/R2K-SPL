@@ -1022,6 +1022,9 @@ void GameController::setTeamInfos(Settings::TeamColor firstTeamColor, Settings::
 {
   teamInfos[0].teamNumber = 1;
   teamInfos[0].teamColor = firstTeamColor;
+  teamInfos[0].messageBudget = 1200;
   teamInfos[1].teamNumber = 2;
   teamInfos[1].teamColor = secondTeamColor;
+  teamInfos[1].messageBudget = 1200;
+
 }
