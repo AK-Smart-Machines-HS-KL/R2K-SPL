@@ -39,16 +39,6 @@ void EventBasedCommunicationHandler::update(EventBasedCommunicationData& ebc){
 
   */
 
-  if(!ebc.ebcMessageMonitor){
-    ebc.ebcMessageMonitor = [&] () {ebcMessageMonitor(ebc);};
-  }
-
-
-    // not used yet
-  if(!ebc.ebcMessageReceiveCheck){
-    ebc.ebcMessageReceiveCheck = [&] () {ebcMessageReceiveCheck();};
-  }
-
   if(!ebc.sendThisFrame){
     ebc.sendThisFrame = [&] () {return ebcSendThisFrame(ebc);};
   }
@@ -95,7 +85,7 @@ void EventBasedCommunicationHandler::ebcLevelMonitor(){
       if(ebcDebugMessages){
         OUTPUT_TEXT("robot nr:" << theRobotInfo.number << ": msg: my behavior has changed.");
         if (theRobotInfo.number == 4) {
-          OUTPUT_TEXT("flexibleInterval " << flexibleInterval << " ebc_message budget : " << getOwnTeamInfoMessageBudget() <<
+          OUTPUT_TEXT("flexibleInterval " << flexibleInterval << " ebc_message budget : " << theOwnTeamInfo.messageBudget <<
             " active bots: " << activeRobots);
         };
 
@@ -158,51 +148,13 @@ void EventBasedCommunicationHandler::ebcLevelMonitor(){
   // // Has robot fallen? send message
 }
 
-  
-    
-  
-
-  
-
-  
-
-  
-
-
-void EventBasedCommunicationHandler::ebcMessageMonitor(const EventBasedCommunicationData& ebc){
-  // AM
-  // if(theOwnTeamInfo.messageBudget > 0){
-  if (getOwnTeamInfoMessageBudget() >= minMessageBudget) {
-    sendCount++;
-    /*
-    if(ebcDebugMessages){
-      OUTPUT_TEXT("================");
-      OUTPUT_TEXT("theRobotInfo.number:" << theRobotInfo.number);
-      OUTPUT_TEXT("frame last send: " << timeLastSent);
-      OUTPUT_TEXT("secs remaining: " << theGameInfo.secsRemaining);  // 10m * 60sec = 1200 msg
-      OUTPUT_TEXT("avail messages: " << theOwnTeamInfo.messageBudget);
-      OUTPUT_TEXT("my_writes: "  << ebc_my_writes);
-      OUTPUT_TEXT("Bandwidth: " << ebc_flexibleInterval);
-    }
-    */
-  }
-}
-
-void EventBasedCommunicationHandler::ebcMessageReceiveCheck(){
-    // OUTPUT_TEXT("robo: " << theRobotInfo.number << " my receives: " << ebc_my_receives);
-    receiveCount++; 
-    if(ebcDebugMessages){
-	    OUTPUT_TEXT("robo: " << theRobotInfo.number << " my receives: " << receiveCount);
-    }
-}
-
 void EventBasedCommunicationHandler::ebcMessageIntervalAdjust(const EventBasedCommunicationData& ebc){
   // AM
   // ebc_flexibleInterval = (theGameInfo.secsRemaining * 1000) / ebcMaxAvailableMessage - ebc_my_receives;
 
   // sample: 200 sec left, 40 messages left in budget -> send 1 msg each 5 frame * defaultFlexibleInterval
   // the lower the constant - eg 2000 - the lower the #msg send  --> flexible intervall is ~ 2sec
-  flexibleInterval = defaultFlexibleInterval * getTotalSecsRemaining() / getOwnTeamInfoMessageBudget();
+  flexibleInterval = defaultFlexibleInterval * getTotalSecsRemaining() / theOwnTeamInfo.messageBudget;
 
   if(theGameInfo.state == STATE_READY || theGameInfo.state == STATE_SET){
     flexibleInterval = sendInterval * 2;
@@ -241,7 +193,7 @@ bool EventBasedCommunicationHandler::ebcSendThisFrame(const EventBasedCommunicat
     return false;
     // Note: R2K_TeamCard deals with STATE_READY explicitely, to save bandwith here
 
-  if(getOwnTeamInfoMessageBudget() <= minMessageBudget){
+  if(theOwnTeamInfo.messageBudget <= minMessageBudget){
     return false;
   } 
   //Mode 0: Burst Mode: All robots send a message every ebcSendInterval msecs all at once: sendInterval: see .cfg

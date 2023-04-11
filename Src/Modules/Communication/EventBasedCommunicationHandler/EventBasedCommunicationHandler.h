@@ -128,20 +128,11 @@ private:
   // return value: #messages written
   void ebcLevelMonitor();                                                     //Mode 2 only: function for keeping track of the ebc_level and changing it when needed
   void ebcLevelRestart();                                                     //function for setting ebc_level back to 0
-  void ebcMessageMonitor(const EventBasedCommunicationData& ebc);             //function for keeping track of messages send and how many are left
-  void ebcMessageReceiveCheck();                                              //function for counting up how many messages each robot has received so far
   void ebcMessageIntervalAdjust(const EventBasedCommunicationData& ebc);      //
   
-  bool ebcSendThisFrame(const EventBasedCommunicationData& ebc);              //bool utilized to check wether frame should be send over at the teammessagehandler
-  int getOwnTeamInfoMessageBudget();                                 // this function patches the fact theOwnTeamInfo.messageBudget == 0 in SimRobot
+  bool ebcSendThisFrame(const EventBasedCommunicationData& ebc);              //bool utilized to check wether frame should be send over at the teammessagehandler                           // this function patches the fact theOwnTeamInfo.messageBudget == 0 in SimRobot
   unsigned int getTotalSecsRemaining();                                       // counting down 1200 .. 0 
 };
-
- int EventBasedCommunicationHandler::getOwnTeamInfoMessageBudget() {
-   // this is a ROUGH estimation
-   // to be replaced by theOwnTeamInfo.messageBudget
-  return messageBudget - sendCount * activeRobots;
-}
 
 unsigned int EventBasedCommunicationHandler::getTotalSecsRemaining() {
   if (theGameInfo.firstHalf == 1) return 600 + theGameInfo.secsRemaining;
