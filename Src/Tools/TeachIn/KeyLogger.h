@@ -30,8 +30,6 @@
 //#include "Column.h" - ToDo remove
 //#include "Tools/RZWEI/RZWEI_Constant.h" - ToDo remove
 
-struct playbackAction;
-
 namespace Keys
 {
 #if defined(MACOS) || defined(WINDOWS)
