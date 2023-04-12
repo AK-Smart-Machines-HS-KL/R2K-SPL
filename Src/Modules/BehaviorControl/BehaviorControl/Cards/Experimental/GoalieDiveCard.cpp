@@ -1,6 +1,6 @@
 /**
  * @file GoalieDiveCard.cpp
- * @author Asfiya Aazim
+ * @author Asfiya Aazim & Mohammed
  * @brief This card's preconditions are always true.
  *        Edit it for testing
  * @version 0.1
@@ -18,7 +18,7 @@
 
 // Representations
 #include "Representations/BehaviorControl/FieldBall.h"
-#include "Representations\Communication\RobotInfo.h"
+#include "Representations/Communication/RobotInfo.h"
 //#include <filesystem>
 
 // Modify this card but don't commit changes to keep it clean for other developers
