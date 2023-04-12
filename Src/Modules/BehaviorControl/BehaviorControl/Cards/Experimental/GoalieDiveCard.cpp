@@ -60,14 +60,14 @@ class GoalieDiveCard : public GoalieDiveCardBase
 
   bool postconditions() const override
   {
-    return true;   // set to true, when used as default card, ie, lowest card on stack
+    return  !preconditions();   // set to true, when used as default card, ie, lowest card on stack
   }
 
   void execute() override
   {
 
-    theActivitySkill(BehaviorStatus::testingBehavior);
-    // std::string s = "testingBehavior";
+    theActivitySkill(BehaviorStatus::dive);
+    // std::string s = "dive";
     // OUTPUT_TEXT(s);
 
     // Override these skills with the skills you wish to test
