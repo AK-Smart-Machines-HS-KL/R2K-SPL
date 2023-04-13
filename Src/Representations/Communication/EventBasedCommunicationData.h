@@ -19,5 +19,7 @@
 STREAMABLE(EventBasedCommunicationData,
 { 
   FUNCTION(bool()) sendThisFrame;             //custom sendThisFrame, used when ebc is enabled
-  FUNCTION(int()) ebcSendMessageImportant;,  // tmp return int = ebc #writes
+  FUNCTION(int()) ebcSendMessageImportant;  // tmp return int = ebc #writes
+  FUNCTION(void()) ebcMessageMonitor;
+  , 
 });

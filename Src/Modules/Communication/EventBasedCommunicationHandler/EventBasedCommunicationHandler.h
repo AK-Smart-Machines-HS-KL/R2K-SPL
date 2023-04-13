@@ -128,9 +128,11 @@ private:
   // return value: #messages written
   void ebcLevelMonitor();                                                     //Mode 2 only: function for keeping track of the ebc_level and changing it when needed
   void ebcLevelRestart();                                                     //function for setting ebc_level back to 0
+  void ebcMessageMonitor(const EventBasedCommunicationData& ebc);             //function for keeping track of messages send and how many are left
   void ebcMessageIntervalAdjust(const EventBasedCommunicationData& ebc);      //
   
   bool ebcSendThisFrame(const EventBasedCommunicationData& ebc);              //bool utilized to check wether frame should be send over at the teammessagehandler                           // this function patches the fact theOwnTeamInfo.messageBudget == 0 in SimRobot
+  int getOwnTeamInfoMessageBudget(); 
   unsigned int getTotalSecsRemaining();                                       // counting down 1200 .. 0 
 };
 
