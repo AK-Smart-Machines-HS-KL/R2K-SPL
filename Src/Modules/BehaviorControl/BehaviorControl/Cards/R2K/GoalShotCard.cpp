@@ -60,12 +60,12 @@ class GoalShotCard : public GoalShotCardBase
   //always active
   bool preconditions() const override
   {
-    return theFieldBall.positionRelative.norm() < 500 && theFrameInfo.getTimeSince(timeLastFail) > cooldown && theShots.goalShot.failureProbability < 0.95;
+    return theFieldBall.positionRelative.norm() < 500 && theFrameInfo.getTimeSince(timeLastFail) > cooldown && theShots.goalShot.failureProbability < 0.70;
   }
 
   bool postconditions() const override
   {
-    return done;   // set to true, when used as default card, ie, lowest card on stack
+    return done;   
   }
 
   option
@@ -85,7 +85,9 @@ class GoalShotCard : public GoalShotCardBase
 
       action
       {
-        theWalkToPointSkill(Pose2f(angleToGoal));
+        // face the goal
+        theWalkAtRelativeSpeedSkill(Pose2f(std::clamp((float) angleToGoal, -1.f, 1.f)));
+        // look around
         theLookActiveSkill();
       }
     }
