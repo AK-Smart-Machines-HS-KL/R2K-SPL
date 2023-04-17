@@ -61,6 +61,7 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanCompressedMessageParticle<Behavior
     calibrationFinished,
 
     referenceCard,      // R2K
+    searchForBall,  // R2K
   });
 
   /**
