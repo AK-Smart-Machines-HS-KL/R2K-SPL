@@ -1,13 +1,13 @@
 /**
- * @file TeachinCard.cpp 
- * @author Felix Mayer (R2K)
- * @brief This file is responsible for handling the key events of a gamepad and execute the corresponding actions.
+ * @file TIRecorderCard.cpp 
+ * @author Wilhelm Simus (R2K)
+ * @brief This file is responsible for handling the key events of a gamepad and execute the corresponding actions while keeping a recording of the performed actions when needed.
  * 
- * This Card is to control the NAO manuel with the PS4 Controller and to protocol the handled actions.
- * Once a button got pressed, the Nao will start it's specific action until an other one got pressed.
+ * This Card is to control the NAO manually with the PS4 Controller and to protocol the handled actions.
+ * Once a button is pressed, the Nao will start its specific action until an other one is pressed.
  * 
- * The actions are saved inside a playbackAction struct defined in TIData.h 
- * This struct is provided in with the 'void protocol()' function to the keyLogger which saves and writes the playback File
+ * The actions are saved inside a playbackAction struct defined in TIRecorderData.h 
+ * This struct is provided in with the 'void protocol()' function to the KeyLogger which saves and writes into the playback file
  * 
  * It checks the pressed key and then will handle its asociated action
  * i key == X{
@@ -18,8 +18,8 @@
  * Skills, which are setting head and body motion, should be handled first
  * 
  * 
- * @version 1.1
- * @date 2021-10-05
+ * @version 1.0
+ * @date 2023-04-18
  * 
  *  */
 

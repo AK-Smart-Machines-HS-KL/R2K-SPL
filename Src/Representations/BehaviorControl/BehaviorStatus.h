@@ -27,6 +27,7 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanCompressedMessageParticle<Behavior
     initial,
     lookAroundAfterPenalty,
     set,
+    
     teachin,
     testingBehavior,
     goalShot,
