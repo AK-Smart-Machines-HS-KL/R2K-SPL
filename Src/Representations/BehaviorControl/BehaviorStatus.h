@@ -51,6 +51,7 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanCompressedMessageParticle<Behavior
     
     //Game States
     ownFreeKick,
+    ownPenaltyKick,
     oppFreeKick,
 
     ownKickoff,
