@@ -107,8 +107,8 @@ WorldModel TIRecorderProvider::getWorldModel() {
     model.robotPose=Pose2f(theGroundTruthWorldState.ownPose);
     model.timeLeft = theGameInfo.secsRemaining;
     model.robotNumber=theRobotInfo.number;
-    model.setPlay = theGameInfo.getPlay();
-    model.gameState = theGameInfo.getState();
+    model.setPlay = theGameInfo.setPlay;
+    model.gameState = theGameInfo.state;
     model.ballPosition = theGroundTruthWorldState.balls.size() == 0 ? 
         Vector2f(0, 0) :  
         Vector2f(theGroundTruthWorldState.balls[0].position.x(),theGroundTruthWorldState.balls[0].position.y()); /* */
