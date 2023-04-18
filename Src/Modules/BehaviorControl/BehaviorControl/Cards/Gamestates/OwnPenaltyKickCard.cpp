@@ -1,5 +1,5 @@
 /**
- * @file OwnPenaltyKickCard.cpp
+ * @file OwnPenaltyKickCard.cpp 
  * @author Asfiya Aazim
  * @brief Covers the Penalty Kick: Own Team has Penalty Kick
  * @version 1.1
@@ -32,7 +32,7 @@
 #include "Tools/Math/Geometry.h"
 
 
-CARD(OwnPenaltykKickCard,
+CARD(OwnPenaltyKickCard,
     { ,
       CALLS(Stand),
       CALLS(Activity),
@@ -51,7 +51,7 @@ CARD(OwnPenaltykKickCard,
 
     });
 
-class OwnPenaltykKickCard : public OwnPenaltykKickCardBase
+class OwnPenaltyKickCard : public OwnPenaltyKickCardBase
 {
     KickInfo::KickType kickType;
     /**
@@ -61,7 +61,9 @@ class OwnPenaltykKickCard : public OwnPenaltykKickCardBase
     {
         return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
             && theGameInfo.setPlay == SET_PLAY_PENALTY_KICK
-            && theTeammateRoles.isTacticalDefense(theRobotInfo.number);
+            // && theTeammateRoles.isTacticalDefense(theRobotInfo.number);
+            // this is a nasty patch
+            && theRobotInfo.number == 2;
 
     }
 
@@ -109,18 +111,6 @@ class OwnPenaltykKickCard : public OwnPenaltykKickCardBase
         }
       }
 
-      state(standby)
-      {
-        transition
-        {
-
-        }
-
-        action
-        {
-
-        }
-      }
     }
         Angle calcAngleToGoal() const
     {
@@ -128,4 +118,4 @@ class OwnPenaltykKickCard : public OwnPenaltykKickCardBase
     }
 };
 
-MAKE_CARD(OwnPenaltykKickCard);
+MAKE_CARD(OwnPenaltyKickCard);
