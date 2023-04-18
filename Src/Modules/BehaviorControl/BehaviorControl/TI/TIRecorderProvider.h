@@ -24,4 +24,4 @@ public:
     TIRecorderProvider();
 
     // TODO
-}
+};
