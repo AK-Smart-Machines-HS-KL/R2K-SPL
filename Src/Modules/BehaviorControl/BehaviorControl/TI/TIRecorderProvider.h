@@ -9,5 +9,19 @@
  */
 
 #pragma once
+#include "Tools\Module\Module.h"
 
-// TODO
+MODULE(TIRecorderProvider,
+    {
+        ,
+        // TODO
+    });
+
+class TIRecorderProvider : public TIRecorderProviderBase
+{
+public:
+
+    TIRecorderProvider();
+
+    // TODO
+}
