@@ -149,9 +149,11 @@ class TIRecorderCard : public TIRecorderCardBase
 
       if (specialCallbacks.count(e)) {
         specialCallbacks.at(e)();
+        OUTPUT_TEXT("Key " << e << " pressed.");
       } else if (actionCallbacks.count(e)) {
         setAction(actionCallbacks.at(e));
         cursorControl = false;
+        OUTPUT_TEXT("Key " << e << " pressed.");
       } else {
         OUTPUT_TEXT("Key " << e << " not bound");
       }

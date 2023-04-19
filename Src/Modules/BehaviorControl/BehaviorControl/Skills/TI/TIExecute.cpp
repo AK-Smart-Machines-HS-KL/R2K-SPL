@@ -45,6 +45,7 @@ SKILL_IMPLEMENTATION(TIExecuteImpl,
   REQUIRES(FrameInfo),
   CALLS(Stand),
   CALLS(WalkAtRelativeSpeed),
+  CALLS(GoToBallAndKick),
 });
 
 class TIExecuteImpl : public TIExecuteImplBase
@@ -57,10 +58,9 @@ class TIExecuteImpl : public TIExecuteImplBase
     
     // Mappings for Skills defined in TIData.h
     MAP_EXPLICIT(PlaybackAction::Skills::Default, theStandSkill, {theStandSkill();});
-
     MAP_EXPLICIT(PlaybackAction::Skills::Stand, theStandSkill, {theStandSkill();});
-
     MAP(PlaybackAction::Skills::WalkAtRelativeSpeed, theWalkAtRelativeSpeedSkill, (action.poseParam));
+    MAP(PlaybackAction::Skills::KickAtGoal, theGoToBallAndKickSkill, (0_deg, KickInfo::KickType::forwardFastRight));
     // MAP(PlaybackAction::Skills::KickAtGoal, theWalkToBallAndKickAtGoalSkill, ());
     // MAP(PlaybackAction::Skills::WalkToBall, theWalkToBallSkill, ());
 
