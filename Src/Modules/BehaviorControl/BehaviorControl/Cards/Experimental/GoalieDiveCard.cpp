@@ -1,12 +1,16 @@
 /**
  * @file GoalieDiveCard.cpp
  * @author Asfiya Aazim & Mohammed
- * @brief This card's preconditions are always true.
- *        Edit it for testing
- * @version 0.1
+ * @brief This card's preconditions are true only when the ball is rolling towards own goal.
+ * @Details:
+ * - this card qualifies for only robot num1 GOALIE player if the ball is rolling towards own goal,
+ * - the groundline + ball position <= -150,
+ * - goalie will not go beyond penalty mark
+ * - after the dive the goalie will stand.
+ 
+ * @version 1.0
  * @date 2023-04-05
- *
- *
+ 
  */
 
  // Skills - Must be included BEFORE Card Base
@@ -15,14 +19,14 @@
 // Card Base
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
+#include "Representations/Configuration/FieldDimensions.h"
 
 // Representations
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/Communication/RobotInfo.h"
-//#include <filesystem>
 
-// Modify this card but don't commit changes to keep it clean for other developers
-// Also don't forget to put this card at the top of your Card Stack!
+
+
 CARD(GoalieDiveCard,
   {
      ,
@@ -30,37 +34,28 @@ CARD(GoalieDiveCard,
      CALLS(InterceptBall),
      REQUIRES(FieldBall),
      REQUIRES(RobotInfo),
-
-
-     DEFINES_PARAMETERS(
-          {,
-       //Define Params here
-    }),
-
-  /*
-  //Optionally, Load Config params here. DEFINES and LOADS can not be used together
-  LOADS_PARAMETERS(
-       {,
-          //Load Params here
-       }),
-
-  */
+     REQUIRES(FieldDimensions),
 
   });
 
 class GoalieDiveCard : public GoalieDiveCardBase
 {
 
-  //always active
+  
   bool preconditions() const override
   {
-    return theFieldBall.isRollingTowardsOwnGoal && theRobotInfo.number == 1;
-
+    return theFieldBall.isRollingTowardsOwnGoal && theRobotInfo.number == 1
+      && theFieldDimensions.xPosOwnPenaltyMark + theFieldBall.positionOnField.x() <= -150;
+   /* OUTPUT_TEXT(s);
+       the groundline + ball position <= -150
+      -450+300 =-150
+      -450+400 =-50 
+   */ 
   }
 
   bool postconditions() const override
   {
-    return  !preconditions();   // set to true, when used as default card, ie, lowest card on stack
+    return  !preconditions();  
   }
 
   void execute() override
@@ -69,10 +64,10 @@ class GoalieDiveCard : public GoalieDiveCardBase
     theActivitySkill(BehaviorStatus::dive);
     // std::string s = "dive";
     // OUTPUT_TEXT(s);
+    // goalie can dive in both left & right directions
+    // after the dive the goalie will stand
 
-    // Override these skills with the skills you wish to test
-
-    theInterceptBallSkill((unsigned)(bit(Interception::jumpRight) | bit(Interception::jumpLeft) | bit(Interception::genuflectFromSitting) | bit(Interception::stand)));
+    theInterceptBallSkill((unsigned)(bit(Interception::jumpRight) | bit(Interception::jumpLeft) | bit(Interception::stand)));
   }
 };
 
