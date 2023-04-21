@@ -110,10 +110,10 @@ class GoalieDefaultCard : public GoalieDefaultCardBase
       {        
         Angle angleToBallEstimate = Angle::normalize(theFieldBall.recentBallPositionRelative().angle());
         
-        if (angleToBallEstimate < 5_deg) {
+        if (std::abs(angleToBallEstimate) < 5_deg) {
           theStandSkill();
         } else {
-          theWalkAtRelativeSpeedSkill(Pose2f(angleToBallEstimate));
+          theWalkAtRelativeSpeedSkill(Pose2f(std::clamp((float)angleToBallEstimate, -1.0f, 1.0f)));
         }
 
         theLookActiveSkill();
