@@ -76,13 +76,13 @@ class JerseyClassifierProvider : public JerseyClassifierProviderBase
   /**
    * The method determines the best way to detect whether a pixel belongs to the jersey
    * color of a specific team. It also considers the jersey color the other team uses.
-   * @param teamColor The team color index of the jersey color that should be detected.
+   * @param fieldPlayerColour The team color index of the jersey color that should be detected.
    * @param otherTeam The team color index of the other team playing.
    * @param maxBrightness The intensity of the brightest pixel below the jersey. This
    *                     functions as a reference if one of the two teams uses the
    *                     jersey color gray.
    * @return The classifier that detects whether the pixel at (x, y) (the two parameters)
-   *         belongs to the jersey color of teamColor.
+   *         belongs to the jersey color of fieldPlayerColour.
    */
-  std::function<bool(const int, const int)> getPixelClassifier(const int teamColor, const int otherColor, const int maxBrightness) const;
+  std::function<bool(const int, const int)> getPixelClassifier(const int fieldPlayerColour, const int otherColor, const int maxBrightness) const;
 };

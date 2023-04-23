@@ -340,7 +340,7 @@ int main(int argc, char* argv[])
       printf("Hi, I am %s (using %s's body).\n", settings.headName.c_str(), settings.bodyName.c_str());
     printf("teamNumber %d\n", settings.teamNumber);
     printf("teamPort %d\n", settings.teamPort);
-    printf("teamColor %s\n", TypeRegistry::getEnumName(settings.teamColor));
+    printf("fieldPlayerColour %s\n", TypeRegistry::getEnumName(settings.fieldPlayerColour));
     printf("playerNumber %d\n", settings.playerNumber);
     printf("location %s\n", settings.location.c_str());
     printf("scenario %s\n", settings.scenario.c_str());

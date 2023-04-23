@@ -213,7 +213,7 @@ void BallDropInLocator::draw() const
     for(unsigned int i = 0; i < numOfTouchedBys; ++i)
     {
       ColorRGBA color = i != unknown
-                        ? ColorRGBA::fromTeamColor((i == ownTeam) ? theOwnTeamInfo.teamColor : theOpponentTeamInfo.teamColor)
+                        ? ColorRGBA::fromTeamColor((i == ownTeam) ? theOwnTeamInfo.fieldPlayerColour : theOpponentTeamInfo.fieldPlayerColour)
                         : ColorRGBA::orange;
       const int age = theFrameInfo.getTimeSince(lastTouchEvents[i].timestamp);
       if(age > rememberEventDuration)

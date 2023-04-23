@@ -54,14 +54,14 @@ public:
    * @param headName The name of the robot's head.
    * @param bodyName The name of the robot's body.
    * @param teamNumber The team number.
-   * @param teamColor The team color.
+   * @param fieldPlayerColour The team color.
    * @param playerNumber The player number.
    * @param location The location.
    * @param scenario The scenario.
    * @param teamPort The team port.
    * @param magicNumber The magic number.
    */
-  Settings(const std::string& headName, const std::string& bodyName, int teamNumber, TeamColor teamColor, int playerNumber, const std::string& location, const std::string& scenario, int teamPort, unsigned char magicNumber);
+  Settings(const std::string& headName, const std::string& bodyName, int teamNumber, TeamColor fieldPlayerColour, int playerNumber, const std::string& location, const std::string& scenario, int teamPort, unsigned char magicNumber);
 
   /**
    * Parses parts of the settings from a log file name and loads the rest from settings.cfg.
@@ -76,7 +76,8 @@ public:
   std::string bodyName, /**< The name of this robot's body. */
 
   (int)(-1) teamNumber, /**< The number of our team in the game controller. Use theOwnTeamInfo.teamNumber instead. */
-  (TeamColor)(numOfTeamColors) teamColor, /**< The color of our team. Use theOwnTeamInfo.teamColor instead. */
+  (TeamColor)(numOfTeamColors) fieldPlayerColour, /**< The color of our team. Use theOwnTeamInfo.fieldPlayerColour instead. */
+  (TeamColor)(numOfTeamColors) goalKeeperColour, /**< The color of our goalie. Use theOwnTeamInfo.goalKeeperColour instead. */
   (int)(-1) playerNumber, /**< The number of the robot in the team. Use theRobotInfo.playerNumber instead. */
   (std::string)("Default") location, /**< The name of the location. */
   (std::string)("Default") scenario, /**< The name of the scenario. */

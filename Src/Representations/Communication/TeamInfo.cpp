@@ -80,7 +80,9 @@ void TeamInfo::read(In& stream)
   PlayerInfo(&players)[MAX_NUM_PLAYERS] = reinterpret_cast<PlayerInfo(&)[MAX_NUM_PLAYERS]>(this->players);
 
   STREAM(teamNumber); // unique team number
-  STREAM(teamColor); // TEAM_BLUE, TEAM_RED, TEAM_YELLOW, TEAM_BLACK, ...
+  STREAM(fieldPlayerColour); // TEAM_BLUE, TEAM_RED, TEAM_YELLOW, TEAM_BLACK, ...
+  STREAM(goalkeeperColour); // TEAM_BLUE, TEAM_RED, TEAM_YELLOW, TEAM_BLACK, ...
+  STREAM(goalkeeper); // which robot is the goal keeper (i.e. allowed to dive)
   STREAM(score); // team's score
   STREAM(players); // the team's players
   STREAM(messageBudget); // the team's remaining messages
@@ -91,7 +93,9 @@ void TeamInfo::write(Out& stream) const
   const PlayerInfo(&players)[MAX_NUM_PLAYERS] = reinterpret_cast<const PlayerInfo(&)[MAX_NUM_PLAYERS]>(this->players);
 
   STREAM(teamNumber); // unique team number
-  STREAM(teamColor); // TEAM_BLUE, TEAM_RED, TEAM_YELLOW, TEAM_BLACK, ...
+  STREAM(fieldPlayerColour); // TEAM_BLUE, TEAM_RED, TEAM_YELLOW, TEAM_BLACK, ...
+  STREAM(goalkeeperColour); // TEAM_BLUE, TEAM_RED, TEAM_YELLOW, TEAM_BLACK, ...
+  STREAM(goalkeeper); // which robot is the goal keeper (i.e. allowed to dive)
   STREAM(score); // team's score
   STREAM(players); // the team's players
   STREAM(messageBudget); // the team's remaining messages
@@ -102,13 +106,15 @@ void TeamInfo::reg()
   PUBLISH(reg);
   REG_CLASS(TeamInfo);
   REG(teamNumber);
-  REG(teamColor);
+  REG(fieldPlayerColour);
+  REG(goalkeeperColour); 
+  REG(goalkeeper); 
   REG(score);
   REG(PlayerInfo(&)[MAX_NUM_PLAYERS], players);
   REG(messageBudget);
 }
 
-static void drawDigit(int digit, const Vector3f& pos, float size, int teamColor)
+static void drawDigit(int digit, const Vector3f& pos, float size, int fieldPlayerColour)
 {
   static const Vector3f points[8] =
   {
@@ -141,7 +147,7 @@ static void drawDigit(int digit, const Vector3f& pos, float size, int teamColor)
     {
       Vector3f from = pos - points[i] * size;
       Vector3f to = pos - points[i + 1] * size;
-      LINE3D("representation:TeamInfo", from.x(), from.y(), from.z(), to.x(), to.y(), to.z(), 2, ColorRGBA::fromTeamColor(teamColor));
+      LINE3D("representation:TeamInfo", from.x(), from.y(), from.z(), to.x(), to.y(), to.z(), 2, ColorRGBA::fromTeamColor(fieldPlayerColour));
     }
 }
 
@@ -155,14 +161,16 @@ void TeamInfo::draw() const
     yPosLeftSideline += 500.f;
     const float x = teamNumber == 1 ? -1535.f : 1465.f;
     const int score = std::min(static_cast<int>(this->score), 99);
-    drawDigit(score / 10, Vector3f(x, yPosLeftSideline, 1000), 200, teamColor);
-    drawDigit(score % 10, Vector3f(x + 270, yPosLeftSideline, 1000), 200, teamColor);
+    drawDigit(score / 10, Vector3f(x, yPosLeftSideline, 1000), 200, fieldPlayerColour);
+    drawDigit(score % 10, Vector3f(x + 270, yPosLeftSideline, 1000), 200, fieldPlayerColour);
   };
 }
 
 OwnTeamInfo::OwnTeamInfo()
 {
-  teamColor = Global::settingsExist() ? Global::getSettings().teamColor : TEAM_BLACK;
+  fieldPlayerColour = Global::settingsExist() ? Global::getSettings().fieldPlayerColour : TEAM_RED;
+  goalkeeperColour = Global::settingsExist() ? Global::getSettings().goalKeeperColour : TEAM_BLACK;
+  goalkeeper = 1;
 }
 
 void OwnTeamInfo::draw() const
@@ -180,11 +188,12 @@ void OwnTeamInfo::draw() const
       xPosOwnFieldBorder = theFieldDimensions.xPosOwnFieldBorder;
       yPosRightFieldBorder = theFieldDimensions.yPosRightFieldBorder;
     }
-    DRAW_TEXT("representation:OwnTeamInfo", xPosOwnFieldBorder + 200, yPosRightFieldBorder - 100, (xPosOwnFieldBorder / -5200.f) * 140, ColorRGBA::red, "Team color: " << TypeRegistry::getEnumName((Settings::TeamColor) teamColor));
+    DRAW_TEXT("representation:OwnTeamInfo", xPosOwnFieldBorder + 200, yPosRightFieldBorder - 100, (xPosOwnFieldBorder / -5200.f) * 140, ColorRGBA::red, "Team color: " << TypeRegistry::getEnumName((Settings::TeamColor) fieldPlayerColour));
   }
 }
 
 OpponentTeamInfo::OpponentTeamInfo()
 {
-  teamColor = 1 ^ (Global::settingsExist() ? Global::getSettings().teamColor : TEAM_RED);
+  fieldPlayerColour = 1 ^ (Global::settingsExist() ? Global::getSettings().fieldPlayerColour : TEAM_BLACK);
+  goalkeeperColour = 1 ^ (Global::settingsExist() ? Global::getSettings().goalKeeperColour : TEAM_BLACK);
 }

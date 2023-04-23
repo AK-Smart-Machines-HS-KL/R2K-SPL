@@ -50,7 +50,7 @@ void WhistleHandler::update(GameInfo& theGameInfo)
     // before the referee finally whistles.
     kickingTeam = theBallInGoal.inOwnGoal ? theOwnTeamInfo.teamNumber : theOpponentTeamInfo.teamNumber;
     SystemCall::say((std::string("Goal for ") + TypeRegistry::getEnumName(static_cast<Settings::TeamColor>(
-      kickingTeam == theOwnTeamInfo.teamNumber ? theOpponentTeamInfo.teamColor : theOwnTeamInfo.teamColor))).c_str());
+      kickingTeam == theOwnTeamInfo.teamNumber ? theOpponentTeamInfo.fieldPlayerColour : theOwnTeamInfo.fieldPlayerColour))).c_str());
   }
 
   // Check GameController messages for wrong switch to READY. If the GameController does not
