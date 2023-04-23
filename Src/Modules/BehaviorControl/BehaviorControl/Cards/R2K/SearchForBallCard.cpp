@@ -33,6 +33,7 @@
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/Modeling/RobotPose.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Representations/BehaviorControl/TeammateRoles.h"
 
 
 CARD(SearchForBallCard,
@@ -48,6 +49,7 @@ CARD(SearchForBallCard,
         REQUIRES(FieldBall),
         REQUIRES(RobotPose),
         REQUIRES(RobotInfo),
+        REQUIRES(TeammateRoles),
 
         DEFINES_PARAMETERS(
              {,
@@ -89,7 +91,8 @@ class SearchForBallCard : public SearchForBallCardBase
     {
       transition
       {
-        if (state_time > headSweepDuration)
+        if (state_time > headSweepDuration &&
+        !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number))
           goto turnBody;
       }
 
