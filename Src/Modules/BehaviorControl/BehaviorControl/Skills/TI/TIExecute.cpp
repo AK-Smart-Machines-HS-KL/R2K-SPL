@@ -61,6 +61,8 @@ class TIExecuteImpl : public TIExecuteImplBase
     MAP_EXPLICIT(PlaybackAction::Skills::Stand, theStandSkill, {theStandSkill();});
     MAP(PlaybackAction::Skills::WalkAtRelativeSpeed, theWalkAtRelativeSpeedSkill, (action.poseParam));
     MAP(PlaybackAction::Skills::KickAtGoal, theGoToBallAndKickSkill, (0_deg, KickInfo::KickType::forwardFastRight));
+    // TODO: MAP(PlaybackAction::Skills::GoToTarget, theWalkToTargetSkill, ());
+    // TODO: MAP(PlaybackAction::Skills::GoToBall, theGoToBallSkill, ());
     // MAP(PlaybackAction::Skills::KickAtGoal, theWalkToBallAndKickAtGoalSkill, ());
     // MAP(PlaybackAction::Skills::WalkToBall, theWalkToBallSkill, ());
 
