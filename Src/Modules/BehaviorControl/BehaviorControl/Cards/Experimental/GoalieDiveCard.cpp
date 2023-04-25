@@ -4,7 +4,6 @@
  * @brief This card's preconditions are true only when the ball is rolling towards own goal.
  * @Details:
  * - this card qualifies for only robot num1 GOALIE player if the ball is rolling towards own goal,
- * - the groundline + ball position <= -150,
  * - goalie will not go beyond penalty mark
  * - after the dive the goalie will stand.
  
@@ -45,17 +44,13 @@ class GoalieDiveCard : public GoalieDiveCardBase
   bool preconditions() const override
   {
     return theFieldBall.isRollingTowardsOwnGoal && theRobotInfo.number == 1
-      && theFieldDimensions.xPosOwnPenaltyMark + theFieldBall.positionOnField.x() <= -150;
-   /* OUTPUT_TEXT(s);
-       the groundline + ball position <= -150
-      -450+300 =-150
-      -450+400 =-50 
-   */ 
+      && theFieldDimensions.xPosOwnPenaltyMark - 150 < theFieldBall.positionOnField.x();
+ 
   }
 
   bool postconditions() const override
   {
-    return  !preconditions();  
+    return  !theFieldBall.isRollingTowardsOwnGoal;  //Only stop the skill when the ball is not rolling towards own goal
   }
 
   void execute() override
@@ -65,9 +60,9 @@ class GoalieDiveCard : public GoalieDiveCardBase
     // std::string s = "dive";
     // OUTPUT_TEXT(s);
     // goalie can dive in both left & right directions
-    // after the dive the goalie will stand
+    // after dive the goalie will stand
 
-    theInterceptBallSkill((unsigned)(bit(Interception::jumpRight) | bit(Interception::jumpLeft) | bit(Interception::stand)));
+    theInterceptBallSkill((unsigned)(bit(Interception::jumpRight) | bit(Interception::jumpLeft) | bit(Interception::walk) | bit(Interception::stand)));
   }
 };
 
