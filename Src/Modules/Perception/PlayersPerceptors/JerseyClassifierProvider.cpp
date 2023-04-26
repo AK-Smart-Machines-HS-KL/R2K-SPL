@@ -230,7 +230,7 @@ std::function<bool(int, int)> JerseyClassifierProvider::getPixelClassifier(const
       {
         if (classifier(x,y)) return true;
       }
-      return true;
+      return false;
     };
 }
 
