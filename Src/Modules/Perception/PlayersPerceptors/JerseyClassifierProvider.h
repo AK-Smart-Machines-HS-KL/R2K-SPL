@@ -85,7 +85,6 @@ class JerseyClassifierProvider : public JerseyClassifierProviderBase
    *         belongs to the jersey color of fieldPlayerColour.
    */
   std::function<bool(const int, const int)> getPixelClassifier(const int fieldPlayerColour, const int otherColor, const int maxBrightness) const;
-
   std::function<bool(const int, const int)> getPixelClassifier(const int positiveColor, const std::vector<int> negativeColors, const int maxBrightness) const;
   std::function<bool(const int, const int)> getPixelClassifier(const std::vector<int> positiveColors, const std::vector<int> negativeColors, const int maxBrightness) const;
 };

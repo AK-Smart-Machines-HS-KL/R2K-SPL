@@ -194,6 +194,7 @@ void OwnTeamInfo::draw() const
 
 OpponentTeamInfo::OpponentTeamInfo()
 {
-  fieldPlayerColour = 1 ^ (Global::settingsExist() ? Global::getSettings().fieldPlayerColour : TEAM_BLACK);
-  goalkeeperColour = 1 ^ (Global::settingsExist() ? Global::getSettings().goalKeeperColour : TEAM_BLACK);
+  fieldPlayerColour = ((Global::settingsExist() ? Global::getSettings().fieldPlayerColour : TEAM_RED) + 5) % TEAM_GRAY;
+  goalkeeperColour = ((Global::settingsExist() ? Global::getSettings().goalKeeperColour : TEAM_BLACK) + 5) % TEAM_GRAY;
+  goalkeeper = 1;
 }

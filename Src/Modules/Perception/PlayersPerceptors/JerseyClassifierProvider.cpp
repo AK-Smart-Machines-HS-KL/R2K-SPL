@@ -103,19 +103,16 @@ void JerseyClassifierProvider::detectJersey(const ObstaclesImagePercept::Obstacl
 
       // The maximum brightness is needed to determine black, white and gray relative to it.
       unsigned char maxBrightness = 0;
-      if(theOwnTeamInfo.fieldPlayerColour == TEAM_BLACK || theOpponentTeamInfo.fieldPlayerColour == TEAM_BLACK ||
-         theOwnTeamInfo.fieldPlayerColour == TEAM_GRAY || theOpponentTeamInfo.fieldPlayerColour == TEAM_GRAY ||
-         theOwnTeamInfo.fieldPlayerColour == TEAM_WHITE || theOpponentTeamInfo.fieldPlayerColour == TEAM_WHITE)
-      {
-        Vector2f centerInImage = Vector2f(static_cast<float>(obstacleInImage.left + obstacleInImage.right) * 0.5f,
-                std::min(static_cast<float>(obstacleInImage.bottom), static_cast<float>(theCameraInfo.height - (whiteScanOffSet + 1))) * (1.f - whiteScanHeightRatio)
-                + std::min(lowerInImage.y(), static_cast<float>(theCameraInfo.height - (whiteScanOffSet + 1))) * whiteScanHeightRatio);
-        float center_left = std::max(centerInImage.x() - static_cast<float>(width) * 0.5f, 0.f);
-        float center_right = std::min(centerInImage.x() + static_cast<float>(width) * 0.5f, static_cast<float>(theCameraInfo.width) - 0.5f);
-        for(int yOffset = -1; yOffset <= 1; ++yOffset)
-          for(float x = center_left; x < center_right; x += xStep)
-            maxBrightness = std::max(theECImage.grayscaled[static_cast<int>(centerInImage.y()) + whiteScanOffSet * yOffset][static_cast<int>(x)], maxBrightness);
-      }
+      
+      Vector2f centerInImage = Vector2f(static_cast<float>(obstacleInImage.left + obstacleInImage.right) * 0.5f,
+              std::min(static_cast<float>(obstacleInImage.bottom), static_cast<float>(theCameraInfo.height - (whiteScanOffSet + 1))) * (1.f - whiteScanHeightRatio)
+              + std::min(lowerInImage.y(), static_cast<float>(theCameraInfo.height - (whiteScanOffSet + 1))) * whiteScanHeightRatio);
+      float center_left = std::max(centerInImage.x() - static_cast<float>(width) * 0.5f, 0.f);
+      float center_right = std::min(centerInImage.x() + static_cast<float>(width) * 0.5f, static_cast<float>(theCameraInfo.width) - 0.5f);
+      for(int yOffset = -1; yOffset <= 1; ++yOffset)
+        for(float x = center_left; x < center_right; x += xStep)
+          maxBrightness = std::max(theECImage.grayscaled[static_cast<int>(centerInImage.y()) + whiteScanOffSet * yOffset][static_cast<int>(x)], maxBrightness);
+      
 
       // Get pixel classifier
       std::vector<int> opponentColors = {theOpponentTeamInfo.fieldPlayerColour, theOpponentTeamInfo.goalkeeperColour};
