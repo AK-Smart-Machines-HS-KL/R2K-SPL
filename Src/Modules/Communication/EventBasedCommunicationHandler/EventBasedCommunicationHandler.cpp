@@ -55,7 +55,11 @@ int EventBasedCommunicationHandler::getOwnTeamInfoMessageBudget() {
    
    // to be replaced by theOwnTeamInfo.messageBudget
   #ifdef TARGET_ROBOT
-  return theOwnTeamInfo.messageBudget;
+  if(theOwnTeamInfo.messageBudget == 0) // some stupid turned the GC ;-)
+    // since we stop sending at min 10 msg, this is ok
+    return messageBudget - sendCount * activeRobots;
+  else 
+    return theOwnTeamInfo.messageBudget;
   #else
   return messageBudget - sendCount * activeRobots; // this is a ROUGH estimation
   #endif
