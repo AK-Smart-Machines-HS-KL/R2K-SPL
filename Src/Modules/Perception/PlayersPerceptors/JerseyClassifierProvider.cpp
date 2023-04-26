@@ -118,8 +118,14 @@ void JerseyClassifierProvider::detectJersey(const ObstaclesImagePercept::Obstacl
       }
 
       // Get pixel classifier
-      const std::function<bool(int, int)>& isOwn = getPixelClassifier(theOwnTeamInfo.fieldPlayerColour, theOpponentTeamInfo.fieldPlayerColour, maxBrightness);
-      const std::function<bool(int, int)>& isOpponent = getPixelClassifier(theOpponentTeamInfo.fieldPlayerColour, theOwnTeamInfo.fieldPlayerColour, maxBrightness);
+      std::vector<int> opponentColors = {theOpponentTeamInfo.fieldPlayerColour, theOpponentTeamInfo.goalkeeperColour};
+      std::vector<int> ownColors = {theOwnTeamInfo.fieldPlayerColour};
+      if (!theOwnTeamInfo.goalkeeperColour == theOpponentTeamInfo.goalkeeperColour) {
+        ownColors.push_back(theOwnTeamInfo.goalkeeperColour);
+      }
+
+      const std::function<bool(int, int)>& isOwn = getPixelClassifier(ownColors, opponentColors, maxBrightness);
+      const std::function<bool(int, int)>& isOpponent = getPixelClassifier(opponentColors, ownColors, maxBrightness);
 
       float ownPixels = 0;
       float opponentPixels = 0;
@@ -189,6 +195,46 @@ void JerseyClassifierProvider::detectJersey(const ObstaclesImagePercept::Obstacl
       }
     }
   }
+}
+
+std::function<bool(int, int)> JerseyClassifierProvider::getPixelClassifier(const int positiveColor, const std::vector<int> negativeColors, const int maxBrightness) const
+{
+  std::vector<std::function<bool(int, int)>> classifiers;
+  classifiers.reserve(negativeColors.size());
+  for(auto negativeColor : negativeColors)
+  {
+    classifiers.push_back(getPixelClassifier(positiveColor, negativeColor, maxBrightness));
+  }
+
+  return [this, classifiers](const int x, const int y)
+    {
+      // If any classifier is false, pixel is not positiveColor
+      for(auto classifier : classifiers)
+      {
+        if (!classifier(x,y)) return false;
+      }
+      return true;
+    };
+}
+
+std::function<bool(int, int)> JerseyClassifierProvider::getPixelClassifier(const std::vector<int> positiveColors, const std::vector<int> negativeColors, const int maxBrightness) const
+{
+  std::vector<std::function<bool(int, int)>> classifiers;
+  classifiers.reserve(negativeColors.size());
+  for(int positiveColor : positiveColors)
+  {
+    classifiers.push_back(getPixelClassifier(positiveColor, negativeColors, maxBrightness));
+  }
+
+  return [this, classifiers](const int x, const int y)
+    {
+      // If any classifier is true, pixel is one of positiveColors
+      for(auto classifier : classifiers)
+      {
+        if (classifier(x,y)) return true;
+      }
+      return true;
+    };
 }
 
 std::function<bool(int, int)> JerseyClassifierProvider::getPixelClassifier(const int fieldPlayerColour, const int otherColor, const int maxBrightness) const
