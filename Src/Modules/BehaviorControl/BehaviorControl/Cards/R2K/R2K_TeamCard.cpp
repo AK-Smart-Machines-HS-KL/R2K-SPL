@@ -532,10 +532,6 @@ private:
      )
       refreshAllData = true;
 
-
-    //unsure, wether we need this 
-    if (1 >= pRole.numOfActiveSupporters) refreshAllData = false; // might happen, when comm. frequence is too low due to EBC
-
     if (refreshAllData) {
       // OUTPUT_TEXT("team data are refreshed.");
       lastGameState = theGameInfo.state;

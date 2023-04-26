@@ -8,6 +8,7 @@
  * Makes the Offensive and Defensive robots wait until the ball has been Kicked after Kickoff
  * 
  * V1.1 Card migrated (Nicholas)
+ * V1.2 Wait (do nothing): either for 10 sec or opponent has moved the ball for at least .25cm (Adrian)
  */
 
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
@@ -62,8 +63,12 @@ class OppKickoffCard : public OppKickoffCardBase
    */
   bool preconditions() const override
   {
+    // OUTPUT_TEXT("time" << theGameInfo.secondaryTime);
+    // starts at time 114193
+    // theFrameInfo.getTimeSince(theGameInfo.timeLastStateChange) <= 1000 * 10
+
     return theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
-      && theFrameInfo.getTimeSince(theGameInfo.timeLastStateChange) <= 1000*10
+      && theGameInfo.secondaryTime > 0  // wait for GC to count down
       && theGameInfo.state == STATE_PLAYING
       && theFieldBall.positionOnField.norm() < ballKickedThreshold
       && !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number);
