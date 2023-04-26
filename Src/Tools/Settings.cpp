@@ -20,11 +20,12 @@ Settings::Settings(const std::string& headName, const std::string& bodyName) :
     OUTPUT_ERROR("Could not load settings for robot \"" << headName.c_str() << "\" from settings.cfg");
 }
 
-Settings::Settings(const std::string& headName, const std::string& bodyName, int teamNumber, TeamColor teamColor, int playerNumber, const std::string& location, const std::string& scenario, int teamPort, unsigned char magicNumber) :
+Settings::Settings(const std::string& headName, const std::string& bodyName, int teamNumber, TeamColor fieldPlayerColour, int playerNumber, const std::string& location, const std::string& scenario, int teamPort, unsigned char magicNumber) :
   headName(headName),
   bodyName(bodyName),
   teamNumber(teamNumber),
-  teamColor(teamColor),
+  fieldPlayerColour(fieldPlayerColour),
+  goalKeeperColour(TeamColor::black),
   playerNumber(playerNumber),
   location(location),
   scenario(scenario),

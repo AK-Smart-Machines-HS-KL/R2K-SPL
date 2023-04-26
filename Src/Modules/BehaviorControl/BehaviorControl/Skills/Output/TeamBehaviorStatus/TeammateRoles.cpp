@@ -21,8 +21,7 @@ TEAM_SKILL_IMPLEMENTATION(TeammateRolesImpl,
 
 
 bool TeammateRoles::isTacticalGoalKeeper(const int robotNumber) const{
-  ASSERT(robotNumber > 0 && robotNumber <= 7);
-  
+  ASSERT(robotNumber >= Global::getSettings().lowestValidPlayerNumber && robotNumber <= Global::getSettings().highestValidPlayerNumber);
   return (
     roles[robotNumber - 1] == TeammateRoles::GOALKEEPER_NORMAL ||
     roles[robotNumber - 1] == TeammateRoles::GOALKEEPER_ACTIVE
@@ -30,7 +29,7 @@ bool TeammateRoles::isTacticalGoalKeeper(const int robotNumber) const{
 }
 
 bool TeammateRoles::isTacticalDefense(const int robotNumber) const {
-  ASSERT(robotNumber > 0 && robotNumber <= 7);
+  ASSERT(robotNumber >= Global::getSettings().lowestValidPlayerNumber && robotNumber <= Global::getSettings().highestValidPlayerNumber);
   return (
     roles[robotNumber - 1] == TeammateRoles::DEFENSE_RIGHT ||
     roles[robotNumber - 1] == TeammateRoles::DEFENSE_MIDDLE ||
@@ -39,7 +38,7 @@ bool TeammateRoles::isTacticalDefense(const int robotNumber) const {
 }
 
 bool TeammateRoles::isTacticalOffense(const int robotNumber) const {
-  ASSERT(robotNumber > 0 && robotNumber <= 7);
+  ASSERT(robotNumber >= Global::getSettings().lowestValidPlayerNumber && robotNumber <= Global::getSettings().highestValidPlayerNumber);
   return (
     roles[robotNumber - 1] == TeammateRoles::OFFENSE_RIGHT ||
     roles[robotNumber - 1] == TeammateRoles::OFFENSE_MIDDLE ||
@@ -48,7 +47,7 @@ bool TeammateRoles::isTacticalOffense(const int robotNumber) const {
 }
 
 bool TeammateRoles::playsTheBall(int robotNumber) const {
-  ASSERT(robotNumber > 0 && robotNumber <= 7);
+  ASSERT(robotNumber >= Global::getSettings().lowestValidPlayerNumber && robotNumber <= Global::getSettings().highestValidPlayerNumber);
 
   return (captain == robotNumber);
 }

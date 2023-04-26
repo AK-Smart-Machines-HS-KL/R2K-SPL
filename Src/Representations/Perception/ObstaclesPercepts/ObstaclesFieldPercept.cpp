@@ -34,9 +34,9 @@ void ObstaclesFieldPercept::draw() const
   {
     ColorRGBA::white,
     ColorRGBA::fromTeamColor(Blackboard::getInstance().exists("OwnTeamInfo") ?
-        static_cast<const OwnTeamInfo&>(Blackboard::getInstance()["OwnTeamInfo"]).teamColor : TEAM_BLACK),
+        static_cast<const OwnTeamInfo&>(Blackboard::getInstance()["OwnTeamInfo"]).fieldPlayerColour : TEAM_RED),
     ColorRGBA::fromTeamColor(Blackboard::getInstance().exists("OpponentTeamInfo") ?
-         static_cast<const OpponentTeamInfo&>(Blackboard::getInstance()["OpponentTeamInfo"]).teamColor : TEAM_RED)
+         static_cast<const OpponentTeamInfo&>(Blackboard::getInstance()["OpponentTeamInfo"]).fieldPlayerColour : TEAM_BLACK)
   };
 
   // Draw robots in field view:

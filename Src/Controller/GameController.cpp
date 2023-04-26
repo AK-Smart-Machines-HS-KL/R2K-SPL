@@ -1021,10 +1021,12 @@ void GameController::addCompletion(std::set<std::string>& completion) const
 void GameController::setTeamInfos(Settings::TeamColor firstTeamColor, Settings::TeamColor secondTeamColor)
 {
   teamInfos[0].teamNumber = 1;
-  teamInfos[0].teamColor = firstTeamColor;
+  teamInfos[0].fieldPlayerColour = firstTeamColor;
+  teamInfos[0].goalkeeperColour = Settings::TeamColor::black;
   teamInfos[0].messageBudget = 1200; // Initialize to normal Available Messages
   teamInfos[1].teamNumber = 2;
-  teamInfos[1].teamColor = secondTeamColor;
+  teamInfos[1].fieldPlayerColour = secondTeamColor;
+  teamInfos[1].goalkeeperColour = Settings::TeamColor::black;
   teamInfos[1].messageBudget = 1200; // Initialize to normal Available Messages
 
 }
