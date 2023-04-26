@@ -34,7 +34,8 @@ settingsReplacements()
   local SEDFLAGS=""
   [ ! -z $SCENARIO ] && SEDFLAGS="$SEDFLAGS -e 's/scenario =.*/scenario = $SCENARIO;/'"
   [ ! -z $LOCATION ] && SEDFLAGS="$SEDFLAGS -e 's/location =.*/location = $LOCATION;/'"
-  [ ! -z $TEAM ] && SEDFLAGS="$SEDFLAGS -e 's/teamColor =.*/teamColor = $TEAM;/'"
+  [ ! -z $TEAM_COLOR ] && SEDFLAGS="$SEDFLAGS -e 's/fieldPlayerColour =.*/fieldPlayerColour = $TEAM_COLOR;/'"
+  [ ! -z $GOALIE_COLOR ] && SEDFLAGS="$SEDFLAGS -e 's/goalkeeperColour =.*/goalkeeperColour = $GOALIE_COLOR;/'"
   [ ! -z $PLAYER ] && SEDFLAGS="$SEDFLAGS -e 's/playerNumber =.*/playerNumber = $PLAYER;/'"
   [ ! -z $NUMBER ] && SEDFLAGS="$SEDFLAGS -e 's/teamNumber =.*/teamNumber = $NUMBER;/'"
   [ ! -z $PORT ] && SEDFLAGS="$SEDFLAGS -e 's/teamPort =.*/teamPort = $PORT;/'"
@@ -127,7 +128,8 @@ cp -n $keySource $keyFile || true
 # init variables
 [ -z $CONFIG ] && CONFIG="Develop"
 PLAYER=
-TEAM=
+TEAM_COLOR=
+GOALIE_COLOR=
 NUMBER=
 SCENARIO=
 LOCATION=
@@ -172,7 +174,11 @@ while true; do
       ;;
     "-c" | "/c")
       shift
-      TEAM=$1
+      TEAM_COLOR=$1
+      ;;
+    "-g" | "/g")
+      shift
+      GOALIE_COLOR=$1
       ;;
     "-t" | "/t")
       shift

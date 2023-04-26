@@ -174,8 +174,8 @@ void FieldDimensions::drawPolygons() const
         ColorRGBA(127, 80, 20),
         ColorRGBA(120, 120, 120)
       };
-      const ColorRGBA& own = colors[ownTeamInfo.teamColor];
-      const ColorRGBA& opp = colors[opponentTeamInfo.teamColor];
+      const ColorRGBA& own = colors[ownTeamInfo.fieldPlayerColour];
+      const ColorRGBA& opp = colors[opponentTeamInfo.fieldPlayerColour];
 
       Vector2f goal[4];
       goal[0] = Vector2f(xPosOwnGroundLine - fieldLinesWidth * 0.5f, yPosLeftGoal);

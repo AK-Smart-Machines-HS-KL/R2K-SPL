@@ -171,7 +171,7 @@ void GameDataProvider::handleButtons()
   if(gameCtrlData.state == STATE_INITIAL && player.penalty == PENALTY_NONE)
   {
     if(theEnhancedKeyStates.hitStreak[KeyStates::lFootLeft] == 1)
-      team.teamColor = (team.teamColor + 1) % (TEAM_GRAY + 1); // cycle between TEAM_BLUE .. TEAM_GRAY
+      team.fieldPlayerColour = (team.fieldPlayerColour + 1) % (TEAM_GRAY + 1); // cycle between TEAM_BLUE .. TEAM_GRAY
 
     if(theEnhancedKeyStates.hitStreak[KeyStates::rFootRight] == 1)
     {
@@ -196,8 +196,8 @@ void GameDataProvider::resetGameCtrlData()
 {
   std::memset(&gameCtrlData, 0, sizeof(gameCtrlData));
   gameCtrlData.teams[0].teamNumber = static_cast<uint8_t>(Global::getSettings().teamNumber);
-  gameCtrlData.teams[0].teamColor = static_cast<uint8_t>(Global::getSettings().teamColor);
-  gameCtrlData.teams[1].teamColor = gameCtrlData.teams[0].teamColor ^ 1; // we don't know better
+  gameCtrlData.teams[0].fieldPlayerColour = static_cast<uint8_t>(Global::getSettings().fieldPlayerColour);
+  gameCtrlData.teams[1].fieldPlayerColour = gameCtrlData.teams[0].fieldPlayerColour ^ 1; // we don't know better
   gameCtrlData.playersPerTeam = static_cast<uint8_t>(Global::getSettings().playerNumber); // we don't know better
   gameCtrlData.firstHalf = 1;
   whenGameCtrlDataWasSet = 0;
