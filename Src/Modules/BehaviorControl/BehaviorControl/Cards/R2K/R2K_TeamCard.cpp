@@ -337,7 +337,10 @@ private:
       {
         // pRole.role = PlayerRole::supporter4;
         // pRole.role = static_cast<PlayerRole> (static_cast<int>(PlayerRole::firstSupporterRole) + count);
-        switch (count) {
+
+        // PATCH: AM
+        // switch (count) {
+        switch (theRobotInfo.number - 1) {
         case 0: pRole.role = PlayerRole::supporter0;   break;
         case 1: pRole.role = PlayerRole::supporter1;   break;
         case 2: pRole.role = PlayerRole::supporter2;   break;
@@ -350,11 +353,19 @@ private:
       // ASSERT(role.supporterIndex() - firstSupporterRole <= activeBuddies);  // we are in range supporter0 
 
     }
+    switch (theRobotInfo.number - 1) {
+      case 0: pRole.role = PlayerRole::supporter0;   break;
+      case 1: pRole.role = PlayerRole::supporter1;   break;
+      case 2: pRole.role = PlayerRole::supporter2;   break;
+      case 3: pRole.role = PlayerRole::supporter3;   break;
+      case 4: pRole.role = PlayerRole::supporter4;   break;
     
     // d2: static assignment , only for specific gamestates
 
 
-    if (theGameInfo.state == STATE_READY || theGameInfo.state == STATE_SET) {
+    // if (theGameInfo.state == STATE_READY || theGameInfo.state == STATE_SET) {
+    if (theGameInfo.state == STATE_READY || theGameInfo.state == STATE_SET || 
+      theGameInfo.state == STATE_PLAYING) {
       // switch (theTeamBehaviorStatus.teamActivity) {
       switch (teamBehaviorStatus) {
       case(TeamBehaviorStatus::R2K_DEFENSIVE_GAME):
