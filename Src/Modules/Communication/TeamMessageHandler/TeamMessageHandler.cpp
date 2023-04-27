@@ -152,6 +152,7 @@ void TeamMessageHandler::generateMessage(BHumanMessageOutputGenerator& outputGen
 void TeamMessageHandler::writeMessage(BHumanMessageOutputGenerator& outputGenerator, RoboCup::SPLStandardMessage* const m) const
 {
   ASSERT(outputGenerator.sendThisFrame);
+  
 
   outputGenerator.theBHumanStandardMessage.write(reinterpret_cast<void*>(m->data));
 
@@ -170,7 +171,7 @@ void TeamMessageHandler::writeMessage(BHumanMessageOutputGenerator& outputGenera
           && !outputGenerator.theBHumanArbitraryMessage.queue.isEmpty());
   }
 
-  OUTPUT_TEXT("ARB SIZE:" << sizeOfArbitraryMessage);
+  if ((sizeOfArbitraryMessage + offset) > 94) return;
 
   ASSERT(sizeOfArbitraryMessage <= restBytes);
 
