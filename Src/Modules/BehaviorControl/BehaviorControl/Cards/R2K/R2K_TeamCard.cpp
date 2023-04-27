@@ -576,7 +576,8 @@ private:
     }
     theRoleSkill(lastPlayerRole);
     theTimeToReachBallSkill(lastTimeToReachBall);
-    if (theGameInfo.state != STATE_READY && theGameInfo.state != STATE_SET) { // we sended the teammateRoles already at line 347
+    if (theGameInfo.state != STATE_READY && theGameInfo.state != STATE_SET 
+      && theGameInfo.state != STATE_PLAYING) { // we sended the teammateRoles already at line 347
       theTeammateRolesSkill(lastTeammateRoles);
     }
 
