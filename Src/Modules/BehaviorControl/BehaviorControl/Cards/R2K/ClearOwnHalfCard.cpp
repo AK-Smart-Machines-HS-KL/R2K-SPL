@@ -86,9 +86,9 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
   bool preconditions() const override
   {
     return
-      theGameInfo.setPlay == SET_PLAY_NONE &&
+     theGameInfo.setPlay == SET_PLAY_NONE &&
       // !aBuddyIsClearingOwnHalf() &&
-      theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
+      // theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
       theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
       theFieldBall.endPositionOnField.x() < 0 && 
