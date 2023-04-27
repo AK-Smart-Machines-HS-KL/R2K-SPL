@@ -83,7 +83,7 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
   {
     return
       theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
-      theObstacleModel.opponentIsTooClose(theFieldBall.positionRelative) != KickInfo::LongShotType::noKick &&  // see below: min distance is minOppDistance
+      !theObstacleModel.opponentIsClose() && // see below: min distance is minOppDistance
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
 
       //don't leave own half, unless we are in OFFENSIVE or SPARSE Mode)
@@ -96,7 +96,10 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
 
   bool postconditions() const override
   {
-    return !preconditions();
+    return 
+    theObstacleModel.opponentIsClose() && 
+    !theTeammateRoles.isTacticalDefense(theRobotInfo.number) &&
+    !(theFieldBall.endPositionOnField.x() < 0);
   }
 
  
