@@ -44,7 +44,7 @@ class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
    */
   bool preconditions() const override
   {
-		return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theGameInfo.state == STATE_READY;
+    return true; //  theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theGameInfo.state == STATE_READY;
   }
 
   /**
@@ -60,7 +60,10 @@ class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
 
     theActivitySkill(BehaviorStatus::defaultBehavior);
 
-    Vector2f targetRelative = theRobotPose.toRelative(theDefaultPose.ownDefaultPose.translation);
+    Vector2f targetAbsolute = theDefaultPose.ownDefaultPose.translation + Vector2f(+500.f, 0);
+
+    Vector2f targetRelative = theRobotPose.toRelative(targetAbsolute);
+
 
     theLookActiveSkill(); // Head Motion Request
     theWalkToPointSkill(Pose2f(theDefaultPose.ownDefaultPose.rotation - theRobotPose.rotation, targetRelative), 1.0f, true);

@@ -63,9 +63,10 @@ class ReadyOppKickoffCard : public ReadyOppKickoffCardBase
 
       theActivitySkill(BehaviorStatus::defaultBehavior);
 
-      Vector2f targetRelative = theRobotPose.toRelative(theDefaultPose.ownDefaultPose.translation);
-     
-      targetRelative = targetRelative + Vector2f(-1000.f, 0);
+      
+      Vector2f targetAbsolute = theDefaultPose.ownDefaultPose.translation + Vector2f(-500.f, 0);
+
+      Vector2f targetRelative = theRobotPose.toRelative(targetAbsolute);
 
       theLookActiveSkill(); // Head Motion Request
       theWalkToPointSkill(Pose2f(theDefaultPose.ownDefaultPose.rotation - theRobotPose.rotation, targetRelative), 1.0f, true);
