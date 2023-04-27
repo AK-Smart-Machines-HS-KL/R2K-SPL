@@ -220,13 +220,22 @@ private:
     int teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME; // patch due to update errors
     if (opp_penalties > 2 || (own_penalties >= 1 && opp_penalties >= 2)) {
    
+      /*
       theTeamActivitySkill(TeamBehaviorStatus::R2K_SPARSE_GAME);
       teamBehaviorStatus = TeamBehaviorStatus::R2K_SPARSE_GAME;
+      */
+      /* patch due problems with new data structure from GC*/
+  
+      theTeamActivitySkill(TeamBehaviorStatus::R2K_NORMAL_GAME);
+      teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME;
+    
     }
     else {
       if (own_score == opp_score) { //default
+        
         theTeamActivitySkill(TeamBehaviorStatus::R2K_NORMAL_GAME); 
         teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME;
+
       }  
       if (own_score < opp_score) { 
         theTeamActivitySkill(TeamBehaviorStatus::R2K_OFFENSIVE_GAME); 
