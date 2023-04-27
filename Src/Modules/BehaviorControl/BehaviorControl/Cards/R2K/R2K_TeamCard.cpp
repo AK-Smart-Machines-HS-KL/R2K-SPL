@@ -218,8 +218,8 @@ private:
     // to do: who is active - loop supp. index, number active
     // what if substitute goalie?
     int teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME; // patch due to update errors
-    if (opp_penalties > 2 || (own_penalties >= 1 && opp_penalties >= 2)) {
-   
+    // if (opp_penalties > 2 || (own_penalties >= 1 && opp_penalties >= 2)) {
+    if (own_penalties >= 3) {
       theTeamActivitySkill(TeamBehaviorStatus::R2K_SPARSE_GAME);
       teamBehaviorStatus = TeamBehaviorStatus::R2K_SPARSE_GAME;
     }
