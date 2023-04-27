@@ -20,11 +20,8 @@ MAKE_MODULE(TeamMessageHandler, communication);
 #define FOREACH_TEAM_MESSAGE_REPRESENTATION(_) \
   _(FrameInfo); \
   _(BallModel); \
-  _(ObstacleModel); \
-  _(Whistle); \
   _(BehaviorStatus); \
-  _(TeamBehaviorStatus); \
-  _(TeamTalk);
+  //_(TeamBehaviorStatus); \
 
 struct TeamMessage
 {};
@@ -63,6 +60,7 @@ void TeamMessageHandler::update(BHumanMessageOutputGenerator& outputGenerator)
   if (ebcEnable) {
     bool ebcSendThisFrame = theEventBasedCommunicationData.sendThisFrame();
     if(ebcSendThisFrame) theEventBasedCommunicationData.ebcMessageMonitor();
+    if(ebcSendThisFrame) OUTPUT_TEXT("Sending!");
     
     outputGenerator.sendThisFrame =
 #ifndef SITTING_TEST
@@ -113,11 +111,6 @@ void TeamMessageHandler::generateMessage(BHumanMessageOutputGenerator& outputGen
 
   theRobotStatus.isPenalized = theRobotInfo.penalty != PENALTY_NONE;
   // The other members of theRobotStatus are filled in the update method.
-  theRobotStatus.sequenceNumbers.fill(-1);
-  for(const Teammate& teammate : theTeamData.teammates)
-    theRobotStatus.sequenceNumbers[teammate.number - Settings::lowestValidPlayerNumber] = teammate.sequenceNumber;
-  theRobotStatus.sequenceNumbers[theRobotInfo.number - Settings::lowestValidPlayerNumber] = outputGenerator.sentMessages % 15;
-
   outputGenerator.theBSPLStandardMessage.fallen = !theRobotStatus.hasGroundContact || !theRobotStatus.isUpright;
 
   outputGenerator.theBHumanStandardMessage.compressedContainer.reserve(SPL_STANDARD_MESSAGE_DATA_SIZE);
@@ -141,17 +134,19 @@ void TeamMessageHandler::generateMessage(BHumanMessageOutputGenerator& outputGen
 
   FOREACH_TEAM_MESSAGE_REPRESENTATION(SEND_PARTICLE);
 
-  SEND_PARTICLE(FieldCoverage);
+  // SEND_PARTICLE(FieldCoverage);
 
   //Send this last, because it is unimportant for robots, (so it is ok, if it gets dropped)
-  SEND_PARTICLE(RobotHealth);
-  SEND_PARTICLE(FieldFeatureOverview);
+  // SEND_PARTICLE(RobotHealth);
+  // SEND_PARTICLE(FieldFeatureOverview);
 
   outputGenerator.theBHumanStandardMessage.out = nullptr;
 
   outputGenerator.theBSPLStandardMessage.numOfDataBytes =
     static_cast<uint16_t>(outputGenerator.theBHumanStandardMessage.sizeOfBHumanMessage()
                           + outputGenerator.theBHumanArbitraryMessage.sizeOfArbitraryMessage());
+  OUTPUT_TEXT(static_cast<uint16_t>(outputGenerator.theBHumanStandardMessage.sizeOfBHumanMessage()
+                          + outputGenerator.theBHumanArbitraryMessage.sizeOfArbitraryMessage()););
 }
 
 void TeamMessageHandler::writeMessage(BHumanMessageOutputGenerator& outputGenerator, RoboCup::SPLStandardMessage* const m) const
@@ -168,12 +163,14 @@ void TeamMessageHandler::writeMessage(BHumanMessageOutputGenerator& outputGenera
   {
     OUTPUT_ERROR("outputGenerator.theBHumanArbitraryMessage.sizeOfArbitraryMessage() > restBytes "
                  "-- with size of " << sizeOfArbitraryMessage << " and restBytes " << restBytes);
-
+    
     do
       outputGenerator.theBHumanArbitraryMessage.queue.removeLastMessage();
     while((sizeOfArbitraryMessage = outputGenerator.theBHumanArbitraryMessage.sizeOfArbitraryMessage()) > restBytes
           && !outputGenerator.theBHumanArbitraryMessage.queue.isEmpty());
   }
+
+  OUTPUT_TEXT("ARB SIZE:" << sizeOfArbitraryMessage);
 
   ASSERT(sizeOfArbitraryMessage <= restBytes);
 
@@ -187,6 +184,7 @@ void TeamMessageHandler::writeMessage(BHumanMessageOutputGenerator& outputGenera
     timeLastSent = theFrameInfo.time;
   else
     timeLastSent += sendInterval;
+  OUTPUT_TEXT("SENT");
 }
 
 void TeamMessageHandler::update(TeamData& teamData)
@@ -279,7 +277,7 @@ bool TeamMessageHandler::readSPLStandardMessage(const SPLStandardMessageBufferEn
      receivedMessageContainer.theBSPLStandardMessage.playerNum > Settings::highestValidPlayerNumber)
     PARSING_ERROR("Invalid robot number received");
 
-  if(receivedMessageContainer.theBSPLStandardMessage.teamNum != static_cast<uint8_t>(Global::getSettings().teamNumber))
+if(receivedMessageContainer.theBSPLStandardMessage.teamNum != static_cast<uint8_t>(Global::getSettings().teamNumber))
     PARSING_ERROR("Invalid team number received");
 
   if(!receivedMessageContainer.theBHumanStandardMessage.read(m->message.data))
@@ -332,8 +330,6 @@ void TeamMessageHandler::parseMessageIntoBMate(Teammate& currentTeammate)
   currentTeammate.hasGroundContact = robotStatus.hasGroundContact;
   currentTeammate.timeWhenLastUpright = robotStatus.timeWhenLastUpright;
   currentTeammate.timeOfLastGroundContact = robotStatus.timeOfLastGroundContact;
-  currentTeammate.sequenceNumber = robotStatus.sequenceNumbers[currentTeammate.number - Settings::lowestValidPlayerNumber];
-  currentTeammate.returnSequenceNumber = robotStatus.sequenceNumbers[theRobotInfo.number - Settings::lowestValidPlayerNumber];
 
   RECEIVE_PARTICLE(RobotPose);
   FOREACH_TEAM_MESSAGE_REPRESENTATION(RECEIVE_PARTICLE);
