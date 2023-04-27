@@ -55,7 +55,6 @@ STREAMABLE(BHumanStandardMessage,
   BHumanStandardMessage(),
 
   (char[4]) header,         /**< BHUMAN_STANDARD_MESSAGE_STRUCT_HEADER */
-  (uint8_t) version,        /**< BHUMAN_STANDARD_MESSAGE_STRUCT_VERSION */
   (uint8_t)(0) magicNumber, /**< The magic number. */
   (unsigned)(0) timestamp,  /**< Timestamp when this message has been sent (relative to the clock frame of the sending robot). */
 

@@ -13,6 +13,7 @@ RobotPose
   translation: Vector<Float(min=-32768, max=32767, bits=16)>(n=2) // Is also present in the SPLStandardMessage.
   quality: Enum(type=RobotPose::LocalizationQuality)
   covariance: Matrix<Float>(m=3, n=3, symmetric)
+  timestampLastJump: Timestamp(bits=8, shift=7, reference=relativePast, noclip)
 }
 
 BallState
@@ -41,26 +42,10 @@ Whistle
 BehaviorStatus
 {
   activity: Enum(type=BehaviorStatus::Activity, uncompressed)
+  passTarget: Integer(min=-1, max=14)
+  walkingTo: Vector<Float(min=-32768, max=32767, bits=16)>(n=2)
   speed: Float(min=-500.0, max=500.0, bits=16)
-}
-
-TeammateRoles
-{
-  roles: Integer(min=-1, max=14)[:5]
-  captain: Integer(min=-1, max=14)
-  timestamp: Timestamp(bits=13, reference=relativePast)
-}
-
-PlayerRole
-{
-  role: Enum(type=PlayerRole::RoleType)
-}
-
-TeamBehaviorStatus
-{
-  teamActivity: Enum(type=TeamBehaviorStatus::TeamActivity)
-  teammateRoles: TeammateRoles
-  role: PlayerRole
+  shootingTo: Vector<Float(min=-32768, max=32767, bits=16)>(n=2)
 }
 
 FrameInfo

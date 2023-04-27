@@ -60,7 +60,6 @@ void TeamMessageHandler::update(BHumanMessageOutputGenerator& outputGenerator)
   if (ebcEnable) {
     bool ebcSendThisFrame = theEventBasedCommunicationData.sendThisFrame();
     if(ebcSendThisFrame) theEventBasedCommunicationData.ebcMessageMonitor();
-    if(ebcSendThisFrame) OUTPUT_TEXT("Sending!");
     
     outputGenerator.sendThisFrame =
 #ifndef SITTING_TEST
@@ -111,7 +110,7 @@ void TeamMessageHandler::generateMessage(BHumanMessageOutputGenerator& outputGen
 
   theRobotStatus.isPenalized = theRobotInfo.penalty != PENALTY_NONE;
   // The other members of theRobotStatus are filled in the update method.
-  outputGenerator.theBSPLStandardMessage.fallen = !theRobotStatus.hasGroundContact || !theRobotStatus.isUpright;
+  // outputGenerator.theBSPLStandardMessage.fallen = !theRobotStatus.hasGroundContact || !theRobotStatus.isUpright;
 
   outputGenerator.theBHumanStandardMessage.compressedContainer.reserve(SPL_STANDARD_MESSAGE_DATA_SIZE);
   CompressedTeamCommunicationOut stream(outputGenerator.theBHumanStandardMessage.compressedContainer, outputGenerator.theBHumanStandardMessage.timestamp,
@@ -145,14 +144,21 @@ void TeamMessageHandler::generateMessage(BHumanMessageOutputGenerator& outputGen
   outputGenerator.theBSPLStandardMessage.numOfDataBytes =
     static_cast<uint16_t>(outputGenerator.theBHumanStandardMessage.sizeOfBHumanMessage()
                           + outputGenerator.theBHumanArbitraryMessage.sizeOfArbitraryMessage());
-  OUTPUT_TEXT(static_cast<uint16_t>(outputGenerator.theBHumanStandardMessage.sizeOfBHumanMessage()
-                          + outputGenerator.theBHumanArbitraryMessage.sizeOfArbitraryMessage()););
+
+  OUTPUT_TEXT(
+    "SPL: " << (int) offsetof(RoboCup::SPLStandardMessage, data) <<
+    "\nBHUM: " << outputGenerator.theBHumanStandardMessage.sizeOfBHumanMessage() << 
+    "\nBHUA: " << outputGenerator.theBHumanArbitraryMessage.sizeOfArbitraryMessage() <<
+    "\nTotal: " << outputGenerator.theBSPLStandardMessage.numOfDataBytes + (int) offsetof(RoboCup::SPLStandardMessage, data)
+  );
 }
 
 void TeamMessageHandler::writeMessage(BHumanMessageOutputGenerator& outputGenerator, RoboCup::SPLStandardMessage* const m) const
 {
   ASSERT(outputGenerator.sendThisFrame);
-  
+
+  // Abort if message too large 
+  if (outputGenerator.theBSPLStandardMessage.numOfDataBytes + (int) offsetof(RoboCup::SPLStandardMessage, data) > 128) return;
 
   outputGenerator.theBHumanStandardMessage.write(reinterpret_cast<void*>(m->data));
 
@@ -171,21 +177,18 @@ void TeamMessageHandler::writeMessage(BHumanMessageOutputGenerator& outputGenera
           && !outputGenerator.theBHumanArbitraryMessage.queue.isEmpty());
   }
 
-  if ((sizeOfArbitraryMessage + offset) > 94) return;
-
   ASSERT(sizeOfArbitraryMessage <= restBytes);
 
   outputGenerator.theBHumanArbitraryMessage.write(reinterpret_cast<void*>(m->data + offset));
 
   outputGenerator.theBSPLStandardMessage.numOfDataBytes = static_cast<uint16_t>(offset + sizeOfArbitraryMessage);
-  outputGenerator.theBSPLStandardMessage.write(reinterpret_cast<void*>(&m->header[0]));
+  outputGenerator.theBSPLStandardMessage.write(reinterpret_cast<void*>(&m->playerNum));
 
   outputGenerator.sentMessages++;
   if(theFrameInfo.getTimeSince(timeLastSent) >= 2 * sendInterval)
     timeLastSent = theFrameInfo.time;
   else
     timeLastSent += sendInterval;
-  OUTPUT_TEXT("SENT");
 }
 
 void TeamMessageHandler::update(TeamData& teamData)
@@ -266,7 +269,7 @@ void TeamMessageHandler::maintainBMateList(TeamData& teamData) const
 #define PARSING_ERROR(outputText) { OUTPUT_ERROR(outputText); receivedMessageContainer.lastErrorCode = ReceivedBHumanMessage::parsingError;  return false; }
 bool TeamMessageHandler::readSPLStandardMessage(const SPLStandardMessageBufferEntry* const m)
 {
-  if(!receivedMessageContainer.theBSPLStandardMessage.read(&m->message.header[0]))
+  if(!receivedMessageContainer.theBSPLStandardMessage.read(&m->message.playerNum))
     PARSING_ERROR("BSPL" " message part reading failed");
 
 #ifndef SELF_TEST
