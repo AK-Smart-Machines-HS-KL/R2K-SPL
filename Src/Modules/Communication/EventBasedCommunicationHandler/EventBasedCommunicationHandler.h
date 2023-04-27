@@ -60,10 +60,10 @@ MODULE(EventBasedCommunicationHandler,
   // v- using for calculations
   REQUIRES(FrameInfo),
   REQUIRES(OwnTeamInfo),
+  USES(GameInfo),
   // Uses following for messages
   USES(BallModel),
   USES(BehaviorStatus),
-	USES(GameInfo),
   USES(RobotInfo),
   USES(Whistle),
   USES(TeamBehaviorStatus),
