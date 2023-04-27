@@ -359,7 +359,7 @@ private:
       case 2: pRole.role = PlayerRole::supporter2;   break;
       case 3: pRole.role = PlayerRole::supporter3;   break;
       case 4: pRole.role = PlayerRole::supporter4;   break;
-    
+    }
     // d2: static assignment , only for specific gamestates
 
 
