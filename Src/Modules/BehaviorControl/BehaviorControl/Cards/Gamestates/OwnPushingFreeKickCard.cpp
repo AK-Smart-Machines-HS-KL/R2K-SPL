@@ -15,19 +15,36 @@
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/TeamInfo.h"
+#include "Representations/BehaviorControl/FieldBall.h"
+#include "Representations/Modeling/RobotPose.h"
+#include "Representations/Communication/RobotInfo.h"
 
 #include "Tools/Math/Geometry.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
-
+#include "Representations/Configuration/FieldDimensions.h"
+#include "Representations/BehaviorControl/TeammateRoles.h"
 
 CARD(OwnPushingFreeKickCard,
-{,
-  CALLS(Stand),
-  CALLS(Activity),
-  CALLS(LookForward),
-  REQUIRES(OwnTeamInfo),
-  REQUIRES(GameInfo),
+  { ,
+    CALLS(Stand),
+    CALLS(Activity),
+    CALLS(LookForward),
+    CALLS(GoToBallAndKick),
+    REQUIRES(OwnTeamInfo),
+    REQUIRES(GameInfo),
+    REQUIRES(FieldBall),
+    REQUIRES(RobotPose),
+    REQUIRES(RobotInfo),
+    REQUIRES(TeammateRoles),
+    REQUIRES(FieldDimensions),
+
+    DEFINES_PARAMETERS(
+    {,
+      (bool)(false) footIsSelected,  // freeze the first decision
+      (bool)(true) leftFoot,
+      (Vector2f)(Vector2f(1000.0f, -340.0f)) kickTarget, // Based on 20_deg setup angle in ready card; This is a 20 degree shot
+    }),
 });
 
 class OwnPushingFreeKickCard : public OwnPushingFreeKickCardBase
@@ -37,8 +54,17 @@ class OwnPushingFreeKickCard : public OwnPushingFreeKickCardBase
    */
   bool preconditions() const override
   {
-    return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
-        && theGameInfo.setPlay == SET_PLAY_PUSHING_FREE_KICK;
+    int i = 0;
+    for (i = 0; i < 5; i++ ) {
+      if (theTeammateRoles.roles[i] != TeammateRoles::GOALKEEPER_NORMAL &&
+        theTeammateRoles.roles[i] != TeammateRoles::GOALKEEPER_ACTIVE &&
+        theTeammateRoles.roles[i] != TeammateRoles::UNDEFINED)
+        break;
+    }
+    return theRobotInfo.number == (i+1)
+      && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
+      && theGameInfo.setPlay == SET_PLAY_PUSHING_FREE_KICK
+      ;
   }
 
   /**
@@ -49,50 +75,19 @@ class OwnPushingFreeKickCard : public OwnPushingFreeKickCardBase
     return !preconditions();
   }
 
-  option
+  void execute() override
   {
     theActivitySkill(BehaviorStatus::ownFreeKick);
-    
-    initial_state(init)
-    {
-
-      transition
-      {
-        
-      }
-
-      action
-      {
-        theLookForwardSkill();
-        theStandSkill();
-      }
+    if (!footIsSelected) {  // select only once
+      footIsSelected = true;
+      leftFoot = theFieldBall.positionRelative.y() < 0;
     }
-
-    state(active)
-    {
-      transition
-      {
-
-      }
-
-      action
-      {
-
-      }
-    }
-
-    state(standby)
-    {
-      transition
-      {
-
-      }
-
-      action
-      {
-        
-      }
-    }
+    KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeftLong : KickInfo::forwardFastRightLong;
+    theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true);
+  }
+  Angle calcAngleToGoal() const
+  {
+  return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
   }
 };
 
