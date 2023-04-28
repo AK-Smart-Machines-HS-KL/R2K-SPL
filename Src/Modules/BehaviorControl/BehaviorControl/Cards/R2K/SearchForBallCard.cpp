@@ -34,6 +34,8 @@
 #include "Representations/Modeling/RobotPose.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/BehaviorControl/TeammateRoles.h"
+#include "Representations/Infrastructure/FrameInfo.h"
+#include "Representations/Infrastructure/ExtendedGameInfo.h"
 
 
 CARD(SearchForBallCard,
@@ -50,12 +52,16 @@ CARD(SearchForBallCard,
         REQUIRES(RobotPose),
         REQUIRES(RobotInfo),
         REQUIRES(TeammateRoles),
-
+        REQUIRES(FrameInfo),
+        REQUIRES(ExtendedGameInfo),
         DEFINES_PARAMETERS(
              {,
           (int)(4000) headSweepDuration,
           (int)(400) bodyTurnDuration,
           (int)(5000) ballNotSeenTimeout,
+          (int)(15000) maxRuntime,
+          (int)(10000) cooldown,
+          (unsigned)(0) startTime,
              }),
 
         /*
@@ -76,18 +82,33 @@ class SearchForBallCard : public SearchForBallCardBase
   bool preconditions() const override
   {
     // return true;   // use for testing the head and body moves in a fast game
-    return !theFieldBall.ballWasSeen(ballNotSeenTimeout);
+    int timeSinceLastStart = theFrameInfo.getTimeSince(startTime);
+    return !theFieldBall.ballWasSeen(ballNotSeenTimeout) 
+      && (timeSinceLastStart < maxRuntime || timeSinceLastStart > maxRuntime + cooldown) 
+      && theExtendedGameInfo.timeSinceLastPenaltyEnded > 10000;
   }
 
   bool postconditions() const override
   {
     return !preconditions(); 
   }
+
   option
   {
     theActivitySkill(BehaviorStatus::searchForBall);
 
-    initial_state(start)
+    initial_state(init)
+    {
+      startTime = theFrameInfo.time;
+      transition
+      {
+        goto search;
+      }
+
+      action{}
+    }
+  
+    state(search)
     {
       transition
       {
@@ -109,7 +130,7 @@ class SearchForBallCard : public SearchForBallCardBase
       {
         srand(theRobotInfo.number);
         if (state_time > headSweepDuration + (rand() % 10 + 0.5) * bodyTurnDuration)
-        goto start;
+        goto search;
       }
 
       action
