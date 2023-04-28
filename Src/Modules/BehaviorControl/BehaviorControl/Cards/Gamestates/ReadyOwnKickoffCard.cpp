@@ -60,7 +60,7 @@ class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
 
     theActivitySkill(BehaviorStatus::defaultBehavior);
 
-    Vector2f targetAbsolute = theDefaultPose.ownDefaultPose.translation + Vector2f(+500.f, 0);
+    Vector2f targetAbsolute = theDefaultPose.ownDefaultPose.translation + Vector2f(+450.f, 0);
 
     Vector2f targetRelative = theRobotPose.toRelative(targetAbsolute);
 
