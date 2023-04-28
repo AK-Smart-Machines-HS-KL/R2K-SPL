@@ -8,6 +8,7 @@
  * Behavior: During the Own Kickoff, Robot 5 attempts to kick the ball 20_deg to the left 
  * 
  * V1.1 Card migrated (Nicholas)
+ * V 1.2. changed to long kick (Adrian)
  */
 
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
@@ -19,6 +20,7 @@
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Communication/GameInfo.h"
+#include "Representations/Infrastructure/ExtendedGameInfo.h"
 #include "Representations/Communication/TeamInfo.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Modeling/RobotPose.h"
@@ -41,11 +43,14 @@ CARD(OwnKickoffCard,
   REQUIRES(FrameInfo),
   REQUIRES(OwnTeamInfo),
   REQUIRES(GameInfo),
+  REQUIRES(ExtendedGameInfo),
   REQUIRES(TeamBehaviorStatus),
   REQUIRES(TeammateRoles),
 
   DEFINES_PARAMETERS(
   {,
+    (bool)(false) footIsSelected,  // freeze the first decision
+    (bool)(true) leftFoot,
     (Vector2f)(Vector2f(1000.0f, -340.0f)) kickTarget, // Based on 20_deg setup angle in ready card; This is a 20 degree shot
   }),
 });
@@ -58,18 +63,11 @@ class OwnKickoffCard : public OwnKickoffCardBase
    * @brief The condition that needs to be met to execute this card
    */
   bool preconditions() const override
-  {  
-    return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber 
-           && theFrameInfo.getTimeSince(theGameInfo.timeLastStateChange) <= 1000*10
-           && theGameInfo.state == STATE_PLAYING 
-           && ((4 == theRobotInfo.number 
-               && !std::strcmp(theRobotInfo.getPenaltyAsString().c_str(), "None") 
-               && theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_DEFENSIVE_GAME
-               ) 
-              || 
-              (5 == theRobotInfo.number
-               && theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_NORMAL_GAME
-              ));
+  {
+    return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
+      && theExtendedGameInfo.timeSincePlayingStarted < 10000 // 10sec
+      && theGameInfo.state == STATE_PLAYING
+      && theTeammateRoles.isTacticalOffense(theRobotInfo.number); // my recent role;
   }
 
   /**
@@ -78,46 +76,22 @@ class OwnKickoffCard : public OwnKickoffCardBase
   bool postconditions() const override
   {
     return !preconditions();
-  }
+  };
 
-  option
+  void execute() override
   {
     theActivitySkill(BehaviorStatus::ownKickoff);
-    
-    initial_state(init)
-    {
-      transition
-      {
-
-        bool leftFoot = theFieldBall.positionRelative.y() < 0;
-        kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
-        goto kick;
-      }
-
-      action
-      {
-        theLookForwardSkill();
-        theStandSkill();
-      }
+    if (!footIsSelected) {  // select only once
+      footIsSelected = true;
+      leftFoot = theFieldBall.positionRelative.y() < 0;
     }
-
-    state(kick)
-    {
-      transition
-      {
-
-      }
-
-      action
-      {
-        theGoToBallAndKickSkill(calcAngleToTarget(), kickType);
-      }
+    KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeftLong : KickInfo::forwardFastRightLong;
+    theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true); 
     }
-  }
-
-  Angle calcAngleToTarget() const
+ 
+  Angle calcAngleToGoal() const
   {
-    return (theRobotPose.inversePose * kickTarget).angle();
+    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
   }
 };
 

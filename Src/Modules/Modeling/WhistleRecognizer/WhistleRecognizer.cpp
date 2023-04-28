@@ -72,7 +72,7 @@ void WhistleRecognizer::update(Whistle& theWhistle)
   DECLARE_PLOT("module:WhistleRecognizer:samples3");
 
   // Remember if sound was playing during this team communication cycle
-  soundWasPlaying |= SystemCall::soundIsPlaying();
+  soundWasPlaying = false;
 
   // Empty buffers when entering a state where it should be recorded.
   const bool shouldRecord = (theGameInfo.state == STATE_SET

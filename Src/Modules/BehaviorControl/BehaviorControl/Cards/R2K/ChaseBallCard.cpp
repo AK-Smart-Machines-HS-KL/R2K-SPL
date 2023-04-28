@@ -22,6 +22,7 @@
  * v.1.2 card now checks wether there is an passing event active (OffenseForwardPassCard, OffenseReceivePassCard)
     
  * - Check: GoalShot has higher priority and takes over close to opp.goal
+ * v 1.3 DEFENSE only x < 0 - threshold
  */
 
 // Skills - Must be included BEFORE Card Base
@@ -93,7 +94,7 @@ class ChaseBallCard : public ChaseBallCardBase
         //theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
         theObstacleModel.opponentIsClose(800) &&  // see LongShotCard, !opponentIsTooClose()
         theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
-        theFieldBall.endPositionOnField.x() < 0 &&
+        theFieldBall.endPositionOnField.x() < -500 &&
         !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME));
   }
 

@@ -32,6 +32,8 @@
  * - However, if the ball is stuck, the flag may still be set, and the player will follow the ball
  * - This behavior is ok in OFFENSIVE and SPARSE mode
  * 
+ *  v.1.3 precond: x < 0 - threshold. 
+ *      Activated !aBuddyIsClearingOwnHalf
  * ToDo: 
  * check for free shoot vector and opt. change y-coordinate
  * check whether isDone () works correctly 
@@ -45,6 +47,7 @@
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Modeling/ObstacleModel.h"
+#include "Representations/Communication/TeamData.h"
 
 #include "Representations/Modeling/RobotPose.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
@@ -68,12 +71,14 @@ CARD(DefenseLongShotCard,
     REQUIRES(RobotInfo),
     REQUIRES(RobotPose),
     REQUIRES(TeamBehaviorStatus),
+    REQUIRES(TeamData),
     REQUIRES(TeammateRoles),  // R2K
 
     DEFINES_PARAMETERS(
     {,
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
+      (int)(-1000) offsetX,
     }),
   });
 
@@ -83,14 +88,15 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
   {
     return
       // theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
-      !theObstacleModel.opponentIsClose() && // see below: min distance is minOppDistance
+      !theObstacleModel.opponentIsClose(1200) && // see below: min distance is minOppDistance
+      // !aBuddyIsClearingOwnHalf() &&
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
 
       //don't leave own half, unless we are in OFFENSIVE or SPARSE Mode)
       (
         theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_OFFENSIVE_GAME ||
         theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME ||
-        theFieldBall.endPositionOnField.x() < 0
+        theFieldBall.positionOnField.x() < -500
       );
   }
 
@@ -126,6 +132,19 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
   {
     return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
   }
+
+  bool aBuddyIsClearingOwnHalf() const
+  {
+    for (const auto& buddy : theTeamData.teammates)
+    {
+      if (buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie)
+        return true;
+    }
+    return false;
+  }
+
 };
 
 MAKE_CARD(DefenseLongShotCard);

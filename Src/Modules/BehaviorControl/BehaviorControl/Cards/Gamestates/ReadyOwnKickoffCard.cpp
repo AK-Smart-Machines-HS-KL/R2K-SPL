@@ -35,6 +35,7 @@ CARD(ReadyOwnKickoffCard,
     REQUIRES(GameInfo),
     REQUIRES(OwnTeamInfo),
     REQUIRES(RobotPose),
+  REQUIRES(RobotInfo),
   });
 
 class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
@@ -59,11 +60,13 @@ class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
   {
 
     theActivitySkill(BehaviorStatus::defaultBehavior);
-
     Vector2f targetAbsolute = theDefaultPose.ownDefaultPose.translation + Vector2f(+450.f, 0);
 
-    Vector2f targetRelative = theRobotPose.toRelative(targetAbsolute);
+    if (theRobotInfo.number == 5) {
+      targetAbsolute = Vector2f(-700, 0);
+    }
 
+    Vector2f targetRelative = theRobotPose.toRelative(targetAbsolute);
 
     theLookActiveSkill(); // Head Motion Request
     theWalkToPointSkill(Pose2f(theDefaultPose.ownDefaultPose.rotation - theRobotPose.rotation, targetRelative), 1.0f, true);

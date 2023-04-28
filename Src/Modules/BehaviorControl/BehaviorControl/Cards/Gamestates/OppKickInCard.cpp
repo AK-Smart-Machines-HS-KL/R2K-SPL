@@ -28,6 +28,7 @@
 #include "Representations/Communication/TeamInfo.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/TeamData.h"
+#include "Representations/BehaviorControl/TeammateRoles.h"
 
 #include "Representations/Modeling/RobotPose.h"
 
@@ -55,6 +56,9 @@ CARD(OppKickInCard,
   REQUIRES(OwnTeamInfo),
   REQUIRES(RobotPose),
   REQUIRES(TeamData),
+  REQUIRES(RobotInfo),
+  REQUIRES(TeammateRoles),
+
 
   DEFINES_PARAMETERS(
     {,
@@ -75,7 +79,8 @@ class OppKickInCard : public OppKickInCardBase
   bool preconditions() const override
   {
     return theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
-        && theGameInfo.setPlay == SET_PLAY_KICK_IN;
+      && theGameInfo.setPlay == SET_PLAY_KICK_IN
+      && !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number);
   }
 
   /**

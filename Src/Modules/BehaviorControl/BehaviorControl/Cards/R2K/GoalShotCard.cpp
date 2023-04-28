@@ -46,7 +46,7 @@ CARD(GoalShotCard,
                 (bool)(false) done,
                 (Shot) currentShot,
                 (unsigned int) (0) timeLastFail,
-                (unsigned int) (10000) cooldown,
+                (unsigned int) (8000) cooldown,
              }),
 
      });

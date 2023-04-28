@@ -173,7 +173,7 @@ private:
 
     // this tactic table is used in step d4 below. It becomes active for STATE_PLAYING
      //         nr of active players x team tactic x 5 TeamMate roles[]
-    int r2k_tactics[5][TeamBehaviorStatus::numOfTeamActivities][5] =
+    const int r2k_tactics[5][TeamBehaviorStatus::numOfTeamActivities][5] =
     {
       //      R2K_NORMAL_GAME, R2K_DEFENSIVE_GAME,R2K_OFFENSIVE_GAME, R2K_SPARSE_GAME
 
@@ -383,42 +383,25 @@ private:
     // if (theGameInfo.state == STATE_READY || theGameInfo.state == STATE_SET) {
     if (theGameInfo.state == STATE_READY || theGameInfo.state == STATE_SET || 
       theGameInfo.state == STATE_PLAYING) {
-      // switch (theTeamBehaviorStatus.teamActivity) {
-      switch (teamBehaviorStatus) {
-      case(TeamBehaviorStatus::R2K_DEFENSIVE_GAME):
-        teamMateRoles.roles = { TeammateRoles::GOALKEEPER_NORMAL,
-                               TeammateRoles::DEFENSE_RIGHT,
-                               TeammateRoles::DEFENSE_MIDDLE,
-                               TeammateRoles::DEFENSE_LEFT,
-                               TeammateRoles::OFFENSE_MIDDLE,
-                               TeammateRoles::UNDEFINED };
-        break;
-      case(TeamBehaviorStatus::R2K_NORMAL_GAME):
-        teamMateRoles.roles = { TeammateRoles::GOALKEEPER_NORMAL, // 0
-                              TeammateRoles::DEFENSE_RIGHT,  // 2
-                              TeammateRoles::DEFENSE_LEFT, // 4
-                              TeammateRoles::OFFENSE_RIGHT,  // 5
-                              TeammateRoles::OFFENSE_LEFT, // 7
-                              TeammateRoles::UNDEFINED };
-        break;
-      case(TeamBehaviorStatus::R2K_OFFENSIVE_GAME):
-        teamMateRoles.roles = { TeammateRoles::GOALKEEPER_ACTIVE,
-                             TeammateRoles::DEFENSE_MIDDLE,
-                             TeammateRoles::OFFENSE_LEFT,
-                             TeammateRoles::OFFENSE_RIGHT,
-                             TeammateRoles::OFFENSE_MIDDLE,
-                             TeammateRoles::UNDEFINED };
-
-        break;
-      case(TeamBehaviorStatus::R2K_SPARSE_GAME):  // never reached
-        teamMateRoles.roles = { TeammateRoles::GOALKEEPER_ACTIVE,
-                        TeammateRoles::DEFENSE_LEFT,
-                        TeammateRoles::DEFENSE_RIGHT,
-                        TeammateRoles::OFFENSE_LEFT,
-                        TeammateRoles::OFFENSE_RIGHT,
-                        TeammateRoles::UNDEFINED };
-        break;
-      default: ASSERT(false);
+      
+      int nActive = 0;
+      for (auto &gcPlayer : theOwnTeamInfo.players)
+      {
+        if (gcPlayer.penalty == PENALTY_NONE) {
+          nActive++;
+        }
+      }
+      nActive = std::min(nActive, 5);
+      
+      int roleIdx = 0;
+      for (size_t i = 0; i < 5; i++)
+      {
+        if (theOwnTeamInfo.players[i].penalty == PENALTY_NONE) {
+          teamMateRoles.roles[i] = r2k_tactics[nActive - 1][teamBehaviorStatus - 1][roleIdx];
+          roleIdx++;
+        } else {
+          teamMateRoles.roles[i] = TeammateRoles::UNDEFINED;
+        }
       }
       theTeammateRolesSkill(teamMateRoles);
     }
