@@ -90,11 +90,11 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
   {
     return
      theGameInfo.setPlay == SET_PLAY_NONE &&
-      !aBuddyIsClearingOwnHalf() &&
+      // !aBuddyIsClearingOwnHalf() &&
       // theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
       theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
-      theFieldBall.positionOnField.x() < offsetX &&
+      theFieldBall.positionOnField.x() < 500 &&
       !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME);
   }
 

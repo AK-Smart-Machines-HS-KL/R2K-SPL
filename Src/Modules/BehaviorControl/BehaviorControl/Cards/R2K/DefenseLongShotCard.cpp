@@ -89,14 +89,14 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
     return
       // theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
       !theObstacleModel.opponentIsClose() && // see below: min distance is minOppDistance
-      !aBuddyIsClearingOwnHalf() &&
+      // !aBuddyIsClearingOwnHalf() &&
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
 
       //don't leave own half, unless we are in OFFENSIVE or SPARSE Mode)
       (
         theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_OFFENSIVE_GAME ||
         theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME ||
-        theFieldBall.positionOnField.x() < offsetX
+        theFieldBall.positionOnField.x() < 500
       );
   }
 
