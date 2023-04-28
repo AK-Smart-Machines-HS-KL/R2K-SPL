@@ -92,7 +92,7 @@ class ChaseBallCard : public ChaseBallCardBase
       (theGameInfo.setPlay == SET_PLAY_NONE &&
         // !aBuddyIsClearingOwnHalf() &&
         //theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
-        theObstacleModel.opponentIsClose(800) &&  // see LongShotCard, !opponentIsTooClose()
+        theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
         theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
         theFieldBall.endPositionOnField.x() < -500 &&
         !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME));
