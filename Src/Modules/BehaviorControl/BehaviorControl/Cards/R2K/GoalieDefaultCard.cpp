@@ -46,6 +46,7 @@ CARD(GoalieDefaultCard,
                 (Vector2f) (Vector2f(-3500, 1500)) goalAreaUpperBound,
                 (Vector2f) (Vector2f(-4800, -1500)) goalAreaLowerBound,
                 (float) (2000) blockingArcDepth,
+                (int) (400) goalposesafetyarea,
              }),
      });
 
@@ -82,8 +83,8 @@ class GoalieDefaultCard : public GoalieDefaultCardBase
       // Calculate parameters for blocking positioning
       blockingArcCenter = Vector2f(theFieldDimensions.xPosOwnGroundLine - blockingArcDepth, 0);
       blockingArcRadius = (Vector2f(theFieldDimensions.xPosOwnGoalPost, theFieldDimensions.yPosRightGoal) - blockingArcCenter).norm();
-      lowerBlockingArcLimit = (Vector2f(theFieldDimensions.xPosOwnGoalPost, theFieldDimensions.yPosRightGoal + 200) - blockingArcCenter).angle();
-      upperBlockingArcLimit = (Vector2f(theFieldDimensions.xPosOwnGoalPost, theFieldDimensions.yPosLeftGoal - 200) - blockingArcCenter).angle();
+      lowerBlockingArcLimit = (Vector2f(theFieldDimensions.xPosOwnGoalPost, theFieldDimensions.yPosRightGoal + goalposesafetyarea) - blockingArcCenter).angle();
+      upperBlockingArcLimit = (Vector2f(theFieldDimensions.xPosOwnGoalPost, theFieldDimensions.yPosLeftGoal - goalposesafetyarea) - blockingArcCenter).angle();
 
       ballPosLost = false;
 
