@@ -88,7 +88,7 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
   {
     return
       // theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
-      !theObstacleModel.opponentIsClose() && // see below: min distance is minOppDistance
+      !theObstacleModel.opponentIsClose(1200) && // see below: min distance is minOppDistance
       // !aBuddyIsClearingOwnHalf() &&
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
 
@@ -96,7 +96,7 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
       (
         theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_OFFENSIVE_GAME ||
         theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME ||
-        theFieldBall.positionOnField.x() < 500
+        theFieldBall.positionOnField.x() < -500
       );
   }
 
