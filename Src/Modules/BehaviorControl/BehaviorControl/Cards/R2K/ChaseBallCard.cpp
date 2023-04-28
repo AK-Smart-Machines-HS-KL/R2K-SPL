@@ -82,26 +82,19 @@ class ChaseBallCard : public ChaseBallCardBase
   
     return
       (
-        !aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
+        //!aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
         theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
         theFieldBall.positionOnField.x() > (0 - threshold)
         // theFieldBall.positionOnField.x() >= theRobotPose.translation.x() - threshold;
         )
-    ||
-    (theGameInfo.setPlay == SET_PLAY_NONE &&
-      // !aBuddyIsClearingOwnHalf() &&
-      //theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
-      theObstacleModel.opponentIsClose(800) &&  // see LongShotCard, !opponentIsTooClose()
-      theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
-      theFieldBall.endPositionOnField.x() < 0 &&
-      !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME))&&
-      
-      //don't leave own half, unless we are in OFFENSIVE or SPARSE Mode)
-      (
-        theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_OFFENSIVE_GAME ||
-        theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME ||
-        theFieldBall.endPositionOnField.x() < 0
-        );
+      ||
+      (theGameInfo.setPlay == SET_PLAY_NONE &&
+        // !aBuddyIsClearingOwnHalf() &&
+        //theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
+        theObstacleModel.opponentIsClose(800) &&  // see LongShotCard, !opponentIsTooClose()
+        theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
+        theFieldBall.endPositionOnField.x() < 0 &&
+        !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME));
   }
 
   bool postconditions() const override
