@@ -24,6 +24,9 @@
  * v1.2. added setPlay==SET_PLAY_NONE to prevent goalie be activated for CORNER_KICK
  *       changed to theTeammateRoles.isTacticalGoalkeeper
          goalie must not leave the goal box + maxDistanceFromGoalArea
+        
+   v3: restricting the active area to penalty zone . 
+     GoalieLongShot card is prefered IFF there is no opp. too close.
  * 
  * Note: 
  * - because this is a short shot, the flag "playsTheBall" may not re-set after the shot, 
@@ -75,7 +78,7 @@ CARD(ClearOwnHalfCardGoalie,
 
     DEFINES_PARAMETERS(
     {,
-      (float)(500) maxDistanceFromGoalArea,  // how far  goalie will leave the goal box
+      (float)(0) maxDistanceFromGoalArea,  // how far  goalie will leave the goal box
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
       (bool)(true) shootAngleIsZero,
@@ -89,10 +92,14 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
     return
       theGameInfo.setPlay == SET_PLAY_NONE &&
       //theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
-      !aBuddyIsClearingOwnHalf() &&
-      theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
+      // !aBuddyIsClearingOwnHalf() &&
+      // 
+      // either LongShotCard is above in the stack or add this pre-cond:
+      // theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) && // my recent role
       theFieldBall.positionOnField.x() <= theFieldDimensions.xPosOwnGoalArea + maxDistanceFromGoalArea &&
+      theFieldBall.positionOnField.y() <= theFieldDimensions.yPosLeftGoalArea + maxDistanceFromGoalArea &&
+      theFieldBall.positionOnField.y() >= theFieldDimensions.yPosRightGoalArea - maxDistanceFromGoalArea &&
       !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME);
   }
 
