@@ -31,6 +31,8 @@
  * - minOppDistance must be maintained with the ...LongShotCards
  * 
  * 
+ * v.1.3 precond: x < 0 - threshold. 
+ *      Activated !aBuddyIsClearingOwnHalf
  * ToDo:
  * - we need a better shooting direction!! 
  * - maybe add OFFENSIVE mode as a blocker?
@@ -78,6 +80,7 @@ CARD(ClearOwnHalfCard,
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
       (bool)(true) shootAngleIsZero,
+      (int) (-1000) offsetX,
     }),
   });
 
@@ -87,11 +90,11 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
   {
     return
      theGameInfo.setPlay == SET_PLAY_NONE &&
-      // !aBuddyIsClearingOwnHalf() &&
+      !aBuddyIsClearingOwnHalf() &&
       // theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
       theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
-      theFieldBall.endPositionOnField.x() < 0 && 
+      theFieldBall.positionOnField.x() < offsetX &&
       !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME);
   }
 
@@ -133,6 +136,7 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
     for (const auto& buddy : theTeamData.teammates)
     {
       if (buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie) 
         return true;
     }
