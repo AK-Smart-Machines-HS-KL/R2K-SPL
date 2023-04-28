@@ -34,8 +34,12 @@ GameController::GameController()
   gameInfo.kickingTeam = 1;
   gameInfo.secsRemaining = halfTime;
   gameInfo.secondaryTime = 0;
-  for(auto& teamInfo : teamInfos)
-    teamInfo.players[gameInfo.playersPerTeam - 1].penalty = PENALTY_SUBSTITUTE;
+  for(auto& teamInfo : teamInfos) {
+    for(auto& player : teamInfo.players) {
+       player.penalty = PENALTY_SUBSTITUTE; 
+    }
+  }
+    
   // Force reloading of the field dimensions (they cannot be loaded here because the file search path is not available yet).
   fieldDimensions.xPosOwnPenaltyMark = 0.f;
 }
@@ -49,6 +53,8 @@ void GameController::registerSimulatedRobot(int robot, SimulatedRobot& simulated
     robots[robot].info.penalty = robots[robot].lastPenalty = PENALTY_SUBSTITUTE;
   if(fieldDimensions.xPosOwnPenaltyMark == 0.f)
     fieldDimensions.load();
+  int team = gameInfo.playersPerTeam >= robot ? 0 : 1;
+  teamInfos[team].players[robots[robot].info.number - 1].penalty = PENALTY_NONE;
 }
 
 bool GameController::handleStateCommand(const std::string& command)
