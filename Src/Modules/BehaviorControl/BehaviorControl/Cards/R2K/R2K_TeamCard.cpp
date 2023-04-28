@@ -171,12 +171,12 @@ private:
   void execute() override
   {
 
-   // this tactic table is used in step d4 below. It becomes active for STATE_PLAYING
-    //         nr of active players x team tactic x 5 TeamMate roles[]
+    // this tactic table is used in step d4 below. It becomes active for STATE_PLAYING
+     //         nr of active players x team tactic x 5 TeamMate roles[]
     int r2k_tactics[5][TeamBehaviorStatus::numOfTeamActivities][5] =
     {
       //      R2K_NORMAL_GAME, R2K_DEFENSIVE_GAME,R2K_OFFENSIVE_GAME, R2K_SPARSE_GAME
-    
+
       // 1 player
         { {GN,UN,UN,UN,UN}, {GN,UN,UN,UN,UN}, {GN,UN,UN,UN,UN}, {OM,UN,UN,UN,UN} },
         // 2 player
@@ -195,7 +195,7 @@ private:
 
     // 2019 code
     // RoboCup::TeamInfo& team = gameCtrlData.teams[gameCtrlData.teams[0].teamNumber == Global::getSettings().teamNumber ? 0 : 1];
-    
+
     // 2022 code
     int own_score = theOwnTeamInfo.score;
     int opp_score = theOpponentTeamInfo.score;
@@ -203,14 +203,14 @@ private:
     int own_penalties = -1;
     int opp_penalties = -1;
     // loop over players and sum up penalized states
-  
+
     for (const auto& buddy : theOwnTeamInfo.players) {
       if (buddy.penalty != PENALTY_NONE) own_penalties++;
     }
     for (const auto& buddy : theOpponentTeamInfo.players) {
       if (buddy.penalty != PENALTY_NONE) opp_penalties++;
     }
-      
+
     TeammateRoles teamMateRoles;
 
 
@@ -218,54 +218,55 @@ private:
     // to do: who is active - loop supp. index, number active
     // what if substitute goalie?
     int teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME; // patch due to update errors
-    if (opp_penalties > 2 || (own_penalties >= 1 && opp_penalties >= 2)) {
-   
+    // if (opp_penalties > 2 || (own_penalties >= 1 && opp_penalties >= 2)) {
+    // HOT FIX
+    if(true) {
       /*
       theTeamActivitySkill(TeamBehaviorStatus::R2K_SPARSE_GAME);
       teamBehaviorStatus = TeamBehaviorStatus::R2K_SPARSE_GAME;
       */
       /* patch due problems with new data structure from GC*/
-  
+
       theTeamActivitySkill(TeamBehaviorStatus::R2K_NORMAL_GAME);
       teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME;
-    
+
     }
     else {
       if (own_score == opp_score) { //default
         
-        theTeamActivitySkill(TeamBehaviorStatus::R2K_NORMAL_GAME); 
+        theTeamActivitySkill(TeamBehaviorStatus::R2K_NORMAL_GAME);
         teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME;
 
-      }  
-      if (own_score < opp_score) { 
-        theTeamActivitySkill(TeamBehaviorStatus::R2K_OFFENSIVE_GAME); 
+      }
+      if (own_score < opp_score) {
+        theTeamActivitySkill(TeamBehaviorStatus::R2K_OFFENSIVE_GAME);
         teamBehaviorStatus = TeamBehaviorStatus::R2K_OFFENSIVE_GAME;
       }
 
       // to do: add time limit, so we will not spoil our leadership in the last n minutes
-      if (own_score > opp_score) { 
-        theTeamActivitySkill(TeamBehaviorStatus::R2K_DEFENSIVE_GAME); 
+      if (own_score > opp_score) {
+        theTeamActivitySkill(TeamBehaviorStatus::R2K_DEFENSIVE_GAME);
         teamBehaviorStatus = TeamBehaviorStatus::R2K_DEFENSIVE_GAME;
       }
     }
- 
-      
+
+
     /* information flow for role assignments:
     a) count #active players
     b) is our goali active? (ie not penalized)
     c) make a sorted, lean copy of relevant data (helper class BotOnField)
     d1) PlayerRole:: computing the supporterindex for each bot from left to right
-    d2) TeammateRoles:: static assignment for STATE_INITIAL else 
+    d2) TeammateRoles:: static assignment for STATE_INITIAL else
     d3) TeammateRoles: dynamic assignment
     d4) Use tactic table for assignments of active bots
-          
+
     e) find min distance to ball for all bots
     f) who plays the ball?
     g) bot#1 is  penalized?
 
     h) since version 1.3: check for triggers, whether team relevant data should be updated (and send) or not
 
-    */ 
+    */
     // a) count #active players
     unsigned int activeBuddies = 0;
     std::vector<BotOnField> botsLineUp;
@@ -278,25 +279,40 @@ private:
       lastNrOwnPenalties = own_penalties;
     }
 
-    for (const auto& buddy : theTeamData.teammates)
-    {
-      if (!buddy.isPenalized && buddy.isUpright)
-      {
+    for (int i = 0; i < 4; i++)
+      if (theOwnTeamInfo.players[i].penalty == PENALTY_NONE)
         activeBuddies++;
+    // OUTPUT_TEXT("theTeamData.numberOfActiveTeammates " << theTeamData.numberOfActiveTeammates);
+    if (theTeamData.numberOfActiveTeammates == 0) {
+      // OUTPUT_TEXT("theTeamData.teammates is empty");
+      for (int i = 0; i < activeBuddies; i++) {
+        botsLineUp.push_back(BotOnField(theRobotInfo.number, theRobotPose.translation.x()));
+        if (theRobotInfo.number == 1) goalieIsActive = true;
+      }
+
+    } 
+    else {
+      for (const auto& buddy : theTeamData.teammates)
+      {
+        if (!buddy.isPenalized) // && buddy.isUpright)
+        {
+        // activeBuddies++;
         // 
         // botsLineUp.push_back(BotOnField(buddy.number, (float)buddy.number));
-        if (recomputeLineUp) {
-          botsLineUp.push_back(BotOnField(buddy.number, buddy.theRobotPose.translation.x()));
+          if (recomputeLineUp) {
+            botsLineUp.push_back(BotOnField(buddy.number, buddy.theRobotPose.translation.x()));
+          }
+          else
+            botsLineUp.push_back(BotOnField(buddy.number, (float)lineUp[buddy.number - 1] * 100));
         }
-        else
-          botsLineUp.push_back(BotOnField(buddy.number, (float)lineUp[buddy.number-1]*100));
-      }
-      // b) is our goalie active ? (ie not penalized)
-      if (1 == buddy.number && !buddy.isPenalized)
-        goalieIsActive = true;  // This flag will be used below
+        // b) is our goalie active ? (ie not penalized)
+        if (1 == buddy.number && !buddy.isPenalized)
+          goalieIsActive = true;  // This flag will be used below
 
-    }
-    ASSERT(botsLineUp.size() == activeBuddies);
+      } 
+    }  // do we see valid team data
+    // HOT FIX
+    // ASSERT(botsLineUp.size() == activeBuddies);
     // now add myself 
     if (theRobotInfo.penalty == PENALTY_NONE)
       if (recomputeLineUp) {
@@ -353,6 +369,7 @@ private:
       // ASSERT(role.supporterIndex() - firstSupporterRole <= activeBuddies);  // we are in range supporter0 
 
     }
+    // patch for communication problems
     switch (theRobotInfo.number - 1) {
       case 0: pRole.role = PlayerRole::supporter0;   break;
       case 1: pRole.role = PlayerRole::supporter1;   break;
