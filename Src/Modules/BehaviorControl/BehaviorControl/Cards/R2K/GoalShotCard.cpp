@@ -61,7 +61,11 @@ class GoalShotCard : public GoalShotCardBase
   //always active
   bool preconditions() const override
   {
-    return theFieldBall.positionRelative.norm() < 500 && theFrameInfo.getTimeSince(timeLastFail) > cooldown && theShots.goalShot.failureProbability < 0.70;
+    return theFieldBall.positionRelative.norm() < 500
+      && theFrameInfo.getTimeSince(timeLastFail) > cooldown
+      && theShots.goalShot.failureProbability < 0.70
+      && theFieldBall.positionOnField.x() > theRobotPose.translation.x()
+    ;
   }
 
   bool postconditions() const override
