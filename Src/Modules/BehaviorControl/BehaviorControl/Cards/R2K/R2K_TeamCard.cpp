@@ -227,8 +227,8 @@ private:
       */
       /* patch due problems with new data structure from GC*/
 
-      theTeamActivitySkill(TeamBehaviorStatus::R2K_DEFENSIVE_GAME);
-      teamBehaviorStatus = TeamBehaviorStatus::R2K_DEFENSIVE_GAME;
+      theTeamActivitySkill(TeamBehaviorStatus::R2K_NORMAL_GAME);
+      teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME;
 
     }
     else {
