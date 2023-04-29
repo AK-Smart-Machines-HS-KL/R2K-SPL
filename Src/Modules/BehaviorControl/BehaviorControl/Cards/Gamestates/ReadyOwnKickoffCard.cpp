@@ -20,6 +20,7 @@
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Modeling/RobotPose.h"
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h" 
+#include "Representations/BehaviorControl/TeammateRoles.h"
 
 #include "Tools/Math/Geometry.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
@@ -36,6 +37,7 @@ CARD(ReadyOwnKickoffCard,
     REQUIRES(OwnTeamInfo),
     REQUIRES(RobotPose),
   REQUIRES(RobotInfo),
+  REQUIRES(TeammateRoles),
   });
 
 class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
@@ -62,9 +64,27 @@ class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
     theActivitySkill(BehaviorStatus::defaultBehavior);
     Vector2f targetAbsolute = theDefaultPose.ownDefaultPose.translation + Vector2f(+450.f, 0);
 
-    if (theRobotInfo.number == 5) {
-      targetAbsolute = Vector2f(-700, 0);
-    }
+    int nOffenseFound = 0;
+    int i;
+    for (i = 4; i >= 0; i--) {
+      if (theTeammateRoles.isTacticalOffense(i+1))
+      {
+        nOffenseFound++;
+        if(theRobotInfo.number == i+1 && theTeammateRoles.isTacticalOffense(theRobotInfo.number)) {
+          switch (nOffenseFound)
+          {
+          case 1:
+            targetAbsolute = Vector2f(-500, 0);
+            break;
+
+          case 2:
+            targetAbsolute = Vector2f(-700, -2000);
+            break;
+          }
+          break;
+        }
+      }
+    } 
 
     Vector2f targetRelative = theRobotPose.toRelative(targetAbsolute);
 
