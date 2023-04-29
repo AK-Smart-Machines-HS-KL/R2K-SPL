@@ -45,7 +45,7 @@ CARD(OwnPenaltyKickCard,
       CALLS(GoToBallAndKick),
       CALLS(LookActive),
       CALLS(Stand),
-      CALLS(WalkToPoint),
+      CALLS(WalkAtRelativeSpeed),
       CALLS(PenaltyStrikerGoToBallAndKick),
 
       REQUIRES(FieldBall),
@@ -60,14 +60,11 @@ CARD(OwnPenaltyKickCard,
       REQUIRES(Shots),
       REQUIRES(FrameInfo),
 
-
       DEFINES_PARAMETERS(
              {,
                 (unsigned int)(1000) initalCheckTime,
                 (bool)(false) done,
-                (Shot)currentShot,
-                (unsigned int)(0) timeLastFail,
-                (unsigned int)(10000) cooldown,
+                (Shot) currentShot,
              }),
     });
 
@@ -82,11 +79,20 @@ class OwnPenaltyKickCard : public OwnPenaltyKickCardBase
   }
   bool preconditions() const override
   {
+    int i;
+    for (i = 5; i > 0; i--) {
+      if (theTeammateRoles.isTacticalOffense(i))
+      {
+        break;
+      }
+    }
+
     return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
       && theGameInfo.setPlay == SET_PLAY_PENALTY_KICK
-      // && theTeammateRoles.isTacticalDefense(theRobotInfo.number);
-     // && theFieldBall.positionRelative.norm() < 500 && theFrameInfo.getTimeSince(timeLastFail) > cooldown && theShots.goalShot.failureProbability < 0.95
-      && thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters; // I am not the right most player
+      && theGameInfo.state == STATE_PLAYING
+      // && thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters; 
+      && theRobotInfo.number == i;
+    
 
   }
 
@@ -118,7 +124,7 @@ class OwnPenaltyKickCard : public OwnPenaltyKickCardBase
 
       action
     {
-      theWalkToPointSkill(Pose2f(angleToGoal));
+      theWalkAtRelativeSpeedSkill(Pose2f(angleToGoal));
       theLookActiveSkill();
     }
   }
@@ -131,13 +137,7 @@ class OwnPenaltyKickCard : public OwnPenaltyKickCardBase
     {
       if (state_time > initalCheckTime) {
         currentShot = theShots.goalShot;
-        OUTPUT_TEXT("Locking Target: (" << currentShot.target.x() << ", " << currentShot.target.y() << ")\n" << currentShot);
-        if (currentShot.failureProbability > 0.2) {
-          OUTPUT_TEXT("Aborting! shot too likely to fail");
-          timeLastFail = theFrameInfo.time;
-          goto done;
-        }
-
+    
         goto kick;
       }
     }

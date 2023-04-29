@@ -90,7 +90,6 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
   bool preconditions() const override
   {
     return
-      theGameInfo.setPlay == SET_PLAY_NONE &&
       //theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
       // !aBuddyIsClearingOwnHalf() &&
       // 
