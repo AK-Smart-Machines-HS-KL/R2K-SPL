@@ -9,6 +9,7 @@
  *  added (Adrian): pre-condition: triggers for role.playBall, action: WalkToBallAndKickAtGoal
  * 
  * V1.1 Card migrated (Nicholas)
+ * v1.2.added functionality to OwnCornerKick: OFFENSE goes to ball and kick to goal" (Adrian)
  */
 
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
@@ -44,20 +45,32 @@ CARD(OwnCornerKickCard,
   REQUIRES(GameInfo),
   REQUIRES(TeamBehaviorStatus),
   REQUIRES(TeammateRoles),
+
+  DEFINES_PARAMETERS(
+    {,
+      (bool)(false) footIsSelected,  // freeze the first decision
+      (bool)(true) leftFoot,
+      (Vector2f)(Vector2f(1000.0f, -340.0f)) kickTarget, // Based on 20_deg setup angle in ready card; This is a 20 degree shot
+    }),
 });
 
 class OwnCornerKickCard : public OwnCornerKickCardBase
 {
-  KickInfo::KickType kickType;
+
   /**
    * @brief The condition that needs to be met to execute this card
    */
   bool preconditions() const override
   {
-		return /*deprecated theTeamBehaviorStatus.role.playBall*/
-        theTeammateRoles.playsTheBall(theRobotInfo.number)
-        && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
-        && theGameInfo.setPlay == SET_PLAY_CORNER_KICK;
+    int i = 0;
+    for (i = 0; i < 5; i++) {
+      if (theTeammateRoles.isTacticalOffense(i+1))
+        break;
+    }
+    return theRobotInfo.number == (i + 1)
+      && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
+      && theGameInfo.setPlay == SET_PLAY_CORNER_KICK
+      ;
   }
 
   /**
@@ -68,54 +81,16 @@ class OwnCornerKickCard : public OwnCornerKickCardBase
     return !preconditions();
   }
 
-  option
+  void execute() override
   {
     theActivitySkill(BehaviorStatus::ownFreeKick);
-    
-    initial_state(init)
-    {
-
-      transition
-      {
-        bool leftFoot = theFieldBall.positionRelative.y() < 0;
-        kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
-        goto active;
-      }
-
-      action
-      {
-        
-        
-      }
+    if (!footIsSelected) {  // select only once
+      footIsSelected = true;
+      leftFoot = theFieldBall.positionRelative.y() < 0;
     }
-
-    state(active)
-    {
-      transition
-      {
-
-      }
-
-      action
-      {
-        theGoToBallAndKickSkill(calcAngleToGoal(), kickType);
-      }
-    }
-
-    state(standby)
-    {
-      transition
-      {
-
-      }
-
-      action
-      {
-        
-      }
-    }
+    KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
+    theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true);
   }
-
   Angle calcAngleToGoal() const
   {
     return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
