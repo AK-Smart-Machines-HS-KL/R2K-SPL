@@ -93,9 +93,9 @@ class OffenseFastGoalKick : public OffenseFastGoalKickBase
       leftFoot = theFieldBall.positionRelative.y() < 0;
     }
     if (leftFoot)
-      theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::forwardFastLeft);
+      theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::forwardFastLeft, false);
     else
-      theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::forwardFastRight);
+      theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::forwardFastRight, false);
   }
 
   Angle calcAngleToGoal() const
