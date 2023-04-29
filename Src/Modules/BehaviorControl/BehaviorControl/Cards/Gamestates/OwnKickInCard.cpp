@@ -62,22 +62,25 @@ class OwnKickInCard : public OwnKickInCardBase
    */
   bool preconditions() const override
   {
-    int i = 0;
-    for (i = 0; i < 5; i++) {
-      if (theTeammateRoles.isTacticalOffense(i + 1))
+    int theDefense = -1;
+    for (int i = 0; i < 5; i++) {
+      if (theTeammateRoles.isTacticalDefense(i + 1)) {
+        theDefense = i + 1;
         break;
+      }
     }
-
-    int j = 0;
-    for (j = 4; j >= 0; j--) {
-      if (theTeammateRoles.isTacticalDefense(j + 1))
+    int theOffense = -1;
+    for (int j = 4; j >= 0; j--) {
+      if (theTeammateRoles.isTacticalOffense(j + 1)) {
+        theOffense = j + 1;
         break;
+      }
     }
     return
       // theTeammateRoles.playsTheBall(theRobotInfo.number)
       theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
       && theGameInfo.setPlay == SET_PLAY_KICK_IN
-      && (theRobotInfo.number == (i + 1) || theRobotInfo.number == (j + 1));
+      && (theRobotInfo.number == theDefense || theRobotInfo.number == theOffense);
   }
 
   /**
