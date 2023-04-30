@@ -42,7 +42,7 @@ CARD(GoalShotCard,
 
         DEFINES_PARAMETERS(
              {,
-                (unsigned int)(1000) initalCheckTime,
+                (unsigned int)(500) initalCheckTime,
                 (bool)(false) done,
                 (Shot) currentShot,
                 (unsigned int) (0) timeLastFail,
@@ -83,7 +83,7 @@ class GoalShotCard : public GoalShotCardBase
       Angle angleToGoal = (Vector2f(4500, 0) - theRobotPose.translation).angle() - theRobotPose.rotation; 
       transition
       {
-        if(abs(angleToGoal.normalize()) < 10_deg || state_time > 2000) {
+        if(abs(angleToGoal.normalize()) < 20_deg || state_time > 2000) {
           goto check;
         }
       }
@@ -105,7 +105,7 @@ class GoalShotCard : public GoalShotCardBase
         if(state_time > initalCheckTime) {
           currentShot = theShots.goalShot;
           OUTPUT_TEXT("Locking Target: (" << currentShot.target.x() << ", " << currentShot.target.y() << ")\n" << currentShot);
-          if (currentShot.failureProbability > 0.5) {
+          if (currentShot.failureProbability > 0.4) {
             OUTPUT_TEXT("Aborting! shot too likely to fail");
             timeLastFail = theFrameInfo.time;
             goto done;
