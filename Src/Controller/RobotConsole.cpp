@@ -2847,26 +2847,27 @@ void RobotConsole::handleJoystick()
       KeyLogger::getInstance()->setKey(buttonId);
     }
     
-    // Original BHuman Code, disabled for Card based key events
-    //buttonCommandExecuted |= joystickExecCommand(pressed ? joystickButtonPressCommand[buttonId] : joystickButtonReleaseCommand[buttonId]);
-    //if(!pressed)
-    //  for(auto& joystickMotionCommand : joystickMotionCommands)
-    //    joystickMotionCommand.lastCommand = "";
+    /* Original BHuman Code, disabled for Card based key events
+    buttonCommandExecuted |= joystickExecCommand(pressed ? joystickButtonPressCommand[buttonId] : joystickButtonReleaseCommand[buttonId]);
+    if(!pressed)
+      for(auto& joystickMotionCommand : joystickMotionCommands)
+        joystickMotionCommand.lastCommand = "";
+    */
   }
 
   // protocolling the cursor
   #ifdef MACOS
     float leftCursorY = joystick.getAxisState(1);
     float leftCursorX = joystick.getAxisState(0);
-    float righttCursorX = joystick.getAxisState(2);
+    float rightCursorX = joystick.getAxisState(2);
   #else
     float leftCursorY = joystick.getAxisState(1);
     float leftCursorX = joystick.getAxisState(0);
-    float righttCursorX = joystick.getAxisState(3);
+    float rightCursorX = joystick.getAxisState(3);
   #endif
 
     KeyLogger::getInstance()->setLeftCursor(leftCursorX, leftCursorY);
-    KeyLogger::getInstance()->setRightCursor(righttCursorX,0);
+    KeyLogger::getInstance()->setRightCursor(rightCursorX,0);
 
   // walk and move head only when there is no button command
   if(buttonCommandExecuted)
