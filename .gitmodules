@@ -4,3 +4,9 @@
 [submodule "Util/SimRobot"]
   path = Util/SimRobot
   url = https://github.com/bhuman/SimRobot.git
+[submodule "Util/bitpacker"]
+	path = Util/bitpacker
+	url = https://github.com/CrustyAuklet/bitpacker.git
+[submodule "Util/span-lite"]
+	path = Util/span-lite
+	url = https://github.com/martinmoene/span-lite.git
