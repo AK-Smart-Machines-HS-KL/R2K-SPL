@@ -17,13 +17,13 @@ REGISTER_EXECUTION_UNIT(Cognition)
 thread_local bool Cognition::isUpper = false;
 
 Cognition::Cognition()
-: theSPLMessageHandler(inTeamMessages, outTeamMessage)
+: robotMessageHandler()
 {
 #ifndef TARGET_ROBOT
-  theSPLMessageHandler.startLocal(Global::getSettings().teamPort, static_cast<unsigned>(Global::getSettings().playerNumber));
+  robotMessageHandler.startLocal(Global::getSettings().teamPort, static_cast<unsigned>(Global::getSettings().playerNumber));
 #else
   std::string bcastAddr = UdpComm::getWifiBroadcastAddress();
-  theSPLMessageHandler.start(Global::getSettings().teamPort, bcastAddr.c_str());
+  robotMessageHandler.start(Global::getSettings().teamPort, bcastAddr.c_str());
 #endif
   Blackboard::getInstance().alloc<UpperFrameInfo>("UpperFrameInfo").time = 100000;
   Blackboard::getInstance().alloc<LowerFrameInfo>("LowerFrameInfo").time = 100000;
@@ -38,7 +38,7 @@ Cognition::~Cognition()
 bool Cognition::beforeFrame()
 {
   // read from team comm udp socket
-  theSPLMessageHandler.receive();
+  // robotMessageHandler.receive();
 
   const FrameInfo* lowerFrameInfo = Blackboard::getInstance().exists("LowerFrameInfo")
                                     ? static_cast<FrameInfo*>(const_cast<Streamable*>(&Blackboard::getInstance()["LowerFrameInfo"]))
@@ -100,8 +100,8 @@ void Cognition::beforeModules()
   if(Blackboard::getInstance().exists("TeamData") &&
      static_cast<const TeamData&>(Blackboard::getInstance()["TeamData"]).generate)
   {
-    while(!inTeamMessages.empty())
-      static_cast<const TeamData&>(Blackboard::getInstance()["TeamData"]).generate(inTeamMessages.takeBack());
+    //while(!inTeamMessages.empty())
+    //  static_cast<const TeamData&>(Blackboard::getInstance()["TeamData"]).generate(inTeamMessages.takeBack());
   }
 
   DECLARE_PLOT("module:SPLMessageHandler:standardMessageDataBufferUsageInPercent");
@@ -113,10 +113,10 @@ void Cognition::afterModules()
      && static_cast<const BHumanMessageOutputGenerator&>(Blackboard::getInstance()["BHumanMessageOutputGenerator"]).generate
      && static_cast<const BHumanMessageOutputGenerator&>(Blackboard::getInstance()["BHumanMessageOutputGenerator"]).sendThisFrame)
   {
-    static_cast<const BHumanMessageOutputGenerator&>(Blackboard::getInstance()["BHumanMessageOutputGenerator"]).generate(&outTeamMessage);
+    // static_cast<const BHumanMessageOutputGenerator&>(Blackboard::getInstance()["BHumanMessageOutputGenerator"]).generate(&outTeamMessage);
 
     BH_TRACE_MSG("before theSPLMessageHandler.send()");
-    theSPLMessageHandler.send();
+    // robotMessageHandler.send();
   }
 }
 
