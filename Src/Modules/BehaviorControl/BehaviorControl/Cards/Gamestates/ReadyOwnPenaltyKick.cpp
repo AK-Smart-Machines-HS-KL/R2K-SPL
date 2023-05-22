@@ -10,6 +10,7 @@
  * 
  * v1.1: Card dynamically select robot instead hardcoding number  (Adrian)
  * v1.2. Card migrated (Adrian)
+ * v 1.3. (Adrian) using theTeammateRoles.offenseRoleIndex(theRobotInfo.number) now
  */
 
 #include "Representations/BehaviorControl/DefaultPose.h"
@@ -49,15 +50,9 @@ class ReadyOwnPenaltyKickCard : public ReadyOwnPenaltyKickCardBase
    */
   bool preconditions() const override
   {
-    int highestOffensePlayerNum;
-    for (highestOffensePlayerNum = 5; highestOffensePlayerNum > 0; highestOffensePlayerNum--) {
-      if (theTeammateRoles.isTacticalOffense(highestOffensePlayerNum))
-      {
-        break;
-      }
-    }
-
-    return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theGameInfo.state == STATE_READY && theRobotInfo.number == highestOffensePlayerNum;
+    return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
+      && theGameInfo.state == STATE_READY
+      && theTeammateRoles.offenseRoleIndex(theRobotInfo.number) == 0;
   }
 
   /**

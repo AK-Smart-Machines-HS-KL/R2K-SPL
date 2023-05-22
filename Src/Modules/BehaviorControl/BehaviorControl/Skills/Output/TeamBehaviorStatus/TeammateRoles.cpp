@@ -52,6 +52,35 @@ bool TeammateRoles::playsTheBall(int robotNumber) const {
   return (captain == robotNumber);
 }
 
+// 0 = left most defense by robot number, 1 = one more defense to the right up to n
+int TeammateRoles::defenseRoleIndex(int robotNumber) const {
+  ASSERT(robotNumber >= Global::getSettings().lowestValidPlayerNumber && robotNumber <= Global::getSettings().highestValidPlayerNumber);
+  int theDefense = -1;
+
+  for (int i = 0; i < 5; i++) {
+    theDefense++;
+    if (TeammateRoles::isTacticalDefense(i + 1) && i+1 == robotNumber)
+      break;
+  }
+  // OUTPUT_TEXT("dI " << theDefense << " " << robotNumber);
+  return theDefense-1;
+}
+
+// 0 = right most defense, 1 = one more defense to the left 
+int TeammateRoles::offenseRoleIndex(int robotNumber) const {
+  ASSERT(robotNumber >= Global::getSettings().lowestValidPlayerNumber && robotNumber <= Global::getSettings().highestValidPlayerNumber);
+  int theOffense = -1;
+  for (int j = 4; j >= 0; j--) {
+    theOffense++;
+    if (TeammateRoles::isTacticalOffense(j + 1) && j + 1 == robotNumber) {
+      break;
+    }
+  }
+  return theOffense;
+}
+
+
+
 
 class TeammateRolesImpl : public TeammateRolesImplBase
 {

@@ -9,6 +9,8 @@
  * 
  * V1.1 Card migrated (Nicholas)
  * V 1.2. changed to long kick (Adrian)
+ * 
+ * Note: all tactical offense try to kick the ball. So default position is crucial
  */
 
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
@@ -60,8 +62,8 @@ class OwnKickoffCard : public OwnKickoffCardBase
   KickInfo::KickType kickType;
 
   /**
-   * @brief The condition that needs to be met to execute this card
-   */
+   * @brief all tactical offense try to kick the ball
+   * 
   bool preconditions() const override
   {
     return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber

@@ -2,13 +2,14 @@
  * @file OwnKickInCard.cpp
  * @author Andy Hobelsberger, Adrian Müller (R2K)
  * @brief 
- * @version 1.0
- * @date 2022-11-22
+ * @version 1.3
+ * @date 2023-05-23
  *   
  * Covers the Free Kick: Own Team has Kick in
  * added (Adrian): pre-condition: triggers for role.playBall, action: WalkToBallAndKickAtGoal
  * V1.1 Card migrated; uses goToBallAndKickAtGoal (Nicholas) 
- * v1.2. Gore hack: first DEFENSE and latest (acc. to roles[] OFFENSE qualify
+ * v1.2. (Adrian) Gore hack: first DEFENSE and latest (acc. to roles[] OFFENSE qualify
+ * v.3.  (Adrian) wo is doing the kick in differs from online vs offline  (see precondition for details)
  */
 
 
@@ -23,6 +24,7 @@
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/TeamInfo.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 #include "Representations/Modeling/RobotPose.h"
 
@@ -44,6 +46,7 @@ CARD(OwnKickInCard,
   REQUIRES(GameInfo),
   REQUIRES(TeamBehaviorStatus),
   REQUIRES(TeammateRoles),
+  REQUIRES(TeamCommStatus),  // wifi on off?
 
   DEFINES_PARAMETERS(
     { ,
@@ -58,29 +61,22 @@ class OwnKickInCard : public OwnKickInCardBase
 {
 
   /**
-   * @brief The condition that needs to be met to execute this card
+   * @brief SET_PLAY_KICK_IN: wo is doing the kick in, online/offline differ
    */
   bool preconditions() const override
   {
-    int theDefense = -1;
-    for (int i = 0; i < 5; i++) {
-      if (theTeammateRoles.isTacticalDefense(i + 1)) {
-        theDefense = i + 1;
-        break;
-      }
-    }
-    int theOffense = -1;
-    for (int j = 4; j >= 0; j--) {
-      if (theTeammateRoles.isTacticalOffense(j + 1)) {
-        theOffense = j + 1;
-        break;
-      }
-    }
+    bool wifiPred = (theTeamCommStatus.isWifiCommActive) 
+      // online: striker 
+      ? theTeammateRoles.playsTheBall(theRobotInfo.number)  
+      // offline: left most defense OR right most offense qualify
+      : (0 == theTeammateRoles.defenseRoleIndex(theRobotInfo.number) || 0 == theTeammateRoles.offenseRoleIndex(theRobotInfo.number));
     return
-      // theTeammateRoles.playsTheBall(theRobotInfo.number)
       theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
       && theGameInfo.setPlay == SET_PLAY_KICK_IN
-      && (theRobotInfo.number == theDefense || theRobotInfo.number == theOffense);
+      && wifiPred;
+
+    
+ 
   }
 
   /**

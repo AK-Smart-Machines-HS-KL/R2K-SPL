@@ -24,6 +24,7 @@
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/BehaviorControl/TeammateRoles.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 CARD(OwnPushingFreeKickCard,
   { ,
@@ -38,6 +39,7 @@ CARD(OwnPushingFreeKickCard,
     REQUIRES(RobotInfo),
     REQUIRES(TeammateRoles),
     REQUIRES(FieldDimensions),
+    REQUIRES(TeamCommStatus),  // wifi on off?
 
     DEFINES_PARAMETERS(
     {,
@@ -54,17 +56,20 @@ class OwnPushingFreeKickCard : public OwnPushingFreeKickCardBase
    */
   bool preconditions() const override
   {
-    int i = 0;
-    for (i = 0; i < 5; i++ ) {
-      if (theTeammateRoles.roles[i] != TeammateRoles::GOALKEEPER_NORMAL &&
-        theTeammateRoles.roles[i] != TeammateRoles::GOALKEEPER_ACTIVE &&
-        theTeammateRoles.roles[i] != TeammateRoles::UNDEFINED)
-        break;
-    }
-    return theRobotInfo.number == (i+1)
-      && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
+    
+
+    bool wifiPred = (theTeamCommStatus.isWifiCommActive)
+      // online: striker
+      ? theTeammateRoles.playsTheBall(theRobotInfo.number)   
+      // offline: the first defense field player qualies (typically, robot #2) AND the right most offense
+      : (0 == theTeammateRoles.defenseRoleIndex(theRobotInfo.number) || 0 == theTeammateRoles.offenseRoleIndex(theRobotInfo.number));
+
+    return 
+      theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
       && theGameInfo.setPlay == SET_PLAY_PUSHING_FREE_KICK
-      ;
+      && wifiPred;
+
+
   }
 
   /**
