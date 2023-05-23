@@ -163,6 +163,7 @@ void KeyLogger::setKey(int key)
     mtx.lock();
     //remember the time of the button hit in ms
     setKeyHitTime(key, now());
+    OUTPUT_TEXT("Key " << key << " pressed.");
     
     if (keyEvents.size() >= 10) keyEvents.pop();
     keyEvents.push(key);
