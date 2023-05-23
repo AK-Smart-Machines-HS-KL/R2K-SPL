@@ -30,6 +30,7 @@
 #include "Representations/BehaviorControl/Shots.h"
 
 #include "Representations/Modeling/RobotPose.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 #include "Tools/Math/Geometry.h"
 
@@ -59,6 +60,7 @@ CARD(OwnPenaltyKickCard,
       REQUIRES(PlayerRole),
       REQUIRES(Shots),
       REQUIRES(FrameInfo),
+      REQUIRES(TeamCommStatus),  // wifi on off?
 
       DEFINES_PARAMETERS(
              {,
@@ -79,19 +81,17 @@ class OwnPenaltyKickCard : public OwnPenaltyKickCardBase
   }
   bool preconditions() const override
   {
-    int i;
-    for (i = 5; i > 0; i--) {
-      if (theTeammateRoles.isTacticalOffense(i))
-      {
-        break;
-      }
-    }
+    bool wifiPred = (theTeamCommStatus.isWifiCommActive)
+      // online: striker 
+      ? thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters
+      // offline: right most offense qualify
+      : ( 0 == theTeammateRoles.offenseRoleIndex(theRobotInfo.number));
 
-    return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
-      && theGameInfo.setPlay == SET_PLAY_PENALTY_KICK
-      && theGameInfo.state == STATE_PLAYING
-      // && thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters; 
-      && theRobotInfo.number == i;
+      return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
+        && theGameInfo.setPlay == SET_PLAY_PENALTY_KICK
+        && theGameInfo.state == STATE_PLAYING
+        // && thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters; 
+        && wifiPred;
     
 
   }
