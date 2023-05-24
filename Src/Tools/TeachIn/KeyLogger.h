@@ -72,19 +72,19 @@ namespace Keys
   // Controller:
   // Keys:
   constexpr int Cross       = 0;
-  constexpr int Square      = 3;
-  constexpr int Triangle    = 2;
   constexpr int Circle      = 1;
-  constexpr int R1          = 5;
-  constexpr int R2          = 7;
-  constexpr int R3          = 12;   // stick press
+  constexpr int Triangle    = 2;
+  constexpr int Square      = 3;
   constexpr int L1          = 4;
+  constexpr int R1          = 5;
   constexpr int L2          = 6;
-  constexpr int L3          = 11;   // stick press
-  constexpr int Start       = 9;
-  constexpr int Share       = 8;
-  constexpr int Home        = 10;   // PS Button
-  constexpr int TouchButton = 13;   // TODO: confirm id
+  constexpr int R2          = 7;
+  constexpr int Share       = 8;   
+  constexpr int Start       = 9;    // Options-Button ins some Controllers
+  constexpr int Home        = 10;   // PS-Button
+  constexpr int L3          = 11;   // analog stick press
+  constexpr int R3          = 12;   // analog stick press
+  constexpr int TouchButton = 13;   // TODO: confirm id -> not confirmed ... no id given on press
   constexpr int Mute        = 14;   // DualSense Mute TODO: confirm id
 
   constexpr int DPadDown    = 30;   // TODO: confirm ids
