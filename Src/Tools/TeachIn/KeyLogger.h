@@ -222,7 +222,7 @@ public:
      * get the speed modes.True, if the robot should be in fast mode, else false
      * @param usedKey the key which is binded to this action
      */
-    void toggleHead(int usedKey);
+    void toggleHead();
 
     /**
      * checks if the start/option button got pressed

@@ -148,10 +148,10 @@ bool KeyLogger::isHeadUp() const
     return headUp;
 }
 
-void KeyLogger::toggleHead(int usedKey)
+void KeyLogger::toggleHead()
 {
     mtx.lock();
-    if (keyPressedJustNow(usedKey, 500))
+    if (keyPressedJustNow(Keys::Home, 500))
     {
         headUp = !headUp;
     }
@@ -262,7 +262,6 @@ void KeyLogger::protocol(PlaybackAction* playbackAction)
 
 void KeyLogger::saveProtocol()
 {
-    OUTPUT_TEXT("Saving protocol ...");
     /* ToDo: rapidCSV
     saving stuff
     */
@@ -290,7 +289,7 @@ float KeyLogger::getProtocolInterval() const{
     return protocolIntervals; 
 }
 
-void KeyLogger::toggleSaveing()
+void KeyLogger::toggleSaving()
 {
     mtx.lock();
     if (keyPressedJustNow(Keys::Share, 500))
