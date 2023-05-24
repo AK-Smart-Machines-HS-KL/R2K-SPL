@@ -102,7 +102,7 @@ void KeyLogger::setKeyHitTime(int key, int64_t time)
     }
 }
 
-bool KeyLogger::keyJustGotHitted(int usedKey, int timePeriod)
+bool KeyLogger::keyPressedJustNow(int usedKey, int timePeriod)
 {
     if (now() < getKeyHitTime(usedKey) + timePeriod)
     {
@@ -136,7 +136,7 @@ bool KeyLogger::isFastMode() const
 void KeyLogger::toggleFastMode(int usedKey)
 {
     mtx.lock();
-    if (keyJustGotHitted(usedKey, 500))
+    if (keyPressedJustNow(usedKey, 500))
     {
         fastMode = !fastMode;
     }
@@ -151,7 +151,7 @@ bool KeyLogger::isHeadUp() const
 void KeyLogger::toggleHead(int usedKey)
 {
     mtx.lock();
-    if (keyJustGotHitted(usedKey, 500))
+    if (keyPressedJustNow(usedKey, 500))
     {
         headUp = !headUp;
     }
@@ -163,7 +163,7 @@ void KeyLogger::setKey(int key)
     mtx.lock();
     //remember the time of the button hit in ms
     setKeyHitTime(key, now());
-    OUTPUT_TEXT("Key " << key << " pressed.");
+    // OUTPUT_TEXT("Key " << key << " pressed." // set output with key number
     
     if (keyEvents.size() >= 10) keyEvents.pop();
     keyEvents.push(key);
@@ -204,7 +204,7 @@ bool KeyLogger::isStartPressed() const
 
 void KeyLogger::toggleStart()
 {
-    if (keyJustGotHitted(Keys::Start, 500))
+    if (keyPressedJustNow(Keys::Start, 500))
     {
         startGamepadControl = !startGamepadControl;
     }
@@ -292,7 +292,7 @@ float KeyLogger::getProtocolInterval() const{
 void KeyLogger::toggleSaveing(int usedKey)
 {
     mtx.lock();
-    if (keyJustGotHitted(usedKey, 500))
+    if (keyPressedJustNow(usedKey, 500))
     {
         saving = !saving;
     }

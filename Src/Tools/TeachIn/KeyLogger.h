@@ -251,7 +251,7 @@ public:
      * @param timePeriod the past time in which the key got pressed in ms
      * @return true, if the key got hitted in the given past time, else false
      */
-    bool keyJustGotHitted(int usedKey, int timePeriod);
+    bool keyPressedJustNow(int usedKey, int timePeriod);
 
     /**
      * set the key once it got pressed
