@@ -249,7 +249,7 @@ public:
      * Checks if the specififc key just got pressed
      * @param usedKey the specific key to check if it just got pressed
      * @param timePeriod the past time in which the key got pressed in ms
-     * @return true, if the key got hitted in the given past time, else false
+     * @return true, if the key got pressed less than timePeriod ms ago, else false
      */
     bool keyPressedJustNow(int usedKey, int timePeriod);
 
@@ -324,5 +324,5 @@ public:
      * get the speed modes.True, if the robot should be in fast mode, else false
      * @param usedKey the key which is binded to this action
      */
-    void toggleSaveing(int usedKey);
+    void toggleSaving();
 };

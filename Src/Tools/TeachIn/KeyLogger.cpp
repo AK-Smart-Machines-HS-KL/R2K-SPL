@@ -262,6 +262,7 @@ void KeyLogger::protocol(PlaybackAction* playbackAction)
 
 void KeyLogger::saveProtocol()
 {
+    OUTPUT_TEXT("Saving protocol ...");
     /* ToDo: rapidCSV
     saving stuff
     */
@@ -289,10 +290,10 @@ float KeyLogger::getProtocolInterval() const{
     return protocolIntervals; 
 }
 
-void KeyLogger::toggleSaveing(int usedKey)
+void KeyLogger::toggleSaveing()
 {
     mtx.lock();
-    if (keyPressedJustNow(usedKey, 500))
+    if (keyPressedJustNow(Keys::Share, 500))
     {
         saving = !saving;
     }
