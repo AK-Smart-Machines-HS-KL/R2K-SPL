@@ -9,7 +9,8 @@
  * Sets up Robot 5 Behind the Ball so that it may be kicked towards the opponents Field. 
  * 
  * v1.1: Card dynamically select robot instead hardcoding number  (Adrian)
- * v1.2. Card migrated (Adrian)
+ * v1.2. Card migrated (Adrian
+ * v1.3. using offenseIndex for qualifiying (Asrar)
  */
 
 #include "Representations/BehaviorControl/DefaultPose.h"
@@ -66,7 +67,7 @@ class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
     Vector2f targetAbsolute = theDefaultPose.ownDefaultPose.translation + Vector2f(+450.f, 0);
 
     int nOffenseFound = 0;
-    int i;
+
     switch (theTeammateRoles.offenseRoleIndex(theRobotInfo.number)) {
     case 0: // right-most offense
       targetAbsolute = Vector2f(-500, 0);

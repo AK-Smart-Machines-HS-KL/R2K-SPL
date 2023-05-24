@@ -6,16 +6,19 @@
  * @author Arne Hasselbring
  */
 
+#include <Tools/Communication/BNTP.h>
 #include "Representations/BehaviorControl/Libraries/LibCheck.h"
 #include "Representations/BehaviorControl/TeamSkills.h"
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h"
-
+// #include "Representations/Communication/RobotInfo.h"
 #include "Representations/BehaviorControl/TeammateRoles.h"  // GOALKEEPER, OFFENSE, DEFENSE
+
 
 TEAM_SKILL_IMPLEMENTATION(TeammateRolesImpl,
 {,
   IMPLEMENTS(TeammateRoles),
   REQUIRES(LibCheck),
+//  CALLS(RobotInfo),
   MODIFIES(TeamBehaviorStatus),
 });
 
@@ -80,6 +83,19 @@ int TeammateRoles::offenseRoleIndex(int robotNumber) const {
 }
 
 
+// 0 = right most defense, 1 = one more defense to the left 
+int TeammateRoles::anyRoleIndex(int robotNumber) const {
+  ASSERT(robotNumber >= Global::getSettings().lowestValidPlayerNumber && robotNumber <= Global::getSettings().highestValidPlayerNumber);
+  int thePlayer = -1;
+
+  if (robotNumber == 5) return 0;
+  for (int j = 4; j >= 0; j--) {
+    thePlayer++;
+    // if (theRobotInfo.number == j + 1 && theRobotInfo.penalty == PENALTY_NONE) {
+    // if (0 == j) break;
+  }
+  return thePlayer;
+}
 
 
 class TeammateRolesImpl : public TeammateRolesImplBase

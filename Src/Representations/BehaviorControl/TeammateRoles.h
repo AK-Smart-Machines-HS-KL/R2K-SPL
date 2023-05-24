@@ -40,7 +40,9 @@ STREAMABLE(TeammateRoles,
   // communication offline utils 
 
   int  defenseRoleIndex(const int robotNumber) const;    // 0 = left most defense by robot number, 1 = one more defense to the right up to n
-  int  offenseRoleIndex(const int robotNumber) const;    // 0 = right most defense, 1 = one more defense to the left 
+  int  offenseRoleIndex(const int robotNumber) const;    // 0 = right most defense, 1 = one more defense to the left
+  int  anyRoleIndex(const int robotNumber) const;    // 0 = right most first any role 
+
 
 
   int operator[](const size_t i) const;

@@ -52,7 +52,7 @@ class ReadyOwnPenaltyKickCard : public ReadyOwnPenaltyKickCardBase
   {
     return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
       && theGameInfo.state == STATE_READY
-      && theTeammateRoles.offenseRoleIndex(theRobotInfo.number) == 0;
+      && theTeammateRoles.anyRoleIndex(theRobotInfo.number) == 0;
   }
 
   /**

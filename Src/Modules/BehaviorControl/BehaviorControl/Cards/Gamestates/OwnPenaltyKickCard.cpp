@@ -4,10 +4,11 @@
  * @brief Covers the Penalty Kick: Own Team has Penalty Kick
  * @version 1.1
  * @date 2023-04-18
- *
+ * @version 1.2 online: supporterIndex, offline offenseIndex 
+ *  apply in after penalty shootout only
+ * - see ReadyOwnPenaly for ingame penalty
  * Notes:
- *  - Currently Triggers for all Robots. Use this Card as a template for preconditions
- *  - Currently only calls stand
+ *  - 
  *
  * 
  */
@@ -81,19 +82,10 @@ class OwnPenaltyKickCard : public OwnPenaltyKickCardBase
   }
   bool preconditions() const override
   {
-    bool wifiPred = (theTeamCommStatus.isWifiCommActive)
-      // online: striker 
-      ? thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters
-      // offline: right most offense qualify
-      : ( 0 == theTeammateRoles.offenseRoleIndex(theRobotInfo.number));
-
       return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
         && theGameInfo.setPlay == SET_PLAY_PENALTY_KICK
         && theGameInfo.state == STATE_PLAYING
-        // && thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters; 
-        && wifiPred;
-    
-
+        && theTeammateRoles.anyRoleIndex(theRobotInfo.number) == 0;
   }
 
   /**
