@@ -15,21 +15,9 @@
 #include <vector>
 #include <map>
 #include <set>
+#include "Tools/SubclassRegistry.h"
 
 #define SPL_MAX_MESSAGE_BYTES 128
-
-template <typename base_T, typename key_T, typename val_T>
-struct SubclassRegistry {
-  public: 
-  SubclassRegistry(key_T key, val_T val) {
-    subclasses[key] = val;
-  };
-  static std::map<key_T, val_T> subclasses;
-};
-
-template <typename base_T, typename key_T, typename val_T>
-std::map<key_T, val_T> SubclassRegistry<base_T, key_T, val_T>::subclasses = std::map<key_T, val_T>();
-
 
 struct AbstractRobotMessageComponent {
   virtual size_t compress(char* buff) = 0;
