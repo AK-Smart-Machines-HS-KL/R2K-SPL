@@ -15,6 +15,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <functional>
 #include "Tools/SubclassRegistry.h"
 
 #define SPL_MAX_MESSAGE_BYTES 128
@@ -22,38 +23,49 @@
 struct AbstractRobotMessageComponent {
   virtual size_t compress(char* buff) = 0;
   virtual bool decompress(char* compressed) = 0;
+  virtual void doCallbacks() = 0;
+  virtual void compileData() = 0;
 };
 
 using ComponentRegistry = SubclassRegistry<AbstractRobotMessageComponent, std::string, AbstractRobotMessageComponent* (*)()>;
 
 template<typename T>
-class RobotMessageComponent : AbstractRobotMessageComponent {
+class RobotMessageComponent : public AbstractRobotMessageComponent {
+
+  protected:
+  volatile static ComponentRegistry registry;
+  inline static std::set<std::function<void(T*)>> callbacks = std::set<std::function<void(T*)>>(); 
+  inline static std::set<std::function<void(T*)>> dataCompilers = std::set<std::function<void(T*)>>(); 
   
-    private:
-      volatile static ComponentRegistry m;
-      static std::set<void (*) (T*)> callbacks; 
-      static std::set<void (*) (T*)> dataCompilers; 
-    
-    public:
-      
-      static void addCallback(void (*foo) (T*));
-      static void removeCallback(void (*foo) (T*));
-      void doCallbacks();
+  public:
+  static void addCallback(std::function<void(T*)> foo) {callbacks.insert(foo);}
+  static void removeCallback(std::function<void(T*)> foo) {callbacks.erase(foo);}
+  void doCallbacks() {
+    for(auto callbackFunc : callbacks)
+    {
+      callbackFunc(static_cast<T *>(this));
+    }
+  }
 
-      static void addDataCompiler(void (*foo) (T*));
-      static void removeDataCompiler(void (*foo) (T*));
-      void compileData();
+  static void addDataCompiler(std::function<void(T*)> foo) {dataCompilers.insert(foo);}
+  static void removeDataCompiler(std::function<void(T*)> foo) {dataCompilers.erase(foo);}
+  void compileData() {
+    for (auto dataCompiler : dataCompilers)
+    {
+      dataCompiler(static_cast<T *>(this));
+    }
+  }
 
-      static AbstractRobotMessageComponent* create() {return new T();}
+  static AbstractRobotMessageComponent* create() {return new T();}
 
-      RobotMessageComponent() {
-          (void) m; // Access m so it is not optimized out of existence by the compiler
-      }
+  RobotMessageComponent() {
+      (void) registry; // Access registry so it is not optimized out of existence by the compiler
+  }
 };
 
-// m must be defined out of class so T can exist before m is set
+// registry must be defined out of class so T can exist before registry is set
 template<typename T>
-volatile ComponentRegistry RobotMessageComponent<T>::m = ComponentRegistry(typeid(T).name(),  T::create);
+volatile ComponentRegistry RobotMessageComponent<T>::registry = ComponentRegistry(T::name, T::create);
 
 class RobotMessage
 {
@@ -87,16 +99,3 @@ class RobotMessage
         return sizeof(RobotMessage);
     }
 };
-
-// class SubclassRegister {
-//     public:
-//     static std::vector<std::string> subclasses{};
-//     SubclassRegister(const char *name) {
-//         subclasses.push_back(name);
-//     }
-// };
-
-
-
-// template<typename T>
-// SubclassRegister Base<T>::r = StaticClassType(typeid(T).name());

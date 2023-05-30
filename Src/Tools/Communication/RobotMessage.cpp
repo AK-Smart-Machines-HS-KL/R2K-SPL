@@ -34,34 +34,5 @@ bool RobotMessage::decompress(std::array<uint8_t, SPL_MAX_MESSAGE_BYTES> buff){
     return false;
 }
 
-template<typename T> void RobotMessageComponent<T>::addCallback(void (*foo) (T*)) {
-  callbacks.insert(foo);
-}
-
-template<typename T> void RobotMessageComponent<T>::removeCallback(void (*foo) (T*)) {
-  callbacks.erase(foo);
-}
-
-template<typename T> void RobotMessageComponent<T>::doCallbacks() {
-  for (void (*callbackFunc)(T *) : callbacks)
-  {
-    callbackFunc(static_cast<T *>(this));
-  }
-}
-
-template<typename T> void RobotMessageComponent<T>::addDataCompiler(void (*foo) (T*)) {
-  dataCompilers.insert(foo);
-}
-
-template<typename T> void RobotMessageComponent<T>::removeDataCompiler(void (*foo) (T*)) {
-  dataCompilers.erase(foo);
-}
-
-template<typename T> void RobotMessageComponent<T>::compileData() {
-  for (void (*dataCompiler)(T *) : dataCompilers)
-  {
-    dataCompiler(static_cast<T *>(this));
-  }
-}
 
 

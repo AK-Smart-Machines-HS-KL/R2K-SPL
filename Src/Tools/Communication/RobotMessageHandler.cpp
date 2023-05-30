@@ -18,8 +18,16 @@
 #include "Tools/Debugging/DebugDrawings.h"
 
 class TestMessage: public RobotMessageComponent<TestMessage> {
-  size_t compress(char* buff) { return 0; };
-  bool decompress(char* compressed) { return true; };
+  public:
+
+  TestMessage() : RobotMessageComponent<TestMessage>() { }
+  inline static const std::string name = "Test";
+
+  size_t compress(char* buff) { 
+    return 0; 
+  }
+
+  bool decompress(char* compressed) { return true; }
 };
 
 void RobotMessageHandler::startLocal(int port, unsigned localId)
@@ -38,8 +46,9 @@ void RobotMessageHandler::startLocal(int port, unsigned localId)
   VERIFY(socket.setTarget(group.c_str(), port));
   socket.setLoopback(true);
 
-  TestMessage tm = TestMessage();
-  ComponentRegistry::subclasses;
+  AbstractRobotMessageComponent* test = ComponentRegistry::subclasses["Test"]();
+  test->compileData();
+  delete test;
 }
 
 void RobotMessageHandler::start(int port, const char* subnet)
@@ -52,7 +61,6 @@ void RobotMessageHandler::start(int port, const char* subnet)
   VERIFY(socket.bind("0.0.0.0", port));
   socket.setTarget(subnet, port);
   socket.setLoopback(false);
-  printf("Hi!");
 }
 
 void RobotMessageHandler::send(RobotMessage* message)
