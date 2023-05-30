@@ -56,7 +56,11 @@ CARD(TIRecorderCard, {
   }),
 });
 
+// performable actions
 const PlaybackAction standAction = PlaybackAction().setSkill(PlaybackAction::Skills::Stand);
+const PlaybackAction goalKickAction = PlaybackAction().setSkill(PlaybackAction::Skills::KickAtGoal);
+const PlaybackAction goToBallAction = PlaybackAction().setSkill(PlaybackAction::Skills::WalkToBall);
+
 
 class TIRecorderCard : public TIRecorderCardBase
 {
@@ -74,10 +78,9 @@ class TIRecorderCard : public TIRecorderCardBase
   PlaybackAction currentAction = PlaybackAction();
 
   TIRecorderCard() {
-    
-	actionCallbacks[Keys::Circle] = standAction;
-    actionCallbacks[Keys::Triangle] = PlaybackAction().setSkill(PlaybackAction::Skills::KickAtGoal);
-    actionCallbacks[Keys::Square] = PlaybackAction().setSkill(PlaybackAction::Skills::WalkToBall);
+	  actionCallbacks[Keys::Circle] = standAction;
+    actionCallbacks[Keys::Triangle] = goalKickAction;
+    actionCallbacks[Keys::Square] = goToBallAction;
 
     specialCallbacks[Keys::Share] = [&]() {if(theTIRecorderData.recording) {theTIRecorderData.stop();} else {theTIRecorderData.start();}}; // toggle recording
     specialCallbacks[Keys::L1] = [&]() {theTIRecorderData.save();}; // save
@@ -87,6 +90,7 @@ class TIRecorderCard : public TIRecorderCardBase
   bool preconditions() const override
   {
     if(theRobotInfo.number == keyLogger->getRobotNumber() && keyLogger->isStartPressed()) {
+      OUTPUT_TEXT("TIRecorder triggered");
       keyLogger->clearEvents();
       return true;
     }
