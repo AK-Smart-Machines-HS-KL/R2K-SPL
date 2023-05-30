@@ -33,6 +33,7 @@
  * 
  * v.1.3 precond: x < 0 - threshold. 
  *      Activated !aBuddyIsClearingOwnHalf
+ * v.1.4 Added the online & offline role assignment(Asrar)
  * ToDo:
  * - we need a better shooting direction!! 
  * - maybe add OFFENSIVE mode as a blocker?
@@ -58,6 +59,7 @@
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/TeamData.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 
 CARD(ClearOwnHalfCard,
@@ -74,6 +76,7 @@ CARD(ClearOwnHalfCard,
     REQUIRES(TeamBehaviorStatus),
     REQUIRES(TeamData),
     REQUIRES(TeammateRoles),  // R2K
+    REQUIRES(TeamCommStatus),  // wifi on off?
 
     DEFINES_PARAMETERS(
     {,
@@ -88,9 +91,14 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
 {
   bool preconditions() const override
   {
+    bool wifiPred = (theTeamCommStatus.isWifiCommActive)
+     //Online
+      ?  theTeammateRoles.playsTheBall(theRobotInfo.number)
+      // offline
+      : (0 == theTeammateRoles.defenseRoleIndex(theRobotInfo.number));
     return
      theGameInfo.setPlay == SET_PLAY_NONE &&
-      // !aBuddyIsClearingOwnHalf() &&
+       !aBuddyIsClearingOwnHalf() &&
       // theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
       theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
