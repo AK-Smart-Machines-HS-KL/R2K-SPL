@@ -38,7 +38,7 @@ Cognition::~Cognition()
 bool Cognition::beforeFrame()
 {
   // read from team comm udp socket
-  // robotMessageHandler.receive();
+  robotMessageHandler.receive();
 
   const FrameInfo* lowerFrameInfo = Blackboard::getInstance().exists("LowerFrameInfo")
                                     ? static_cast<FrameInfo*>(const_cast<Streamable*>(&Blackboard::getInstance()["LowerFrameInfo"]))
