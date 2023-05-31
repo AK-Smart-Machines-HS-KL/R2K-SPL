@@ -3,27 +3,37 @@
 #include <vector>
 #include <algorithm>
 
-bool componentListFinalized = false; // If the list of possible components has been finalized. 
-
-// Finalize the list of possible components. This should be called once the first time the list is used. 
-void finalizeComponentList() {
-  
-}
-
-size_t RobotMessage::compress(std::array<uint8_t, SPL_MAX_MESSAGE_BYTES> buff)
+size_t RobotMessage::compress(std::array<uint8_t, SPL_MAX_MESSAGE_BYTES> outBuff)
 {
-    size_t bitIdx = 0;
-    bitpacker::insert(buff, bitIdx, bitIdx += (sizeof(componentHash) * 8), componentHash);
+    size_t byteOffset = 0; // current offset in bytes from the beginning of Buff
+    std::array<uint8_t, SPL_MAX_MESSAGE_BYTES> componentBuff; // buffer reused for component compression
 
+    // reserve space for bitfield
+    byteOffset += (sizeof(componentsIncluded)); 
 
+    // Copy component hash
+    memcpy(outBuff.data() + byteOffset, &componentHash, sizeof(componentHash)); 
+    byteOffset += sizeof(componentHash);
+
+    // Copy Individual Components
     for (auto component : componentPointers) {
-      // make component buffer
-      // compress component into buffer
-      // copy buffer data into message buffer
+
+      // compress component into componentBuff
+      size_t len = component->compress((char*) componentBuff.data()); 
+      
+      // check if length of component exceeds max Message Bytes
+      if (byteOffset + len > SPL_MAX_MESSAGE_BYTES) {
+        // TODO: Handle
+        return 0;
+      }
+
+      // Copy component into buffer
+      memcpy(outBuff.data() + byteOffset, componentBuff.data(), len);
+
       // set component bit in bitfield
       // size_t newBits = component->compress();
     }
-    return bitIdx;
+    return byteOffset;
 }
 
 bool RobotMessage::decompress(std::array<uint8_t, SPL_MAX_MESSAGE_BYTES> buff){

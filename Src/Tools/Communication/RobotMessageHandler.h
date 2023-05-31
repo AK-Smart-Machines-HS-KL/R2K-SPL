@@ -52,7 +52,8 @@ public:
   void receive();
 
 private:
-  std::array<uint8_t, SPL_MAX_MESSAGE_BYTES> socketReadBuffer;
+  std::array<uint8_t, SPL_MAX_MESSAGE_BYTES> readBuffer;
+  std::array<uint8_t, SPL_MAX_MESSAGE_BYTES> writeBuffer;
   std::queue<RobotMessage> incoming; /**< Incoming messages are stored here. */
   int port = 0; /**< The UDP port this handler is listening to. */
   UdpComm socket; /**< The socket used to communicate. */

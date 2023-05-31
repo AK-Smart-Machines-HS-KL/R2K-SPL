@@ -15,24 +15,32 @@
 #include <vector>
 #include <map>
 #include <set>
-#include <functional>
+#include <functional> // lambda abstraction for callbacks
+#include <memory>     // shared_ptr
 #include "Tools/SubclassRegistry.h"
 
 #define SPL_MAX_MESSAGE_BYTES 128
 
 struct AbstractRobotMessageComponent {
+  /**
+   * @brief 
+   * 
+   * @param buff 
+   * @return size_t 
+   */
   virtual size_t compress(char* buff) = 0;
   virtual bool decompress(char* compressed) = 0;
+  virtual size_t getSize() = 0;
   virtual void doCallbacks() = 0;
   virtual void compileData() = 0;
 };
 
-using ComponentRegistry = SubclassRegistry<AbstractRobotMessageComponent, std::string, AbstractRobotMessageComponent* (*)()>;
+using ComponentRegistry = SubclassRegistry<AbstractRobotMessageComponent, std::string, std::shared_ptr<AbstractRobotMessageComponent> (*)()>;
 
 template<typename T>
 class RobotMessageComponent : public AbstractRobotMessageComponent {
 
-  protected:
+  private:
   volatile static ComponentRegistry registry;
   inline static std::set<std::function<void(T*)>> callbacks = std::set<std::function<void(T*)>>(); 
   inline static std::set<std::function<void(T*)>> dataCompilers = std::set<std::function<void(T*)>>(); 
@@ -56,7 +64,9 @@ class RobotMessageComponent : public AbstractRobotMessageComponent {
     }
   }
 
-  static AbstractRobotMessageComponent* create() {return new T();}
+  static std::shared_ptr<AbstractRobotMessageComponent> create() {
+    return std::shared_ptr<AbstractRobotMessageComponent>(new T());
+  }
 
   RobotMessageComponent() {
       (void) registry; // Access registry so it is not optimized out of existence by the compiler
@@ -72,7 +82,7 @@ class RobotMessage
     public: 
     uint32_t componentHash;                                 // Hash value of possible components, to ensure that messages are compatible
     uint64_t componentsIncluded;                            // Bitfield of included components 
-    std::vector<AbstractRobotMessageComponent*> componentPointers;  // Pointers to the included components
+    std::vector<std::shared_ptr<AbstractRobotMessageComponent>> componentPointers;  // Pointers to the included components. With smart pointers we don't need to worry about deleting them!
 
     /**
      * @brief 
@@ -86,9 +96,19 @@ class RobotMessage
     /**
      * @brief generates a compressed version of the message into buff
      * 
-     * @return size_t number of significant bits written to buffer
+     * @return size_t number of significant Bytes written to buffer
      */
     size_t compress(std::array<uint8_t, SPL_MAX_MESSAGE_BYTES> buff);
+
+    /**
+     * @brief Runs all callbacks for components
+     * 
+     */
+    void doCallbacks() {
+      for( auto component : componentPointers) {
+        component->doCallbacks();
+      }
+    }
 
     /**
      * @brief size, in bytes of the compressed packet

@@ -28,6 +28,10 @@ class TestMessage: public RobotMessageComponent<TestMessage> {
   }
 
   bool decompress(char* compressed) { return true; }
+
+  size_t getSize() {
+    return 0;
+  }
 };
 
 void RobotMessageHandler::startLocal(int port, unsigned localId)
@@ -46,9 +50,8 @@ void RobotMessageHandler::startLocal(int port, unsigned localId)
   VERIFY(socket.setTarget(group.c_str(), port));
   socket.setLoopback(true);
 
-  AbstractRobotMessageComponent* test = ComponentRegistry::subclasses["Test"]();
+  auto test = ComponentRegistry::subclasses["Test"]();
   test->compileData();
-  delete test;
 }
 
 void RobotMessageHandler::start(int port, const char* subnet)
@@ -70,6 +73,7 @@ void RobotMessageHandler::send(RobotMessage* message)
 
   ASSERT(message->size() <= SPL_MAX_MESSAGE_BYTES);
 
+  
   socket.write(reinterpret_cast<char*>(&message), message->size());
 
   // Plot usage of data buffer in percent:
@@ -87,9 +91,9 @@ void RobotMessageHandler::receive()
 
   // Read all messages 
   do {
-    // Read raw bytes into read buffer, assuming we only revieve SPL_MAX_MESSAGE_BYTES number of bytes
-    size = localId ? socket.readLocal((char*) socketReadBuffer.data(), SPL_MAX_MESSAGE_BYTES)
-                   : socket.read((char*) socketReadBuffer.data(), SPL_MAX_MESSAGE_BYTES, remoteIp);
+    // Read raw bytes into read buffer
+    size = localId ? socket.readLocal((char*) readBuffer.data(), readBuffer.size())
+                   : socket.read((char*) readBuffer.data(), readBuffer.size(), remoteIp);
                    
     // Error Check
     if (size == -1) {
@@ -99,8 +103,8 @@ void RobotMessageHandler::receive()
     // A Message was read
     if (size > 0) {
       RobotMessage msg;
-      if (msg.decompress(socketReadBuffer)) {
-        incoming.push(msg);
+      if (msg.decompress(readBuffer)) {
+        msg.doCallbacks();
       }
     }
   } while(size > 0);
