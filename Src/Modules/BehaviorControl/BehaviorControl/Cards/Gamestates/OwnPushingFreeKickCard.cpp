@@ -58,16 +58,11 @@ class OwnPushingFreeKickCard : public OwnPushingFreeKickCardBase
   {
     
 
-    bool wifiPred = (theTeamCommStatus.isWifiCommActive)
-      // online: striker
-      ? theTeammateRoles.playsTheBall(theRobotInfo.number)   
-      // offline: the first defense field player qualies (typically, robot #2) AND the right most offense
-      : (0 == theTeammateRoles.defenseRoleIndex(theRobotInfo.number) || 0 == theTeammateRoles.offenseRoleIndex(theRobotInfo.number));
-
+    
     return 
       theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
       && theGameInfo.setPlay == SET_PLAY_PUSHING_FREE_KICK
-      && wifiPred;
+      && theTeammateRoles.playsTheBall(theRobotInfo.number);
 
 
   }

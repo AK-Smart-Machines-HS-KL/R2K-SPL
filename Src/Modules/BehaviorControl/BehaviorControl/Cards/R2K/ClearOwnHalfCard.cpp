@@ -91,15 +91,10 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
 {
   bool preconditions() const override
   {
-    bool wifiPred = (theTeamCommStatus.isWifiCommActive)
-     //Online
-      ?  theTeammateRoles.playsTheBall(theRobotInfo.number)
-      // offline
-      : (0 == theTeammateRoles.defenseRoleIndex(theRobotInfo.number));
-    return
+   return
      theGameInfo.setPlay == SET_PLAY_NONE &&
-       !aBuddyIsClearingOwnHalf() &&
-      // theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
+      !aBuddyIsClearingOwnHalf() &&
+      theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&  // I am the striker
       theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
       theFieldBall.positionOnField.x() < 500 &&
@@ -143,9 +138,12 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
   {
     for (const auto& buddy : theTeamData.teammates)
     {
-      if (buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie) 
+      if (buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
         return true;
     }
     return false;

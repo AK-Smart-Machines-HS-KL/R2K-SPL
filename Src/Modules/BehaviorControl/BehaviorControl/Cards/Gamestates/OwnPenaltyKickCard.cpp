@@ -85,7 +85,7 @@ class OwnPenaltyKickCard : public OwnPenaltyKickCardBase
       return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
         && theGameInfo.setPlay == SET_PLAY_PENALTY_KICK
         && theGameInfo.state == STATE_PLAYING
-        && theTeammateRoles.anyRoleIndex(theRobotInfo.number) == 0;
+        && theTeammateRoles.playsTheBall(theRobotInfo.number);
   }
 
   /**

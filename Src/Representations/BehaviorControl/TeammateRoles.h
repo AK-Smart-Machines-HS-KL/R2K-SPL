@@ -14,6 +14,7 @@
 #include "Tools/Streams/AutoStreamable.h"
 #include "Tools/Settings.h"
 #include <vector>
+#include "Representations/Communication/RobotInfo.h"
 
 STREAMABLE(TeammateRoles,
 {
@@ -36,10 +37,12 @@ STREAMABLE(TeammateRoles,
   bool isTacticalOffense(const int robotNumber) const;
   bool isTacticalDefense(const int robotNumber) const;
   bool playsTheBall(const int robotNumber) const;
+  bool playsTheBall(const RobotInfo *info, const bool wifi) const;   // online/offline variant
 
   // communication offline utils 
 
   int  defenseRoleIndex(const int robotNumber) const;    // 0 = left most defense by robot number, 1 = one more defense to the right up to n
+  int  defenseRoleIndex(const RobotInfo* info) const;
   int  offenseRoleIndex(const int robotNumber) const;    // 0 = right most defense, 1 = one more defense to the left
   int  anyRoleIndex(const int robotNumber) const;    // 0 = right most first any role 
 

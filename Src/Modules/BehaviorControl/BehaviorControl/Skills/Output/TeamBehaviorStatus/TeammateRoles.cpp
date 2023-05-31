@@ -8,17 +8,19 @@
 
 #include <Tools/Communication/BNTP.h>
 #include "Representations/BehaviorControl/Libraries/LibCheck.h"
+#include "Representations/Communication/RobotInfo.h"
 #include "Representations/BehaviorControl/TeamSkills.h"
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h"
-// #include "Representations/Communication/RobotInfo.h"
 #include "Representations/BehaviorControl/TeammateRoles.h"  // GOALKEEPER, OFFENSE, DEFENSE
+#include "Representations/BehaviorControl/TeamBehaviorStatus.h" 
+#include "Representations/Communication/TeamCommStatus.h" //wifi state
+
 
 
 TEAM_SKILL_IMPLEMENTATION(TeammateRolesImpl,
 {,
   IMPLEMENTS(TeammateRoles),
   REQUIRES(LibCheck),
-//  CALLS(RobotInfo),
   MODIFIES(TeamBehaviorStatus),
 });
 
@@ -49,10 +51,33 @@ bool TeammateRoles::isTacticalOffense(const int robotNumber) const {
     );
 }
 
-bool TeammateRoles::playsTheBall(int robotNumber) const {
-  ASSERT(robotNumber >= Global::getSettings().lowestValidPlayerNumber && robotNumber <= Global::getSettings().highestValidPlayerNumber);
 
+// online/offline variant
+// 
+bool TeammateRoles::playsTheBall(const RobotInfo * info, const bool wifiPred) const {
+  if (info->penalty != PENALTY_NONE) return false;
+  if (wifiPred) 
+    return TeammateRoles::playsTheBall(info->number);
+  else
+    return 0 == TeammateRoles::offenseRoleIndex(info->number);
+}  
+
+bool TeammateRoles::playsTheBall(const int robotNumber) const {
+  ASSERT(robotNumber >= Global::getSettings().lowestValidPlayerNumber && robotNumber <= Global::getSettings().highestValidPlayerNumber);
   return (captain == robotNumber);
+}
+
+int TeammateRoles::defenseRoleIndex(const RobotInfo* info)const{
+  ASSERT(info->number >= Global::getSettings().lowestValidPlayerNumber && info->number <= Global::getSettings().highestValidPlayerNumber);
+  int theDefense = -1;
+
+  for (int i = 0; i < 5; i++) {
+    // if(info->penalty == PENALTY_NONE) theDefense++;
+    if (TeammateRoles::isTacticalDefense(i + 1) && i + 1 == info->number)
+      break;
+  }
+  OUTPUT_TEXT("dI " << theDefense - 1 << " for bot " << info->number);
+  return theDefense -1;  //
 }
 
 // 0 = left most defense by robot number, 1 = one more defense to the right up to n
@@ -70,6 +95,7 @@ int TeammateRoles::defenseRoleIndex(int robotNumber) const {
 }
 
 // 0 = right most defense, 1 = one more defense to the left 
+// returns 4 for defense players and goalie 
 int TeammateRoles::offenseRoleIndex(int robotNumber) const {
   ASSERT(robotNumber >= Global::getSettings().lowestValidPlayerNumber && robotNumber <= Global::getSettings().highestValidPlayerNumber);
   int theOffense = -1;
@@ -88,11 +114,16 @@ int TeammateRoles::anyRoleIndex(int robotNumber) const {
   ASSERT(robotNumber >= Global::getSettings().lowestValidPlayerNumber && robotNumber <= Global::getSettings().highestValidPlayerNumber);
   int thePlayer = -1;
 
-  if (robotNumber == 5) return 0;
+  // if (robotNumber == 5) return 0;
   for (int j = 4; j >= 0; j--) {
     thePlayer++;
-    // if (theRobotInfo.number == j + 1 && theRobotInfo.penalty == PENALTY_NONE) {
-    // if (0 == j) break;
+
+    /*
+    if(theRobotInfo.penalty == PENALTY_NONE)
+      break;
+    }
+    */
+    // if (theOwnTeamInfo) break;
   }
   return thePlayer;
 }

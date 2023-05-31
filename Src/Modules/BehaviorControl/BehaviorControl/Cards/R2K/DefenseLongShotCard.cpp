@@ -89,16 +89,12 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
 {
   bool preconditions() const override
   {
-    bool wifiPred = (theTeamCommStatus.isWifiCommActive)
-      //Online
-      ? theTeammateRoles.playsTheBall(theRobotInfo.number)
-      // offline
-      : (0 == theTeammateRoles.defenseRoleIndex(theRobotInfo.number));
+    
     return
-      // theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
+      theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
       !theObstacleModel.opponentIsClose(1200) && // see below: min distance is minOppDistance
       !aBuddyIsClearingOwnHalf() &&
-     // theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
+     theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
 
       //don't leave own half, unless we are in OFFENSIVE or SPARSE Mode)
       (
@@ -145,9 +141,12 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
   {
     for (const auto& buddy : theTeamData.teammates)
     {
-      if (buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+      if (buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
         buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
-        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie)
+        buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
         return true;
     }
     return false;

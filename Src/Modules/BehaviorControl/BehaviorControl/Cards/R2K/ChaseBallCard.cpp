@@ -83,15 +83,15 @@ class ChaseBallCard : public ChaseBallCardBase
   
     return
       (
-        //!aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
+        !aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
         theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
         theFieldBall.positionOnField.x() > (0 - threshold)
         // theFieldBall.positionOnField.x() >= theRobotPose.translation.x() - threshold;
         )
       ||
       (theGameInfo.setPlay == SET_PLAY_NONE &&
-        // !aBuddyIsClearingOwnHalf() &&
-        //theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
+        !aBuddyIsChasingOrClearing() &&
+        theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
         theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
         theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
         theFieldBall.endPositionOnField.x() < -500 &&
@@ -157,6 +157,7 @@ class ChaseBallCard : public ChaseBallCardBase
         if (buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
           return true;
