@@ -91,10 +91,10 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
   {
     
     return
-      theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
+      theTeammateRoles.playsTheBall(&theRobotInfo , theTeamCommStatus.isWifiCommActive) &&  // I am the striker
       !theObstacleModel.opponentIsClose(1200) && // see below: min distance is minOppDistance
       !aBuddyIsClearingOwnHalf() &&
-     theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
+      theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
 
       //don't leave own half, unless we are in OFFENSIVE or SPARSE Mode)
       (
