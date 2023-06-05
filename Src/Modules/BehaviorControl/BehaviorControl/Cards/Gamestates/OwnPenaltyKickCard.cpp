@@ -82,10 +82,10 @@ class OwnPenaltyKickCard : public OwnPenaltyKickCardBase
   }
   bool preconditions() const override
   {
-      return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
-        && theGameInfo.setPlay == SET_PLAY_PENALTY_KICK
-        && theGameInfo.state == STATE_PLAYING
-        && theTeammateRoles.playsTheBall(theRobotInfo.number);
+    return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
+      && theGameInfo.setPlay == SET_PLAY_PENALTY_KICK
+      && theGameInfo.state == STATE_PLAYING
+      && theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive);  // I am the striker
   }
 
   /**
