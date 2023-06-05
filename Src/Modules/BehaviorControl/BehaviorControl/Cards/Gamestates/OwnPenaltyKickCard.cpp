@@ -7,6 +7,7 @@
  * @version 1.2 online: supporterIndex, offline offenseIndex 
  *  apply in after penalty shootout only
  * - see ReadyOwnPenaly for ingame penalty
+ * v 1.3: (Asrar) "theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)" this is for online and offline role assignment
  * Notes:
  *  - 
  *
