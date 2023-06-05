@@ -10,6 +10,7 @@
  * 
  * V1.1 Card migrated (Nicholas)
  * v1.2.added functionality to OwnCornerKick: OFFENSE goes to ball and kick to goal" (Adrian)
+ * v1.3 Added online and offline role assignment(Asrar)
  */
 
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
@@ -26,6 +27,7 @@
 #include "Representations/Communication/RobotInfo.h"
 
 #include "Representations/Modeling/RobotPose.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 #include "Tools/Math/Geometry.h"
 
@@ -45,6 +47,7 @@ CARD(OwnCornerKickCard,
   REQUIRES(GameInfo),
   REQUIRES(TeamBehaviorStatus),
   REQUIRES(TeammateRoles),
+  REQUIRES(TeamCommStatus),  // wifi on off?
 
   DEFINES_PARAMETERS(
     {,
@@ -62,15 +65,12 @@ class OwnCornerKickCard : public OwnCornerKickCardBase
    */
   bool preconditions() const override
   {
-    int i = 0;
-    for (i = 0; i < 5; i++) {
-      if (theTeammateRoles.isTacticalOffense(i+1))
-        break;
-    }
-    return theRobotInfo.number == (i + 1)
+   
+    
+    return  theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)  // I am the striker
       && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
       && theGameInfo.setPlay == SET_PLAY_CORNER_KICK
-      ;
+      && theTeammateRoles.isTacticalOffense(theRobotInfo.number); // My recent role
   }
 
   /**
