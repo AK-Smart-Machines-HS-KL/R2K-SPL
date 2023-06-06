@@ -1,7 +1,7 @@
 <Simulation>
 
   <Include href="Includes/NaoV6H25.rsi2"/>
-  <Include href="Includes/5vs5.rsi2"/>
+  <Include href="Includes/3vs3.rsi2"/>
   <Include href="Includes/Ball2016SPL.rsi2"/>
   <Include href="Includes/Field2020SPL.rsi2"/>
 
@@ -18,6 +18,12 @@
     <Compound name="extras">
     </Compound>
 
+    <Compound name="robots">
+      <Body ref="Nao" name="robot1">
+        <Translation x="2.5" y="-2" z="320mm"/>
+        </Body>
+      </Compound>
+    
     <Compound name="balls">
       <Body ref="ball">
         <Translation z="1m"/>
