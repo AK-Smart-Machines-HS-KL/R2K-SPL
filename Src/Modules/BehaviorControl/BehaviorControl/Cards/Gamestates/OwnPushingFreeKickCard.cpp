@@ -6,10 +6,10 @@
  * @date 2022-11-22
  *   
  * Notes: 
- *  - Currently Triggers for all Robots. Use this Card as a template for preconditions
- *  - Currently only calls stand  
+ *  
  * 
  * V1.1 Card migrated (Nicholas)
+ * V1.2 Added the online offline role assignment (Asrar)
  */
 
 #include "Representations/BehaviorControl/Skills.h"
@@ -62,7 +62,7 @@ class OwnPushingFreeKickCard : public OwnPushingFreeKickCardBase
     return 
       theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
       && theGameInfo.setPlay == SET_PLAY_PUSHING_FREE_KICK
-      && theTeammateRoles.playsTheBall(theRobotInfo.number);
+      && theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive);  // I am the striker
 
 
   }
