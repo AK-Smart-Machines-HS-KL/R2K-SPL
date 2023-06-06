@@ -65,15 +65,15 @@ class OwnKickInCard : public OwnKickInCardBase
    */
   bool preconditions() const override
   {
-    bool wifiPred = (theTeamCommStatus.isWifiCommActive) 
-      // online: striker 
-      ? theTeammateRoles.playsTheBall(theRobotInfo.number)  
-      // offline: left most defense OR right most offense qualify
-      : (0 == theTeammateRoles.defenseRoleIndex(theRobotInfo.number) || 0 == theTeammateRoles.offenseRoleIndex(theRobotInfo.number));
+    
     return
-      theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
+      theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) // I am the striker
+      && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
       && theGameInfo.setPlay == SET_PLAY_KICK_IN
-      && wifiPred;
+      //  && theTeammateRoles.isTacticalDefense(theRobotInfo.number) // my recent role
+      //  && theTeammateRoles.isTacticalOffense(theRobotInfo.number)
+
+      ;
 
     
  
