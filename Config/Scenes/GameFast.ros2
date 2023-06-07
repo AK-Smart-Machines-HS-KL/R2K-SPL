@@ -1,7 +1,6 @@
 <Simulation>
 
   <Include href="Includes/NaoV6H25.rsi2"/>
-  <Include href="Includes/3vs3.rsi2"/>
   <Include href="Includes/Ball2016SPL.rsi2"/>
   <Include href="Includes/Field2020SPL.rsi2"/>
 
@@ -13,9 +12,7 @@
       <Appearance name="blue"/>
     </Compound>
 
-    <Compound name="extras">
-    </Compound>
-
+    
     <Compound name="robots">
       <Body ref="Nao" name="robot1">
         <Translation x="3.9m" y="0" z="320mm"/>
@@ -47,6 +44,9 @@
         <Rotation z="0degree"/>
         <Set name="NaoColor" value="dblue"/>
       </Body>
+    </Compound>
+
+      <Compound name="extras">
     </Compound>
     
     <Compound name="balls">

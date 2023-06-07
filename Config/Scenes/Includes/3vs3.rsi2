@@ -1,32 +1,34 @@
 <Simulation>
-
+  
   <Compound name="robots">
     <Body ref="Nao" name="robot1">
-      <Translation x="3.9" y="-3" z="320mm"/>
-      <Rotation z="90degree"/>
-    </Body>
-    <Body ref="Nao" name="robot3">
-      <Translation x="2.25" y="-3" z="320mm"/>
-      <Rotation z="72.43degree"/>
+      <Translation x="3.9m" y="0" z="320mm"/>
+      <Rotation z="180degree"/>
+      <Set name="NaoColor" value="red"/>
     </Body>
     <Body ref="Nao" name="robot2">
-      <Translation x="2.25" y="3" z="320mm"/>
-      <Rotation z="-72.43degree"/>
+      <Translation x="0.30" y="1.875m" z="320mm"/>
+      <Rotation z="180degree"/>
+      <Set name="NaoColor" value="red"/>
     </Body>
-
-    <Body ref="Nao" name="robot7">
-      <Translation x="-3.9" y="3" z="320mm"/>
-      <Rotation z="-90degree"/>
+    <Body ref="Nao" name="robot3">
+      <Translation x="0.30" y="-1.875m" z="320mm"/>
+      <Rotation z="180degree"/>
+      <Set name="NaoColor" value="red"/>
+    </Body>
+    <Body ref="Nao" name="robot8">
+      <Translation x="-4.5m" y="0" z="320mm"/>
+      <Rotation z="0degree"/>
       <Set name="NaoColor" value="dblue"/>
     </Body>
     <Body ref="Nao" name="robot9">
-      <Translation x="-2.25" y="3" z="320mm"/>
-      <Rotation z="-107.57degree"/>
+      <Translation x="-2.850m" y="-1" z="320mm"/>
+      <Rotation z="0degree"/>
       <Set name="NaoColor" value="dblue"/>
     </Body>
-    <Body ref="Nao" name="robot8">
-      <Translation x="-2.25" y="-3" z="320mm"/>
-      <Rotation z="107.57degree"/>
+    <Body ref="Nao" name="robot10">
+      <Translation x="-0.50" y="0" z="320mm"/>
+      <Rotation z="0degree"/>
       <Set name="NaoColor" value="dblue"/>
     </Body>
 
