@@ -10,16 +10,16 @@
  */
 
 #pragma once
-#include <map>
+#include <set>
 
-template <typename base_T, typename key_T, typename val_T>
+template <typename base_T, typename val_T>
 struct SubclassRegistry {
   public: 
-  SubclassRegistry(key_T key, val_T val) {
-    subclasses[key] = val;
+  SubclassRegistry(val_T val) {
+    subclasses.insert(val);
   };
-  static std::map<key_T, val_T> subclasses;
+  static std::set<val_T> subclasses;
 };
 
-template <typename base_T, typename key_T, typename val_T>
-std::map<key_T, val_T> SubclassRegistry<base_T, key_T, val_T>::subclasses = std::map<key_T, val_T>();
+template <typename base_T, typename val_T>
+std::set<val_T> SubclassRegistry<base_T, val_T>::subclasses = std::set<val_T>();

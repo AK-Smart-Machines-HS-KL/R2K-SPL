@@ -44,7 +44,7 @@ public:
   /**
    * The method sends the outgoing message if possible.
    */
-  void send(RobotMessage* message);
+  void send();
 
   /**
    * The method receives packets if available.

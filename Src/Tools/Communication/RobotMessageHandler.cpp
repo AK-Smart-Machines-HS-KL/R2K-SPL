@@ -19,18 +19,22 @@
 
 class TestMessage: public RobotMessageComponent<TestMessage> {
   public:
-
+  int data = 0;
   TestMessage() : RobotMessageComponent<TestMessage>() { }
   inline static const std::string name = "Test";
 
   size_t compress(char* buff) { 
-    return 0; 
+    memcpy(buff, &data, sizeof(data));
+    return getSize();
   }
 
-  bool decompress(char* compressed) { return true; }
+  bool decompress(char* compressed) { 
+    memcpy(&data, compressed, sizeof(data));
+    return true; 
+  }
 
   size_t getSize() {
-    return 0;
+    return sizeof(data);
   }
 };
 
@@ -50,8 +54,9 @@ void RobotMessageHandler::startLocal(int port, unsigned localId)
   VERIFY(socket.setTarget(group.c_str(), port));
   socket.setLoopback(true);
 
-  auto test = ComponentRegistry::subclasses["Test"]();
-  test->compileData();
+  TestMessage::addDataCompiler([&](TestMessage* msg) {
+    msg->data = 1;
+  });
 }
 
 void RobotMessageHandler::start(int port, const char* subnet)
@@ -66,18 +71,19 @@ void RobotMessageHandler::start(int port, const char* subnet)
   socket.setLoopback(false);
 }
 
-void RobotMessageHandler::send(RobotMessage* message)
+void RobotMessageHandler::send()
 {
   if(!port)
     return;
 
-  ASSERT(message->size() <= SPL_MAX_MESSAGE_BYTES);
+  RobotMessage msg = RobotMessage();
+  msg.compile();
+  size_t size = msg.compress(writeBuffer);
 
-  
-  socket.write(reinterpret_cast<char*>(&message), message->size());
+  socket.write((char*) writeBuffer.data(), SPL_MAX_MESSAGE_BYTES); // Guarantees 128 bytes are sent
 
   // Plot usage of data buffer in percent:
-  const float usageInPercent = 100.f * message->size() / SPL_MAX_MESSAGE_BYTES;
+  const float usageInPercent = 100.f * size / SPL_MAX_MESSAGE_BYTES;
   PLOT("module:RobotMessageHandler:messageDataUsageInPercent", usageInPercent);
 }
 

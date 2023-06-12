@@ -110,13 +110,10 @@ void Cognition::beforeModules()
 void Cognition::afterModules()
 {
   if(Blackboard::getInstance().exists("BHumanMessageOutputGenerator")
-     && static_cast<const BHumanMessageOutputGenerator&>(Blackboard::getInstance()["BHumanMessageOutputGenerator"]).generate
      && static_cast<const BHumanMessageOutputGenerator&>(Blackboard::getInstance()["BHumanMessageOutputGenerator"]).sendThisFrame)
   {
-    // static_cast<const BHumanMessageOutputGenerator&>(Blackboard::getInstance()["BHumanMessageOutputGenerator"]).generate(&outTeamMessage);
-
     BH_TRACE_MSG("before theSPLMessageHandler.send()");
-    // robotMessageHandler.send();
+    robotMessageHandler.send();
   }
 }
 
