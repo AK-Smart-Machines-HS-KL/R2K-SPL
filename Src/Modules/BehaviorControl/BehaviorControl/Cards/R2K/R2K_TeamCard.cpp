@@ -370,6 +370,7 @@ private:
 
     }
     // patch for communication problems
+    /*
     switch (theRobotInfo.number - 1) {
       case 0: pRole.role = PlayerRole::supporter0;   break;
       case 1: pRole.role = PlayerRole::supporter1;   break;
@@ -377,6 +378,8 @@ private:
       case 3: pRole.role = PlayerRole::supporter3;   break;
       case 4: pRole.role = PlayerRole::supporter4;   break;
     }
+    */
+   
     // d2: static assignment , only for specific gamestates
 
 

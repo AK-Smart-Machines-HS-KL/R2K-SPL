@@ -3,7 +3,19 @@
  *
  * This file implements the implementation of the TeammateRoles skill.
  *
- * @author Arne Hasselbring
+ * @author Arne Hasselbring, Adrian Müller
+ * @version 1.1.
+ * v1.0
+ * nartive code B-Human
+ * 
+ * v1.1.
+ * added predicates playsTheBall/1 isTacticalOffense, isTacticalGoalKeeper/1, isTacticalDefense
+ * Notes: all predicates checks the bots role via TeammateRoles.roles[]
+ * 
+ * v1.2
+ * now taking care of on/offline situation (see wifipred)
+ * added playsTheBall/2, 
+ * defenseRoleIndex/1, offenseRoleIndex/2 loop over isTacticalDefense and isTacticalOffense, resp. 
  */
 
 #include <Tools/Communication/BNTP.h>
@@ -85,24 +97,33 @@ int TeammateRoles::defenseRoleIndex(int robotNumber) const {
   ASSERT(robotNumber >= Global::getSettings().lowestValidPlayerNumber && robotNumber <= Global::getSettings().highestValidPlayerNumber);
   int theDefense = -1;
 
-  for (int i = 0; i < 5; i++) {
-    theDefense++;
-    if (TeammateRoles::isTacticalDefense(i + 1) && i+1 == robotNumber)
-      break;
+  if (!TeammateRoles::isTacticalDefense(robotNumber)) return theDefense;
+  for (int j = 0; j <=4; j++) {
+    if (TeammateRoles::isTacticalDefense(j + 1)) {
+      theDefense++;
+    }
+    if (j + 1 == robotNumber) {
+      // OUTPUT_TEXT("bot " << robotNumber << " defenseRoleInxes " << theDefense);
+      return theDefense;
+    }
   }
-  // OUTPUT_TEXT("dI " << theDefense << " " << robotNumber);
-  return theDefense-1;
+  return theDefense;
 }
 
 // 0 = right most defense, 1 = one more defense to the left 
-// returns 4 for defense players and goalie 
-int TeammateRoles::offenseRoleIndex(int robotNumber) const {
+// returns -1 for defense players and goalie 
+
+int TeammateRoles::offenseRoleIndex(const int robotNumber) const {
   ASSERT(robotNumber >= Global::getSettings().lowestValidPlayerNumber && robotNumber <= Global::getSettings().highestValidPlayerNumber);
   int theOffense = -1;
+  if (!TeammateRoles::isTacticalOffense(robotNumber)) return theOffense;
   for (int j = 4; j >= 0; j--) {
-    theOffense++;
-    if (TeammateRoles::isTacticalOffense(j + 1) && j + 1 == robotNumber) {
-      break;
+    if (TeammateRoles::isTacticalOffense(j + 1)){
+      theOffense++;
+    }
+    if  (j + 1 == robotNumber) {
+      // OUTPUT_TEXT("bot " << robotNumber << " offenseRoleInxes " << theOffense);
+      return theOffense;;
     }
   }
   return theOffense;
@@ -111,6 +132,8 @@ int TeammateRoles::offenseRoleIndex(int robotNumber) const {
 
 // 0 = right most defense, 1 = one more defense to the left 
 int TeammateRoles::anyRoleIndex(int robotNumber) const {
+  OUTPUT_TEXT("deprecated call TeammateRoles::anyRoleIndex");
+
   ASSERT(robotNumber >= Global::getSettings().lowestValidPlayerNumber && robotNumber <= Global::getSettings().highestValidPlayerNumber);
   int thePlayer = -1;
 
