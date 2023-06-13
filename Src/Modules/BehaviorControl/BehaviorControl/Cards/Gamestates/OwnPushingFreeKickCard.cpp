@@ -10,8 +10,8 @@
  * 
  * V1.1 Card migrated (Nicholas)
  * V1.2 Added the online offline role assignment (Asrar)
- * v1.3 (Asrar) card is "sticky" for  ballWasSeenStickyPeriod (5000msec), i.e., bot assumes ball to be at the last-seen position
- *                 Apply this parameter by changing the postcondition().
+ * v1.3 (Asrar) card is  for  ballWasSeenStickyPeriod (5000msec), i.e., bot assumes ball to be at the last-seen position
+ *                 Applied this parameter by changing the postcondition().
  */
 
 #include "Representations/BehaviorControl/Skills.h"
@@ -75,10 +75,11 @@ class OwnPushingFreeKickCard : public OwnPushingFreeKickCardBase
    */
   bool postconditions() const override
   {
-    return !theFieldBall.ballWasSeen(ballWasSeenStickyPeriod)
+    return 
+      !theFieldBall.ballWasSeen(ballWasSeenStickyPeriod)
       ||
       theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
-      || theGameInfo.setPlay != SET_PLAY_KICK_IN;;
+      || theGameInfo.setPlay != SET_PLAY_PUSHING_FREE_KICK;
   }
 
   void execute() override

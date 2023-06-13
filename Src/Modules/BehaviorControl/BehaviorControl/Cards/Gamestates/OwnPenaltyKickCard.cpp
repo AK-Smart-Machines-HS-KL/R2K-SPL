@@ -8,6 +8,8 @@
  *  apply in after penalty shootout only
  * - see ReadyOwnPenaly for ingame penalty
  * v 1.3: (Asrar) "theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)" this is for online and offline role assignment
+ *  v1.4: (Asrar) card is  for  ballWasSeenStickyPeriod (5000msec), i.e., bot assumes ball to be at the last-seen position
+ *                 Applied this parameter by changing the postcondition().
  * Notes:
  *  - 
  *
@@ -69,6 +71,7 @@ CARD(OwnPenaltyKickCard,
                 (unsigned int)(1000) initalCheckTime,
                 (bool)(false) done,
                 (Shot) currentShot,
+                (int)(5000) ballWasSeenStickyPeriod,  // freeze the first decision
              }),
     });
 
@@ -94,7 +97,10 @@ class OwnPenaltyKickCard : public OwnPenaltyKickCardBase
    */
   bool postconditions() const override
   {
-    return !preconditions();
+    return !theFieldBall.ballWasSeen(ballWasSeenStickyPeriod)
+      ||
+      theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
+      || theGameInfo.setPlay != SET_PLAY_PENALTY_KICK;
   }
 
   option
