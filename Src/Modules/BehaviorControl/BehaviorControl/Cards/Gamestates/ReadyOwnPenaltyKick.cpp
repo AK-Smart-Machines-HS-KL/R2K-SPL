@@ -10,7 +10,8 @@
  * 
  * v1.1: Card dynamically select robot instead hardcoding number  (Adrian)
  * v1.2. Card migrated (Adrian)
- * v 1.3. (Adrian) using theTeammateRoles.offenseRoleIndex(theRobotInfo.number) now
+ * v 1.3. (Adrian) using theTeammateRoles.offenseRoleIndex(theRobotInfo.number) 
+ * 
  */
 
 #include "Representations/BehaviorControl/DefaultPose.h"
@@ -23,6 +24,7 @@
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h" 
 #include "Representations/BehaviorControl/TeammateRoles.h"
 #include "Representations/Configuration/FieldDimensions.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 #include "Tools/Math/Geometry.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
@@ -38,9 +40,10 @@ CARD(ReadyOwnPenaltyKickCard,
     REQUIRES(GameInfo),
     REQUIRES(OwnTeamInfo),
     REQUIRES(RobotPose),
-  REQUIRES(RobotInfo),
-  REQUIRES(TeammateRoles),
-  REQUIRES(FieldDimensions),
+    REQUIRES(RobotInfo),
+    REQUIRES(TeammateRoles),
+    REQUIRES(FieldDimensions),
+    REQUIRES(TeamCommStatus),  // wifi on off?
   });
 
 class ReadyOwnPenaltyKickCard : public ReadyOwnPenaltyKickCardBase
@@ -52,7 +55,8 @@ class ReadyOwnPenaltyKickCard : public ReadyOwnPenaltyKickCardBase
   {
     return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
       && theGameInfo.state == STATE_READY
-      && theTeammateRoles.anyRoleIndex(theRobotInfo.number) == 0;
+      //&& theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive);
+      && theTeammateRoles.offenseRoleIndex(theRobotInfo.number)==0;
   }
 
   /**
