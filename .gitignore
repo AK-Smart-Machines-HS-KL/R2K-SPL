@@ -33,3 +33,5 @@ Thumbs.db
 /Util/Buildchain/macOS/include
 /Util/Buildchain/macOS/lib
 /Util/WSL
+/Make
+/r2k_robocup

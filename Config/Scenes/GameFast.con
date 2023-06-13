@@ -1,3 +1,2 @@
-cs DynamicBallHandler [team2]
 call Includes/Fast
-call Includes/3vs3
+call Includes/5vs5
