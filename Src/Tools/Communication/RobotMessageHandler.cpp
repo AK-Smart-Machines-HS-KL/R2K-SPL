@@ -17,26 +17,7 @@
 #include "Platform/Time.h"
 #include "Tools/Debugging/DebugDrawings.h"
 
-class TestMessage: public RobotMessageComponent<TestMessage> {
-  public:
-  int data = 0;
-  TestMessage() : RobotMessageComponent<TestMessage>() { }
-  inline static const std::string name = "Test";
 
-  size_t compress(char* buff) { 
-    memcpy(buff, &data, sizeof(data));
-    return getSize();
-  }
-
-  bool decompress(char* compressed) { 
-    memcpy(&data, compressed, sizeof(data));
-    return true; 
-  }
-
-  size_t getSize() {
-    return sizeof(data);
-  }
-};
 
 void RobotMessageHandler::startLocal(int port, unsigned localId)
 {
@@ -53,10 +34,6 @@ void RobotMessageHandler::startLocal(int port, unsigned localId)
   VERIFY(socket.joinMulticast(group.c_str()));
   VERIFY(socket.setTarget(group.c_str(), port));
   socket.setLoopback(true);
-
-  TestMessage::addDataCompiler([&](TestMessage* msg) {
-    msg->data = 1;
-  });
 }
 
 void RobotMessageHandler::start(int port, const char* subnet)

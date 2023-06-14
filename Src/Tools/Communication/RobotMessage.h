@@ -60,11 +60,28 @@ class RobotMessageComponent : public AbstractRobotMessageComponent {
   inline static std::list<std::function<void(T*)>> dataCompilers = std::list<std::function<void(T*)>>(); 
   inline static int id = -1;
 
-  public:
+  public: 
+  class CallbackRef {
+    private:
+    std::list<std::function<void(T*)>>& list;
+    typename std::list<std::function<void(T*)>>::iterator element;
+    
+    public:
+    ~CallbackRef() {list.erase(element);}
+  };
+
+  class CompilerRef {
+    private:
+    std::list<std::function<void(T*)>>& list;
+    typename std::list<std::function<void(T*)>>::iterator element;
+    
+    public:
+    ~CompilerRef() {list.erase(element);}
+  };
+
   inline static int priority = 0;
 
-  static void addCallback(std::function<void(T*)> foo) {callbacks.push_back(foo);}
-  static void removeCallback() {callbacks.pop_back();} // TODO
+  static CallbackRef addCallback(std::function<void(T*)> foo);
   void doCallbacks() final {
     for(auto callbackFunc : callbacks)
     {
@@ -72,8 +89,7 @@ class RobotMessageComponent : public AbstractRobotMessageComponent {
     }
   }
 
-  static void addDataCompiler(std::function<void(T*)> foo) {dataCompilers.push_back(foo);}
-  static void removeDataCompiler() {dataCompilers.pop_back();} // TODO
+  static CompilerRef addDataCompiler(std::function<void(T*)> foo);
   void compileData() final {
     for (auto dataCompiler : dataCompilers)
     {

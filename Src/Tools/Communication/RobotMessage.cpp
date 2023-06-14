@@ -3,10 +3,25 @@
 #include <vector>
 #include <algorithm>
 
+template<typename T>
+typename RobotMessageComponent<T>::CallbackRef RobotMessageComponent<T>::addCallback(std::function<void(T*)> foo) {
+  callbacks.push_back(foo);
+  RobotMessageComponent<T>::CallbackRef ref{callbacks, --callbacks.end()};
+  return ref;
+};
+
+template<typename T>
+typename RobotMessageComponent<T>::CompilerRef RobotMessageComponent<T>::addDataCompiler(std::function<void(T*)> foo) {
+  dataCompilers.push_back(foo);
+  RobotMessageComponent<T>::CompilerRef ref{dataCompilers, --dataCompilers.end()};
+  return ref;
+};
+
 bool idsAssigned = false;
 std::vector<ComponentMetadata> metadataById = std::vector<ComponentMetadata>();
 
 void assignComponentIDs() {
+  
   int currentID = 0;
   metadataById.reserve(ComponentRegistry::subclasses.size());
 
