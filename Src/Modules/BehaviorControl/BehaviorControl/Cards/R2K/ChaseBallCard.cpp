@@ -20,6 +20,8 @@
  *      if BehaviorStatus::chaseBallCard or clearOwnHalfCard or clearOwnHalfCardGoalie exit this card
  * 
  * v.1.2 card now checks wether there is an passing event active (OffenseForwardPassCard, OffenseReceivePassCard)
+ * v 1.3: (Asrar) "theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)"
+          this is for online and offline role assignment
     
  * - Check: GoalShot has higher priority and takes over close to opp.goal
  * v 1.3 DEFENSE only x < 0 - threshold
@@ -41,6 +43,7 @@
 #include "Representations/Communication/TeamData.h"
 #include "Representations/BehaviorControl/TeammateRoles.h"
 #include "Representations/Communication/GameInfo.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 
 
@@ -60,6 +63,7 @@ CARD(ChaseBallCard,
         REQUIRES(FieldDimensions),
         REQUIRES(TeamData),   // check behavior
         REQUIRES(TeammateRoles),
+        REQUIRES(TeamCommStatus),  // wifi on off?
 
         DEFINES_PARAMETERS(
              {,
@@ -91,7 +95,7 @@ class ChaseBallCard : public ChaseBallCardBase
       ||
       (theGameInfo.setPlay == SET_PLAY_NONE &&
         !aBuddyIsChasingOrClearing() &&
-        theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
+        theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
         theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
         theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
         theFieldBall.endPositionOnField.x() < -500 &&
