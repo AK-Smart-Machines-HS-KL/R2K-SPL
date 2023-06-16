@@ -15,11 +15,9 @@
 template <typename base_T, typename val_T>
 struct SubclassRegistry {
   public: 
+  inline static std::set<val_T> subclasses = std::set<val_T>();
+
   SubclassRegistry(val_T val) {
     subclasses.insert(val);
   };
-  static std::set<val_T> subclasses;
 };
-
-template <typename base_T, typename val_T>
-std::set<val_T> SubclassRegistry<base_T, val_T>::subclasses = std::set<val_T>();
