@@ -100,7 +100,7 @@ class OwnCornerKickCard : public OwnCornerKickCardBase
   }
   Angle calcAngleToGoal() const
   {
-    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
+    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGoalArea, 0.f)).angle();
   }
 };
 

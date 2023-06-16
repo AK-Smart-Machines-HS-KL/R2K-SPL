@@ -166,7 +166,7 @@ class R2K_TeamCard : public R2K_TeamCardBase
 
 private:
   int myEbcWrites = 0;  // tnmp. hack for tracing ebc
-  bool recomputeLineUp;
+  bool recomputeLineUp = false; // check for fresh penalties
 
   void execute() override
   {
@@ -182,7 +182,7 @@ private:
         // 2 player
             { {GN,OM,UN,UN,UN}, {GN,DM,UN,UN,UN}, {GN,DM,UN,UN,UN}, {DM,OM,UN,UN,UN} },
             // 3 player
-                { {GN,DM,OM,UN,UN}, {GN,DR,DL,UN,UN}, {GA,DM,OM,UN,UN}, {GN,OR,OM,UN,UN} },
+                { {GN,OL,OM,UN,UN}, {GN,DR,DL,UN,UN}, {GA,DM,OM,UN,UN}, {GN,OR,OM,UN,UN} },
                 // 4 player
                     { {GN,DR,DL,OM,UN}, {GN,DR,DL,DM,UN}, {GA,DM,OL,OM,UN}, {GN,DM,OL,OM,UN} },
                     // 5 player
@@ -273,8 +273,9 @@ private:
     bool goalieIsActive = false;
 
 
+// OUTPUT_TEXT("own penalties "<< own_penalties );  // 16
     if (own_penalties != lastNrOwnPenalties) {
-      recomputeLineUp = true;
+      recomputeLineUp = false;
       // OUTPUT_TEXT("recomputeLineUp  " << lastNrOwnPenalties << " " << own_penalties);
       lastNrOwnPenalties = own_penalties;
     }
@@ -370,7 +371,7 @@ private:
 
     }
     // patch for communication problems
-    /*
+    
     switch (theRobotInfo.number - 1) {
       case 0: pRole.role = PlayerRole::supporter0;   break;
       case 1: pRole.role = PlayerRole::supporter1;   break;
@@ -378,17 +379,17 @@ private:
       case 3: pRole.role = PlayerRole::supporter3;   break;
       case 4: pRole.role = PlayerRole::supporter4;   break;
     }
-    */
+    
    
     // d2: static assignment , only for specific gamestates
 
 
-    if (theGameInfo.state == STATE_READY || theGameInfo.state == STATE_SET) {
+    // if (theGameInfo.state == STATE_READY || theGameInfo.state == STATE_SET) {
 
     // HOT FIX GORE 2023 
     
-    // if (theGameInfo.state == STATE_READY || theGameInfo.state == STATE_SET || 
-    //  theGameInfo.state == STATE_PLAYING) {
+    if (theGameInfo.state == STATE_READY || theGameInfo.state == STATE_SET || 
+        theGameInfo.state == STATE_PLAYING) {
       
       int nActive = 0;
       for (auto &gcPlayer : theOwnTeamInfo.players)
@@ -585,12 +586,13 @@ private:
       myEbcWrites = theEventBasedCommunicationData.ebcSendMessageImportant();
       // OUTPUT_TEXT("Nr: " << theRobotInfo.number << " : R2K TeamCard ebc  update");
       refreshAllData = false;
+      recomputeLineUp = false;
     }
     theRoleSkill(lastPlayerRole);
     theTimeToReachBallSkill(lastTimeToReachBall);
     if (theGameInfo.state != STATE_READY && theGameInfo.state != STATE_SET){
       // HOT FIX
-      // && theGameInfo.state != STATE_PLAYING) { // we sended the teammateRoles already at line 347
+      && theGameInfo.state != STATE_PLAYING) { // we sended the teammateRoles already at line 347
       theTeammateRolesSkill(lastTeammateRoles);
     }
 

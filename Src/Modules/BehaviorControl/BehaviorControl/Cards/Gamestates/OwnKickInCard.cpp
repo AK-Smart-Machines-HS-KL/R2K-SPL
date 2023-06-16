@@ -53,6 +53,7 @@ CARD(OwnKickInCard,
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
       (Vector2f)(Vector2f(1000.0f, -340.0f)) kickTarget, // Based on 20_deg setup angle in ready card; This is a 20 degree shot
+      (int)(5000) ballWasSeenStickyPeriod,  // freeze the first decision
     }),
 
 });
@@ -84,7 +85,10 @@ class OwnKickInCard : public OwnKickInCardBase
    */
   bool postconditions() const override
   {
-    return !preconditions();
+    return 
+       !theFieldBall.ballWasSeen(ballWasSeenStickyPeriod)
+        || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
+        || theGameInfo.setPlay != SET_PLAY_KICK_IN;
   }
 
   void execute() override
