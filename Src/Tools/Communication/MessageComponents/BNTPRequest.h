@@ -2,14 +2,12 @@
 #include "Tools/Communication/RobotMessage.h"
 #include "Tools/Communication/BHumanTeamMessageParts/BNTPMessage.h"
 
-class BNTPComponent: public RobotMessageComponent<BNTPComponent> {
+class BNTPRequestComponent: public RobotMessageComponent<BNTPRequestComponent> {
   public:
 
-  
-
   //Required
-  inline static const std::string name = "BNTP";
-  BNTPComponent() : RobotMessageComponent<BNTPComponent>() { }
+  inline static const std::string name = "BNTPRequest";
+  BNTPRequestComponent() : RobotMessageComponent<BNTPRequestComponent>() { }
 
   size_t compress(char* buff);
 

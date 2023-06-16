@@ -1,4 +1,4 @@
-#include "FieldBall.h"
+#include "BallModel.h"
 
 size_t BallModelComponent::compress(char* buff) {
     return 0;
