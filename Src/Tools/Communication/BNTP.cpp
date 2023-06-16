@@ -10,6 +10,22 @@
 
 #include "BNTP.h"
 
+BNTP::BNTP(const FrameInfo& theFrameInfo, const RobotInfo& theRobotInfo) : theFrameInfo(theFrameInfo), theRobotInfo(theRobotInfo) {
+  
+  requestCallback = BNTPRequestComponent::addCallback([&](BNTPRequestComponent* comp, RobotMessageHeader& header) {this->rcvRequest(comp, header); });
+  requestCompiler = BNTPRequestComponent::addDataCompiler([&](BNTPRequestComponent* comp) {this->sndRequest(comp); });
+  
+  responseCallback = BNTPResponseComponent::addCallback([&](BNTPResponseComponent* comp, RobotMessageHeader& header) {this->rcvResponse(comp, header); });
+  responseCompiler = BNTPResponseComponent::addDataCompiler([&](BNTPResponseComponent* comp) {this->sndResponse(comp); });
+
+}
+
+void BNTP::rcvRequest(BNTPRequestComponent * comp, RobotMessageHeader & header) {}
+void BNTP::rcvResponse(BNTPResponseComponent * comp, RobotMessageHeader & header) {}
+
+void BNTP::sndRequest(BNTPRequestComponent * comp) {}
+void BNTP::sndResponse(BNTPResponseComponent * comp) {}
+
 void BNTP::operator>>(BHumanMessage& m) const
 {
   // Respond to buffered requests.

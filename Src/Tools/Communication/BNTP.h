@@ -15,7 +15,8 @@
 #include "Tools/Communication/BHumanTeamMessageParts/BHumanMessageParticle.h"
 #include "Tools/MessageQueue/MessageIDs.h"
 #include "Tools/Settings.h"
-
+#include "Tools/Communication/MessageComponents/BNTPRequest.h"
+#include "Tools/Communication/MessageComponents/BNTPResponse.h"
 /**
  * @struct BNTPRequest
  *
@@ -93,6 +94,12 @@ public:
   void operator>>(BHumanMessage& m) const override;
   void operator<<(const BHumanMessage& m) override;
 
+  void rcvRequest(BNTPRequestComponent *, RobotMessageHeader &);
+  void rcvResponse(BNTPResponseComponent *, RobotMessageHeader &);
+
+  void sndRequest(BNTPRequestComponent *);
+  void sndResponse(BNTPResponseComponent *);
+
   const SynchronizationMeasurementsBuffer* operator[](unsigned number) const
   {
     return number >= Settings::lowestValidPlayerNumber && number <= Settings::highestValidPlayerNumber ?
@@ -100,6 +107,14 @@ public:
   }
 
 private:
+
+  // Callback References
+  BNTPRequestComponent::CallbackRef requestCallback;
+  BNTPRequestComponent::CompilerRef requestCompiler;
+
+  BNTPResponseComponent::CallbackRef responseCallback;
+  BNTPResponseComponent::CompilerRef responseCompiler;
+
   static constexpr int ntpRequestInterval = 10000; /**< Request an NTP message every $ ms. */
 
   unsigned lastNTPRequestSent = 0; /**< The point of time when the last NTP request has been sent to the team. */
@@ -115,5 +130,5 @@ public:
    * @param theFrameInfo Contains the current time.
    * @param theRobotInfo Contains the player number.
    */
-  BNTP(const FrameInfo& theFrameInfo, const RobotInfo& theRobotInfo) : theFrameInfo(theFrameInfo), theRobotInfo(theRobotInfo) {}
+  BNTP(const FrameInfo& theFrameInfo, const RobotInfo& theRobotInfo);
 };

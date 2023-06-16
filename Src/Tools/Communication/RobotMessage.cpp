@@ -1,21 +1,22 @@
 #include "RobotMessage.h"
+#include "Tools/Settings.h"
 #include <bitpacker.hpp>
 #include <vector>
 #include <algorithm>
 
-template<typename T>
-typename RobotMessageComponent<T>::CallbackRef RobotMessageComponent<T>::addCallback(std::function<void(T*)> foo) {
-  callbacks.push_back(foo);
-  RobotMessageComponent<T>::CallbackRef ref{callbacks, --callbacks.end()};
-  return ref;
-};
+// template<typename T>
+// typename RobotMessageComponent<T>::CallbackRef RobotMessageComponent<T>::addCallback(RobotMessageComponent<T>::CallbackFunc_t foo) {
+//   callbacks.push_back(foo);
+//   RobotMessageComponent<T>::CallbackRef ref(callbacks, --callbacks.end());
+//   return ref;
+// }
 
-template<typename T>
-typename RobotMessageComponent<T>::CompilerRef RobotMessageComponent<T>::addDataCompiler(std::function<void(T*)> foo) {
-  dataCompilers.push_back(foo);
-  RobotMessageComponent<T>::CompilerRef ref{dataCompilers, --dataCompilers.end()};
-  return ref;
-};
+// template<typename T>
+// typename RobotMessageComponent<T>::CompilerRef RobotMessageComponent<T>::addDataCompiler(RobotMessageComponent<T>::CompilerFunc_t foo) {
+//   dataCompilers.push_back(foo);
+//   RobotMessageComponent<T>::CompilerRef ref(dataCompilers, --dataCompilers.end());
+//   return ref;
+// }
 
 bool idsAssigned = false;
 std::vector<ComponentMetadata> metadataById = std::vector<ComponentMetadata>();
@@ -49,17 +50,19 @@ size_t RobotMessage::compress(std::array<uint8_t, SPL_MAX_MESSAGE_BYTES>& outBuf
       return a->getID() < b->getID();
     }
   };
+
   std::sort(componentPointers.begin(), componentPointers.end(), IDSortPredicate());
 
   size_t byteOffset = 0; // current offset in bytes from the beginning of Buff
   std::array<uint8_t, SPL_MAX_MESSAGE_BYTES> componentBuff; // buffer reused for component compression
 
   // reserve space for bitfield
-  byteOffset += (MAX_NUM_COMPONENTS / 8); 
+  size_t bitfieldBytes = MAX_NUM_COMPONENTS / 8 + (bool) (MAX_NUM_COMPONENTS % 8);
+  byteOffset += bitfieldBytes; 
 
   // Copy component hash
-  memcpy(outBuff.data() + byteOffset, &componentHash, sizeof(componentHash)); 
-  byteOffset += sizeof(componentHash);
+  memcpy(outBuff.data() + byteOffset, &header.componentHash, sizeof(header.componentHash)); 
+  byteOffset += sizeof(header.componentHash);
 
   // Compress and Copy Individual Components
   for (auto component : componentPointers) {
@@ -96,11 +99,18 @@ bool RobotMessage::decompress(std::array<uint8_t, SPL_MAX_MESSAGE_BYTES>& buff){
     }
   }
 
-  byteOffset += MAX_NUM_COMPONENTS / 8;
+  size_t bitfieldBytes = MAX_NUM_COMPONENTS / 8 + (bool) (MAX_NUM_COMPONENTS % 8);
+  byteOffset += bitfieldBytes; 
 
   // Copy component hash out of the buffer
-  memcpy(&componentHash, buff.data() + byteOffset, sizeof(componentHash));
-  byteOffset += sizeof(componentHash);
+  memcpy(&header.componentHash, buff.data() + byteOffset, sizeof(header.componentHash));
+  byteOffset += sizeof(header.componentHash);
+
+  // TODO: Compare Hash
+  
+  // Copy Sender
+  memcpy(&header.senderID, buff.data() + byteOffset, sizeof(header.senderID));
+  byteOffset += sizeof(header.senderID);
 
   for (auto &componentID : includedComponents)
   {
@@ -121,10 +131,13 @@ void RobotMessage::compile() {
     assignComponentIDs();
   }
 
+  header.componentHash = 1337; //TODO: Generate and use hash
+  header.senderID = Global::getSettings().playerNumber;
+
   static std::vector<ComponentMetadata> metadataByPriority(metadataById); // list for prioritization
 
-  struct PrioritySortPredicate
-  {
+  // Sorts ComponenentMetadata by Component priority
+  struct PrioritySortPredicate {
     inline bool operator() (const ComponentMetadata& a, const ComponentMetadata& b)
     {
       return *a.priority < *b.priority;
@@ -134,10 +147,16 @@ void RobotMessage::compile() {
   std::sort(metadataByPriority.begin(), metadataByPriority.end(), PrioritySortPredicate());
 
   size_t bytesRemaining = 128;
-  bytesRemaining -= MAX_NUM_COMPONENTS / 8;
-  bytesRemaining -= sizeof(componentHash);
+  bytesRemaining -= MAX_NUM_COMPONENTS / 8 + (bool) (MAX_NUM_COMPONENTS % 8);
+  bytesRemaining -= sizeof(header.componentHash);
 
-  for( auto metadata : metadataByPriority) {
+  for(auto metadata : metadataByPriority) {
+
+    // Components with a priority 0 or lower are not compiled
+    if(!(*metadata.priority > 0)) {
+      break;
+    }
+
     auto component = metadata.createNew();
     component->compileData();
     int size = component->getSize();
@@ -145,7 +164,7 @@ void RobotMessage::compile() {
       bytesRemaining -= size;
       componentPointers.push_back(component);
     } else {
-      return;
+      break;
     }
   }
 }

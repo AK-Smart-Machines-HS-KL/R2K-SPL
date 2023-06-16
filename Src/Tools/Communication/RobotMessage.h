@@ -23,6 +23,11 @@
 #define SPL_MAX_MESSAGE_BYTES 128
 #define MAX_NUM_COMPONENTS 64
 
+struct RobotMessageHeader {
+  uint32_t componentHash = 1337; // Temporary     
+  uint16_t senderID;
+};
+
 struct AbstractRobotMessageComponent {
   /**
    * @brief 
@@ -32,7 +37,7 @@ struct AbstractRobotMessageComponent {
    */
   virtual size_t compress(char* buff) = 0;
   virtual bool decompress(char* compressed) = 0;
-  virtual void doCallbacks() = 0;
+  virtual void doCallbacks(RobotMessageHeader& header) = 0;
   virtual void compileData() = 0;
   virtual size_t getSize() = 0;
   virtual int getID() = 0;
@@ -53,43 +58,58 @@ using ComponentRegistry = SubclassRegistry<AbstractRobotMessageComponent, Compon
 
 template<typename T>
 class RobotMessageComponent : public AbstractRobotMessageComponent {
+  public:
+  using CallbackFunc_t = std::function<void(T*, RobotMessageHeader&)>;
+  using CompilerFunc_t = std::function<void(T*)>;
 
   private:
   static volatile ComponentRegistry registry; // = ComponentRegistry(ComponentMetadata{ T::name, T::create, T::setID });
-  inline static std::list<std::function<void(T*)>> callbacks = std::list<std::function<void(T*)>>(); 
-  inline static std::list<std::function<void(T*)>> dataCompilers = std::list<std::function<void(T*)>>(); 
+  inline static std::list<CallbackFunc_t> callbacks = std::list<CallbackFunc_t>(); 
+  inline static std::list<CompilerFunc_t> dataCompilers = std::list<CompilerFunc_t>(); 
   inline static int id = -1;
 
   public: 
   class CallbackRef {
     private:
-    std::list<std::function<void(T*)>>& list;
-    typename std::list<std::function<void(T*)>>::iterator element;
+    std::list<CallbackFunc_t>* list;
+    typename std::list<CallbackFunc_t>::iterator element;
     
     public:
-    ~CallbackRef() {list.erase(element);}
+    CallbackRef() = default;
+    CallbackRef(std::list<CallbackFunc_t>* list_ptr, typename std::list<CallbackFunc_t>::iterator element) : list(list_ptr), element(element) {}
+    ~CallbackRef() {list->erase(element);}
   };
 
   class CompilerRef {
     private:
-    std::list<std::function<void(T*)>>& list;
-    typename std::list<std::function<void(T*)>>::iterator element;
+    std::list<CompilerFunc_t>* list;
+    typename std::list<CompilerFunc_t>::iterator element;
     
     public:
-    ~CompilerRef() {list.erase(element);}
+    CompilerRef() = default;
+    CompilerRef(std::list<CompilerFunc_t>* list_ptr, typename std::list<CompilerFunc_t>::iterator element) : list(list_ptr), element(element) {}
+    ~CompilerRef() {list->erase(element);}
   };
 
   inline static int priority = 0;
 
-  static CallbackRef addCallback(std::function<void(T*)> foo);
-  void doCallbacks() final {
+  static CallbackRef addCallback(CallbackFunc_t foo) {
+    callbacks.push_back(foo);
+    return CallbackRef(&callbacks, --callbacks.end());
+  }
+
+  void doCallbacks(RobotMessageHeader& header) final {
     for(auto callbackFunc : callbacks)
     {
-      callbackFunc(static_cast<T *>(this));
+      callbackFunc(static_cast<T *>(this), header);
     }
   }
 
-  static CompilerRef addDataCompiler(std::function<void(T*)> foo);
+  static CompilerRef addDataCompiler(CompilerFunc_t foo) {
+    dataCompilers.push_back(foo);
+    return CompilerRef(&dataCompilers, --dataCompilers.end());
+  }
+  
   void compileData() final {
     for (auto dataCompiler : dataCompilers)
     {
@@ -129,10 +149,11 @@ volatile ComponentRegistry RobotMessageComponent<T>::registry = ComponentRegistr
 
 class RobotMessage
 {
-    public: 
-    uint32_t componentHash = 1337; // Temporary                                                        // Hash value of possible components, to ensure that messages are compatible
-    uint64_t componentsIncluded;                                                    // Bitfield of included components 
-    std::vector<std::shared_ptr<AbstractRobotMessageComponent>> componentPointers;  // Pointers to the included components. With smart pointers we don't need to worry about deleting them!
+
+  public:
+  RobotMessageHeader header; 
+  std::vector<std::shared_ptr<AbstractRobotMessageComponent>> componentPointers;  // Pointers to the included components. With smart pointers we don't need to worry about deleting them!
+
 
     /**
      * @brief 
@@ -156,7 +177,7 @@ class RobotMessage
      */
     void doCallbacks() {
       for( auto component : componentPointers) {
-        component->doCallbacks();
+        component->doCallbacks(header);
       }
     }
 
