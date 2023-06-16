@@ -182,7 +182,7 @@ private:
         // 2 player
             { {GN,OM,UN,UN,UN}, {GN,DM,UN,UN,UN}, {GN,DM,UN,UN,UN}, {DM,OM,UN,UN,UN} },
             // 3 player
-                { {GN,OL,OM,UN,UN}, {GN,DR,DL,UN,UN}, {GA,DM,OM,UN,UN}, {GN,OR,OM,UN,UN} },
+                { {GN,DM,OM,UN,UN}, {GN,DR,DL,UN,UN}, {GA,DM,OM,UN,UN}, {GN,OR,OM,UN,UN} },
                 // 4 player
                     { {GN,DR,DL,OM,UN}, {GN,DR,DL,DM,UN}, {GA,DM,OL,OM,UN}, {GN,DM,OL,OM,UN} },
                     // 5 player
@@ -204,6 +204,7 @@ private:
     int opp_penalties = -1;
     // loop over players and sum up penalized states
 
+    
     for (const auto& buddy : theOwnTeamInfo.players) {
       if (buddy.penalty != PENALTY_NONE) own_penalties++;
     }
@@ -213,23 +214,22 @@ private:
 
     TeammateRoles teamMateRoles;
 
-
+// OUTPUT_TEXT("onw" << own_penalties << "opp" << opp_penalties);
 
     // to do: who is active - loop supp. index, number active
     // what if substitute goalie?
     int teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME; // patch due to update errors
-    if (opp_penalties > 2 || (own_penalties >= 1 && opp_penalties >= 2)) {
+    if (opp_penalties > 18 || (own_penalties >= 19 && opp_penalties >= 18)) {  //undeployed robots count as penalized; the array is 20 bots long
     // HOT FIX
     // if(true) {
-      /*
+/*      
       theTeamActivitySkill(TeamBehaviorStatus::R2K_SPARSE_GAME);
       teamBehaviorStatus = TeamBehaviorStatus::R2K_SPARSE_GAME;
-      */
-      /* patch due problems with new data structure from GC*/
-
+  */  
+    
       theTeamActivitySkill(TeamBehaviorStatus::R2K_NORMAL_GAME);
       teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME;
-
+    
     }
     else {
       if (own_score == opp_score) { //default
@@ -590,7 +590,7 @@ private:
     }
     theRoleSkill(lastPlayerRole);
     theTimeToReachBallSkill(lastTimeToReachBall);
-    if (theGameInfo.state != STATE_READY && theGameInfo.state != STATE_SET){
+    if (theGameInfo.state != STATE_READY && theGameInfo.state != STATE_SET
       // HOT FIX
       && theGameInfo.state != STATE_PLAYING) { // we sended the teammateRoles already at line 347
       theTeammateRolesSkill(lastTeammateRoles);
