@@ -188,11 +188,7 @@ void WhistleRecognizer::update(Whistle& theWhistle)
           else
           {
             const float channelCorrelation = correlate(signature.spectrum, buffers[i]);
-            if(channelCorrelation > bestChannelCorrelation)
-            {
-              bestChannelCorrelation = channelCorrelation;
-              bestUpdated = true;
-            }
+            bestChannelCorrelation = std::max(bestChannelCorrelation, channelCorrelation);
             correlation += channelCorrelation;
           }
 
@@ -230,11 +226,10 @@ void WhistleRecognizer::update(Whistle& theWhistle)
   }
 
   // Reset best correlation after it was sent in two network packets.
-  if(theBHumanMessageOutputGenerator.sendThisFrame)
+  if (theFrameInfo.getTimeSince(theWhistle.lastTimeWhistleDetected) >= accumulationDuration)
   {
-    if(!bestUpdated)
-      bestCorrelation = 1.f;
-    bestUpdated = false;
+    theWhistle.lastTimeWhistleDetected = theWhistle.lastTimeWhistleDetected;
+    bestCorrelation = 1.f;
     soundWasPlaying = SystemCall::soundIsPlaying();
   }
 
