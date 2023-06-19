@@ -1,3 +1,4 @@
-cs DynamicBallHandling team2
+cs DynamicBallHandlingAttacker team1
+cs DynamicBallHandlingDefender team2
 call Includes/Fast
 call Includes/3vs3

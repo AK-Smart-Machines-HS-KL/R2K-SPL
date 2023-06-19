@@ -8,7 +8,7 @@
     <Light z="9m" ambientColor="rgb(50%, 50%, 50%)"/>
 
     <Compound name="teamColors">
-      <Appearance name="black"/>
+      <Appearance name="red"/>
       <Appearance name="blue"/>
     </Compound>
 
@@ -40,7 +40,7 @@
         <Set name="NaoColor" value="dblue"/>
       </Body>
       <Body ref="Nao" name="robot10">
-        <Translation x="-0.50" y="0" z="320mm"/>
+        <Translation x="-0.90" y="0" z="320mm"/>
         <Rotation z="0degree"/>
         <Set name="NaoColor" value="dblue"/>
       </Body>
@@ -56,6 +56,11 @@
     </Compound>
 
     <Compound ref="field"/>
+    
+    <Compound name="scenarios">
+      <Compound name="DynamicBallHandlingAttacker"/>
+      <Compound name="DynamicBallHandlingDefender"/>
+    </Compound>
 
   </Scene>
 </Simulation>
