@@ -27,6 +27,7 @@
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/Configuration/FieldDimensions.h"
+#include "Representations/Modeling/ObstacleModel.h"
 #include "Representations/Modeling/RobotPose.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
@@ -38,6 +39,7 @@
 #include "Representations/BehaviorControl/TeammateRoles.h"
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 CARD(OffenseForwardPassCard,
      {
@@ -49,12 +51,14 @@ CARD(OffenseForwardPassCard,
     CALLS(WalkAtRelativeSpeed),
     REQUIRES(FieldBall),
     REQUIRES(FieldDimensions),
+    REQUIRES(ObstacleModel),
     REQUIRES(RobotPose),
     REQUIRES(TeamData),
-    REQUIRES(TeamBehaviorStatus),   // R2K
-    REQUIRES(TeammateRoles),        // R2K
-    REQUIRES(PlayerRole),           // R2K
-    REQUIRES(RobotInfo),            // R2K
+    REQUIRES(TeamBehaviorStatus),   
+    REQUIRES(TeammateRoles),        
+    REQUIRES(PlayerRole),           
+    REQUIRES(RobotInfo),           
+    REQUIRES(TeamCommStatus),
     DEFINES_PARAMETERS(
                        {,
                            (float)(0.8f) walkSpeed,
@@ -77,10 +81,12 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
     bool preconditions() const override
     {
         
-      return theTeammateRoles.playsTheBall(theRobotInfo.number) &&   // I am the striker
+      return 
+        theTeammateRoles.playsTheBall(&theRobotInfo,theTeamCommStatus.isWifiCommActive) &&   // I am the striker
         theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
-        thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1;
-        // theTeamBehaviorStatus.teamActivity != TeamBehaviorStatus::R2K_SPARSE_GAME;
+        thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1 &&
+        theObstacleModel.opponentIsTooClose(theFieldBall.positionRelative) != KickInfo::LongShotType::noKick &&  
+        theTeamBehaviorStatus.teamActivity != TeamBehaviorStatus::R2K_SPARSE_GAME;
         
     }
     

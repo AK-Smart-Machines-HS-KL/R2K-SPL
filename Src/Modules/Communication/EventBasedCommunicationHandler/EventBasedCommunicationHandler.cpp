@@ -139,23 +139,23 @@ void EventBasedCommunicationHandler::ebcLevelMonitor(){
     }
 
     //Is DribblingOrSidePass active? Send Message (Also Increase Message Output?)
-    /*
-    if(ebc_last_activity == BehaviorStatus::offenseDribblingOrSidePass && !ebc_dribbling_active){
+    
+    if(lastBehavior == BehaviorStatus::offenseForwardPassCard && !ebc_dribbling_active){
       ebcImportantMessageSend();
-      ebc_my_level+=EBCCountBoost;
+      myUrgencyLevel+=EBCCountBoost;
       ebc_dribbling_active = true;
       if(ebcDebugMessages){
         OUTPUT_TEXT("================");
         OUTPUT_TEXT("robot nr:" << theRobotInfo.number << ": *********Offense Dribbling Active******");
       } 
     }
-    else if(ebc_last_activity != BehaviorStatus::offenseDribblingOrSidePass && ebc_dribbling_active){
+    else if(lastBehavior!= BehaviorStatus::offenseForwardPassCard && ebc_dribbling_active){
       ebc_dribbling_active = false;
       if(ebcDebugMessages){
         OUTPUT_TEXT("Dribbling Complete!");
       }
     }
-    */
+    
     //Player: I Became Striker? Send Message
         
     if(theTeammateRoles.playsTheBall(theRobotInfo.number) && !ebcIsStriker){

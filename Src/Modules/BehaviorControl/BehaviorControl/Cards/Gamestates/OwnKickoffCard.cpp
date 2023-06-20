@@ -9,6 +9,7 @@
  * 
  * V1.1 Card migrated (Nicholas)
  * V 1.2. changed to long kick (Adrian)
+ * v 1.3 card disabled
  * 
  * Note: all tactical offense try to kick the ball. So default position is crucial
  */

@@ -20,6 +20,7 @@
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Tools/Math/Geometry.h"
+#include "Representations/Communication/TeamData.h"
 
 // Debug Drawings
 #include "Tools/Debugging/DebugDrawings.h"
@@ -39,6 +40,7 @@ CARD(GoalShotCard,
         REQUIRES(RobotPose),
         REQUIRES(FieldBall),
         REQUIRES(FrameInfo),
+        REQUIRES(TeamData),
 
         DEFINES_PARAMETERS(
              {,
@@ -65,6 +67,7 @@ class GoalShotCard : public GoalShotCardBase
       && theFrameInfo.getTimeSince(timeLastFail) > cooldown
       && theShots.goalShot.failureProbability < 0.70
       && theFieldBall.positionOnField.x() > theRobotPose.translation.x()
+      && !aBuddyIsChasingOrClearing()
     ;
   }
 
@@ -152,6 +155,21 @@ class GoalShotCard : public GoalShotCardBase
   void postProcess() override {
     
   }
+  bool aBuddyIsChasingOrClearing() const
+    {
+      for (const auto& buddy : theTeamData.teammates) 
+      {
+        if (buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
+          return true;
+      }
+      return false;
+    }
 };
 
 MAKE_CARD(GoalShotCard);

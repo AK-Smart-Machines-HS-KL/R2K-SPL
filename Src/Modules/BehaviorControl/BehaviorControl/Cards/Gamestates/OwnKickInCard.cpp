@@ -22,6 +22,7 @@
 
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Communication/GameInfo.h"
+#include "Representations/Communication/TeamData.h"
 #include "Representations/Communication/TeamInfo.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/TeamCommStatus.h"
@@ -45,6 +46,7 @@ CARD(OwnKickInCard,
   REQUIRES(OwnTeamInfo),
   REQUIRES(GameInfo),
   REQUIRES(TeamBehaviorStatus),
+  REQUIRES(TeamData),
   REQUIRES(TeammateRoles),
   REQUIRES(TeamCommStatus),  // wifi on off?
 
@@ -70,7 +72,8 @@ class OwnKickInCard : public OwnKickInCardBase
     return
       theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) // I am the striker
       && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
-      && theGameInfo.setPlay == SET_PLAY_KICK_IN
+      && theGameInfo.setPlay == SET_PLAY_KICK_IN 
+      && !aBuddyIsDoingPenaltyKick()
       //  && theTeammateRoles.isTacticalDefense(theRobotInfo.number) // my recent role
       //  && theTeammateRoles.isTacticalOffense(theRobotInfo.number)
 
@@ -105,6 +108,15 @@ class OwnKickInCard : public OwnKickInCardBase
   {
   return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
   }
+  bool aBuddyIsDoingPenaltyKick() const
+    {
+      for (const auto& buddy : theTeamData.teammates) 
+      {
+        if (buddy.theBehaviorStatus.activity == BehaviorStatus::ownFreeKick)
+          return true;
+      }
+      return false;
+    }
 };
 
 MAKE_CARD(OwnKickInCard);

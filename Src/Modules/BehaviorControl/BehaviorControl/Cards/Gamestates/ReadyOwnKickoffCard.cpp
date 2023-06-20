@@ -75,6 +75,9 @@ class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
     case 1: // 
       targetAbsolute = Vector2f(-700, -2000);
       break;
+    case 2: // OFFENSIVE MODE - we have 3 offense
+      targetAbsolute = Vector2f(-700, 2000);
+      break;
     }
 
     Vector2f targetRelative = theRobotPose.toRelative(targetAbsolute);
