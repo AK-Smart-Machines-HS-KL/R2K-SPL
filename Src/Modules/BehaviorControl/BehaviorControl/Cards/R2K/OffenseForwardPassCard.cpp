@@ -78,9 +78,7 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
     {
         
       return theTeammateRoles.playsTheBall(theRobotInfo.number) &&   // I am the striker
-        theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
-        thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1 &&
-        theTeamBehaviorStatus.teamActivity != TeamBehaviorStatus::R2K_SPARSE_GAME;
+        theTeammateRoles.isTacticalOffense(theRobotInfo.number);
         
     }
     
