@@ -26,6 +26,7 @@
 struct RobotMessageHeader {
   uint32_t componentHash = 1337; // Temporary     
   uint16_t senderID;
+  uint32_t timestamp;
 };
 
 struct AbstractRobotMessageComponent {
@@ -64,53 +65,54 @@ class RobotMessageComponent : public AbstractRobotMessageComponent {
 
   private:
   static volatile ComponentRegistry registry; // = ComponentRegistry(ComponentMetadata{ T::name, T::create, T::setID });
+  inline static int id = -1;
   inline static std::list<CallbackFunc_t> callbacks = std::list<CallbackFunc_t>(); 
   inline static std::list<CompilerFunc_t> dataCompilers = std::list<CompilerFunc_t>(); 
-  inline static int id = -1;
 
   public: 
   class CallbackRef {
     private:
-    std::list<CallbackFunc_t>* list;
     typename std::list<CallbackFunc_t>::iterator element;
     
     public:
+    CallbackRef(CallbackRef&&) = default;
+    CallbackRef(const CallbackRef&) = delete;
     CallbackRef() = default;
-    CallbackRef(std::list<CallbackFunc_t>* list_ptr, typename std::list<CallbackFunc_t>::iterator element) : list(list_ptr), element(element) {}
-    ~CallbackRef() {list->erase(element);}
+    CallbackRef(typename std::list<CallbackFunc_t>::iterator element) : element(element) {}
+    ~CallbackRef() {callbacks.erase(element);}
   };
 
   class CompilerRef {
     private:
-    std::list<CompilerFunc_t>* list;
     typename std::list<CompilerFunc_t>::iterator element;
     
     public:
+    CompilerRef(CompilerRef&&) = default;
+    CompilerRef(const CompilerRef&) = delete;
     CompilerRef() = default;
-    CompilerRef(std::list<CompilerFunc_t>* list_ptr, typename std::list<CompilerFunc_t>::iterator element) : list(list_ptr), element(element) {}
-    ~CompilerRef() {list->erase(element);}
+    CompilerRef(typename std::list<CompilerFunc_t>::iterator element) : element(element) {}
+    ~CompilerRef() {dataCompilers.erase(element);}
   };
 
   inline static int priority = 0;
 
   static CallbackRef addCallback(CallbackFunc_t foo) {
     callbacks.push_back(foo);
-    return CallbackRef(&callbacks, --callbacks.end());
+    return CallbackRef(--callbacks.end());
   }
 
-  void doCallbacks(RobotMessageHeader& header) final {
-    for(auto callbackFunc : callbacks)
-    {
+  void doCallbacks(RobotMessageHeader& header) {
+    for(auto callbackFunc : callbacks) {
       callbackFunc(static_cast<T *>(this), header);
     }
   }
 
   static CompilerRef addDataCompiler(CompilerFunc_t foo) {
     dataCompilers.push_back(foo);
-    return CompilerRef(&dataCompilers, --dataCompilers.end());
+    return CompilerRef(--dataCompilers.end());
   }
   
-  void compileData() final {
+  void compileData() {
     for (auto dataCompiler : dataCompilers)
     {
       dataCompiler(static_cast<T *>(this));

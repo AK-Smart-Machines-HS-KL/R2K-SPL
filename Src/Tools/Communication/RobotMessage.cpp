@@ -3,20 +3,8 @@
 #include <bitpacker.hpp>
 #include <vector>
 #include <algorithm>
+#include "Platform/Time.h"
 
-// template<typename T>
-// typename RobotMessageComponent<T>::CallbackRef RobotMessageComponent<T>::addCallback(RobotMessageComponent<T>::CallbackFunc_t foo) {
-//   callbacks.push_back(foo);
-//   RobotMessageComponent<T>::CallbackRef ref(callbacks, --callbacks.end());
-//   return ref;
-// }
-
-// template<typename T>
-// typename RobotMessageComponent<T>::CompilerRef RobotMessageComponent<T>::addDataCompiler(RobotMessageComponent<T>::CompilerFunc_t foo) {
-//   dataCompilers.push_back(foo);
-//   RobotMessageComponent<T>::CompilerRef ref(dataCompilers, --dataCompilers.end());
-//   return ref;
-// }
 
 bool idsAssigned = false;
 std::vector<ComponentMetadata> metadataById = std::vector<ComponentMetadata>();
@@ -63,6 +51,12 @@ size_t RobotMessage::compress(std::array<uint8_t, SPL_MAX_MESSAGE_BYTES>& outBuf
   // Copy component hash
   memcpy(outBuff.data() + byteOffset, &header.componentHash, sizeof(header.componentHash)); 
   byteOffset += sizeof(header.componentHash);
+
+  memcpy(outBuff.data() + byteOffset, &header.senderID, sizeof(header.senderID)); 
+  byteOffset += sizeof(header.senderID);
+
+  memcpy(outBuff.data() + byteOffset, &header.timestamp, sizeof(header.timestamp)); 
+  byteOffset += sizeof(header.timestamp);
 
   // Compress and Copy Individual Components
   for (auto component : componentPointers) {
@@ -112,6 +106,10 @@ bool RobotMessage::decompress(std::array<uint8_t, SPL_MAX_MESSAGE_BYTES>& buff){
   memcpy(&header.senderID, buff.data() + byteOffset, sizeof(header.senderID));
   byteOffset += sizeof(header.senderID);
 
+  // Copy Timestamp
+  memcpy(&header.timestamp, buff.data() + byteOffset, sizeof(header.timestamp));
+  byteOffset += sizeof(header.timestamp);
+
   for (auto &componentID : includedComponents)
   {
     auto component = metadataById[componentID].createNew();
@@ -133,6 +131,7 @@ void RobotMessage::compile() {
 
   header.componentHash = 1337; //TODO: Generate and use hash
   header.senderID = Global::getSettings().playerNumber;
+  header.timestamp = Time::getCurrentSystemTime();
 
   static std::vector<ComponentMetadata> metadataByPriority(metadataById); // list for prioritization
 
@@ -140,7 +139,7 @@ void RobotMessage::compile() {
   struct PrioritySortPredicate {
     inline bool operator() (const ComponentMetadata& a, const ComponentMetadata& b)
     {
-      return *a.priority < *b.priority;
+      return *a.priority > *b.priority;
     }
   };
 

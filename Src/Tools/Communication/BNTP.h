@@ -82,6 +82,8 @@ public:
   }
 };
 
+  using namespace std::placeholders; // for _1 _2 etc.
+
 /**
  * @class BNTP
  *
@@ -100,6 +102,9 @@ public:
   void sndRequest(BNTPRequestComponent *);
   void sndResponse(BNTPResponseComponent *);
 
+  // Frame Update
+  void update();
+
   const SynchronizationMeasurementsBuffer* operator[](unsigned number) const
   {
     return number >= Settings::lowestValidPlayerNumber && number <= Settings::highestValidPlayerNumber ?
@@ -107,13 +112,12 @@ public:
   }
 
 private:
-
   // Callback References
-  BNTPRequestComponent::CallbackRef requestCallback;
-  BNTPRequestComponent::CompilerRef requestCompiler;
+  BNTPRequestComponent::CallbackRef requestCallback = BNTPRequestComponent::addCallback(std::bind(&BNTP::rcvRequest, this, _1, _2));;
+  BNTPRequestComponent::CompilerRef requestCompiler = BNTPRequestComponent::addDataCompiler(std::bind(&BNTP::sndRequest, this, _1));
 
-  BNTPResponseComponent::CallbackRef responseCallback;
-  BNTPResponseComponent::CompilerRef responseCompiler;
+  BNTPResponseComponent::CallbackRef responseCallback = BNTPResponseComponent::addCallback(std::bind(&BNTP::rcvResponse, this, _1, _2));; 
+  BNTPResponseComponent::CompilerRef responseCompiler = BNTPResponseComponent::addDataCompiler(std::bind(&BNTP::sndResponse, this, _1));;
 
   static constexpr int ntpRequestInterval = 10000; /**< Request an NTP message every $ ms. */
 

@@ -193,6 +193,8 @@ void TeamMessageHandler::writeMessage(BHumanMessageOutputGenerator& outputGenera
 
 void TeamMessageHandler::update(TeamData& teamData)
 {
+  theBNTP.update();
+
   teamData.generate = [this, &teamData](const SPLStandardMessageBufferEntry* const m)
   {
     if(readSPLStandardMessage(m))
