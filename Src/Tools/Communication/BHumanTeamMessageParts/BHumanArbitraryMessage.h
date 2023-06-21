@@ -18,6 +18,8 @@
 
 struct BHumanArbitraryMessage : public Streamable
 {
+  char header[4];
+  uint8_t version;
   MessageQueue queue;
 
   // returns the size of this struct when it is written
@@ -36,6 +38,12 @@ struct BHumanArbitraryMessage : public Streamable
 
   BHumanArbitraryMessage()
   {
+    const char* init = BHUMAN_ARBITRARY_MESSAGE_STRUCT_HEADER;
+    for(unsigned int i = 0; i < sizeof(header); ++i)
+      header[i] = init[i];
+
+    version = BHUMAN_ARBITRARY_MESSAGE_STRUCT_VERSION;
+
     queue.setSize(SPL_STANDARD_MESSAGE_DATA_SIZE);
   };
 

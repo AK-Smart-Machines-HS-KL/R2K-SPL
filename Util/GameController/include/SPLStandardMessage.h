@@ -28,9 +28,11 @@
  */
 struct SPLStandardMessage
 {
+  char header[4];        // "SPL "
+  uint8_t version;       // has to be set to SPL_STANDARD_MESSAGE_STRUCT_VERSION
   uint8_t playerNum;     // [MANDATORY FIELD] 1-7
   uint8_t teamNum;       // [MANDATORY FIELD] the number of the team (as provided by the organizers)
-  // uint8_t fallen;        // [MANDATORY FIELD] 1 means that the robot is fallen, 0 means that the robot can play
+  uint8_t fallen;        // [MANDATORY FIELD] 1 means that the robot is fallen, 0 means that the robot can play
 
   // [MANDATORY FIELD]
   // position and orientation of robot
@@ -42,7 +44,7 @@ struct SPLStandardMessage
   float pose[3];         // x,y,theta
 
   // ball information
-  // float ballAge;         // seconds since this robot last saw the ball. -1.f if we haven't seen it
+  float ballAge;         // seconds since this robot last saw the ball. -1.f if we haven't seen it
 
   // position of ball relative to the robot
   // coordinates in millimeters
@@ -60,16 +62,16 @@ struct SPLStandardMessage
 #ifdef __cplusplus
   // constructor
   SPLStandardMessage() :
-    // version(SPL_STANDARD_MESSAGE_STRUCT_VERSION),
+    version(SPL_STANDARD_MESSAGE_STRUCT_VERSION),
     playerNum(0),
     teamNum(0),
-    // fallen(255), // placeholder to detect in the TCM if this field is not set
-    // ballAge(-1.f),
+    fallen(255), // placeholder to detect in the TCM if this field is not set
+    ballAge(-1.f),
     numOfDataBytes(0)
   {
-    // const char* init = SPL_STANDARD_MESSAGE_STRUCT_HEADER;
-    // for(unsigned int i = 0; i < sizeof(header); ++i)
-      // header[i] = init[i];
+    const char* init = SPL_STANDARD_MESSAGE_STRUCT_HEADER;
+    for(unsigned int i = 0; i < sizeof(header); ++i)
+      header[i] = init[i];
     pose[0] = 0.f;
     pose[1] = 0.f;
     pose[2] = 0.f;

@@ -55,13 +55,7 @@ int EventBasedCommunicationHandler::getOwnTeamInfoMessageBudget() {
    
    // to be replaced by theOwnTeamInfo.messageBudget
   #ifdef TARGET_ROBOT
-  if(theFrameInfo.getTimeSince(theGameInfo.timeLastPacketReceived) == 0 ||
-     theFrameInfo.getTimeSince(theGameInfo.timeLastPacketReceived) > 3000)
-    // some stupid turned the GC ;-) or drop outs
-
-    return messageBudget - sendCount * activeRobots;
-  else 
-    return theOwnTeamInfo.messageBudget;
+  return theOwnTeamInfo.messageBudget;
   #else
   return messageBudget - sendCount * activeRobots; // this is a ROUGH estimation
   #endif
@@ -210,7 +204,7 @@ void EventBasedCommunicationHandler::ebcMessageIntervalAdjust(const EventBasedCo
 // Note: if we do not communicate, #robots = 1 is assumed -> all bots become the goalie in STATE_PLAYING ;-)
 
 bool EventBasedCommunicationHandler::ebcSendThisFrame(const EventBasedCommunicationData& ebc){
-  return false;
+
     if (theGameInfo.state == STATE_FINISHED && !gameIsFinished) {
     gameIsFinished = true;
     if (ebcDebugMessages) {

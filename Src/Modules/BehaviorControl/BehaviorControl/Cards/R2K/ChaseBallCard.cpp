@@ -20,6 +20,8 @@
  *      if BehaviorStatus::chaseBallCard or clearOwnHalfCard or clearOwnHalfCardGoalie exit this card
  * 
  * v.1.2 card now checks wether there is an passing event active (OffenseForwardPassCard, OffenseReceivePassCard)
+ * v 1.3: (Asrar) "theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)"
+          this is for online and offline role assignment
     
  * - Check: GoalShot has higher priority and takes over close to opp.goal
  * v 1.3 DEFENSE only x < 0 - threshold
@@ -41,6 +43,7 @@
 #include "Representations/Communication/TeamData.h"
 #include "Representations/BehaviorControl/TeammateRoles.h"
 #include "Representations/Communication/GameInfo.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 
 
@@ -60,6 +63,7 @@ CARD(ChaseBallCard,
         REQUIRES(FieldDimensions),
         REQUIRES(TeamData),   // check behavior
         REQUIRES(TeammateRoles),
+        REQUIRES(TeamCommStatus),  // wifi on off?
 
         DEFINES_PARAMETERS(
              {,
@@ -83,15 +87,15 @@ class ChaseBallCard : public ChaseBallCardBase
   
     return
       (
-        //!aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
+        !aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
         theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
         theFieldBall.positionOnField.x() > (0 - threshold)
         // theFieldBall.positionOnField.x() >= theRobotPose.translation.x() - threshold;
         )
       ||
       (theGameInfo.setPlay == SET_PLAY_NONE &&
-        // !aBuddyIsClearingOwnHalf() &&
-        //theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
+        !aBuddyIsChasingOrClearing() &&
+        theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
         theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
         theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
         theFieldBall.endPositionOnField.x() < -500 &&
@@ -157,6 +161,7 @@ class ChaseBallCard : public ChaseBallCardBase
         if (buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
           return true;

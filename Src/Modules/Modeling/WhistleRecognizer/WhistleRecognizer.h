@@ -42,7 +42,9 @@ MODULE(WhistleRecognizer,
     (float) newSampleRatio, /**< The ratio of new samples buffered before recognition is tried again (0..1). */
     (float) minVolume, /**< The minimum volume that must be reached for accepting a whistle [0..1). */
     (float) minCorrelation, /**< The ratio between the selfCorrelation and the current correlation that is accepted ]0..1]. */
+    (int)accumulationDuration, /**< The duration over which correlations are collected before they are reported. */
     (int) minAnnotationDelay, /**< The minimum time between annotations announcing a detected whistle. */
+    (bool)mute, /**< Deactivate sound output in game states in which a whistle could be detected. */
   }),
 });
 

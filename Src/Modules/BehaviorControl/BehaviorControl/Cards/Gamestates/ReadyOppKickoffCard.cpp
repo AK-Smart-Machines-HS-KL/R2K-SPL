@@ -8,9 +8,11 @@
  * Behavior:
  * Sets up Robot 5 Blocking the center line of the own field during kickoff
  * 
- * @version 1.1.
+ * version 1.1.
  * OFFENSIVE Robots march to their default position (see DefaultPoseProvider for details)
- * @version 1.2 Migrated (Adrian). Offense Players step back 1m from default position to stay clear from center circle
+ * version 1.2 Migrated (Adrian). Offense Players step back 1m from default position to stay clear from center circle
+ * version 1.3. (Andy): changing default position for offense players too even more distance to center circle)
+ * version 1.4. (Adrian): code migration using theTeammateRoles.offenseRoleIndex
  */
 
 #include "Representations/BehaviorControl/DefaultPose.h"
@@ -71,25 +73,15 @@ class ReadyOppKickoffCard : public ReadyOppKickoffCardBase
 
       int nOffenseFound = 0;
       int i;
-      for (i = 4; i >= 0; i--) {
-        if (theTeammateRoles.isTacticalOffense(i+1))
-        {
-          nOffenseFound++;
-          if(theRobotInfo.number == i+1 && theTeammateRoles.isTacticalOffense(theRobotInfo.number)) {
-            switch (nOffenseFound)
-            {
-            case 1:
-              targetAbsolute = Vector2f(-1000, 0);
-              break;
 
-            case 2:
-              targetAbsolute = Vector2f(-1300, -300);
-              break;
-            }
-            break;
-          }
-        }
-      } 
+      switch (theTeammateRoles.offenseRoleIndex(theRobotInfo.number)) {
+      case 0: // right-most offense
+        targetAbsolute = Vector2f(-1000, 0);
+        break;
+      case 1: // 
+        targetAbsolute = Vector2f(-1300, -300);
+        break;
+      }
 
       Vector2f targetRelative = theRobotPose.toRelative(targetAbsolute);
 

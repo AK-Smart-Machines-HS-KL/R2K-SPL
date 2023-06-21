@@ -55,7 +55,7 @@
  * - fixed error in defaultPoseProvider.cfg (+y is left, -y is right. Adjusted and optimized r2k_tactics[][]
  * - dynamic role assignment is coupled to change in #penalized bots; if this is unchanged, we use last lineUp
  * 
- * 
+ * v.16: several HOT FIX on GORE 23: disable computing of roles, tactics, ...
  * 
  * 
  * 
@@ -166,7 +166,7 @@ class R2K_TeamCard : public R2K_TeamCardBase
 
 private:
   int myEbcWrites = 0;  // tnmp. hack for tracing ebc
-  bool recomputeLineUp;
+  bool recomputeLineUp = false; // check for fresh penalties
 
   void execute() override
   {
@@ -204,6 +204,7 @@ private:
     int opp_penalties = -1;
     // loop over players and sum up penalized states
 
+    
     for (const auto& buddy : theOwnTeamInfo.players) {
       if (buddy.penalty != PENALTY_NONE) own_penalties++;
     }
@@ -213,23 +214,22 @@ private:
 
     TeammateRoles teamMateRoles;
 
-
+// OUTPUT_TEXT("onw" << own_penalties << "opp" << opp_penalties);
 
     // to do: who is active - loop supp. index, number active
     // what if substitute goalie?
     int teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME; // patch due to update errors
-    // if (opp_penalties > 2 || (own_penalties >= 1 && opp_penalties >= 2)) {
+    if (opp_penalties > 18 || (own_penalties >= 19 && opp_penalties >= 18)) {  //undeployed robots count as penalized; the array is 20 bots long
     // HOT FIX
-    if(true) {
-      /*
+    // if(true) {
+/*      
       theTeamActivitySkill(TeamBehaviorStatus::R2K_SPARSE_GAME);
       teamBehaviorStatus = TeamBehaviorStatus::R2K_SPARSE_GAME;
-      */
-      /* patch due problems with new data structure from GC*/
-
+  */  
+    
       theTeamActivitySkill(TeamBehaviorStatus::R2K_NORMAL_GAME);
       teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME;
-
+    
     }
     else {
       if (own_score == opp_score) { //default
@@ -273,8 +273,9 @@ private:
     bool goalieIsActive = false;
 
 
+// OUTPUT_TEXT("own penalties "<< own_penalties );  // 16
     if (own_penalties != lastNrOwnPenalties) {
-      recomputeLineUp = true;
+      recomputeLineUp = false;
       // OUTPUT_TEXT("recomputeLineUp  " << lastNrOwnPenalties << " " << own_penalties);
       lastNrOwnPenalties = own_penalties;
     }
@@ -312,7 +313,7 @@ private:
       } 
     }  // do we see valid team data
     // HOT FIX
-    // ASSERT(botsLineUp.size() == activeBuddies);
+   //  ASSERT(botsLineUp.size() == activeBuddies);
     // now add myself 
     if (theRobotInfo.penalty == PENALTY_NONE)
       if (recomputeLineUp) {
@@ -370,6 +371,7 @@ private:
 
     }
     // patch for communication problems
+    
     switch (theRobotInfo.number - 1) {
       case 0: pRole.role = PlayerRole::supporter0;   break;
       case 1: pRole.role = PlayerRole::supporter1;   break;
@@ -377,12 +379,17 @@ private:
       case 3: pRole.role = PlayerRole::supporter3;   break;
       case 4: pRole.role = PlayerRole::supporter4;   break;
     }
+    
+   
     // d2: static assignment , only for specific gamestates
 
 
     // if (theGameInfo.state == STATE_READY || theGameInfo.state == STATE_SET) {
+
+    // HOT FIX GORE 2023 
+    
     if (theGameInfo.state == STATE_READY || theGameInfo.state == STATE_SET || 
-      theGameInfo.state == STATE_PLAYING) {
+        theGameInfo.state == STATE_PLAYING) {
       
       int nActive = 0;
       for (auto &gcPlayer : theOwnTeamInfo.players)
@@ -403,6 +410,8 @@ private:
           teamMateRoles.roles[i] = TeammateRoles::UNDEFINED;
         }
       }
+      // TEMP ANTI HOT FIX
+      // teamMateRoles.captain = 3;
       theTeammateRolesSkill(teamMateRoles);
     }
     else {
@@ -521,8 +530,12 @@ private:
       } // rof: who plays the ball
 
       // or am I the striker?
+
+     
       if (minDist == dist) {  // i am the striker
+        //  // TEMP ANTI HOT FIX
         teamMateRoles.captain = theRobotInfo.number;
+        // teamMateRoles.captain = 3;
         /* 
         if (pRole.isGoalkeeper()) pRole.role = PlayerRole::goalkeeperAndBallPlayer;
         else pRole.role = PlayerRole::ballPlayer
@@ -562,7 +575,7 @@ private:
       lastTeammateRoles = teamMateRoles;
     }
 
-    // partial update
+    // partial updat
     if (1 <= pRole.numOfActiveSupporters && lastTeammateRoles.captain != teamMateRoles.captain) {
       lastTeammateRoles.captain = teamMateRoles.captain;
       // lastPlayerRole = pRole;
@@ -573,10 +586,12 @@ private:
       myEbcWrites = theEventBasedCommunicationData.ebcSendMessageImportant();
       // OUTPUT_TEXT("Nr: " << theRobotInfo.number << " : R2K TeamCard ebc  update");
       refreshAllData = false;
+      recomputeLineUp = false;
     }
     theRoleSkill(lastPlayerRole);
     theTimeToReachBallSkill(lastTimeToReachBall);
-    if (theGameInfo.state != STATE_READY && theGameInfo.state != STATE_SET 
+    if (theGameInfo.state != STATE_READY && theGameInfo.state != STATE_SET
+      // HOT FIX
       && theGameInfo.state != STATE_PLAYING) { // we sended the teammateRoles already at line 347
       theTeammateRolesSkill(lastTeammateRoles);
     }
