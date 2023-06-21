@@ -48,6 +48,7 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanCompressedMessageParticle<Behavior
     offenseFastGoalKick,
     offenseForwardPassCard,
     offenseReceivePassCard,
+    goalieForwardPassCard,
     
     //Game States
     ownFreeKick,
