@@ -51,7 +51,7 @@
     
     <Compound name="balls">
       <Body ref="ball">
-        <Translation z="1m"/>
+        <Translation x="3.2m" y="0" z="320mm"/>
       </Body>
     </Compound>
 
