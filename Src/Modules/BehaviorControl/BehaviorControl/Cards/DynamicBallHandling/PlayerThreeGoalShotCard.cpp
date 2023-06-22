@@ -72,8 +72,8 @@ class PlayerThreeGoalShotCard : public PlayerThreeGoalShotCardBase
   {
     return
      // theTeammateRoles.playsTheBall(theRobotInfo.number) &&   // I am the striker
-      //theRobotInfo.number == 3
-      theTeammateRoles.isTacticalOffense(theRobotInfo.number)
+      theRobotInfo.number == 3
+     // theTeammateRoles.isTacticalOffense(theRobotInfo.number)
       && theFieldBall.positionRelative.norm() < 500
       && theFrameInfo.getTimeSince(timeLastFail) > cooldown
       && theShots.goalShot.failureProbability < 0.70

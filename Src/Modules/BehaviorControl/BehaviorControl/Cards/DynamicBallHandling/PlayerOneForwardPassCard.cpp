@@ -68,9 +68,10 @@ class PlayerOneForwardPassCard : public PlayerOneForwardPassCardBase
     bool preconditions() const override
     {
         
-      return //theTeammateRoles.playsTheBall(theRobotInfo.number) &&   // I am the striker
-        //theRobotInfo.number == 1;
-       theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number);
+      return 
+        // theTeammateRoles.playsTheBall(&theRobotInfo, true) &&   // I am the striker
+        theRobotInfo.number == 1;
+        // theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number);
         
     }
     
