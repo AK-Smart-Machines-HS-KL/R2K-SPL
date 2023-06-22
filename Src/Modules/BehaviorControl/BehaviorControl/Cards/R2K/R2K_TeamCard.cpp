@@ -55,7 +55,8 @@
  * - fixed error in defaultPoseProvider.cfg (+y is left, -y is right. Adjusted and optimized r2k_tactics[][]
  * - dynamic role assignment is coupled to change in #penalized bots; if this is unchanged, we use last lineUp
  * 
- * v.16: several HOT FIX on GORE 23: disable computing of roles, tactics, ...
+ * v.1.6: several HOT FIX on GORE 23: disable computing of roles, tactics, ...
+ * v 1.7. (Adria ) reverting hot fixes, code clean-up, dealing with incomplete TeamData, TeamcommStatus offline triggers static role assignment
  * 
  * 
  * 
@@ -99,6 +100,7 @@
 #include <algorithm>  // min()
 #include "Representations/BehaviorControl/TeammateRoles.h"  // GOALKEEPER, DEFENSE,...
 #include "Representations/Communication/TeamInfo.h"         // access scores, OwnTeamInfo, OppTeamInfo
+#include "Representations/Communication/TeamCommStatus.h"
 
 
 #define GN TeammateRoles::GOALKEEPER_NORMAL
@@ -127,6 +129,7 @@ TEAM_CARD(R2K_TeamCard,
     REQUIRES(GameInfo),   // ttrb, check for state change
     REQUIRES(RobotInfo),  // roles
     REQUIRES(RobotPose),  // supporterindex
+    REQUIRES(TeamCommStatus),
     // USES(TeamBehaviorStatus),   // to be tested
     CALLS(TeamActivity),
     REQUIRES(OwnTeamInfo),    // score, penalty
@@ -166,7 +169,7 @@ class R2K_TeamCard : public R2K_TeamCardBase
 
 private:
   int myEbcWrites = 0;  // tnmp. hack for tracing ebc
-  bool recomputeLineUp = true; // check for fresh penalties
+  bool recomputeLineUp = false; // check for fresh penalties
   std::vector<int> lineUp = {1,2,3,4,5};
 
   void execute() override
@@ -204,8 +207,6 @@ private:
     int own_penalties = -1;
     int opp_penalties = -1;
     // loop over players and sum up penalized states
-
-    
     for (const auto& buddy : theOwnTeamInfo.players) {
       if (buddy.penalty != PENALTY_NONE) own_penalties++;
     }
@@ -220,17 +221,19 @@ private:
     // to do: who is active - loop supp. index, number active
     // what if substitute goalie?
     int teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME; // patch due to update errors
-    if (opp_penalties > 18 || (own_penalties >= 19 && opp_penalties >= 18)) {  //undeployed robots count as penalized; the array is 20 bots long
+
+    // n vs. 2  || 3 vs 3 or less 
+    if (opp_penalties >= 18 || (own_penalties > 18 && opp_penalties > 18)) {  //undeployed robots count as penalized; the array is 20 bots long
     // HOT FIX
     // if(true) {
-/*      
+      
       theTeamActivitySkill(TeamBehaviorStatus::R2K_SPARSE_GAME);
       teamBehaviorStatus = TeamBehaviorStatus::R2K_SPARSE_GAME;
-  */  
-    
+  
+/*    
       theTeamActivitySkill(TeamBehaviorStatus::R2K_NORMAL_GAME);
       teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME;
-    
+  */  
     }
     else {
       if (abs(own_score - opp_score)<=1) { //default: +/- 1 goal
@@ -277,7 +280,7 @@ private:
 // OUTPUT_TEXT("own penalties "<< own_penalties );  // 16
     if (own_penalties != lastNrOwnPenalties) {
       recomputeLineUp = true;
-      // OUTPUT_TEXT("recomputeLineUp  " << lastNrOwnPenalties << " " << own_penalties);
+      OUTPUT_TEXT("recomputeLineUp  " << lastNrOwnPenalties << " " << own_penalties);
       lastNrOwnPenalties = own_penalties;
     }
 
@@ -291,7 +294,7 @@ private:
     // OUTPUT_TEXT("aB " << activeBuddies);
     // OUTPUT_TEXT("theTeamData.numberOfActiveTeammates " << theTeamData.numberOfActiveTeammates);#
 
-      if (1 == activeBuddies) {   // setting  arbritary lineup
+      if (2 >= activeBuddies) {   // setting  arbritary lineup
         OUTPUT_TEXT("no buddies");
         for (unsigned int j = 0; j < 4; j++) {
           botsLineUp.push_back(BotOnField(j, (float)lineUp[j] * 100));
@@ -311,7 +314,7 @@ private:
             goalieIsActive = true;  // This flag will be used below
         }
       } // fi: line up computed on / offline (valid team data yes/no)
-    }
+    
     // HOT FIX
     
     // now add myself 
@@ -325,7 +328,7 @@ private:
         // OUTPUT_TEXT(theRobotInfo.number);
       }
     }
-
+  }
     /*
     int  ms = botsLineUp.size(); 
 
@@ -389,7 +392,7 @@ private:
     // d2: static assignment , only for specific gamestates
 
 
-    if (theGameInfo.state == STATE_READY || theGameInfo.state == STATE_SET) {
+    if (theGameInfo.state == STATE_READY || theGameInfo.state ==  STATE_SET || !theTeamCommStatus.isWifiCommActive ) {
       // default settings
       switch (theRobotInfo.number - 1) {
         case 0: pRole.role = PlayerRole::supporter0;   break;
@@ -402,7 +405,7 @@ private:
     }
 
       
-    if (theGameInfo.state == STATE_READY || theGameInfo.state == STATE_SET){ 
+    if (theGameInfo.state == STATE_READY || theGameInfo.state == STATE_SET|| !theTeamCommStatus.isWifiCommActive){ 
     //    theGameInfo.state == STATE_PLAYING) {
       // HOT FIX GORE 2023 
 
@@ -576,8 +579,7 @@ private:
       lastGamePhase !=  theGameInfo.gamePhase ||
       lastPlayerRole.numOfActiveSupporters != pRole.numOfActiveSupporters||
       lastTeamBehaviorStatus != teamBehaviorStatus || 
-      lastTeammateRoles.roles != teamMateRoles.roles ||
-      recomputeLineUp
+      lastTeammateRoles.roles != teamMateRoles.roles 
       // lastActiveBuddies != activeBuddies
      )
       refreshAllData = true;
@@ -589,7 +591,7 @@ private:
       lastTeamBehaviorStatus = teamBehaviorStatus;
       lastPlayerRole = pRole;
       lastTimeToReachBall = timeToReachBall;
-      lastTeammateRoles = teamMateRoles;
+      if(recomputeLineUp)lastTeammateRoles = teamMateRoles;
     }
 
     // partial updat
@@ -603,12 +605,12 @@ private:
       myEbcWrites = theEventBasedCommunicationData.ebcSendMessageImportant();
       // OUTPUT_TEXT("Nr: " << theRobotInfo.number << " : R2K TeamCard ebc  update");
       refreshAllData = false;
-      recomputeLineUp = true;
+      //reomputeLineUp = true;
     }
-    recomputeLineUp = true;
     theRoleSkill(lastPlayerRole);
     theTimeToReachBallSkill(lastTimeToReachBall);
-    if (theGameInfo.state != STATE_READY && theGameInfo.state != STATE_SET){
+    if (theGameInfo.state != STATE_READY && theGameInfo.state != STATE_SET 
+        && theTeamCommStatus.isWifiCommActive){
       // HOT FIX
       // && theGameInfo.state != STATE_PLAYING) { // we sended the teammateRoles already at line 347
       theTeammateRolesSkill(lastTeammateRoles);

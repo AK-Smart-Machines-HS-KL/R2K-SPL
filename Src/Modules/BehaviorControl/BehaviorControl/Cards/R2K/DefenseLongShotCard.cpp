@@ -93,7 +93,7 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
     return
       theTeammateRoles.playsTheBall(&theRobotInfo , theTeamCommStatus.isWifiCommActive) &&  // I am the striker
       !theObstacleModel.opponentIsClose(1200) && // see below: min distance is minOppDistance
-      !aBuddyIsClearingOwnHalf() &&
+      //!aBuddyIsClearingOwnHalf() &&
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
 
       //don't leave own half, unless we are in OFFENSIVE or SPARSE Mode)
@@ -144,9 +144,7 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
       if (buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
         buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
         buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
-        buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
-        buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard ||
-        buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
+        buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard)
         return true;
     }
     return false;
