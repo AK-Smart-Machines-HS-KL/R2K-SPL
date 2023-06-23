@@ -74,10 +74,10 @@ class PlayerThreeGoalShotCard : public PlayerThreeGoalShotCardBase
      // theTeammateRoles.playsTheBall(theRobotInfo.number) &&   // I am the striker
       theRobotInfo.number == 3
      // theTeammateRoles.isTacticalOffense(theRobotInfo.number)
-      && theFieldBall.positionRelative.norm() < 500
-      && theFrameInfo.getTimeSince(timeLastFail) > cooldown
+      && theFieldBall.positionRelative.norm() < 1500
+      //&& theFrameInfo.getTimeSince(timeLastFail) > cooldown
       && theShots.goalShot.failureProbability < 0.70
-      && theFieldBall.positionOnField.x() > theRobotPose.translation.x()
+     // && theFieldBall.positionOnField.x() > theRobotPose.translation.x()
     ;
   }
 

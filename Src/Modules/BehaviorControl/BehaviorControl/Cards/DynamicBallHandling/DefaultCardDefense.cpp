@@ -1,10 +1,10 @@
 /**
- * @file DefaultCard.cpp
- * @author Andy Hobelsberger    
+ * @file DefaultCardDefense.cpp
+ * @author Asfiya  
  * @brief This card's preconditions are always true. 
- *        Edit it for testing
+ *        
  * @version 0.1
- * @date 2021-05-23
+ * @date 2023-06-18
  * 
  * 
  */
@@ -20,10 +20,7 @@
 #include "Representations/BehaviorControl/DefaultPose.h"
 #include "Representations/Modeling/RobotPose.h"
 
-//#include <filesystem>
 
-// Modify this card but don't commit changes to keep it clean for other developers
-// Also don't forget to put this card at the top of your Card Stack!
 CARD(DefaultCardDefense,
      {
         ,

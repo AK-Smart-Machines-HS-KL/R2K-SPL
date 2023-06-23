@@ -1,6 +1,6 @@
 /**
  * @file PlayerTwoForwardPassCard.cpp
- * @author Asrar
+ * @author Asrar & Asfiya
  * @version 1.1
  * @date 22-06-2023
  *
@@ -69,7 +69,8 @@ class PlayerTwoForwardPassCard : public PlayerTwoForwardPassCardBase
     {
         
       return //theTeammateRoles.playsTheBall(theRobotInfo.number) &&   // I am the striker
-        theRobotInfo.number == 2;
+        theRobotInfo.number == 2
+        && theFieldBall.positionRelative.norm() < 1500;
        // theTeammateRoles.isTacticalDefense(theRobotInfo.number);
         
     }

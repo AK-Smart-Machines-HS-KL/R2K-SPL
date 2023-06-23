@@ -1,6 +1,6 @@
 /**
  * @file PlayerOneForwardPassCard.cpp
- * @author Asrar
+ * @author Asrar & Asfiya
  * @version 1.1
  * @date 21-06-2023
  *
@@ -68,10 +68,12 @@ class PlayerOneForwardPassCard : public PlayerOneForwardPassCardBase
     bool preconditions() const override
     {
         
-      return 
+      return
         // theTeammateRoles.playsTheBall(&theRobotInfo, true) &&   // I am the striker
-        theRobotInfo.number == 1;
+        theRobotInfo.number == 1
+        && theFieldBall.positionRelative.norm() < 1500;
         // theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number);
+
         
     }
     
