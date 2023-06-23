@@ -95,8 +95,8 @@ class PlayerTwoForwardPassCard : public PlayerTwoForwardPassCardBase
                 
                 if(buddy.number==3)
                 {
-                    x = buddy.theRobotPose.translation.x();
-                    y = buddy.theRobotPose.translation.y();
+                    x = buddy.theRobotPose.translation.x()-500;
+                    y = buddy.theRobotPose.translation.y()+250;
                     break;
                 }
             }
