@@ -97,8 +97,8 @@ class PlayerOneForwardPassCard : public PlayerOneForwardPassCardBase
                 
                 if(buddy.number==2)
                 {
-                    x = buddy.theRobotPose.translation.x();
-                    y = buddy.theRobotPose.translation.y();
+                    x = buddy.theRobotPose.translation.x() -500;
+                    y = buddy.theRobotPose.translation.y() +250;
                     break;
                 }
             }
