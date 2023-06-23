@@ -71,7 +71,7 @@ class PlayerOneForwardPassCard : public PlayerOneForwardPassCardBase
       return
         // theTeammateRoles.playsTheBall(&theRobotInfo, true) &&   // I am the striker
         theRobotInfo.number == 1
-        && theFieldBall.positionRelative.norm() < 1500;
+        && theFieldBall.positionOnField.x() < 0;
         // theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number);
 
         
