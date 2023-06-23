@@ -5,7 +5,7 @@
 class BallModelComponent : public RobotMessageComponent<BallModelComponent> {
   public:
 
-
+  BallModel model;
 
   //Required
   inline static const std::string name = "BallModel";
