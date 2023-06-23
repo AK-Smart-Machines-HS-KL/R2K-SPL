@@ -1,8 +1,12 @@
 #pragma once
 #include "Tools/Communication/RobotMessage.h"
+#include "Representations/Modeling/BallModel.h"
 
-class BallModelComponent: public RobotMessageComponent<BallModelComponent> {
+class BallModelComponent : public RobotMessageComponent<BallModelComponent> {
   public:
+
+
+
   //Required
   inline static const std::string name = "BallModel";
   BallModelComponent() : RobotMessageComponent<BallModelComponent>() { }

@@ -15,6 +15,7 @@
 #include "Platform/BHAssert.h"
 #include "Platform/SystemCall.h"
 #include "Platform/Time.h"
+#include "Tools/Settings.h"
 #include "Tools/Debugging/DebugDrawings.h"
 
 
@@ -86,7 +87,9 @@ void RobotMessageHandler::receive()
     // A Message was read
     if (size > 0) {
       RobotMessage msg;
-      if (msg.decompress(readBuffer)) {
+      if (msg.decompress(readBuffer) // Decompress Successful
+        && msg.header.senderID != Global::getSettings().playerNumber) // Ignore Messages from Self
+      {
         msg.doCallbacks();
       }
     }

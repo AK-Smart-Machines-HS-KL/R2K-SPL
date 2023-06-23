@@ -15,8 +15,6 @@
 BNTP::BNTP(const FrameInfo& theFrameInfo, const RobotInfo& theRobotInfo) : theFrameInfo(theFrameInfo), theRobotInfo(theRobotInfo) {}
 
 void BNTP::rcvRequest(BNTPRequestComponent * comp, RobotMessageHeader & header) {
-  OUTPUT_TEXT("BNTP Request Recieved");
-
   const unsigned receiveTimestamp = Time::getCurrentSystemTime();
 
   BNTPRequest& ntpRequest = receivedNTPRequests[header.senderID];
@@ -35,7 +33,6 @@ void BNTP::rcvRequest(BNTPRequestComponent * comp, RobotMessageHeader & header) 
 }
 
 void BNTP::rcvResponse(BNTPResponseComponent * comp, RobotMessageHeader & header) {
-  OUTPUT_TEXT("BNTP Response Recieved");
 
   const unsigned receiveTimestamp = Time::getCurrentSystemTime();
 
@@ -67,13 +64,10 @@ void BNTP::rcvResponse(BNTPResponseComponent * comp, RobotMessageHeader & header
 }
 
 void BNTP::sndRequest(BNTPRequestComponent * comp) {
-  OUTPUT_TEXT("BNTP Request Compiling");
   BNTPRequestComponent::priority = 0;
 }
 
 void BNTP::sndResponse(BNTPResponseComponent * comp) {
-  OUTPUT_TEXT("BNTP Response Compiling");
-
   // Respond to buffered requests.
   comp->messages.clear();
   for(const auto& pair : receivedNTPRequests)
@@ -92,9 +86,11 @@ void BNTP::sndResponse(BNTPResponseComponent * comp) {
 
 void BNTP::update() {
     // Send NTP requests to teammates?
-  if(theFrameInfo.getTimeSince(lastNTPRequestSent) >= ntpRequestInterval)
+  if (theFrameInfo.getTimeSince(lastNTPRequestSent) >= ntpRequestInterval) {
     const_cast<unsigned&>(lastNTPRequestSent) = theFrameInfo.time;
     BNTPRequestComponent::priority = 1;
+  }
+    
 }
 
 

@@ -1,0 +1,25 @@
+proto FieldBall
+
+import "Vector.bitproto"
+
+type Timestamp = int64
+
+message FieldBall {
+    Color color = 1
+    Timestamp produced_at = 2
+}
+
+message BallState {
+  position: Vector2
+  velocity: Vector2
+  covariance: Matrix<Float>(m=2, n=2, symmetric)
+}
+
+BallModel
+{
+  lastPerception: Vector<Float(min=-32768, max=32767, bits=16)>(n=2)
+  BallState estimate
+  timeWhenLastSeen: Timestamp
+  timeWhenDisappeared: Timestamp
+  seenPercentage: Integer(min=0, max=100)
+}

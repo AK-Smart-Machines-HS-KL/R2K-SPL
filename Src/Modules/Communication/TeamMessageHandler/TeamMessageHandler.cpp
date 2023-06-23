@@ -199,7 +199,6 @@ void TeamMessageHandler::update(TeamData& teamData)
   {
     if(readSPLStandardMessage(m))
     {
-      theBNTP << receivedMessageContainer;
       // Don't accept messages from robots to which we do not know a time offset yet.
       if(!theBNTP[receivedMessageContainer.theBSPLStandardMessage.playerNum]->isValid())
         return;

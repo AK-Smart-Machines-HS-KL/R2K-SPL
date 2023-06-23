@@ -12,18 +12,18 @@ size_t BNTPResponseComponent::compress(char* buff) {
     uint8_t n = (uint8_t) messages.size();
 
     // n first
-    memcpy(buff, &n, sizeof(n)); 
+    memcpy(buff + byteOffset, &n, sizeof(n));
     byteOffset += sizeof(n);
 
     for (auto &msg : messages)
     {
-        memcpy(buff, &msg.requestOrigination, sizeof(msg.requestOrigination)); 
+        memcpy(buff + byteOffset, &msg.requestOrigination, sizeof(msg.requestOrigination));
         byteOffset += sizeof(msg.requestOrigination);
 
-        memcpy(buff, &msg.requestReceipt, sizeof(msg.requestReceipt)); 
+        memcpy(buff + byteOffset, &msg.requestReceipt, sizeof(msg.requestReceipt));
         byteOffset += sizeof(msg.requestReceipt);
 
-        memcpy(buff, &msg.receiver, sizeof(msg.receiver)); 
+        memcpy(buff + byteOffset, &msg.receiver, sizeof(msg.receiver));
         byteOffset += sizeof(msg.receiver);
     }
 
@@ -32,24 +32,24 @@ size_t BNTPResponseComponent::compress(char* buff) {
 
 bool BNTPResponseComponent::decompress(char* compressed) {
     size_t byteOffset = 0;
-    int n;
+    uint8_t n;
 
     messages.clear();
 
-    memcpy(&n, compressed, sizeof(n)); 
+    memcpy(&n, compressed + byteOffset, sizeof(n));
     byteOffset += sizeof(n);
 
     for (size_t i = 0; i < n; i++)
     {
         BNTPMessage msg;
         
-        memcpy(&msg.requestOrigination, compressed, sizeof(msg.requestOrigination)); 
+        memcpy(&msg.requestOrigination, compressed + byteOffset, sizeof(msg.requestOrigination));
         byteOffset += sizeof(msg.requestOrigination);
 
-        memcpy(&msg.requestReceipt, compressed, sizeof(msg.requestReceipt)); 
+        memcpy(&msg.requestReceipt, compressed + byteOffset, sizeof(msg.requestReceipt));
         byteOffset += sizeof(msg.requestReceipt);
 
-        memcpy(&msg.receiver, compressed, sizeof(msg.receiver)); 
+        memcpy(&msg.receiver, compressed + byteOffset, sizeof(msg.receiver));
         byteOffset += sizeof(msg.receiver);
 
         messages.push_back(msg);
