@@ -1,6 +1,6 @@
 /**
  * @file PlayerOneForwardPassCard.cpp
- * @author Asrar & Asfiya
+ * @author Asrar
  * @version 1.1
  * @date 21-06-2023
  *
