@@ -85,8 +85,8 @@ class PlayerTwoForwardPassCard : public PlayerTwoForwardPassCardBase
         
         theActivitySkill(BehaviorStatus::playerTwoForwardPassCard);
         
-        float x = 0.f;
-        float y = 0.f;
+        float x = 1000.f;
+        float y = 1500.f;
 
         for (const auto& buddy : theTeamData.teammates)
         {

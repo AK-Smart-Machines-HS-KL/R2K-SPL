@@ -44,7 +44,8 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanCompressedMessageParticle<Behavior
     defenseLongShotCard,
     dive,
 
-    goalieLongShotCard, 
+    goalieLongShotCard,
+    offenseChaseBallCard, 
     offenseFastGoalKick,
     offenseForwardPassCard,
     offenseReceivePassCard,
