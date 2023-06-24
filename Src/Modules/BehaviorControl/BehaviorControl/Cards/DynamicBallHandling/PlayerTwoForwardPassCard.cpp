@@ -85,8 +85,8 @@ class PlayerTwoForwardPassCard : public PlayerTwoForwardPassCardBase
         
         theActivitySkill(BehaviorStatus::playerTwoForwardPassCard);
         
-        float x = 1000.f;
-        float y = 1500.f;
+        float x = 2500.f;
+        float y = 1000.f;
 
         for (const auto& buddy : theTeamData.teammates)
         {
@@ -95,8 +95,9 @@ class PlayerTwoForwardPassCard : public PlayerTwoForwardPassCardBase
                 
                 if(buddy.number==3)
                 {
-                    x = buddy.theRobotPose.translation.x()-500;
-                    y = buddy.theRobotPose.translation.y()+250;
+                    OUTPUT_TEXT("actual target " << x << "  " << y);
+                    x = buddy.theRobotPose.translation.x()+500;
+                    y = buddy.theRobotPose.translation.y()-500;
                     break;
                 }
             }
