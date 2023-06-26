@@ -55,13 +55,7 @@ int EventBasedCommunicationHandler::getOwnTeamInfoMessageBudget() {
    
    // to be replaced by theOwnTeamInfo.messageBudget
   #ifdef TARGET_ROBOT
-  if(theFrameInfo.getTimeSince(theGameInfo.timeLastPacketReceived) == 0 ||
-     theFrameInfo.getTimeSince(theGameInfo.timeLastPacketReceived) > 3000)
-    // some stupid turned the GC ;-) or drop outs
-
-    return messageBudget - sendCount * activeRobots;
-  else 
-    return theOwnTeamInfo.messageBudget;
+  return theOwnTeamInfo.messageBudget;
   #else
   return messageBudget - sendCount * activeRobots; // this is a ROUGH estimation
   #endif
@@ -145,23 +139,23 @@ void EventBasedCommunicationHandler::ebcLevelMonitor(){
     }
 
     //Is DribblingOrSidePass active? Send Message (Also Increase Message Output?)
-    /*
-    if(ebc_last_activity == BehaviorStatus::offenseDribblingOrSidePass && !ebc_dribbling_active){
+    
+    if(lastBehavior == BehaviorStatus::offenseForwardPassCard && !ebc_dribbling_active){
       ebcImportantMessageSend();
-      ebc_my_level+=EBCCountBoost;
+      myUrgencyLevel+=EBCCountBoost;
       ebc_dribbling_active = true;
       if(ebcDebugMessages){
         OUTPUT_TEXT("================");
         OUTPUT_TEXT("robot nr:" << theRobotInfo.number << ": *********Offense Dribbling Active******");
       } 
     }
-    else if(ebc_last_activity != BehaviorStatus::offenseDribblingOrSidePass && ebc_dribbling_active){
+    else if(lastBehavior!= BehaviorStatus::offenseForwardPassCard && ebc_dribbling_active){
       ebc_dribbling_active = false;
       if(ebcDebugMessages){
         OUTPUT_TEXT("Dribbling Complete!");
       }
     }
-    */
+    
     //Player: I Became Striker? Send Message
         
     if(theTeammateRoles.playsTheBall(theRobotInfo.number) && !ebcIsStriker){
@@ -210,7 +204,7 @@ void EventBasedCommunicationHandler::ebcMessageIntervalAdjust(const EventBasedCo
 // Note: if we do not communicate, #robots = 1 is assumed -> all bots become the goalie in STATE_PLAYING ;-)
 
 bool EventBasedCommunicationHandler::ebcSendThisFrame(const EventBasedCommunicationData& ebc){
-  return false;
+
     if (theGameInfo.state == STATE_FINISHED && !gameIsFinished) {
     gameIsFinished = true;
     if (ebcDebugMessages) {

@@ -60,10 +60,10 @@ MODULE(EventBasedCommunicationHandler,
   // v- using for calculations
   REQUIRES(FrameInfo),
   REQUIRES(OwnTeamInfo),
-  USES(GameInfo),
   // Uses following for messages
   USES(BallModel),
   USES(BehaviorStatus),
+	USES(GameInfo),
   USES(RobotInfo),
   USES(Whistle),
   USES(TeamBehaviorStatus),
@@ -117,7 +117,7 @@ private:
   const int EBCCountBoost = EBCCountUp / 2;                                   //the result is: 1 Boost for start and VERY important states
   const int EBCReset = 0;                                                     //constant used to reset ebc back to 0 if a message was send
   unsigned int frameTimeStart = 0;                                            //Used for the beginning of a game so that each nao sends a message
-  // bool ebc_dribbling_active = false;                                          //Check that dribbling is active, if so, send message now
+  bool ebc_dribbling_active = false;                                          //Check that dribbling is active, if so, send message now
   bool whistleDetected = false;
 
   int flexibleInterval = sendInterval;                                 // decrease bandwith by increasing send intervall by ebc_flexibleInterval 

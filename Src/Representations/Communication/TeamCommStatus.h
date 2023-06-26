@@ -15,5 +15,5 @@
 
 STREAMABLE(TeamCommStatus,
 {,
-  (bool)(false) isWifiCommActive,      /** If the teamm communication is active*/
+  (bool)(true) isWifiCommActive,      /** If the teamm communication is active*/
 });
