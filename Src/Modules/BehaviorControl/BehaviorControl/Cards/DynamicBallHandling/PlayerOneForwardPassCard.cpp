@@ -106,7 +106,13 @@ class PlayerOneForwardPassCard : public PlayerOneForwardPassCardBase
         }
 
         // theGoToBallAndKickSkill(calcAngleToOffense(x,y), KickInfo::walkForwardsLeft);
-        theGoToBallAndKickSkill(calcAngleToOffense(x, y), KickInfo::walkForwardsLeftLong);
+        // walkForwardsLeftLong: ~250
+        // @param targetDirection The (robot-relative) direction in which the ball should go
+        // @param kickType The type of kick that should be used
+        // @param alignPrecisely Whether the robot should align more precisely than usual
+        // @param kickPower The amount of power (in [0, 1]) that the kick should use
+    
+        theGoToBallAndKickSkill(calcAngleToOffense(x, y), KickInfo::forwardFastLeft);
     }
     
     Angle calcAngleToOffense(float xPos, float yPos) const
