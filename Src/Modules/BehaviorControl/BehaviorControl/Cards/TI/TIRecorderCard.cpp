@@ -90,7 +90,7 @@ class TIRecorderCard : public TIRecorderCardBase
   bool preconditions() const override
   {
     if(theRobotInfo.number == keyLogger->getRobotNumber() && keyLogger->isStartPressed()) {
-      OUTPUT_TEXT("TIRecorder triggered");
+      OUTPUT_TEXT("TIRecording triggered");
       keyLogger->clearEvents();
       return true;
     }
@@ -101,6 +101,7 @@ class TIRecorderCard : public TIRecorderCardBase
   {
     if (!keyLogger->isStartPressed()) {
       if (theTIRecorderData.recording) {
+        OUTPUT_TEXT("TIRecording halted");
         theTIRecorderData.stop();
       }
       return true;
@@ -150,15 +151,12 @@ class TIRecorderCard : public TIRecorderCardBase
 
     if (keyLogger->hasEvent()) {
       int e = keyLogger->nextEvent(); // only handle first key press this frame. Should be fine. Change if it's an issue
-      int k = keyLogger->getKey();
 
       if (specialCallbacks.count(e)) {
         specialCallbacks.at(e)();
-        OUTPUT_TEXT("Key " << k << " pressed.");
       } else if (actionCallbacks.count(e)) {
         setAction(actionCallbacks.at(e));
         cursorControl = false;
-        OUTPUT_TEXT("Key " << k << " pressed.");
       } else {
         OUTPUT_ERROR("Key " << e << " not bound");
       }
