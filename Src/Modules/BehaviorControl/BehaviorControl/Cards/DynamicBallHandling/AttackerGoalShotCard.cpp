@@ -1,18 +1,14 @@
 /**
- * @file PlayerThreeGoalShotCard.cpp
+ * @file AttackerGoalShotCard.cpp
  * @author Asrar    
  * @brief 
  * @version 1.1
  * @date 22-06-2023
  *
  * Functions, values, side effects:
- * Robot 3 making a Goal Shot
+ * Robot 3 and Robot 2 qualifies for making the goal
  * 
- * name-attackergoalshotcard
- * precondition: qualifies robot2 or robot3
- * ball must be in defender half larger than 0
- * game time 15s or 20s
- * check probability of kick skill
+ *
  */
 
 // Skills - Must be included BEFORE Card Base
@@ -39,7 +35,7 @@
 
 #define drawID "ObstaclesLR"
 
-CARD(PlayerThreeGoalShotCard,
+CARD(AttackerGoalShotCard,
      {
         ,
         CALLS(Activity),
@@ -69,7 +65,7 @@ CARD(PlayerThreeGoalShotCard,
 
      });
 
-class PlayerThreeGoalShotCard : public PlayerThreeGoalShotCardBase
+class AttackerGoalShotCard : public AttackerGoalShotCardBase
 {
   
   void preProcess() override {
@@ -80,14 +76,14 @@ class PlayerThreeGoalShotCard : public PlayerThreeGoalShotCardBase
   bool preconditions() const override
   {
     return
-      // theTeammateRoles.playsTheBall(theRobotInfo.number) &&   // I am the striker
-      (theRobotInfo.number == 3
+        // theTeammateRoles.playsTheBall(theRobotInfo.number) &&   // I am the striker
+        (theRobotInfo.number == 3
         // theTeammateRoles.isTacticalOffense(theRobotInfo.number)
-        && theFieldBall.positionRelative.norm() < 1500
+        && theFieldBall.positionRelative.norm() < 2000
         && !theObstacleModel.opponentIsClose()
         //&& theFrameInfo.getTimeSince(timeLastFail) > cooldown
         && theShots.goalShot.failureProbability < 0.50)
-      //&& theFieldBall.positionOnField.x() > theRobotPose.translation.x()
+        //&& theFieldBall.positionOnField.x() > theRobotPose.translation.x()
       ||
       
         (theRobotInfo.number == 2
@@ -185,4 +181,4 @@ class PlayerThreeGoalShotCard : public PlayerThreeGoalShotCardBase
   }
 };
 
-MAKE_CARD(PlayerThreeGoalShotCard);
+MAKE_CARD(AttackerGoalShotCard);
