@@ -1,12 +1,12 @@
 /**
- * @file PlayerTwoForwardPassCard.cpp
+ * @file PlayerThreeForwardPassCard.cpp
  * @author Asrar
  * @version 1.1
  * @date 22-06-2023
  *
  *
  * Functions, values, side effects:
- *Passing from player two to player three
+ *Passing from player three to player two
  *
  * Details:
  * Purpose of this card is to walk to the ball and kick it to the front teammate.
@@ -30,7 +30,7 @@
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
 
-CARD(PlayerTwoForwardPassCard,
+CARD(PlayerThreeForwardPassCard,
      {
     ,
     CALLS(Activity),
@@ -62,14 +62,14 @@ CARD(PlayerTwoForwardPassCard,
     
 });
 
-class PlayerTwoForwardPassCard : public PlayerTwoForwardPassCardBase
+class PlayerThreeForwardPassCard : public PlayerThreeForwardPassCardBase
 {
     
     bool preconditions() const override
     {
         
       return //theTeammateRoles.playsTheBall(theRobotInfo.number) &&   // I am the striker
-        theRobotInfo.number == 2
+        theRobotInfo.number == 3
         && theFieldBall.positionRelative.norm() < 1500;
        // theTeammateRoles.isTacticalDefense(theRobotInfo.number);
         
@@ -83,19 +83,19 @@ class PlayerTwoForwardPassCard : public PlayerTwoForwardPassCardBase
     void execute() override
     {
         
-        theActivitySkill(BehaviorStatus::playerTwoForwardPassCard);
+        theActivitySkill(BehaviorStatus::PlayerThreeForwardPass);
         
-        float x = 2500.f;
-        float y = 1000.f;
+        float x = 0.f;
+        float y = 0.f;
 
         for (const auto& buddy : theTeamData.teammates)
         {
             if (!buddy.isPenalized && buddy.isUpright)
             {
                 
-                if(buddy.number==3)
+                if(buddy.number==2)
                 {
-                   // OUTPUT_TEXT("actual target " << x << "  " << y);
+                    OUTPUT_TEXT("actual target " << x << "  " << y);
                     x = buddy.theRobotPose.translation.x()+500;
                     y = buddy.theRobotPose.translation.y()-500;
                     break;
@@ -113,4 +113,4 @@ class PlayerTwoForwardPassCard : public PlayerTwoForwardPassCardBase
     }
 };
 
-MAKE_CARD(PlayerTwoForwardPassCard);
+MAKE_CARD(PlayerThreeForwardPassCard);

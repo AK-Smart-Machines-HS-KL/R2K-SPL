@@ -97,7 +97,7 @@ class PlayerOneForwardPassCard : public PlayerOneForwardPassCardBase
                 
                 if(buddy.number==2)
                 {
-                    OUTPUT_TEXT("actual target " << x << "  " << y);
+                   // OUTPUT_TEXT("actual target " << x << "  " << y);
                     x = buddy.theRobotPose.translation.x() +500;
                     y = buddy.theRobotPose.translation.y() +250;
                     break;
