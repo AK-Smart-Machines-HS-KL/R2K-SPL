@@ -1,0 +1,3 @@
+proto Time
+
+type Timestamp = int64

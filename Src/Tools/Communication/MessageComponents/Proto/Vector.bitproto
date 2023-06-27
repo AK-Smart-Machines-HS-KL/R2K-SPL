@@ -1,15 +1,15 @@
 proto Vector
 
 message Vector2 {
-    int16 x = 0
-    int16 y = 0
+    int14 x = 1
+    int14 y = 2
 }
 
 message Angle {
-    int16 milliRadians = 0
+    int12 milli_radians = 1
 }
 
 message Pose2 {
-    Vector2 translation 
-    Angle rotation
+    Vector2 translation = 1
+    Angle rotation = 2
 }
