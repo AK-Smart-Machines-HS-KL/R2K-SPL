@@ -103,23 +103,26 @@ void JerseyClassifierProvider::detectJersey(const ObstaclesImagePercept::Obstacl
 
       // The maximum brightness is needed to determine black, white and gray relative to it.
       unsigned char maxBrightness = 0;
-      if(theOwnTeamInfo.teamColor == TEAM_BLACK || theOpponentTeamInfo.teamColor == TEAM_BLACK ||
-         theOwnTeamInfo.teamColor == TEAM_GRAY || theOpponentTeamInfo.teamColor == TEAM_GRAY ||
-         theOwnTeamInfo.teamColor == TEAM_WHITE || theOpponentTeamInfo.teamColor == TEAM_WHITE)
-      {
-        Vector2f centerInImage = Vector2f(static_cast<float>(obstacleInImage.left + obstacleInImage.right) * 0.5f,
-                std::min(static_cast<float>(obstacleInImage.bottom), static_cast<float>(theCameraInfo.height - (whiteScanOffSet + 1))) * (1.f - whiteScanHeightRatio)
-                + std::min(lowerInImage.y(), static_cast<float>(theCameraInfo.height - (whiteScanOffSet + 1))) * whiteScanHeightRatio);
-        float center_left = std::max(centerInImage.x() - static_cast<float>(width) * 0.5f, 0.f);
-        float center_right = std::min(centerInImage.x() + static_cast<float>(width) * 0.5f, static_cast<float>(theCameraInfo.width) - 0.5f);
-        for(int yOffset = -1; yOffset <= 1; ++yOffset)
-          for(float x = center_left; x < center_right; x += xStep)
-            maxBrightness = std::max(theECImage.grayscaled[static_cast<int>(centerInImage.y()) + whiteScanOffSet * yOffset][static_cast<int>(x)], maxBrightness);
-      }
+      
+      Vector2f centerInImage = Vector2f(static_cast<float>(obstacleInImage.left + obstacleInImage.right) * 0.5f,
+              std::min(static_cast<float>(obstacleInImage.bottom), static_cast<float>(theCameraInfo.height - (whiteScanOffSet + 1))) * (1.f - whiteScanHeightRatio)
+              + std::min(lowerInImage.y(), static_cast<float>(theCameraInfo.height - (whiteScanOffSet + 1))) * whiteScanHeightRatio);
+      float center_left = std::max(centerInImage.x() - static_cast<float>(width) * 0.5f, 0.f);
+      float center_right = std::min(centerInImage.x() + static_cast<float>(width) * 0.5f, static_cast<float>(theCameraInfo.width) - 0.5f);
+      for(int yOffset = -1; yOffset <= 1; ++yOffset)
+        for(float x = center_left; x < center_right; x += xStep)
+          maxBrightness = std::max(theECImage.grayscaled[static_cast<int>(centerInImage.y()) + whiteScanOffSet * yOffset][static_cast<int>(x)], maxBrightness);
+      
 
       // Get pixel classifier
-      const std::function<bool(int, int)>& isOwn = getPixelClassifier(theOwnTeamInfo.teamColor, theOpponentTeamInfo.teamColor, maxBrightness);
-      const std::function<bool(int, int)>& isOpponent = getPixelClassifier(theOpponentTeamInfo.teamColor, theOwnTeamInfo.teamColor, maxBrightness);
+      std::vector<int> opponentColors = {theOpponentTeamInfo.fieldPlayerColour, theOpponentTeamInfo.goalkeeperColour};
+      std::vector<int> ownColors = {theOwnTeamInfo.fieldPlayerColour};
+      if (!theOwnTeamInfo.goalkeeperColour == theOpponentTeamInfo.goalkeeperColour) {
+        ownColors.push_back(theOwnTeamInfo.goalkeeperColour);
+      }
+
+      const std::function<bool(int, int)>& isOwn = getPixelClassifier(ownColors, opponentColors, maxBrightness);
+      const std::function<bool(int, int)>& isOpponent = getPixelClassifier(opponentColors, ownColors, maxBrightness);
 
       float ownPixels = 0;
       float opponentPixels = 0;
@@ -158,8 +161,8 @@ void JerseyClassifierProvider::detectJersey(const ObstaclesImagePercept::Obstacl
         }
       }
       // threshold to counter white robot parts or green field background being classified as opponent jersey
-      if((theOpponentTeamInfo.teamColor == TEAM_WHITE || theOpponentTeamInfo.teamColor == TEAM_GREEN)
-         && theOwnTeamInfo.teamColor != TEAM_WHITE && theOwnTeamInfo.teamColor != TEAM_GREEN)
+      if((theOpponentTeamInfo.fieldPlayerColour == TEAM_WHITE || theOpponentTeamInfo.fieldPlayerColour == TEAM_GREEN)
+         && theOwnTeamInfo.fieldPlayerColour != TEAM_WHITE && theOwnTeamInfo.fieldPlayerColour != TEAM_GREEN)
       {
         const float threshold = 1.5f * ownPixels + (examinedPixels) / 5;
         opponentPixels = opponentPixels <= threshold ? 0 : opponentPixels - threshold;
@@ -191,39 +194,79 @@ void JerseyClassifierProvider::detectJersey(const ObstaclesImagePercept::Obstacl
   }
 }
 
-std::function<bool(int, int)> JerseyClassifierProvider::getPixelClassifier(const int teamColor, const int otherColor, const int maxBrightness) const
+std::function<bool(int, int)> JerseyClassifierProvider::getPixelClassifier(const int positiveColor, const std::vector<int> negativeColors, const int maxBrightness) const
 {
-  const int teamHue = jerseyHues[teamColor];
+  std::vector<std::function<bool(int, int)>> classifiers;
+  classifiers.reserve(negativeColors.size());
+  for(auto negativeColor : negativeColors)
+  {
+    classifiers.push_back(getPixelClassifier(positiveColor, negativeColor, maxBrightness));
+  }
+
+  return [this, classifiers](const int x, const int y)
+    {
+      // If any classifier is false, pixel is not positiveColor
+      for(auto classifier : classifiers)
+      {
+        if (!classifier(x,y)) return false;
+      }
+      return true;
+    };
+}
+
+std::function<bool(int, int)> JerseyClassifierProvider::getPixelClassifier(const std::vector<int> positiveColors, const std::vector<int> negativeColors, const int maxBrightness) const
+{
+  std::vector<std::function<bool(int, int)>> classifiers;
+  classifiers.reserve(negativeColors.size());
+  for(int positiveColor : positiveColors)
+  {
+    classifiers.push_back(getPixelClassifier(positiveColor, negativeColors, maxBrightness));
+  }
+
+  return [this, classifiers](const int x, const int y)
+    {
+      // If any classifier is true, pixel is one of positiveColors
+      for(auto classifier : classifiers)
+      {
+        if (classifier(x,y)) return true;
+      }
+      return false;
+    };
+}
+
+std::function<bool(int, int)> JerseyClassifierProvider::getPixelClassifier(const int fieldPlayerColour, const int otherColor, const int maxBrightness) const
+{
+  const int teamHue = jerseyHues[fieldPlayerColour];
   const int otherHue = jerseyHues[otherColor];
   const Rangei grayRange = Rangei(static_cast<int>(maxBrightness * this->grayRange.min),
                                   static_cast<int>(maxBrightness * this->grayRange.max));
 
   // If gray is involved, different brightnesses must be distinguished.
-  if(teamColor == TEAM_GRAY)
+  if(fieldPlayerColour == TEAM_GRAY)
     return [this, grayRange](const int x, const int y)
     {
       const unsigned char saturation = theECImage.saturated[y][x];
       return saturation < colorDelimiter && grayRange.isInside(theECImage.grayscaled[y][x]);
     };
-  else if(teamColor == TEAM_BLACK && (otherColor == TEAM_GRAY || otherColor == TEAM_WHITE))
+  else if(fieldPlayerColour == TEAM_BLACK && (otherColor == TEAM_GRAY || otherColor == TEAM_WHITE))
     return [this, grayRange](const int x, const int y)
     {
       return theECImage.saturated[y][x] < colorDelimiter && theECImage.grayscaled[y][x] < grayRange.min;
     };
-  else if(teamColor == TEAM_WHITE && (otherColor == TEAM_BLACK || otherColor == TEAM_GRAY))
+  else if(fieldPlayerColour == TEAM_WHITE && (otherColor == TEAM_BLACK || otherColor == TEAM_GRAY))
     return [this, grayRange](const int x, const int y)
     {
       return theECImage.saturated[y][x] < colorDelimiter && theECImage.grayscaled[y][x] > grayRange.max;
     };
 
   // Black or white against color
-  else if(teamColor == TEAM_BLACK)
+  else if(fieldPlayerColour == TEAM_BLACK)
     return [this, grayRange, otherHue](const int x, const int y)
     {
       return theECImage.saturated[y][x] < satThreshold && theECImage.grayscaled[y][x] <= grayRange.min &&
              std::abs(static_cast<char>(theECImage.hued[y][x] - otherHue)) > hueSimilarityThreshold;
     };
-  else if(teamColor == TEAM_WHITE)
+  else if(fieldPlayerColour == TEAM_WHITE)
     return [this, grayRange, otherHue](const int x, const int y)
     {
       return theECImage.saturated[y][x] < satThreshold && theECImage.grayscaled[y][x] >= grayRange.max &&

@@ -24,6 +24,13 @@
  * v1.2. added setPlay==SET_PLAY_NONE to prevent goalie be activated for CORNER_KICK
  *       changed to theTeammateRoles.isTacticalGoalkeeper
          goalie must not leave the goal box + maxDistanceFromGoalArea
+        
+   v3: restricting the active area to penalty zone . 
+     GoalieLongShot card is prefered IFF there is no opp. too close.
+
+
+   v 1.4: (Asrar) "theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)"
+                   this is for online and offline role assignment
  * 
  * Note: 
  * - because this is a short shot, the flag "playsTheBall" may not re-set after the shot, 
@@ -57,6 +64,7 @@
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/GameInfo.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 CARD(ClearOwnHalfCardGoalie,
   { ,
@@ -72,10 +80,11 @@ CARD(ClearOwnHalfCardGoalie,
     REQUIRES(TeamBehaviorStatus),
     REQUIRES(TeamData),
     REQUIRES(TeammateRoles),  // R2K
+    REQUIRES(TeamCommStatus),  // wifi on off?
 
     DEFINES_PARAMETERS(
     {,
-      (float)(500) maxDistanceFromGoalArea,  // how far  goalie will leave the goal box
+      (float)(0) maxDistanceFromGoalArea,  // how far  goalie will leave the goal box
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
       (bool)(true) shootAngleIsZero,
@@ -87,12 +96,15 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
   bool preconditions() const override
   {
     return
-      theGameInfo.setPlay == SET_PLAY_NONE &&
-      //theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
+      theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
       !aBuddyIsClearingOwnHalf() &&
+      // 
+      // either LongShotCard is above in the stack or add this pre-cond:
       theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) && // my recent role
       theFieldBall.positionOnField.x() <= theFieldDimensions.xPosOwnGoalArea + maxDistanceFromGoalArea &&
+      theFieldBall.positionOnField.y() <= theFieldDimensions.yPosLeftGoalArea + maxDistanceFromGoalArea &&
+      theFieldBall.positionOnField.y() >= theFieldDimensions.yPosRightGoalArea - maxDistanceFromGoalArea &&
       !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME);
   }
 

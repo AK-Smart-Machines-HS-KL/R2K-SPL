@@ -16,13 +16,13 @@ const ColorRGBA ColorRGBA::orange(255, 128, 0);
 const ColorRGBA ColorRGBA::violet(183, 10, 210);
 const ColorRGBA ColorRGBA::brown(139, 69, 19);
 
-ColorRGBA ColorRGBA::fromTeamColor(int teamColor)
+ColorRGBA ColorRGBA::fromTeamColor(int fieldPlayerColour)
 {
   static_assert(TEAM_BLUE == 0 && TEAM_RED == 1 && TEAM_YELLOW == 2 && TEAM_BLACK == 3
                 && TEAM_WHITE == 4 && TEAM_GREEN == 5 && TEAM_ORANGE == 6 && TEAM_PURPLE == 7
                 && TEAM_BROWN == 8 && TEAM_GRAY == 9, "The following depends on the order of these macros.");
 
-  ASSERT(teamColor >= 0 && teamColor <= 9);
+  ASSERT(fieldPlayerColour >= 0 && fieldPlayerColour <= 9);
 
   static const ColorRGBA colors[] =
   {
@@ -38,7 +38,7 @@ ColorRGBA ColorRGBA::fromTeamColor(int teamColor)
     ColorRGBA::gray
   };
 
-  return colors[teamColor];
+  return colors[fieldPlayerColour];
 }
 
 ColorRGBA ColorRGBA::operator*(float scale) const

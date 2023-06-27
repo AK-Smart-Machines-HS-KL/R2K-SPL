@@ -213,7 +213,7 @@ void LEDHandler::setChestButton(LEDRequest& ledRequest)
 
 void LEDHandler::setLeftFoot(LEDRequest& ledRequest)
 {
-  switch(theOwnTeamInfo.teamColor)
+  switch(theOwnTeamInfo.fieldPlayerColour)
   {
     case TEAM_ORANGE:
       ledRequest.ledStates[LEDRequest::footLeftGreen] = LEDRequest::half;

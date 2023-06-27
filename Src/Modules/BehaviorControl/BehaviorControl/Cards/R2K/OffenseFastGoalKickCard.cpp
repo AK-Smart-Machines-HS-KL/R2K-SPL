@@ -14,7 +14,8 @@
  * - quick shot using correct foot: 
  *   - left or right is computed once, when the card is called for the first time
 
-
+  * v1.1. 
+  * card is wifi on/off ready (Adrian)
  * 
  * Note: 
  * - because this is a short shot, the flag "playsTheBall" may not re-set after the shot, 
@@ -45,6 +46,7 @@
 #include "Representations/BehaviorControl/TeammateRoles.h"
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 CARD(OffenseFastGoalKick,
   { ,
@@ -58,6 +60,7 @@ CARD(OffenseFastGoalKick,
     REQUIRES(RobotPose),
     REQUIRES(TeamBehaviorStatus),
     REQUIRES(TeammateRoles),  // R2K
+    REQUIRES(TeamCommStatus),  // wifi on off?
 
     DEFINES_PARAMETERS(
     {,
@@ -71,8 +74,9 @@ class OffenseFastGoalKick : public OffenseFastGoalKickBase
 {
   bool preconditions() const override
   {
+    // OUTPUT_TEXT("offense index " << theTeammateRoles.offenseRoleIndex(theRobotInfo.number) << " nr " << theRobotInfo.number);
     return
-      theTeammateRoles.playsTheBall(theRobotInfo.number) &&   // I am the striker
+      theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
       theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
       theFieldBall.endPositionOnField.x() >= theFieldDimensions.xPosOpponentGoalArea;
   }
@@ -93,9 +97,9 @@ class OffenseFastGoalKick : public OffenseFastGoalKickBase
       leftFoot = theFieldBall.positionRelative.y() < 0;
     }
     if (leftFoot)
-      theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::forwardFastLeft);
+      theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::forwardFastLeft, false);
     else
-      theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::forwardFastRight);
+      theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::forwardFastRight, false);
   }
 
   Angle calcAngleToGoal() const

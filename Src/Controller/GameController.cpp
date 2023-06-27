@@ -34,8 +34,12 @@ GameController::GameController()
   gameInfo.kickingTeam = 1;
   gameInfo.secsRemaining = halfTime;
   gameInfo.secondaryTime = 0;
-  for(auto& teamInfo : teamInfos)
-    teamInfo.players[gameInfo.playersPerTeam - 1].penalty = PENALTY_SUBSTITUTE;
+  for(auto& teamInfo : teamInfos) {
+    for(auto& player : teamInfo.players) {
+       player.penalty = PENALTY_SUBSTITUTE; 
+    }
+  }
+    
   // Force reloading of the field dimensions (they cannot be loaded here because the file search path is not available yet).
   fieldDimensions.xPosOwnPenaltyMark = 0.f;
 }
@@ -49,6 +53,8 @@ void GameController::registerSimulatedRobot(int robot, SimulatedRobot& simulated
     robots[robot].info.penalty = robots[robot].lastPenalty = PENALTY_SUBSTITUTE;
   if(fieldDimensions.xPosOwnPenaltyMark == 0.f)
     fieldDimensions.load();
+  int team = gameInfo.playersPerTeam >= robot ? 0 : 1;
+  teamInfos[team].players[robots[robot].info.number - 1].penalty = PENALTY_NONE;
 }
 
 bool GameController::handleStateCommand(const std::string& command)
@@ -1021,7 +1027,12 @@ void GameController::addCompletion(std::set<std::string>& completion) const
 void GameController::setTeamInfos(Settings::TeamColor firstTeamColor, Settings::TeamColor secondTeamColor)
 {
   teamInfos[0].teamNumber = 1;
-  teamInfos[0].teamColor = firstTeamColor;
+  teamInfos[0].fieldPlayerColour = firstTeamColor;
+  teamInfos[0].goalkeeperColour = Settings::TeamColor::black;
+  teamInfos[0].messageBudget = 1200; // Initialize to normal Available Messages
   teamInfos[1].teamNumber = 2;
-  teamInfos[1].teamColor = secondTeamColor;
+  teamInfos[1].fieldPlayerColour = secondTeamColor;
+  teamInfos[1].goalkeeperColour = Settings::TeamColor::black;
+  teamInfos[1].messageBudget = 1200; // Initialize to normal Available Messages
+
 }

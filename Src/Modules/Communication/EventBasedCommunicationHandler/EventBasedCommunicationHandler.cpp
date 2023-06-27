@@ -1,6 +1,6 @@
 /**
  * @file EventBasedCommunicationHandler.cpp
- * @author Connor Lismore 
+ * @author Connor Lismore, Adrian Mueller
  * @brief Module for the Event Based Communication. Responsible for ensuring messages are send by checking for events and other changes. Reduces the amount of messages put out.
  * @version 0.3
  * @date 2022-03-17
@@ -10,6 +10,7 @@
  * 
  * Changelog: Added Adjusting sendinterval for message delay bandwidth. Now adjusts based on time remaining vs message remaining
  * added whistleHeard and dribbleGame priority message sending
+ *  
  * 
  */
 
@@ -17,6 +18,7 @@
 #include "Tools/MessageQueue/OutMessage.h"
 #include "Tools/Global.h"
 #include "Platform/Time.h"
+#include "Representations/Communication/TeamData.h"
 
 //#define SITTING_TEST 
 //#define SELF_TEST
@@ -24,13 +26,20 @@
 MAKE_MODULE(EventBasedCommunicationHandler, communication);
 
 void EventBasedCommunicationHandler::update(EventBasedCommunicationData& ebc){    
-  
+
+ /*
+  unsigned int activeBuddies = 1; // myself
+
+  for (const auto& buddy : theTeamData.teammates)
+  {
+    if (!buddy.isPenalized && buddy.isUpright) activeBuddies++;
+  };
+  activeRobots = activeBuddies;
+
+  */
+
   if(!ebc.ebcMessageMonitor){
     ebc.ebcMessageMonitor = [&] () {ebcMessageMonitor(ebc);};
-  }
-
-  if(!ebc.ebcMessageReceiveCheck){
-    ebc.ebcMessageReceiveCheck = [&] () {ebcMessageReceiveCheck();};
   }
 
   if(!ebc.sendThisFrame){
@@ -42,84 +51,113 @@ void EventBasedCommunicationHandler::update(EventBasedCommunicationData& ebc){
   }
 }
 
+int EventBasedCommunicationHandler::getOwnTeamInfoMessageBudget() {
+   
+   // to be replaced by theOwnTeamInfo.messageBudget
+  #ifdef TARGET_ROBOT
+  return theOwnTeamInfo.messageBudget;
+  #else
+  return messageBudget - sendCount * activeRobots; // this is a ROUGH estimation
+  #endif
+}
+
+void EventBasedCommunicationHandler::ebcMessageMonitor(const EventBasedCommunicationData& ebc){
+  if (getOwnTeamInfoMessageBudget() >= minMessageBudget) {
+    sendCount++;
+    /*
+    if(ebcDebugMessages){
+      OUTPUT_TEXT("================");
+      OUTPUT_TEXT("theRobotInfo.number:" << theRobotInfo.number);
+      OUTPUT_TEXT("frame last send: " << timeLastSent);
+      OUTPUT_TEXT("secs remaining: " << theGameInfo.secsRemaining);  // 10m * 60sec = 1200 msg
+      OUTPUT_TEXT("avail messages: " << getOwnTeamInfoMessageBudget());
+      OUTPUT_TEXT("my_writes: "  << ebc_my_writes);
+      OUTPUT_TEXT("Bandwidth: " << ebc_flexibleInterval);
+    }
+    */
+  }
+}
+
 int EventBasedCommunicationHandler::ebcImportantMessageSend(){
-  ebc_my_level += EBCMaxLevel;
-  return ebc_my_writes;
+  myUrgencyLevel += EBCMaxLevel;  // raise urgency above threshold
+  return sendCount;
 }
 
 void EventBasedCommunicationHandler::ebcLevelRestart(){
-  ebc_my_level = EBCReset; // restart
+  myUrgencyLevel = EBCReset; // restart, reset urgency is minimal (0)
   if(ebcDebugMessagesFull)
     OUTPUT_TEXT("EBC Level restarted back to 0.");
 }
 
-//Here start functions, which are respinsible for any ebc related tasks
+//Here start functions, which are responsible for any ebc related tasks
 void EventBasedCommunicationHandler::ebcLevelMonitor(){
   if (theFrameInfo.time == frameTimeStart) {  // called once at startup, i.e., GAMESTATE = INIT
      ebcImportantMessageSend(); // get things started
-   ebc_last_activity = BehaviorStatus::initial;  // deprecated
+   lastBehavior = BehaviorStatus::initial;  // deprecated
    }
- 
-   // OUTPUT_TEXT(" theGameInfo.state == STATE_PLAYING)" << theGameInfo.secsRemaining);
- 
+  
   // counts up by "1" per frame
    if(theGameInfo.state == STATE_PLAYING){
      if(theGameInfo.secsRemaining > ebcBoostTime){
-       ebc_my_level+=EBCCountBoost;
+       myUrgencyLevel+=EBCCountBoost;
     }
     
     // Have message count up happen, while slowing it down based on the number of robots in the game, only send messages in specific states
-    if (theFrameInfo.time % num_of_robots == theRobotInfo.number - 1 && theRobotInfo.penalty == PENALTY_NONE) {
-      ebc_my_level+=EBCCountUp;
+    if (theFrameInfo.time % activeRobots == theRobotInfo.number - 1 && theRobotInfo.penalty == PENALTY_NONE) {
+      myUrgencyLevel+=EBCCountUp;
     }
   
     // Has Behavior Changed during playing? Send Message (If card change happens, send message)
     
-    if(ebc_last_activity != theBehaviorStatus.activity){ 
+    if(lastBehavior != theBehaviorStatus.activity){ 
       ebcImportantMessageSend();  // this is an important event - send asap
-      ebc_last_activity = theBehaviorStatus.activity; ///
+      lastBehavior = theBehaviorStatus.activity; ///
       if(ebcDebugMessages){
         OUTPUT_TEXT("robot nr:" << theRobotInfo.number << ": msg: my behavior has changed.");
+        if (theRobotInfo.number == 4) {
+          OUTPUT_TEXT("flexibleInterval " << flexibleInterval << " ebc_message budget : " << getOwnTeamInfoMessageBudget() <<
+            " active bots: " << activeRobots);
+        };
+
       }
     }
     
 
     // Has the Whistle been heard? Instant Message
-    if(theWhistle.lastTimeWhistleDetected == 0 && !ebc_whistle_detected){
+    if(theWhistle.lastTimeWhistleDetected == 0 && !whistleDetected){
       ebcImportantMessageSend();
       if(ebcDebugMessages){
         OUTPUT_TEXT("Robot Nr. " << theRobotInfo.number << "msg: whistle deteced");
       }
-      ebc_whistle_detected = true;
+      whistleDetected = true;
     }
-    else if(theWhistle.lastTimeWhistleDetected >= 3 && ebc_whistle_detected){
-      ebc_whistle_detected = false;
+    else if(theWhistle.lastTimeWhistleDetected >= 3 && whistleDetected){
+      whistleDetected = false;
       if(ebcDebugMessagesFull){
         OUTPUT_TEXT("Robot Nr. " << theRobotInfo.number << "WHISTLE DETECTED RESET");
       }
     }
 
     //Is DribblingOrSidePass active? Send Message (Also Increase Message Output?)
-    /*
-    if(ebc_last_activity == BehaviorStatus::offenseDribblingOrSidePass && !ebc_dribbling_active){
+    
+    if(lastBehavior == BehaviorStatus::offenseForwardPassCard && !ebc_dribbling_active){
       ebcImportantMessageSend();
-      ebc_my_level+=EBCCountBoost;
+      myUrgencyLevel+=EBCCountBoost;
       ebc_dribbling_active = true;
       if(ebcDebugMessages){
         OUTPUT_TEXT("================");
         OUTPUT_TEXT("robot nr:" << theRobotInfo.number << ": *********Offense Dribbling Active******");
       } 
     }
-    else if(ebc_last_activity != BehaviorStatus::offenseDribblingOrSidePass && ebc_dribbling_active){
+    else if(lastBehavior!= BehaviorStatus::offenseForwardPassCard && ebc_dribbling_active){
       ebc_dribbling_active = false;
       if(ebcDebugMessages){
         OUTPUT_TEXT("Dribbling Complete!");
       }
     }
-    */
-    //Player: I Became Striker? Send Message
     
-    /*
+    //Player: I Became Striker? Send Message
+        
     if(theTeammateRoles.playsTheBall(theRobotInfo.number) && !ebcIsStriker){
       ebcImportantMessageSend();
       ebcIsStriker = true;
@@ -134,117 +172,93 @@ void EventBasedCommunicationHandler::ebcLevelMonitor(){
         OUTPUT_TEXT("Robot Nr. " << theRobotInfo.number << ": msg: I lost striker.");
       }
     };
-    
-    */
   }
 
   // Ball is not seen: state change: send message
   // // Has robot fallen? send message
 }
 
-  
-    
-  
-
-  
-
-  
-
-  
-
-
-void EventBasedCommunicationHandler::ebcMessageMonitor(const EventBasedCommunicationData& ebc){
-  if(theOwnTeamInfo.messageBudget > 0){
-    ebc_my_writes++;
-    /*
-    if(ebcDebugMessages){
-      OUTPUT_TEXT("================");
-      OUTPUT_TEXT("theRobotInfo.number:" << theRobotInfo.number);
-      OUTPUT_TEXT("frame last send: " << timeLastSent);
-      OUTPUT_TEXT("secs remaining: " << theGameInfo.secsRemaining);  // 10m * 60sec = 1200 msg
-      OUTPUT_TEXT("avail messages: " << theOwnTeamInfo.messageBudget);
-      OUTPUT_TEXT("my_writes: "  << ebc_my_writes);
-      OUTPUT_TEXT("Bandwidth: " << ebc_flexibleInterval);
-    }
-    */
-  }
-}
-
-void EventBasedCommunicationHandler::ebcMessageReceiveCheck(){
-    ebc_my_receives++; 
-    if(ebcDebugMessages){
-	    OUTPUT_TEXT("robo: " << theRobotInfo.number << " my receives: " << ebc_my_receives);
-    }
-}
-
 void EventBasedCommunicationHandler::ebcMessageIntervalAdjust(const EventBasedCommunicationData& ebc){
-  ebc_flexibleInterval = (theGameInfo.secsRemaining * 1000) / theOwnTeamInfo.messageBudget;
+  // AM
+  // ebc_flexibleInterval = (theGameInfo.secsRemaining * 1000) / ebcMaxAvailableMessage - ebc_my_receives;
+
+  // sample: 200 sec left, 40 messages left in budget -> send 1 msg each 5 frame * defaultFlexibleInterval
+  // the lower the constant - eg 2000 - the lower the #msg send  --> flexible intervall is ~ 2sec
+  flexibleInterval = defaultFlexibleInterval * getTotalSecsRemaining() / getOwnTeamInfoMessageBudget();
 
   if(theGameInfo.state == STATE_READY || theGameInfo.state == STATE_SET){
-    ebc_flexibleInterval = ebcSendInterval * 2;
+    flexibleInterval = sendInterval * 2;
   }
+
+  /*
   else if(ebc_flexibleInterval < ebcSendInterval || theGameInfo.secsRemaining < 1){
     ebc_flexibleInterval = ebcSendInterval;
   }
   else if(ebc_flexibleInterval > ebcSendIntervalMax){
     ebc_flexibleInterval = ebcSendIntervalMax;
   }
+  */
 }
 
 //Function responsible for sending messages when requirements are met. Has multiple modes
+// Note: if we do not communicate, #robots = 1 is assumed -> all bots become the goalie in STATE_PLAYING ;-)
+
 bool EventBasedCommunicationHandler::ebcSendThisFrame(const EventBasedCommunicationData& ebc){
 
-  if (theGameInfo.state == STATE_INITIAL || theGameInfo.state == STATE_READY) return false;
-
-  if (theGameInfo.state == STATE_FINISHED && !ebc_gameFinish) {
-    ebc_gameFinish = true;
+    if (theGameInfo.state == STATE_FINISHED && !gameIsFinished) {
+    gameIsFinished = true;
     if (ebcDebugMessages) {
       OUTPUT_TEXT("GAME FINISHED");
-      OUTPUT_TEXT("EBC Messages Remaining: " << theOwnTeamInfo.messageBudget);
-      OUTPUT_TEXT("Robot Nr: " << theRobotInfo.number << ": Messages Sent: " << ebc_my_writes);
+      OUTPUT_TEXT("EBC Messages Remaining: " << getOwnTeamInfoMessageBudget());
+      OUTPUT_TEXT("Robot Nr: " << theRobotInfo.number << ": Messages Sent: " << sendCount);
       
     }
   }
-  else if (theGameInfo.state != STATE_FINISHED && ebc_gameFinish) {
-    ebc_gameFinish = false;
+  else if (theGameInfo.state != STATE_FINISHED && gameIsFinished) {
+    gameIsFinished = false;
   }
-  //Has the minimum available messages been met? Stop sending messages then
-  if(theOwnTeamInfo.messageBudget <= ebcMinAvailableMsgs){
+
+
+  if (theGameInfo.state == STATE_INITIAL || theGameInfo.state == STATE_READY || theGameInfo.state == STATE_FINISHED) 
+    return false;
+    // Note: R2K_TeamCard deals with STATE_READY explicitely, to save bandwith here
+
+  if(getOwnTeamInfoMessageBudget() <= minMessageBudget){
     return false;
   } 
   //Mode 0: Burst Mode: All robots send a message every ebcSendInterval msecs all at once: sendInterval: see .cfg
   else if(0 == ebcModeSwitch){
-    if((theFrameInfo.getTimeSince(timeLastSent) >= ebcSendInterval || theFrameInfo.time < timeLastSent)) {
-      if(theFrameInfo.getTimeSince(timeLastSent) >= 2 * ebcSendInterval){
+    if((theFrameInfo.getTimeSince(timeLastSent) >= sendInterval || theFrameInfo.time < timeLastSent)) {
+      if(theFrameInfo.getTimeSince(timeLastSent) >= 2 * sendInterval){
         timeLastSent = theFrameInfo.time;
       }
       else{
-        timeLastSent += ebcSendInterval;
+        timeLastSent += sendInterval;
       }
       if(ebcDebugMessagesFull){
         OUTPUT_TEXT("Nr: " << theRobotInfo.number 
-          << ": Messages Sent: " << ebc_my_writes 
-          << ": Messages Left: " << theOwnTeamInfo.messageBudget
-          << ": Bandwidth: " << ebc_flexibleInterval);
+          << ": Messages Sent: " << sendCount 
+          << ": Messages Left: " << getOwnTeamInfoMessageBudget()
+          << ": Bandwidth: " << flexibleInterval);
       }
       return true;
     }
   } 
   //Mode 1: Round Robin: Each robot sends a message per second in a specific order, looping after all 5 send a message: ebcSendInterval
   else if(1 == ebcModeSwitch){
-    if((theFrameInfo.time % ebcSendInterval) / thisRobotTurnToSend == theRobotInfo.number - 1){
-      if((theFrameInfo.getTimeSince(timeLastSent) >= ebcSendInterval || theFrameInfo.time < timeLastSent)) {
-        if(theFrameInfo.getTimeSince(timeLastSent) >= 2 * ebcSendInterval){
+    if((theFrameInfo.time % sendInterval) / thisRobotTurnToSend == theRobotInfo.number - 1){
+      if((theFrameInfo.getTimeSince(timeLastSent) >= sendInterval || theFrameInfo.time < timeLastSent)) {
+        if(theFrameInfo.getTimeSince(timeLastSent) >= 2 * sendInterval){
           timeLastSent = theFrameInfo.time;
         }
         else{
-          timeLastSent += ebcSendInterval;
+          timeLastSent += sendInterval;
         }
         if (ebcDebugMessagesFull) {
           OUTPUT_TEXT("Nr: " << theRobotInfo.number
-            << ": Messages Sent: " << ebc_my_writes
-            << ": Messages Left: " << theOwnTeamInfo.messageBudget
-            << ": Bandwidth: " << ebc_flexibleInterval);
+            << ": Messages Sent: " << sendCount
+            << ": Messages Left: " << getOwnTeamInfoMessageBudget()
+            << ": Bandwidth: " << flexibleInterval);
         }
         return true;
       }
@@ -252,25 +266,25 @@ bool EventBasedCommunicationHandler::ebcSendThisFrame(const EventBasedCommunicat
   } 
   //Mode 2: Classic EBC: behavior changes and increase in ebc cause messages to be send: sendInterval = 525
   else if(2 == ebcModeSwitch){
-    
-    if((theFrameInfo.getTimeSince(timeLastSent) >= ebc_flexibleInterval || theFrameInfo.time < timeLastSent)) {
+ 
+    if((theFrameInfo.getTimeSince(timeLastSent) >= flexibleInterval || theFrameInfo.time < timeLastSent)) {
       ebcLevelMonitor();
-      if(ebc_my_level >= EBCMaxLevel){
-        if(theFrameInfo.getTimeSince(timeLastSent) >= 2 * ebc_flexibleInterval){
+      if(myUrgencyLevel >= EBCMaxLevel){
+        if(theFrameInfo.getTimeSince(timeLastSent) >= 2 * flexibleInterval){
           timeLastSent = theFrameInfo.time;
         }
         else {
-          timeLastSent += ebc_flexibleInterval;
+          timeLastSent += flexibleInterval;
         }
         // OUTPUT_TEXT("Nr: " << theRobotInfo.number << " " << ebc_my_level);
         ebcLevelRestart();
         ebcMessageIntervalAdjust(ebc);
         // OUTPUT_TEXT("Nr: " << theRobotInfo.number << ": Time Sent: " << theGameInfo.secsRemaining);
         // OUTPUT_TEXT("Nr: " << theRobotInfo.number << ": Messages Sent: " << ebc_my_writes);
-        // OUTPUT_TEXT("Nr: " << theRobotInfo.number << ": Messages Left: " << theOwnTeamInfo.messageBudget);
+        // OUTPUT_TEXT("Nr: " << theRobotInfo.number << ": Messages Left: " << getOwnTeamInfoMessageBudget());
         // OUTPUT_TEXT("Nr: " << theRobotInfo.number << ": Bandwidth: " << ebc_flexibleInterval);
 
-        // OUTPUT_TEXT("GC Messages Remaining: " << theOwnTeamInfo.messageBudget);
+        // OUTPUT_TEXT("GC Messages Remaining: " << getOwnTeamInfoMessageBudget());
         return true;
       }
     }

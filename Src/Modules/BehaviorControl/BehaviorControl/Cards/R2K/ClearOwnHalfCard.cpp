@@ -31,6 +31,9 @@
  * - minOppDistance must be maintained with the ...LongShotCards
  * 
  * 
+ * v.1.3 precond: x < 0 - threshold. 
+ *      Activated !aBuddyIsClearingOwnHalf
+ * v.1.4 Added the online & offline role assignment(Asrar)
  * ToDo:
  * - we need a better shooting direction!! 
  * - maybe add OFFENSIVE mode as a blocker?
@@ -56,6 +59,7 @@
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/TeamData.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 
 CARD(ClearOwnHalfCard,
@@ -72,12 +76,14 @@ CARD(ClearOwnHalfCard,
     REQUIRES(TeamBehaviorStatus),
     REQUIRES(TeamData),
     REQUIRES(TeammateRoles),  // R2K
+    REQUIRES(TeamCommStatus),  // wifi on off?
 
     DEFINES_PARAMETERS(
     {,
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
       (bool)(true) shootAngleIsZero,
+      (int) (-1000) offsetX,
     }),
   });
 
@@ -85,13 +91,13 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
 {
   bool preconditions() const override
   {
-    return
-      theGameInfo.setPlay == SET_PLAY_NONE &&
-      // !aBuddyIsClearingOwnHalf() &&
-      theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
+   return
+     theGameInfo.setPlay == SET_PLAY_NONE &&
+      theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&  // I am the striker
+      !aBuddyIsClearingOwnHalf() &&
       theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
-      theFieldBall.endPositionOnField.x() < 0 && 
+      theFieldBall.positionOnField.x() < 500 &&
       !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME);
   }
 
@@ -132,8 +138,12 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
   {
     for (const auto& buddy : theTeamData.teammates)
     {
-      if (buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie) 
+      if (buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
         return true;
     }
     return false;

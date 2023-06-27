@@ -5,7 +5,7 @@ RobotStatus
   hasGroundContact: Boolean
   timeWhenLastUpright: Timestamp(bits=8, shift=6, reference=relativePast)
   timeOfLastGroundContact: Timestamp(bits=8, shift=6, reference=relativePast)
-  sequenceNumbers: Integer(min=-1, max=14)[7]
+  sequenceNumbers: Integer(min=-1, max=14)[20]
 }
 
 RobotPose
@@ -57,7 +57,7 @@ TimeToReachBall
 
 TeammateRoles
 {
-  roles: Integer(min=-1, max=14)[:7]
+  roles: Integer(min=-1, max=14)[:20]
   captain: Integer(min=-1, max=14)
   timestamp: Timestamp(bits=13, reference=relativePast)
 }
@@ -87,7 +87,7 @@ Obstacle
 
 ObstacleModel
 {
-  obstacles: Obstacle[:7]
+  obstacles: Obstacle[:20]
 }
 
 TeamTalk

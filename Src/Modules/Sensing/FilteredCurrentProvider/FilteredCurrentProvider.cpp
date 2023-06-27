@@ -103,7 +103,7 @@ void FilteredCurrentProvider::checkMotorMalfunction(FilteredCurrent& theFiltered
           {
             SystemCall::playSound("sirene.wav");
             SystemCall::say("Motor malfunction!");
-            SystemCall::say((std::string(TypeRegistry::getEnumName(Global::getSettings().teamColor)) + " " + std::to_string(theRobotInfo.number)).c_str());
+            SystemCall::say((std::string(TypeRegistry::getEnumName(Global::getSettings().fieldPlayerColour)) + " " + std::to_string(theRobotInfo.number)).c_str());
             if(!theGyroOffset.bodyDisconnect)
               theFilteredCurrent.legMotorMalfunction = true;
           }

@@ -85,7 +85,7 @@ void BehaviorControl::execute()
 
   if((theEnhancedKeyStates.hitStreak[KeyStates::headRear] == 3 && theEnhancedKeyStates.pressedDuration[KeyStates::headFront] > 0)
      || (theEnhancedKeyStates.hitStreak[KeyStates::headFront] == 3 && theEnhancedKeyStates.pressedDuration[KeyStates::headRear] > 0))
-    SKILL(Say)((std::string(TypeRegistry::getEnumName(Global::getSettings().teamColor)) + " " + std::to_string(theRobotInfo.number) + " " + std::regex_replace(TypeRegistry::getEnumName(theRobotHealth.jointWithMaxTemperature), std::regex("([A-Z])"), " $1") + " " + std::to_string(theJointSensorData.temperatures[theRobotHealth.jointWithMaxTemperature])).c_str());
+    SKILL(Say)((std::string(TypeRegistry::getEnumName(Global::getSettings().fieldPlayerColour)) + " " + std::to_string(theRobotInfo.number) + " " + std::regex_replace(TypeRegistry::getEnumName(theRobotHealth.jointWithMaxTemperature), std::regex("([A-Z])"), " $1") + " " + std::to_string(theJointSensorData.temperatures[theRobotHealth.jointWithMaxTemperature])).c_str());
 
   if((status == gettingUp || status == penalized || status == playing) && theRobotInfo.mode == RobotInfo::unstiff)
     status = sittingDown;

@@ -114,7 +114,7 @@ void RobotPose::draw() const
     ColorRGBA::black
   };
   const ColorRGBA ownTeamColorForDrawing = colors[Blackboard::getInstance().exists("OwnTeamInfo") ?
-                                                      static_cast<const OwnTeamInfo&>(Blackboard::getInstance()["OwnTeamInfo"]).teamColor : TEAM_BLACK];
+                                                      static_cast<const OwnTeamInfo&>(Blackboard::getInstance()["OwnTeamInfo"]).fieldPlayerColour : TEAM_RED];
 
   DEBUG_DRAWING("representation:RobotPose", "drawingOnField")
   {

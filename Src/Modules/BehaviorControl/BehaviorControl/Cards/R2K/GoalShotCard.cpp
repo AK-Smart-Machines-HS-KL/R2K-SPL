@@ -20,6 +20,7 @@
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Tools/Math/Geometry.h"
+#include "Representations/Communication/TeamData.h"
 
 // Debug Drawings
 #include "Tools/Debugging/DebugDrawings.h"
@@ -34,18 +35,20 @@ CARD(GoalShotCard,
         CALLS(GoToBallAndKick),
         CALLS(Stand),
         CALLS(WalkToPoint),
+        CALLS(WalkAtRelativeSpeed),
         REQUIRES(Shots),
         REQUIRES(RobotPose),
         REQUIRES(FieldBall),
         REQUIRES(FrameInfo),
+        REQUIRES(TeamData),
 
         DEFINES_PARAMETERS(
              {,
-                (unsigned int)(1000) initalCheckTime,
+                (unsigned int)(500) initalCheckTime,
                 (bool)(false) done,
                 (Shot) currentShot,
                 (unsigned int) (0) timeLastFail,
-                (unsigned int) (10000) cooldown,
+                (unsigned int) (6000) cooldown,
              }),
 
      });
@@ -60,12 +63,17 @@ class GoalShotCard : public GoalShotCardBase
   //always active
   bool preconditions() const override
   {
-    return theFieldBall.positionRelative.norm() < 500 && theFrameInfo.getTimeSince(timeLastFail) > cooldown && theShots.goalShot.failureProbability < 0.95;
+    return theFieldBall.positionRelative.norm() < 600
+      && theFrameInfo.getTimeSince(timeLastFail) > cooldown
+      && theShots.goalShot.failureProbability < 0.70
+      && theFieldBall.positionOnField.x() > theRobotPose.translation.x()
+      // && !aBuddyIsChasingOrClearing()
+    ;
   }
 
   bool postconditions() const override
   {
-    return done;   // set to true, when used as default card, ie, lowest card on stack
+    return done;   
   }
 
   option
@@ -78,14 +86,16 @@ class GoalShotCard : public GoalShotCardBase
       Angle angleToGoal = (Vector2f(4500, 0) - theRobotPose.translation).angle() - theRobotPose.rotation; 
       transition
       {
-        if(abs(angleToGoal.normalize()) < 10_deg || state_time > 2000) {
+        if(abs(angleToGoal.normalize()) < 20_deg || state_time > 2000) {
           goto check;
         }
       }
 
       action
       {
-        theWalkToPointSkill(Pose2f(angleToGoal));
+        // face the goal
+        theWalkAtRelativeSpeedSkill(Pose2f(std::clamp((float) angleToGoal, -1.f, 1.f)));
+        // look around
         theLookActiveSkill();
       }
     }
@@ -98,7 +108,7 @@ class GoalShotCard : public GoalShotCardBase
         if(state_time > initalCheckTime) {
           currentShot = theShots.goalShot;
           OUTPUT_TEXT("Locking Target: (" << currentShot.target.x() << ", " << currentShot.target.y() << ")\n" << currentShot);
-          if (currentShot.failureProbability > 0.2) {
+          if (currentShot.failureProbability > 0.4) {
             OUTPUT_TEXT("Aborting! shot too likely to fail");
             timeLastFail = theFrameInfo.time;
             goto done;
@@ -145,6 +155,21 @@ class GoalShotCard : public GoalShotCardBase
   void postProcess() override {
     
   }
+  bool aBuddyIsChasingOrClearing() const
+    {
+      for (const auto& buddy : theTeamData.teammates) 
+      {
+        if (buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
+          return true;
+      }
+      return false;
+    }
 };
 
 MAKE_CARD(GoalShotCard);

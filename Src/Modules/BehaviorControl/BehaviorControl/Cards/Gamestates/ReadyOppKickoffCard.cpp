@@ -8,9 +8,11 @@
  * Behavior:
  * Sets up Robot 5 Blocking the center line of the own field during kickoff
  * 
- * @version 1.1.
+ * version 1.1.
  * OFFENSIVE Robots march to their default position (see DefaultPoseProvider for details)
- * @version 1.2 Migrated (Adrian). Offense Players step back 1m from default position to stay clear from center circle
+ * version 1.2 Migrated (Adrian). Offense Players step back 1m from default position to stay clear from center circle
+ * version 1.3. (Andy): changing default position for offense players too even more distance to center circle)
+ * version 1.4. (Adrian): code migration using theTeammateRoles.offenseRoleIndex
  */
 
 #include "Representations/BehaviorControl/DefaultPose.h"
@@ -26,6 +28,7 @@
 #include "Tools/Math/Geometry.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
+#include "Representations/BehaviorControl/TeammateRoles.h"
 
 
 CARD(ReadyOppKickoffCard,
@@ -37,6 +40,9 @@ CARD(ReadyOppKickoffCard,
     REQUIRES(GameInfo),
     REQUIRES(OwnTeamInfo),
     REQUIRES(RobotPose),
+    REQUIRES(RobotInfo),
+    REQUIRES(TeammateRoles),
+    
 
 });
 
@@ -63,9 +69,21 @@ class ReadyOppKickoffCard : public ReadyOppKickoffCardBase
 
       theActivitySkill(BehaviorStatus::defaultBehavior);
 
-      Vector2f targetRelative = theRobotPose.toRelative(theDefaultPose.ownDefaultPose.translation);
-     
-      targetRelative = targetRelative + Vector2f(-1000.f, 0);
+      Vector2f targetAbsolute = theDefaultPose.ownDefaultPose.translation + Vector2f(-550.f, 0);
+
+      int nOffenseFound = 0;
+      int i;
+
+      switch (theTeammateRoles.offenseRoleIndex(theRobotInfo.number)) {
+      case 0: // right-most offense
+        targetAbsolute = Vector2f(-1000, 0);
+        break;
+      case 1: // 
+        targetAbsolute = Vector2f(-1300, -300);
+        break;
+      }
+
+      Vector2f targetRelative = theRobotPose.toRelative(targetAbsolute);
 
       theLookActiveSkill(); // Head Motion Request
       theWalkToPointSkill(Pose2f(theDefaultPose.ownDefaultPose.rotation - theRobotPose.rotation, targetRelative), 1.0f, true);

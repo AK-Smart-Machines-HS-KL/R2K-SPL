@@ -1,5 +1,5 @@
 /**
- * @file ReadyOwnKickoffCard.cpp
+ * @file ReadyOwnPenaltyKickCard.cpp
  * @author Andy Hobelsberger
  * @brief Set individual ready behavior for the own Kickoff
  * @version 1.2
@@ -9,8 +9,9 @@
  * Sets up Robot 5 Behind the Ball so that it may be kicked towards the opponents Field. 
  * 
  * v1.1: Card dynamically select robot instead hardcoding number  (Adrian)
- * v1.2. Card migrated (Adrian
- * v1.3. using offenseIndex for qualifiying (Asrar)
+ * v1.2. Card migrated (Adrian)
+ * v 1.3. (Adrian) using theTeammateRoles.offenseRoleIndex(theRobotInfo.number) 
+ * 
  */
 
 #include "Representations/BehaviorControl/DefaultPose.h"
@@ -22,13 +23,15 @@
 #include "Representations/Modeling/RobotPose.h"
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h" 
 #include "Representations/BehaviorControl/TeammateRoles.h"
+#include "Representations/Configuration/FieldDimensions.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 #include "Tools/Math/Geometry.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 
 
-CARD(ReadyOwnKickoffCard,
+CARD(ReadyOwnPenaltyKickCard,
   {,
     CALLS(Activity),
     CALLS(LookActive),
@@ -37,19 +40,23 @@ CARD(ReadyOwnKickoffCard,
     REQUIRES(GameInfo),
     REQUIRES(OwnTeamInfo),
     REQUIRES(RobotPose),
-  REQUIRES(RobotInfo),
-  REQUIRES(TeammateRoles),
+    REQUIRES(RobotInfo),
+    REQUIRES(TeammateRoles),
+    REQUIRES(FieldDimensions),
+    REQUIRES(TeamCommStatus),  // wifi on off?
   });
 
-class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
+class ReadyOwnPenaltyKickCard : public ReadyOwnPenaltyKickCardBase
 {
   /**
    * @brief walk to default position and exit to DefaultCards
    */
   bool preconditions() const override
   {
-    return  theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber 
-      && theGameInfo.state == STATE_READY;
+    return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
+      && theGameInfo.state == STATE_READY
+      //&& theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive);
+      && theTeammateRoles.offenseRoleIndex(theRobotInfo.number)==0;
   }
 
   /**
@@ -64,29 +71,13 @@ class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
   {
 
     theActivitySkill(BehaviorStatus::defaultBehavior);
-    Vector2f targetAbsolute = theDefaultPose.ownDefaultPose.translation + Vector2f(+450.f, 0);
-
-    int nOffenseFound = 0;
-
-    switch (theTeammateRoles.offenseRoleIndex(theRobotInfo.number)) {
-    case 0: // right-most offense
-      targetAbsolute = Vector2f(-500, 0);
-      break;
-    case 1: // 
-      targetAbsolute = Vector2f(-700, -2000);
-      break;
-    case 2: // OFFENSIVE MODE - we have 3 offense
-      targetAbsolute = Vector2f(-700, 2000);
-      break;
-    }
-
-    Vector2f targetRelative = theRobotPose.toRelative(targetAbsolute);
+    Pose2f targetAbsolute = Pose2f(0 ,theFieldDimensions.xPosOpponentPenaltyMark - 300, 0);
+    Pose2f targetRelative = theRobotPose.toRelative(targetAbsolute);
 
     theLookActiveSkill(); // Head Motion Request
-    theWalkToPointSkill(Pose2f(theDefaultPose.ownDefaultPose.rotation - theRobotPose.rotation, targetRelative), 1.0f, true);
-
+    theWalkToPointSkill(targetRelative);
   }
   
 };
 
-MAKE_CARD(ReadyOwnKickoffCard);
+MAKE_CARD(ReadyOwnPenaltyKickCard);
