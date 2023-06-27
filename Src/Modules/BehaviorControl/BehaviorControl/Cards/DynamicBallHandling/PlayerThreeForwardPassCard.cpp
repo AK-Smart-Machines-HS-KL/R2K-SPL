@@ -85,8 +85,8 @@ class PlayerThreeForwardPassCard : public PlayerThreeForwardPassCardBase
         
         theActivitySkill(BehaviorStatus::PlayerThreeForwardPass);
         
-        float x = 0.f;
-        float y = 0.f;
+        float x = -500.f;
+        float y = -2500.f;
 
         for (const auto& buddy : theTeamData.teammates)
         {

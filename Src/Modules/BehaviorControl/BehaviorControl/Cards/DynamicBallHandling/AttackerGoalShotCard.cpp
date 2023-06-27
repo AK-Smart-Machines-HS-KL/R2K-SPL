@@ -77,20 +77,15 @@ class AttackerGoalShotCard : public AttackerGoalShotCardBase
   {
     return
         // theTeammateRoles.playsTheBall(theRobotInfo.number) &&   // I am the striker
-        (theRobotInfo.number == 3
+        (theRobotInfo.number == 3 || theRobotInfo.number == 2)
         // theTeammateRoles.isTacticalOffense(theRobotInfo.number)
         && theFieldBall.positionRelative.norm() < 2000
         && !theObstacleModel.opponentIsClose()
         //&& theFrameInfo.getTimeSince(timeLastFail) > cooldown
-        && theShots.goalShot.failureProbability < 0.50)
+        && theShots.goalShot.failureProbability < 0.50
         //&& theFieldBall.positionOnField.x() > theRobotPose.translation.x()
-      ||
-      
-        (theRobotInfo.number == 2
-        && theExtendedGameInfo.timeSincePlayingStarted > 25000
-        && theFieldBall.positionRelative.norm() < 1500
-        //&& theFrameInfo.getTimeSince(timeLastFail) > cooldown
-        && theShots.goalShot.failureProbability < 0.90)
+        && (theExtendedGameInfo.timeSincePlayingStarted > 25000) == (theRobotInfo.number == 2)
+        
       
     ;
   }
