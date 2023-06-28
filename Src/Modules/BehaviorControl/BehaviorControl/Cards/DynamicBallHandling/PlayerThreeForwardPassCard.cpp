@@ -30,6 +30,7 @@
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
 
+
 CARD(PlayerThreeForwardPassCard,
      {
     ,
@@ -46,6 +47,7 @@ CARD(PlayerThreeForwardPassCard,
     REQUIRES(TeammateRoles),        // R2K
     REQUIRES(PlayerRole),           // R2K
     REQUIRES(RobotInfo),            // R2K
+   
     DEFINES_PARAMETERS(
                        {,
                            (float)(0.8f) walkSpeed,
@@ -68,10 +70,12 @@ class PlayerThreeForwardPassCard : public PlayerThreeForwardPassCardBase
     bool preconditions() const override
     {
         
-      return //theTeammateRoles.playsTheBall(theRobotInfo.number) &&   // I am the striker
+      return //theTeammateRoles.playsTheBall(&theRobotInfo , theTeamCommStatus.isWifiCommActive) &&   // I am the striker
         theRobotInfo.number == 3
-        && theFieldBall.positionRelative.norm() < 1500;
+        && theFieldBall.positionRelative.norm() < 1500
+        && theFieldBall.ballWasSeen(1000);
        // theTeammateRoles.isTacticalDefense(theRobotInfo.number);
+
         
     }
     

@@ -60,7 +60,7 @@ CARD(AttackerGoalShotCard,
                 (bool)(false) done,
                 (Shot) currentShot,
                 (unsigned int) (0) timeLastFail,
-                (unsigned int) (8000) cooldown,
+                (unsigned int) (6000) cooldown,
              }),
 
      });
@@ -80,11 +80,12 @@ class AttackerGoalShotCard : public AttackerGoalShotCardBase
         (theRobotInfo.number == 3 || theRobotInfo.number == 2)
         // theTeammateRoles.isTacticalOffense(theRobotInfo.number)
         && theFieldBall.positionRelative.norm() < 2000
-        && !theObstacleModel.opponentIsClose()
-        //&& theFrameInfo.getTimeSince(timeLastFail) > cooldown
-        && theShots.goalShot.failureProbability < 0.50
+        //&& !theObstacleModel.opponentIsClose()
+        && theFrameInfo.getTimeSince(timeLastFail) > cooldown
+        && theShots.goalShot.failureProbability < 0.8
         //&& theFieldBall.positionOnField.x() > theRobotPose.translation.x()
-        && (theExtendedGameInfo.timeSincePlayingStarted > 25000) == (theRobotInfo.number == 2)
+        && ((theExtendedGameInfo.timeSincePlayingStarted > 25000) && (theRobotInfo.number == 2)
+        || (theExtendedGameInfo.timeSincePlayingStarted > 15000) && (theRobotInfo.number == 3))
         
       
     ;
@@ -105,7 +106,7 @@ class AttackerGoalShotCard : public AttackerGoalShotCardBase
       Angle angleToGoal = (Vector2f(4500, 0) - theRobotPose.translation).angle() - theRobotPose.rotation; 
       transition
       {
-        if(abs(angleToGoal.normalize()) < 20_deg || state_time > 2000) {
+        if(abs(angleToGoal.normalize()) < 20_deg || state_time > 1500) {
           goto check;
         }
       }
@@ -127,7 +128,7 @@ class AttackerGoalShotCard : public AttackerGoalShotCardBase
         if(state_time > initalCheckTime) {
           currentShot = theShots.goalShot;
           OUTPUT_TEXT("Locking Target: (" << currentShot.target.x() << ", " << currentShot.target.y() << ")\n" << currentShot);
-          if (currentShot.failureProbability > 0.4) {
+          if (currentShot.failureProbability > 0.3) {
             OUTPUT_TEXT("Aborting! shot too likely to fail");
             timeLastFail = theFrameInfo.time;
             goto done;

@@ -70,7 +70,8 @@ class PlayerTwoForwardPassCard : public PlayerTwoForwardPassCardBase
         
       return //theTeammateRoles.playsTheBall(theRobotInfo.number) &&   // I am the striker
         theRobotInfo.number == 2
-        && theFieldBall.positionRelative.norm() < 1500;
+        && theFieldBall.positionRelative.norm() < 1500
+        && theFieldBall.ballWasSeen(1000);
        // theTeammateRoles.isTacticalDefense(theRobotInfo.number);
         
     }

@@ -88,7 +88,7 @@ class PlayerOneForwardPassCard : public PlayerOneForwardPassCardBase
         theActivitySkill(BehaviorStatus::playerOneForwardPass);
         
         float x = -500.f;
-        float y = -2500.f;
+        float y = -2000.f;
 
         for (const auto& buddy : theTeamData.teammates)
         {
