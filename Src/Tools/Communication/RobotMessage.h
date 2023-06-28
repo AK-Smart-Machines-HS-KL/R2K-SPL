@@ -20,6 +20,8 @@
 #include <memory>     // shared_ptr
 #include "Tools/SubclassRegistry.h"
 
+using namespace std::placeholders;
+
 #define SPL_MAX_MESSAGE_BYTES 128
 #define MAX_NUM_COMPONENTS 64
 
@@ -36,8 +38,8 @@ struct AbstractRobotMessageComponent {
    * @param buff 
    * @return size_t 
    */
-  virtual size_t compress(char* buff) = 0;
-  virtual bool decompress(char* compressed) = 0;
+  virtual size_t compress(uint8_t* buff) = 0;
+  virtual bool decompress(uint8_t* compressed) = 0;
   virtual void doCallbacks(RobotMessageHeader& header) = 0;
   virtual void compileData() = 0;
   virtual size_t getSize() = 0;
@@ -71,27 +73,46 @@ class RobotMessageComponent : public AbstractRobotMessageComponent {
 
   public: 
   class CallbackRef {
-    private:
+    protected:
+    size_t* refCount;
     typename std::list<CallbackFunc_t>::iterator element;
     
     public:
     CallbackRef(CallbackRef&&) = default;
-    CallbackRef(const CallbackRef&) = delete;
-    CallbackRef() = default;
-    CallbackRef(typename std::list<CallbackFunc_t>::iterator element) : element(element) {}
-    ~CallbackRef() {callbacks.erase(element);}
+    CallbackRef(CallbackRef& other) {
+      this->element = other.element;
+      this->refCount = other.refCount;
+      *refCount++;
+    };
+    CallbackRef(typename std::list<CallbackFunc_t>::iterator element) : element(element), refCount(new size_t(1)) {}
+    ~CallbackRef() {
+      *refCount--;
+      if (*refCount == 0) {
+        callbacks.erase(element);
+      }
+    }
   };
 
   class CompilerRef {
-    private:
+    protected:
+    size_t* refCount;
     typename std::list<CompilerFunc_t>::iterator element;
     
     public:
     CompilerRef(CompilerRef&&) = default;
-    CompilerRef(const CompilerRef&) = delete;
-    CompilerRef() = default;
-    CompilerRef(typename std::list<CompilerFunc_t>::iterator element) : element(element) {}
-    ~CompilerRef() {dataCompilers.erase(element);}
+    CompilerRef(CompilerRef& other) {
+      this->element = other.element;
+      this->refCount = other.refCount;
+      *refCount++;
+    };
+
+    CompilerRef(typename std::list<CompilerFunc_t>::iterator element) : element(element), refCount(new size_t(1)) {}
+    ~CompilerRef() {
+      *refCount--;
+      if (*refCount == 0) {
+        dataCompilers.erase(element);
+      }
+    }
   };
 
   inline static int priority = 0;

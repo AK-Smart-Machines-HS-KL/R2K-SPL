@@ -79,19 +79,26 @@ void RobotMessageHandler::receive()
     size = localId ? socket.readLocal((char*) readBuffer.data(), readBuffer.size())
                    : socket.read((char*) readBuffer.data(), readBuffer.size(), remoteIp);
                    
-    // Error Check
-    if (size == -1) {
+    if (size == -1) { // Error Check
       //TODO Error handling here
     }
 
-    // A Message was read
-    if (size > 0) {
-      RobotMessage msg;
-      if (msg.decompress(readBuffer) // Decompress Successful
-        && msg.header.senderID != Global::getSettings().playerNumber) // Ignore Messages from Self
-      {
-        msg.doCallbacks();
-      }
+    // No Message was read
+    if (size == 0) {
+      break;
     }
+
+    RobotMessage msg;
+    if (!msg.decompress(readBuffer)) { // Decompress failed 
+      // TODO: Log this
+      continue; // Skip this Message
+    }
+
+    if (msg.header.senderID == Global::getSettings().playerNumber) { // Message came from myself! 
+      continue; // Skip this Message
+    }
+
+    msg.doCallbacks();
+
   } while(size > 0);
 }

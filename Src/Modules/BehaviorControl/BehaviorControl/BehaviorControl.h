@@ -27,6 +27,7 @@
 #include "Tools/Module/Module.h"
 #include "Tools/Streams/Enum.h"
 #include <string>
+#include "Tools/Communication/MessageComponents/BehaviorStatus.h"
 
 MODULE(BehaviorControl,
 {,
@@ -66,6 +67,9 @@ class BehaviorControl : public BehaviorControlBase
 public:
   /** Constructor. */
   BehaviorControl();
+
+  void compileBehaviorControl(BehaviorStatusComponent*);
+  BehaviorStatusComponent::CompilerRef messageCompilerRef = BehaviorStatusComponent::addDataCompiler(std::bind(&BehaviorControl::compileBehaviorControl, this, _1));
 
   /**
    * Creates extended module info (union of this module's info and requirements of all behavior parts (cards and skills)).

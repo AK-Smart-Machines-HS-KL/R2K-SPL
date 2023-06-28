@@ -32,6 +32,12 @@ SelfLocator::~SelfLocator()
   delete samples;
 }
 
+void SelfLocator::compileRobotPose(RobotPoseComponent * comp) {
+  comp->pose.translation.x() = theRobotPose.translation.x();
+  comp->pose.translation.y() = theRobotPose.translation.y();
+  comp->pose.rotation = theRobotPose.rotation;
+}
+
 void SelfLocator::update(RobotPose& robotPose)
 {
 #ifndef NDEBUG

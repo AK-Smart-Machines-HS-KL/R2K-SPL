@@ -6,6 +6,7 @@
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Tools/Module/Blackboard.h"
 #include "Tools/Debugging/DebugDrawings3D.h"
+#include "Platform/Time.h"
 #include <algorithm>
 
 #define HANDLE_PARTICLE(particle) case id##particle: return the##particle.handleArbitraryMessage(message, [this](unsigned u){return this->toLocalTimestamp(u);})
@@ -89,4 +90,33 @@ void TeamData::draw() const
     const Vector2f ballPos = teammate.theRobotPose * teammate.theBallModel.estimate.position;
     CIRCLE("representation:TeamData", ballPos.x(), ballPos.y(), 50, 20, Drawings::solidPen, ColorRGBA::yellow, Drawings::solidBrush, ColorRGBA::yellow);
   }
+}
+
+TeamData::TeamData() {
+  RobotPoseComponent::priority = 1;
+  BehaviorStatusComponent::priority = 1;
+}
+
+Teammate& TeamData::getBMate(int number)
+{
+  for(auto& teammate : teammates)
+    if(teammate.number == number)
+      return teammate;
+
+  teammates.emplace_back();
+  Teammate& newTeammate = teammates.back();
+  newTeammate.number = number;
+  return newTeammate;
+}
+
+void TeamData::rcvRobotPose(RobotPoseComponent * comp, RobotMessageHeader & header) {
+  auto& bmate = getBMate(header.senderID);
+  bmate.timeWhenLastPacketReceived = Time::getCurrentSystemTime();
+  bmate.theRobotPose = comp->pose;
+}
+
+void TeamData::rcvBehaviorStatus(BehaviorStatusComponent * comp, RobotMessageHeader & header) {
+  auto& bmate = getBMate(header.senderID);
+  bmate.timeWhenLastPacketReceived = Time::getCurrentSystemTime();
+  bmate.theBehaviorStatus.activity = static_cast<BehaviorStatus::Activity>(comp->activity);
 }

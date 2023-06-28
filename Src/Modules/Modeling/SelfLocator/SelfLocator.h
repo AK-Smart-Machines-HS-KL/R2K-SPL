@@ -38,6 +38,7 @@
 #include "Representations/Configuration/StaticInitialPose.h"
 #include "Tools/Modeling/SampleSet.h"
 #include "Tools/Module/Module.h"
+#include "Tools/Communication/MessageComponents/RobotPose.h"
 
 MODULE(SelfLocator,
 {,
@@ -137,6 +138,9 @@ private:
   unsigned lastTimePenaltyMarkSeen;             /**< Last time a penalty mark was seen */
   unsigned lastTimeCirclePerceptSeen;           /**< Last time a circle percept was seen */
   bool validitiesHaveBeenUpdated;               /**< Flag that indicates that the validities of the samples have been changed this frame */
+
+  void compileRobotPose(RobotPoseComponent *);
+  RobotPoseComponent::CompilerRef messageCompilerRef = RobotPoseComponent::addDataCompiler(std::bind(&SelfLocator::compileRobotPose, this, _1));
 
   /**
    * The method provides the robot pose

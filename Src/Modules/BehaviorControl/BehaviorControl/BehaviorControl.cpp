@@ -25,6 +25,10 @@ BehaviorControl::BehaviorControl() :
   theSkillRegistry.checkSkills(CardCreatorBase::gatherSkillInfo(CardCreatorList<Card>::first));
 }
 
+void BehaviorControl::compileBehaviorControl(BehaviorStatusComponent * comp) {
+  comp->activity = (uint8_t) theBehaviorStatus.activity;
+}
+
 std::vector<ModuleBase::Info> BehaviorControl::getExtModuleInfo()
 {
   auto result = BehaviorControl::getModuleInfo();

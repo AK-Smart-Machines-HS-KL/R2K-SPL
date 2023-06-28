@@ -9,9 +9,9 @@ class BNTPRequestComponent: public RobotMessageComponent<BNTPRequestComponent> {
   inline static const std::string name = "BNTPRequest";
   BNTPRequestComponent() : RobotMessageComponent<BNTPRequestComponent>() { }
 
-  size_t compress(char* buff);
+  size_t compress(uint8_t* buff);
 
-  bool decompress(char* compressed);
+  bool decompress(uint8_t* compressed);
 
   size_t getSize();
 };

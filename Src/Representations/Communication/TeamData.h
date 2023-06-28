@@ -26,6 +26,8 @@
 #include "Tools/Streams/Enum.h"
 
 #include "Tools/Communication/BNTP.h"
+#include "Tools/Communication/MessageComponents/RobotPose.h"
+#include "Tools/Communication/MessageComponents/BehaviorStatus.h"
 
 STREAMABLE(Teammate, COMMA public MessageHandler
 {
@@ -51,8 +53,9 @@ STREAMABLE(Teammate, COMMA public MessageHandler
     PLAYING,                          /** BEST : Teammate is standing/walking and has ground contact :-) */
   });
 
-  FieldCoverage theFieldCoverage, /**< Do not log this huge representation! */
-
+  FieldCoverage theFieldCoverage; /**< Do not log this huge representation! */
+  
+  ,
   (int)(-1) number,
   (bool)(false) isGoalkeeper, /**< This is for a teammate what \c theRobotInfo.isGoalkeeper() is for the player itself. */
   (bool)(true) isPenalized,
@@ -78,6 +81,8 @@ STREAMABLE(Teammate, COMMA public MessageHandler
 
   (RobotHealth) theRobotHealth,
   (TeamTalk) theTeamTalk,
+
+
 });
 
 /**
@@ -86,7 +91,18 @@ STREAMABLE(Teammate, COMMA public MessageHandler
  */
 STREAMABLE(TeamData,
 {
+  TeamData();
+
   void draw() const;
+
+  Teammate& getBMate(int number);
+
+  void rcvRobotPose(RobotPoseComponent *, RobotMessageHeader &);
+  RobotPoseComponent::CallbackRef robotPoseCallbackRef = RobotPoseComponent::addCallback(std::bind(&TeamData::rcvRobotPose, this, _1, _2));
+
+  void rcvBehaviorStatus(BehaviorStatusComponent *, RobotMessageHeader &);
+  BehaviorStatusComponent::CallbackRef behaviorStatusCallbackRef = BehaviorStatusComponent::addCallback(std::bind(&TeamData::rcvBehaviorStatus, this, _1, _2));
+
   FUNCTION(void(const SPLStandardMessageBufferEntry* const)) generate,
 
   (std::vector<Teammate>) teammates, /**< An unordered(!) list of all teammates that are currently communicating with me */

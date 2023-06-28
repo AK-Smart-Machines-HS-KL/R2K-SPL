@@ -4,7 +4,7 @@
 
 // n(1), [origination(4), reciept(4), reciever(1)] x n
 
-size_t BNTPResponseComponent::compress(char* buff) {
+size_t BNTPResponseComponent::compress(uint8_t* buff) {
     size_t byteOffset = 0;
     
     // size must be less than max(n)
@@ -30,7 +30,7 @@ size_t BNTPResponseComponent::compress(char* buff) {
     return byteOffset;
 }
 
-bool BNTPResponseComponent::decompress(char* compressed) {
+bool BNTPResponseComponent::decompress(uint8_t* compressed) {
     size_t byteOffset = 0;
     uint8_t n;
 

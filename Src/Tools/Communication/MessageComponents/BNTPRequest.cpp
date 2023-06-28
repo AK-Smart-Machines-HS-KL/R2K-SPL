@@ -1,10 +1,10 @@
 #include "BNTPRequest.h"
 
-size_t BNTPRequestComponent::compress(char* buff) {
+size_t BNTPRequestComponent::compress(uint8_t* buff) {
     return getSize();
 }
 
-bool BNTPRequestComponent::decompress(char* compressed) {
+bool BNTPRequestComponent::decompress(uint8_t* compressed) {
     return true;
 }
 

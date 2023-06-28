@@ -8,6 +8,7 @@
 
 bool idsAssigned = false;
 std::vector<ComponentMetadata> metadataById = std::vector<ComponentMetadata>();
+uint32_t messageVersionHash = 1337;
 
 void assignComponentIDs() {
   
@@ -62,7 +63,7 @@ size_t RobotMessage::compress(std::array<uint8_t, SPL_MAX_MESSAGE_BYTES>& outBuf
   for (auto component : componentPointers) {
 
     // compress component into componentBuff
-    size_t len = component->compress((char*) componentBuff.data()); 
+    size_t len = component->compress(componentBuff.data()); 
 
     // Copy component into buffer
     memcpy(outBuff.data() + byteOffset, componentBuff.data(), len);
@@ -100,7 +101,9 @@ bool RobotMessage::decompress(std::array<uint8_t, SPL_MAX_MESSAGE_BYTES>& buff){
   memcpy(&header.componentHash, buff.data() + byteOffset, sizeof(header.componentHash));
   byteOffset += sizeof(header.componentHash);
 
-  // TODO: Compare Hash
+  if(header.componentHash != messageVersionHash) {
+    return false;
+  }
   
   // Copy Sender
   memcpy(&header.senderID, buff.data() + byteOffset, sizeof(header.senderID));
@@ -113,7 +116,7 @@ bool RobotMessage::decompress(std::array<uint8_t, SPL_MAX_MESSAGE_BYTES>& buff){
   for (auto &componentID : includedComponents)
   {
     auto component = metadataById[componentID].createNew();
-    bool success = component->decompress((char*) buff.data() + byteOffset);
+    bool success = component->decompress(buff.data() + byteOffset);
     if (!success) {
       return false;
     }

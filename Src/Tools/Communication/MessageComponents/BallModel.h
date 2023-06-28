@@ -11,9 +11,9 @@ class BallModelComponent : public RobotMessageComponent<BallModelComponent> {
   inline static const std::string name = "BallModel";
   BallModelComponent() : RobotMessageComponent<BallModelComponent>() { }
 
-  size_t compress(char* buff);
+  size_t compress(uint8_t* buff);
 
-  bool decompress(char* compressed);
+  bool decompress(uint8_t* compressed);
 
   size_t getSize();
 };

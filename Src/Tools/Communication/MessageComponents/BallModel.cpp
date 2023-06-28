@@ -1,10 +1,11 @@
 #include "BallModel.h"
 
-size_t BallModelComponent::compress(char* buff) {
-    return 0;
+
+size_t BallModelComponent::compress(uint8_t* buff) {
+    return getSize();
 }
 
-bool BallModelComponent::decompress(char* compressed) {
+bool BallModelComponent::decompress(uint8_t* compressed) {
     return true;
 }
 
