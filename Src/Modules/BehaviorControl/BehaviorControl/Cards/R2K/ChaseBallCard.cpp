@@ -69,7 +69,7 @@ CARD(ChaseBallCard,
              {,
                 //Define Params here
                 (float)(0.8f) walkSpeed,
-                (int)(7000) ballNotSeenTimeout,
+                (int)(5000) ballNotSeenTimeout,
                 (int)(1000) threshold,
              }),
 
@@ -87,10 +87,10 @@ class ChaseBallCard : public ChaseBallCardBase
   
     return
       (
-        !aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
+        // !aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
         theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
-        theFieldBall.positionOnField.x() > (0 - threshold)
-        // theFieldBall.positionOnField.x() >= theRobotPose.translation.x() - threshold;
+        (theFieldBall.positionOnField.x() > (0 - threshold)) &&
+        theFieldBall.positionOnField.x() >= theRobotPose.translation.x() - threshold
         )
       ||
       (theGameInfo.setPlay == SET_PLAY_NONE &&
@@ -163,7 +163,7 @@ class ChaseBallCard : public ChaseBallCardBase
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::goalShot ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
           return true;

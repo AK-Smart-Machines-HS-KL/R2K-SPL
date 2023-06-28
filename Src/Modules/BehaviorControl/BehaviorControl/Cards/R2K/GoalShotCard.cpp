@@ -4,6 +4,9 @@
  * @brief 
  * @version 1.0
  * 
+ * Note: we have two checks for theShots.goalShot.failureProbability < x
+ * x = 0.5 in pre-cond
+ * x = 0.4 in state machine (aka "done")
  * 
  */
 
@@ -65,9 +68,9 @@ class GoalShotCard : public GoalShotCardBase
   {
     return theFieldBall.positionRelative.norm() < 600
       && theFrameInfo.getTimeSince(timeLastFail) > cooldown
-      && theShots.goalShot.failureProbability < 0.70
+      && theShots.goalShot.failureProbability < 0.50
       && theFieldBall.positionOnField.x() > theRobotPose.translation.x()
-      // && !aBuddyIsChasingOrClearing()
+      && !aBuddyIsChasingOrClearing()
     ;
   }
 
@@ -78,7 +81,7 @@ class GoalShotCard : public GoalShotCardBase
 
   option
   {
-    theActivitySkill(BehaviorStatus::codeReleaseKickAtGoal);
+    theActivitySkill(BehaviorStatus::goalShotCard);
 
     initial_state(align)
     {
@@ -159,13 +162,14 @@ class GoalShotCard : public GoalShotCardBase
     {
       for (const auto& buddy : theTeamData.teammates) 
       {
-        if (buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
+        if (// buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
+          buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard )
+          // buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
           return true;
       }
       return false;

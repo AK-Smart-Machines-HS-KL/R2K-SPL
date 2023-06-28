@@ -81,11 +81,12 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
     bool preconditions() const override
     {
         
-      return 
+      return
+        !aBuddyIsClearingOrPassing() &&      
         theTeammateRoles.playsTheBall(&theRobotInfo,theTeamCommStatus.isWifiCommActive) &&   // I am the striker
         theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
-        thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1 &&
-        theObstacleModel.opponentIsTooClose(theFieldBall.positionRelative) != KickInfo::LongShotType::noKick &&  
+        // thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1 &&
+        // theObstacleModel.opponentIsTooClose(theFieldBall.positionRelative) != KickInfo::LongShotType::noKick &&  
         theTeamBehaviorStatus.teamActivity != TeamBehaviorStatus::R2K_SPARSE_GAME;
         
     }
@@ -100,8 +101,8 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
         
         theActivitySkill(BehaviorStatus::offenseForwardPassCard);
         
-        float x;
-        float y;
+        float x = 1500;
+        float y = -1500;
 
         for (const auto& buddy : theTeamData.teammates)
         {
@@ -124,6 +125,22 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
     Angle calcAngleToOffense(float xPos, float yPos) const
     {
         return (theRobotPose.inversePose * Vector2f(xPos, yPos)).angle();
+    }
+    bool aBuddyIsClearingOrPassing() const
+    {
+      for (const auto& buddy : theTeamData.teammates) 
+      {
+        if (
+          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard)
+          // uddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
+          return true;
+      }
+      return false;
     }
 };
 
