@@ -1,13 +1,13 @@
 set(SIMULATEDNAO_ROOT_DIR "${BHUMAN_PREFIX}/Src")
 
 file(GLOB_RECURSE SIMULATEDNAO_SOURCES
-    "${SIMULATEDNAO_ROOT_DIR}/Modules/*.cpp" "${SIMULATEDNAO_ROOT_DIR}/Modules/*.h")
+    "${SIMULATEDNAO_ROOT_DIR}/Modules/*.cpp" "${SIMULATEDNAO_ROOT_DIR}/Modules/*.h") 
 file(GLOB SIMULATEDNAO_SOURCES_ADDITIONAL
     "${SIMULATEDNAO_ROOT_DIR}/Platform/*.cpp" "${SIMULATEDNAO_ROOT_DIR}/Platform/*.h")
 list(APPEND SIMULATEDNAO_SOURCES ${SIMULATEDNAO_SOURCES_ADDITIONAL})
 file(GLOB_RECURSE SIMULATEDNAO_SOURCES_ADDITIONAL
     "${SIMULATEDNAO_ROOT_DIR}/Representations/*.cpp" "${SIMULATEDNAO_ROOT_DIR}/Representations/*.h"
-    "${SIMULATEDNAO_ROOT_DIR}/Tools/*.cpp" "${SIMULATEDNAO_ROOT_DIR}/Tools/*.h"
+    "${SIMULATEDNAO_ROOT_DIR}/Tools/*.c" "${SIMULATEDNAO_ROOT_DIR}/Tools/*.cpp" "${SIMULATEDNAO_ROOT_DIR}/Tools/*.h"
     "${SIMULATEDNAO_ROOT_DIR}/Platform/${OS}/*.cpp" "${SIMULATEDNAO_ROOT_DIR}/Platform/${OS}/*.h"
     "${SIMULATEDNAO_ROOT_DIR}/Platform/${OS}/*.mm"
     "${SIMULATEDNAO_ROOT_DIR}/Threads/*.cpp" "${SIMULATEDNAO_ROOT_DIR}/Threads/*.h")
@@ -39,6 +39,7 @@ target_include_directories(SimulatedNao PRIVATE "${SIMULATEDNAO_ROOT_DIR}")
 target_include_directories(SimulatedNao PRIVATE $<$<PLATFORM_ID:Windows>:${BHUMAN_PREFIX}/Util/Buildchain/Windows/include>)
 target_include_directories(SimulatedNao PRIVATE "${BHUMAN_PREFIX}/Util/span-lite/include")
 target_include_directories(SimulatedNao PRIVATE "${BHUMAN_PREFIX}/Util/bitpacker/include/bitpacker")
+target_include_directories(SimulatedNao PRIVATE "${BHUMAN_PREFIX}/Util/bitproto/lib/c")
 target_link_libraries(SimulatedNao PRIVATE Eigen::Eigen)
 target_link_libraries(SimulatedNao PRIVATE FFTW::FFTW FFTW::FFTWF)
 target_link_libraries(SimulatedNao PRIVATE libjpeg::libjpeg)
