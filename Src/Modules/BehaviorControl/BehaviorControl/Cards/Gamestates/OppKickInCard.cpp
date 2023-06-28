@@ -100,7 +100,7 @@ class OppKickInCard : public OppKickInCardBase
       isBlocking = true;
       float ownDistToBall = Geometry::distance(theRobotPose.translation, theFieldBall.positionOnField);
 
-      for(auto teammate : theTeamData.teammates)
+      for(auto& teammate : theTeamData.teammates)
       {
         if (ownDistToBall > Geometry::distance(teammate.theRobotPose.translation, theFieldBall.positionOnField)) {
           isBlocking = false;
