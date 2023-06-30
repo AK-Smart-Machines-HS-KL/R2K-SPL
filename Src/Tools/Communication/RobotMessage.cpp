@@ -46,24 +46,20 @@ size_t RobotMessage::compress(std::array<uint8_t, SPL_MAX_MESSAGE_BYTES>& outBuf
   std::array<uint8_t, SPL_MAX_MESSAGE_BYTES> componentBuff; // buffer reused for component compression
 
   // reserve space for bitfield
-  size_t bitfieldBytes = MAX_NUM_COMPONENTS / 8 + (bool) (MAX_NUM_COMPONENTS % 8);
-  byteOffset += bitfieldBytes; 
+  memset(outBuff.data(), 0, COMPONENT_BITFIELD_SIZE);
+  byteOffset += COMPONENT_BITFIELD_SIZE; 
 
-  // Copy component hash
-  memcpy(outBuff.data() + byteOffset, &header.componentHash, sizeof(header.componentHash)); 
-  byteOffset += sizeof(header.componentHash);
-
-  memcpy(outBuff.data() + byteOffset, &header.senderID, sizeof(header.senderID)); 
-  byteOffset += sizeof(header.senderID);
-
-  memcpy(outBuff.data() + byteOffset, &header.timestamp, sizeof(header.timestamp)); 
-  byteOffset += sizeof(header.timestamp);
+  // Copy header
+  memcpy(outBuff.data() + byteOffset, &header, sizeof(header)); 
+  byteOffset += sizeof(header);
 
   // Compress and Copy Individual Components
   for (auto component : componentPointers) {
 
     // compress component into componentBuff
-    size_t len = component->compress(componentBuff.data()); 
+    size_t len = component->compress(componentBuff.data()); // TODO: Memory safety needed! (Use std::span maybe?)
+
+    // TODO: Verify that component fits
 
     // Copy component into buffer
     memcpy(outBuff.data() + byteOffset, componentBuff.data(), len);
@@ -85,6 +81,7 @@ bool RobotMessage::decompress(std::array<uint8_t, SPL_MAX_MESSAGE_BYTES>& buff){
 
   size_t byteOffset = 0;
 
+  // Read which components are included
   std::list<int> includedComponents = std::list<int>();
   for (int id = 0; id < ComponentRegistry::subclasses.size() ; id++)
   {
@@ -93,30 +90,22 @@ bool RobotMessage::decompress(std::array<uint8_t, SPL_MAX_MESSAGE_BYTES>& buff){
       includedComponents.push_back(id);
     }
   }
+  byteOffset += COMPONENT_BITFIELD_SIZE; 
 
-  size_t bitfieldBytes = MAX_NUM_COMPONENTS / 8 + (bool) (MAX_NUM_COMPONENTS % 8);
-  byteOffset += bitfieldBytes; 
+  // Copy header
+  memcpy(&header, buff.data() + byteOffset, sizeof(header));
+  byteOffset += sizeof(header);
 
-  // Copy component hash out of the buffer
-  memcpy(&header.componentHash, buff.data() + byteOffset, sizeof(header.componentHash));
-  byteOffset += sizeof(header.componentHash);
-
+  // Verify component hash
   if(header.componentHash != messageVersionHash) {
     return false;
   }
-  
-  // Copy Sender
-  memcpy(&header.senderID, buff.data() + byteOffset, sizeof(header.senderID));
-  byteOffset += sizeof(header.senderID);
 
-  // Copy Timestamp
-  memcpy(&header.timestamp, buff.data() + byteOffset, sizeof(header.timestamp));
-  byteOffset += sizeof(header.timestamp);
-
+  // decompress components
   for (auto &componentID : includedComponents)
   {
     auto component = metadataById[componentID].createNew();
-    bool success = component->decompress(buff.data() + byteOffset);
+    bool success = component->decompress(buff.data() + byteOffset); // TODO: Memory safety needed! (Use std::span maybe?)
     if (!success) {
       return false;
     }
@@ -136,7 +125,8 @@ void RobotMessage::compile() {
   header.senderID = Global::getSettings().playerNumber;
   header.timestamp = Time::getCurrentSystemTime();
 
-  static std::vector<ComponentMetadata> metadataByPriority(metadataById); // list for prioritization
+  // Have a copy of the component metadata list. Thread-local for paralellism support
+  thread_local std::vector<ComponentMetadata> metadataByPriority(metadataById); // list for prioritization
 
   // Sorts ComponenentMetadata by Component priority
   struct PrioritySortPredicate {
@@ -148,9 +138,9 @@ void RobotMessage::compile() {
 
   std::sort(metadataByPriority.begin(), metadataByPriority.end(), PrioritySortPredicate());
 
-  size_t bytesRemaining = 128;
-  bytesRemaining -= MAX_NUM_COMPONENTS / 8 + (bool) (MAX_NUM_COMPONENTS % 8);
-  bytesRemaining -= sizeof(header.componentHash);
+  size_t bytesRemaining = 128; // Number of bytes remaining for the next component
+  bytesRemaining -= COMPONENT_BITFIELD_SIZE; // Reserve Component Bitfield
+  bytesRemaining -= sizeof(header); // Reserve Header Space
 
   for(auto metadata : metadataByPriority) {
 
@@ -166,6 +156,7 @@ void RobotMessage::compile() {
       bytesRemaining -= size;
       componentPointers.push_back(component);
     } else {
+      // Log which component we stopped at & which ones were left out
       break;
     }
   }

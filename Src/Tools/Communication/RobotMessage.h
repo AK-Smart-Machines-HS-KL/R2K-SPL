@@ -23,7 +23,7 @@
 using namespace std::placeholders;
 
 #define SPL_MAX_MESSAGE_BYTES 128
-#define MAX_NUM_COMPONENTS 64
+#define COMPONENT_BITFIELD_SIZE 4
 
 struct RobotMessageHeader {
   uint32_t componentHash = 1337; // Temporary     
