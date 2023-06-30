@@ -89,8 +89,8 @@ class ChaseBallCard : public ChaseBallCardBase
       (
         // !aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
         theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
-        (theFieldBall.positionOnField.x() > (0 - threshold)) &&
-        theFieldBall.positionOnField.x() >= theRobotPose.translation.x() - threshold
+        (theFieldBall.endPositionOnField.x() > (0 - threshold)) &&
+        theFieldBall.endPositionOnField.x() >= theRobotPose.translation.x() - threshold
         )
       ||
       (theGameInfo.setPlay == SET_PLAY_NONE &&
