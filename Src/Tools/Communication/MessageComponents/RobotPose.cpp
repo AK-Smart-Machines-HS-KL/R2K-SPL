@@ -24,16 +24,16 @@ bool RobotPoseComponent::decompress(uint8_t* compressed) {
     float x;
     float y;
 
-    memcpy(compressed + byteOffset, &x, sizeof(float));
-    byteOffset += sizeof(float);
+    memcpy(&x, compressed + byteOffset, sizeof(float));
+    byteOffset += sizeof(x); 
 
-    memcpy(compressed + byteOffset, &y, sizeof(float));
-    byteOffset += sizeof(float);
+    memcpy(&y, compressed + byteOffset, sizeof(float));
+    byteOffset += sizeof(y);
 
     pose.translation.x() = x;
     pose.translation.y() = y;
 
-    memcpy(compressed + byteOffset, &pose.rotation, sizeof(Angle));
+    memcpy(&pose.rotation, compressed + byteOffset, sizeof(Angle));
     byteOffset += sizeof(pose.rotation);
     return byteOffset == getSize();
 }
