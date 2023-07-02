@@ -18,6 +18,9 @@
 #include "Tools/Settings.h"
 #include "Tools/Debugging/DebugDrawings.h"
 
+// Message Errors
+#include <cerrno>
+#include <cstring>
 
 
 void RobotMessageHandler::startLocal(int port, unsigned localId)
@@ -81,6 +84,7 @@ void RobotMessageHandler::receive()
                    
     if (size == -1) { // Error Check
       //TODO Error handling here
+      break;
     }
 
     // No Message was read
@@ -95,7 +99,7 @@ void RobotMessageHandler::receive()
     }
 
     if (msg.header.senderID == Global::getSettings().playerNumber) { // Message came from myself! 
-      continue; // Skip this Message
+      //continue; // Skip this Message
     }
 
     msg.doCallbacks();

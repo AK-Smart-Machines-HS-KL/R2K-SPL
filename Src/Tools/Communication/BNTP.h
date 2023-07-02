@@ -113,11 +113,11 @@ public:
 
 private:
   // Callback References
-  BNTPRequestComponent::CallbackRef requestCallback = BNTPRequestComponent::addCallback(std::bind(&BNTP::rcvRequest, this, _1, _2));
-  BNTPRequestComponent::CompilerRef requestCompiler = BNTPRequestComponent::addDataCompiler(std::bind(&BNTP::sndRequest, this, _1));
+  BNTPRequestComponent::Callback requestCallback = BNTPRequestComponent::addCallback(std::bind(&BNTP::rcvRequest, this, _1, _2));
+  BNTPRequestComponent::Compiler requestCompiler = BNTPRequestComponent::addDataCompiler(std::bind(&BNTP::sndRequest, this, _1));
 
-  BNTPResponseComponent::CallbackRef responseCallback = BNTPResponseComponent::addCallback(std::bind(&BNTP::rcvResponse, this, _1, _2));
-  BNTPResponseComponent::CompilerRef responseCompiler = BNTPResponseComponent::addDataCompiler(std::bind(&BNTP::sndResponse, this, _1));
+  BNTPResponseComponent::Callback responseCallback = BNTPResponseComponent::addCallback(std::bind(&BNTP::rcvResponse, this, _1, _2));
+  BNTPResponseComponent::Compiler responseCompiler = BNTPResponseComponent::addDataCompiler(std::bind(&BNTP::sndResponse, this, _1));
 
   static constexpr int ntpRequestInterval = 10000; /**< Request an NTP message every $ ms. */
 

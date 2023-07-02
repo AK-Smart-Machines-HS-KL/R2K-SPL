@@ -57,30 +57,30 @@ STREAMABLE(Teammate, COMMA public MessageHandler
   
   ,
   (int)(-1) number,
-  (bool)(false) isGoalkeeper, /**< This is for a teammate what \c theRobotInfo.isGoalkeeper() is for the player itself. */
-  (bool)(true) isPenalized,
-  (bool)(true) isUpright,
-  (bool)(true) hasGroundContact,
-  (unsigned)(0) timeWhenLastUpright,
-  (unsigned)(0) timeOfLastGroundContact,
+  (bool)(false) isGoalkeeper,             /**< This is for a teammate what \c theRobotInfo.isGoalkeeper() is for the player itself. */
+  (bool)(false) isPenalized,              // Derived in TeamMessageHandler
+  (bool)(true) isUpright,                 // NOT SYNCED 
+  (bool)(true) hasGroundContact,          // NOT SYNCED
+  (unsigned)(0) timeWhenLastUpright,      // NOT SYNCED
+  (unsigned)(0) timeOfLastGroundContact,  // NOT SYNCED
 
   (unsigned)(0) timeWhenLastPacketSent,
   (unsigned)(0) timeWhenLastPacketReceived,
-  (Status)(PENALIZED) status,
-  (unsigned)(0) timeWhenStatusChanged,
-  (signed char)(0) sequenceNumber,
-  (signed char)(0) returnSequenceNumber,
+  (Status)(PENALIZED) status,             // NOT SYNCED - Partially derived in TeamMessageHandler
+  (unsigned)(0) timeWhenStatusChanged,    // Derived in TeamMessageHandler
+  (signed char)(0) sequenceNumber,        // UNUSED
+  (signed char)(0) returnSequenceNumber,  // UNUSED
 
-  (RobotPose) theRobotPose,
-  (BallModel) theBallModel,
-  (FrameInfo) theFrameInfo,
-  (ObstacleModel) theObstacleModel,
-  (BehaviorStatus) theBehaviorStatus,
-  (Whistle) theWhistle,
-  (TeamBehaviorStatus) theTeamBehaviorStatus,
+  (RobotPose) theRobotPose,               // SYNCED
+  (BallModel) theBallModel,               // NOT SYNCED
+  (FrameInfo) theFrameInfo,               // NOT SYNCED
+  (ObstacleModel) theObstacleModel,       // NOT SYNCED
+  (BehaviorStatus) theBehaviorStatus,     // SYNCED
+  (Whistle) theWhistle,                   // NOT SYNCED
+  (TeamBehaviorStatus) theTeamBehaviorStatus, // NOT SYNCED
 
-  (RobotHealth) theRobotHealth,
-  (TeamTalk) theTeamTalk,
+  (RobotHealth) theRobotHealth,           // NOT SYNCED
+  (TeamTalk) theTeamTalk,                 // NOT SYNCED
 
 
 });
@@ -98,10 +98,13 @@ STREAMABLE(TeamData,
   Teammate& getBMate(int number);
 
   void rcvRobotPose(RobotPoseComponent *, RobotMessageHeader &);
-  RobotPoseComponent::CallbackRef robotPoseCallbackRef = RobotPoseComponent::addCallback(std::bind(&TeamData::rcvRobotPose, this, _1, _2));
+  RobotPoseComponent::Callback robotPoseCallbackRef = RobotPoseComponent::addCallback(std::bind(&TeamData::rcvRobotPose, this, _1, _2));
 
   void rcvBehaviorStatus(BehaviorStatusComponent *, RobotMessageHeader &);
-  BehaviorStatusComponent::CallbackRef behaviorStatusCallbackRef = BehaviorStatusComponent::addCallback(std::bind(&TeamData::rcvBehaviorStatus, this, _1, _2));
+  BehaviorStatusComponent::Callback behaviorStatusCallbackRef = BehaviorStatusComponent::addCallback(std::bind(&TeamData::rcvBehaviorStatus, this, _1, _2));
+
+  void rcvMessage(RobotMessageHeader &);
+  CallbackRegistry<std::function<void(RobotMessageHeader&)>>::Callback msgRecieveCallbackRef = RobotMessage::onRecieve.add(std::bind(&TeamData::rcvMessage, this, _1));
 
   FUNCTION(void(const SPLStandardMessageBufferEntry* const)) generate,
 
