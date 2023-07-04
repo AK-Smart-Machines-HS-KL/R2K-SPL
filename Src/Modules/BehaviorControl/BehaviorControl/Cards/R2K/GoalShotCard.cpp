@@ -68,7 +68,7 @@ class GoalShotCard : public GoalShotCardBase
   {
     return theFieldBall.positionRelative.norm() < 600
       && theFrameInfo.getTimeSince(timeLastFail) > cooldown
-      && theShots.goalShot.failureProbability < 0.50
+      && theShots.goalShot.failureProbability < 0.60
       && theFieldBall.positionOnField.x() > theRobotPose.translation.x()
       && !aBuddyIsChasingOrClearing()
     ;
@@ -76,7 +76,7 @@ class GoalShotCard : public GoalShotCardBase
 
   bool postconditions() const override
   {
-    return done;   
+    return !preconditions();
   }
 
   option
@@ -163,12 +163,12 @@ class GoalShotCard : public GoalShotCardBase
       for (const auto& buddy : theTeamData.teammates) 
       {
         if (// buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard )
+          // buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+          // buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
+          // buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
+          // buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard)
+          // buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard )
           // buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
           return true;
       }
