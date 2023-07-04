@@ -193,31 +193,7 @@ void TeamMessageHandler::writeMessage(BHumanMessageOutputGenerator& outputGenera
 
 void TeamMessageHandler::update(TeamData& teamData)
 {
-  theBNTP.update();
-
-  teamData.generate = [this, &teamData](const SPLStandardMessageBufferEntry* const m)
-  {
-    if(readSPLStandardMessage(m))
-    {
-      // Don't accept messages from robots to which we do not know a time offset yet.
-      if(!theBNTP[receivedMessageContainer.theBSPLStandardMessage.playerNum]->isValid())
-        return;
-
-      return parseMessageIntoBMate(getBMate(teamData));
-    }
-
-    if(receivedMessageContainer.lastErrorCode == ReceivedBHumanMessage::myOwnMessage
-#ifndef NDEBUG
-       || receivedMessageContainer.lastErrorCode == ReceivedBHumanMessage::magicNumberDidNotMatch
-#endif
-      ) return;
-
-    //the message had an parsing error
-    if(theFrameInfo.getTimeSince(timeWhenLastMimimi) > minTimeBetween2RejectSounds && SystemCall::playSound("intruderAlert.wav"))
-      timeWhenLastMimimi = theFrameInfo.time;
-
-    ANNOTATION("intruder-alert", "error code: " << receivedMessageContainer.lastErrorCode);
-  };
+  theBNTP.update();  
 
   maintainBMateList(teamData);
 }
@@ -231,7 +207,7 @@ void TeamMessageHandler::maintainBMateList(TeamData& teamData) const
     for(auto& teammate : teamData.teammates)
     {
       Teammate::Status newStatus = Teammate::PLAYING;
-      if(teammate.isPenalized || theOwnTeamInfo.players[teammate.number - 1].penalty != PENALTY_NONE)
+      if(theOwnTeamInfo.players[teammate.number - 1].penalty != PENALTY_NONE)
         newStatus = Teammate::PENALIZED;
       else if(!teammate.isUpright || !teammate.hasGroundContact)
         newStatus = Teammate::FALLEN;
@@ -239,6 +215,7 @@ void TeamMessageHandler::maintainBMateList(TeamData& teamData) const
       if(newStatus != teammate.status)
       {
         teammate.status = newStatus;
+        teammate.isPenalized = teammate.status == Teammate::PENALIZED;
         teammate.timeWhenStatusChanged = theFrameInfo.time;
       }
 

@@ -99,24 +99,28 @@ TeamData::TeamData() {
 
 Teammate& TeamData::getBMate(int number)
 {
-  for(auto& teammate : teammates)
-    if(teammate.number == number)
+  for(auto& teammate : teammates) {
+    if(teammate.number == number) {
       return teammate;
-
+    }
+  }
   teammates.emplace_back();
-  Teammate& newTeammate = teammates.back();
-  newTeammate.number = number;
-  return newTeammate;
+  teammates.back().number = number;
+  return teammates.back();
+}
+
+void TeamData::rcvMessage(RobotMessageHeader & header) {
+  auto& bmate = getBMate(header.senderID);
+
+  bmate.timeWhenLastPacketReceived = Time::getCurrentSystemTime();
 }
 
 void TeamData::rcvRobotPose(RobotPoseComponent * comp, RobotMessageHeader & header) {
   auto& bmate = getBMate(header.senderID);
-  bmate.timeWhenLastPacketReceived = Time::getCurrentSystemTime();
   bmate.theRobotPose = comp->pose;
 }
 
 void TeamData::rcvBehaviorStatus(BehaviorStatusComponent * comp, RobotMessageHeader & header) {
   auto& bmate = getBMate(header.senderID);
-  bmate.timeWhenLastPacketReceived = Time::getCurrentSystemTime();
   bmate.theBehaviorStatus.activity = static_cast<BehaviorStatus::Activity>(comp->activity);
 }

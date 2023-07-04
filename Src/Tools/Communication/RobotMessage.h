@@ -19,6 +19,7 @@
 #include <functional> // lambda abstraction for callbacks
 #include <memory>     // shared_ptr
 #include "Tools/SubclassRegistry.h"
+#include "CallbackRegistry.h"
 
 using namespace std::placeholders;
 
@@ -68,76 +69,30 @@ class RobotMessageComponent : public AbstractRobotMessageComponent {
   private:
   static volatile ComponentRegistry registry; // = ComponentRegistry(ComponentMetadata{ T::name, T::create, T::setID });
   inline static int id = -1;
-  inline static std::list<CallbackFunc_t> callbacks = std::list<CallbackFunc_t>(); 
-  inline static std::list<CompilerFunc_t> dataCompilers = std::list<CompilerFunc_t>(); 
+
+  inline static CallbackRegistry<CompilerFunc_t> onCompile = CallbackRegistry<CompilerFunc_t>();
+  inline static CallbackRegistry<CallbackFunc_t> onRecieve = CallbackRegistry<CallbackFunc_t>();
 
   public: 
-  class CallbackRef {
-    protected:
-    size_t* refCount;
-    typename std::list<CallbackFunc_t>::iterator element;
-    
-    public:
-    CallbackRef(CallbackRef&&) = default;
-    CallbackRef(CallbackRef& other) {
-      this->element = other.element;
-      this->refCount = other.refCount;
-      *refCount++;
-    };
-    CallbackRef(typename std::list<CallbackFunc_t>::iterator element) : element(element), refCount(new size_t(1)) {}
-    ~CallbackRef() {
-      *refCount--;
-      if (*refCount == 0) {
-        callbacks.erase(element);
-      }
-    }
-  };
-
-  class CompilerRef {
-    protected:
-    size_t* refCount;
-    typename std::list<CompilerFunc_t>::iterator element;
-    
-    public:
-    CompilerRef(CompilerRef&&) = default;
-    CompilerRef(CompilerRef& other) {
-      this->element = other.element;
-      this->refCount = other.refCount;
-      *refCount++;
-    };
-
-    CompilerRef(typename std::list<CompilerFunc_t>::iterator element) : element(element), refCount(new size_t(1)) {}
-    ~CompilerRef() {
-      *refCount--;
-      if (*refCount == 0) {
-        dataCompilers.erase(element);
-      }
-    }
-  };
+  typedef typename CallbackRegistry<CallbackFunc_t>::Callback Callback;
+  typedef typename CallbackRegistry<CompilerFunc_t>::Callback Compiler;
 
   inline static int priority = 0;
 
-  static CallbackRef addCallback(CallbackFunc_t foo) {
-    callbacks.push_back(foo);
-    return CallbackRef(--callbacks.end());
+  static Callback addCallback(CallbackFunc_t foo) {
+    return onRecieve.add(foo);
   }
 
   void doCallbacks(RobotMessageHeader& header) {
-    for(auto callbackFunc : callbacks) {
-      callbackFunc(static_cast<T *>(this), header);
-    }
+    onRecieve.call(static_cast<T *>(this), header);
   }
 
-  static CompilerRef addDataCompiler(CompilerFunc_t foo) {
-    dataCompilers.push_back(foo);
-    return CompilerRef(--dataCompilers.end());
+  static Compiler addDataCompiler(CompilerFunc_t foo) {
+    return onCompile.add(foo);
   }
   
   void compileData() {
-    for (auto dataCompiler : dataCompilers)
-    {
-      dataCompiler(static_cast<T *>(this));
-    }
+    onCompile.call(static_cast<T *>(this));
   }
 
   static std::shared_ptr<AbstractRobotMessageComponent> create() {
@@ -176,7 +131,7 @@ class RobotMessage
   public:
   RobotMessageHeader header; 
   std::vector<std::shared_ptr<AbstractRobotMessageComponent>> componentPointers;  // Pointers to the included components. With smart pointers we don't need to worry about deleting them!
-
+  inline static CallbackRegistry<std::function<void(RobotMessageHeader&)>> onRecieve = CallbackRegistry<std::function<void(RobotMessageHeader&)>>();
 
     /**
      * @brief 
@@ -200,6 +155,7 @@ class RobotMessage
      */
     void doCallbacks() {
       for( auto component : componentPointers) {
+        onRecieve.call(header);
         component->doCallbacks(header);
       }
     }

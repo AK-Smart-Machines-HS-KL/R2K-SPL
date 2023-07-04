@@ -43,17 +43,21 @@ size_t RobotMessage::compress(std::array<uint8_t, SPL_MAX_MESSAGE_BYTES>& outBuf
   std::sort(componentPointers.begin(), componentPointers.end(), IDSortPredicate());
 
   size_t byteOffset = 0; // current offset in bytes from the beginning of Buff
-  std::array<uint8_t, SPL_MAX_MESSAGE_BYTES> componentBuff; // buffer reused for component compression
 
-  // reserve space for bitfield
-  memset(outBuff.data(), 0, COMPONENT_BITFIELD_SIZE);
-  byteOffset += COMPONENT_BITFIELD_SIZE; 
-
-  // Copy header
+  // HEADER
   memcpy(outBuff.data() + byteOffset, &header, sizeof(header)); 
   byteOffset += sizeof(header);
 
-  // Compress and Copy Individual Components
+  // COMPONENT BITFIELD
+  const size_t bitfieldOffset = byteOffset; // offset for the beginning of the bitfield;
+
+  // reserve space for bitfield
+  memset(outBuff.data() + byteOffset, 0, COMPONENT_BITFIELD_SIZE);
+  byteOffset += COMPONENT_BITFIELD_SIZE; 
+
+  // COMPONENTS
+  std::array<uint8_t, SPL_MAX_MESSAGE_BYTES> componentBuff; // buffer reused for component compression
+
   for (auto component : componentPointers) {
 
     // compress component into componentBuff
@@ -68,7 +72,8 @@ size_t RobotMessage::compress(std::array<uint8_t, SPL_MAX_MESSAGE_BYTES>& outBuf
     byteOffset += len;
 
     // set component bit in bitfield
-    bitpacker::insert(outBuff, component->getID(), 1, (uint8_t) 1);
+    // offset is `bitfieldOffset * 8 + component->getID()`, as in the nth bit in the bitfield
+    bitpacker::insert(outBuff, bitfieldOffset * 8 + component->getID(), 1, (uint8_t) 1);
   }
   
   return byteOffset;
@@ -81,17 +86,6 @@ bool RobotMessage::decompress(std::array<uint8_t, SPL_MAX_MESSAGE_BYTES>& buff){
 
   size_t byteOffset = 0;
 
-  // Read which components are included
-  std::list<int> includedComponents = std::list<int>();
-  for (int id = 0; id < ComponentRegistry::subclasses.size() ; id++)
-  {
-    bool included = (bool) bitpacker::extract<uint8_t>(buff, id, 1);
-    if(included) {
-      includedComponents.push_back(id);
-    }
-  }
-  byteOffset += COMPONENT_BITFIELD_SIZE; 
-
   // Copy header
   memcpy(&header, buff.data() + byteOffset, sizeof(header));
   byteOffset += sizeof(header);
@@ -101,7 +95,21 @@ bool RobotMessage::decompress(std::array<uint8_t, SPL_MAX_MESSAGE_BYTES>& buff){
     return false;
   }
 
+  // Read which components are included
+  std::list<int> includedComponents = std::list<int>(); // List of IDs of included components, 
+  for (int id = 0; id < ComponentRegistry::subclasses.size() ; id++)
+  {
+    bool included = (bool) bitpacker::extract<uint8_t>(buff, byteOffset * 8 + id, 1);
+    if(included) {
+      includedComponents.push_back(id);
+    }
+  }
+  byteOffset += COMPONENT_BITFIELD_SIZE; 
+
+  
+
   // decompress components
+  // `includedComponents` is inherently sorted from lowest to highest, so this is OK 
   for (auto &componentID : includedComponents)
   {
     auto component = metadataById[componentID].createNew();
@@ -139,8 +147,8 @@ void RobotMessage::compile() {
   std::sort(metadataByPriority.begin(), metadataByPriority.end(), PrioritySortPredicate());
 
   size_t bytesRemaining = 128; // Number of bytes remaining for the next component
-  bytesRemaining -= COMPONENT_BITFIELD_SIZE; // Reserve Component Bitfield
   bytesRemaining -= sizeof(header); // Reserve Header Space
+  bytesRemaining -= COMPONENT_BITFIELD_SIZE; // Reserve Component Bitfield
 
   for(auto metadata : metadataByPriority) {
 
