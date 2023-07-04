@@ -210,6 +210,11 @@ void EventBasedCommunicationHandler::ebcMessageIntervalAdjust(const EventBasedCo
 // Note: if we do not communicate, #robots = 1 is assumed -> all bots become the goalie in STATE_PLAYING ;-)
 
 bool EventBasedCommunicationHandler::ebcSendThisFrame(const EventBasedCommunicationData& ebc){
+
+  if(!theTeamCommStatus.isWifiCommActive) {
+    return false;
+  }
+
     if (theGameInfo.state == STATE_FINISHED && !gameIsFinished) {
     gameIsFinished = true;
     if (ebcDebugMessages) {

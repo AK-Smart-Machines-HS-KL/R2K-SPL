@@ -53,15 +53,16 @@
 #include "Tools/Communication/BNTP.h"
 #include "Tools/Communication/RoboCupGameControlData.h"
 #include "Representations/Communication/TeamInfo.h"
-
+#include "Representations/Communication/TeamCommStatus.h"
 
 MODULE(EventBasedCommunicationHandler,
 {,
   // v- using for calculations
   REQUIRES(FrameInfo),
   REQUIRES(OwnTeamInfo),
-  USES(GameInfo),
+  REQUIRES(TeamCommStatus),  // wifi on off?
   // Uses following for messages
+  USES(GameInfo),
   USES(BallModel),
   USES(BehaviorStatus),
   USES(RobotInfo),
