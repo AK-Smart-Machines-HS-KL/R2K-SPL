@@ -76,13 +76,6 @@ void RobotMessageHandler::send()
 
   if(!success) {
     OUTPUT_TEXT("Error sending message (" << errno << ")" << std::strerror(errno));
-    OUTPUT_TEXT("Attempting Reconnect");
-    #ifndef TARGET_ROBOT
-      startLocal(Global::getSettings().teamPort, static_cast<unsigned>(Global::getSettings().playerNumber));
-    #else
-      std::string bcastAddr = UdpComm::getWifiBroadcastAddress();
-      start(Global::getSettings().teamPort, bcastAddr.c_str());
-    #endif
   } else {
     OUTPUT_TEXT("Message Sent!");
   }
@@ -109,13 +102,6 @@ void RobotMessageHandler::receive()
                    
     if (size == -1) { // Error Check
       OUTPUT_TEXT("Error recieving message (" << errno << ")" << std::strerror(errno));
-      OUTPUT_TEXT("Attempting Reconnect");
-      #ifndef TARGET_ROBOT
-        startLocal(Global::getSettings().teamPort, static_cast<unsigned>(Global::getSettings().playerNumber));
-      #else
-        std::string bcastAddr = UdpComm::getWifiBroadcastAddress();
-        start(Global::getSettings().teamPort, bcastAddr.c_str());
-      #endif
       break;
     }
 
