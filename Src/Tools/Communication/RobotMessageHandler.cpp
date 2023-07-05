@@ -101,7 +101,9 @@ void RobotMessageHandler::receive()
                    : socket.read((char*) readBuffer.data(), readBuffer.size(), remoteIp);
                    
     if (size == -1) { // Error Check
-      OUTPUT_TEXT("Error recieving message (" << errno << ")" << std::strerror(errno));
+      if (errno != EAGAIN && errno != EWOULDBLOCK) { // excluded errors
+        OUTPUT_TEXT("Error recieving message (" << errno << ")" << std::strerror(errno));
+      } 
       break;
     }
 
