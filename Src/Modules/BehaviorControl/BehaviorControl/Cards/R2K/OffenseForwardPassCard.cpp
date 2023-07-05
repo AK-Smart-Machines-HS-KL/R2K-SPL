@@ -40,6 +40,7 @@
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/TeamCommStatus.h"
+#include "Representations/Infrastructure/ExtendedGameInfo.h"
 
 CARD(OffenseForwardPassCard,
      {
@@ -59,6 +60,7 @@ CARD(OffenseForwardPassCard,
     REQUIRES(PlayerRole),           
     REQUIRES(RobotInfo),           
     REQUIRES(TeamCommStatus),
+    REQUIRES(ExtendedGameInfo),
     DEFINES_PARAMETERS(
                        {,
                            (float)(0.8f) walkSpeed,
