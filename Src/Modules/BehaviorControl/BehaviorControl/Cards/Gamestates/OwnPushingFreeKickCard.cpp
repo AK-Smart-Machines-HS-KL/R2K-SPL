@@ -60,12 +60,16 @@ class OwnPushingFreeKickCard : public OwnPushingFreeKickCardBase
   bool preconditions() const override
   {
     
-
+    bool myCaptain;
+    if (theTeamCommStatus.isWifiCommActive)
+      myCaptain = theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive);
+    else myCaptain = theFieldBall.positionRelative.norm() < 1500;
     
     return 
       theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
       && theGameInfo.setPlay == SET_PLAY_PUSHING_FREE_KICK
-      && theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)  // I am the striker
+      // && theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)  // I am the striker
+      && myCaptain
       && !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number)
       // HOT FIX WM
       && (

@@ -85,13 +85,19 @@ class ChaseBallCard : public ChaseBallCardBase
     //Vergleich ob die Spielerposition in der Opponentside liegt
     //mit einem threshold damit Stürmer noch teils ins eigene Feld darf
   
+
+    bool myCaptain;
+    if (theTeamCommStatus.isWifiCommActive)
+      myCaptain = theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive);
+    else myCaptain = theFieldBall.positionRelative.norm() < 1500;
+
     return
       (
         // (theExtendedGameInfo.timeSincePlayingStarted > 9000) &&
         !aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
         theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
-        theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&
-
+        //theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&
+        myCaptain &&
         //HOT FIX WM
         (theFieldBall.positionOnField.x() > (0 - threshold)) 
          // theFieldBall.positionOnField.x() >= theRobotPose.translation.x() - threshold
@@ -99,7 +105,8 @@ class ChaseBallCard : public ChaseBallCardBase
       ||
       (theGameInfo.setPlay == SET_PLAY_NONE &&
         !aBuddyIsChasingOrClearing() &&
-        theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
+        // theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
+        myCaptain &&
         // theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
         theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
         theFieldBall.endPositionOnField.x() < -500 &&

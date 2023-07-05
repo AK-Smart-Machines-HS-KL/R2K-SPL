@@ -25,6 +25,7 @@
 #include "Representations/BehaviorControl/TeammateRoles.h"
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Communication/TeamCommStatus.h"
+#include "Representations/BehaviorControl/FieldBall.h"
 
 #include "Tools/Math/Geometry.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
@@ -37,6 +38,7 @@ CARD(ReadyOwnPenaltyKickCard,
     CALLS(LookActive),
     CALLS(WalkToPoint),
     REQUIRES(DefaultPose),
+    REQUIRES(FieldBall),
     REQUIRES(GameInfo),
     REQUIRES(OwnTeamInfo),
     REQUIRES(RobotPose),
@@ -53,6 +55,12 @@ class ReadyOwnPenaltyKickCard : public ReadyOwnPenaltyKickCardBase
    */
   bool preconditions() const override
   {
+
+    bool myCaptain;
+    if (theTeamCommStatus.isWifiCommActive)
+      myCaptain = theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive);
+    else myCaptain = theFieldBall.positionRelative.norm() < 1500;
+
     return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
       && theGameInfo.state == STATE_READY
       //&& theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive);

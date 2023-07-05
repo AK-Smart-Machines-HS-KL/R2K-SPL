@@ -89,9 +89,14 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
 {
   bool preconditions() const override
   {
-    
+    bool myCaptain;
+    if (theTeamCommStatus.isWifiCommActive)
+      myCaptain = theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive);
+    else myCaptain = theFieldBall.positionRelative.norm() < 1500;
+
     return
-      theTeammateRoles.playsTheBall(&theRobotInfo , theTeamCommStatus.isWifiCommActive) &&  // I am the striker
+      // theTeammateRoles.playsTheBall(&theRobotInfo , theTeamCommStatus.isWifiCommActive) &&  // I am the striker
+      myCaptain && 
       !theObstacleModel.opponentIsClose(1200) && // see below: min distance is minOppDistance
       !aBuddyIsClearingOwnHalf() &&
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role

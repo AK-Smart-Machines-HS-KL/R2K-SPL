@@ -68,9 +68,14 @@ class OwnKickInCard : public OwnKickInCardBase
    */
   bool preconditions() const override
   {
-    
+    bool myCaptain;
+    if (theTeamCommStatus.isWifiCommActive)
+      myCaptain = theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive);
+    else myCaptain = theFieldBall.positionRelative.norm() < 2500;
+
     return
-      theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) // I am the striker
+      // theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) // I am the striker
+      myCaptain 
       && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
       && theGameInfo.setPlay == SET_PLAY_KICK_IN 
       // HOT FIX WM

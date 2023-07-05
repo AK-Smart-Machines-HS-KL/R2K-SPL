@@ -57,6 +57,7 @@
 #include "Representations/BehaviorControl/TeammateRoles.h"
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 CARD(GoalieLongShotCard,
 { ,
@@ -70,6 +71,7 @@ CARD(GoalieLongShotCard,
   REQUIRES(RobotPose),
   REQUIRES(TeamBehaviorStatus),
   REQUIRES(TeammateRoles),  // R2K
+  REQUIRES(TeamCommStatus),
 
   DEFINES_PARAMETERS(
     {,
@@ -82,8 +84,14 @@ class GoalieLongShotCard : public GoalieLongShotCardBase
 {
   bool preconditions() const override
   {
+    bool myCaptain;
+    if (theTeamCommStatus.isWifiCommActive)
+      myCaptain = theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive);
+    else myCaptain = theFieldBall.positionRelative.norm() < 1500;
+
     return
-      theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
+      // theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
+      myCaptain &&
       theObstacleModel.opponentIsTooClose(theFieldBall.positionRelative) != KickInfo::LongShotType::noKick &&  // see below: distace is minOppDistance
       theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) &&// my recent role
 

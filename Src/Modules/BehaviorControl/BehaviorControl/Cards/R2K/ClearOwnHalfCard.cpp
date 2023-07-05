@@ -91,9 +91,14 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
 {
   bool preconditions() const override
   {
+    bool myCaptain;
+    if (theTeamCommStatus.isWifiCommActive)
+      myCaptain = theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive);
+    else myCaptain = theFieldBall.positionRelative.norm() < 1500;
+
    return
+      myCaptain && 
       theGameInfo.setPlay == SET_PLAY_NONE &&  // no penalty active
-      theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&  // I am the striker
       !aBuddyIsClearingOwnHalf() &&
       // theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
@@ -136,6 +141,8 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
 
   bool aBuddyIsClearingOwnHalf() const
   {
+    if (!theTeamCommStatus.isWifiCommActive) return false;
+
     // HOT FIX WM
 #ifdef NAO
     for (const auto& buddy : theTeamData.teammates)

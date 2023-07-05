@@ -84,16 +84,23 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
     
     bool preconditions() const override
     {
-        
+      bool myCaptain;
+      if (theTeamCommStatus.isWifiCommActive)
+        myCaptain = theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive);
+      else myCaptain = theFieldBall.positionRelative.norm() < 1500;
+
       return
         !aBuddyIsClearingOrPassing() &&  
         // HOT FIX WM 
         theFieldBall.positionOnField.x() > -1000 &&
-        theTeammateRoles.playsTheBall(&theRobotInfo,theTeamCommStatus.isWifiCommActive) &&   // I am the striker
+        // theTeammateRoles.playsTheBall(&theRobotInfo,theTeamCommStatus.isWifiCommActive) &&   // I am the striker
+        myCaptain &&
         theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
        // either a substantial delta on x - or we are at kick-off
-       ( thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1 ||
-         theExtendedGameInfo.timeSincePlayingStarted < 10000) &&
+
+        // HOT FIX WM
+        // ( thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1 ||
+        theExtendedGameInfo.timeSincePlayingStarted < 10000 &&
         // theObstacleModel.opponentIsTooClose(theFieldBall.positionRelative) != KickInfo::LongShotType::noKick &&  
         theTeamBehaviorStatus.teamActivity != TeamBehaviorStatus::R2K_SPARSE_GAME;
         

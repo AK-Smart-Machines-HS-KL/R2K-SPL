@@ -551,20 +551,27 @@ private:
 
       // or am I the striker?
 
-     
+
       if (minDist == dist) {  // i am the striker
         //  // TEMP ANTI HOT FIX
         teamMateRoles.captain = theRobotInfo.number;
         // teamMateRoles.captain = 3;
-        /* 
+        /*
         if (pRole.isGoalkeeper()) pRole.role = PlayerRole::goalkeeperAndBallPlayer;
         else pRole.role = PlayerRole::ballPlayer
         */
-
-
-        // tmp. disabled for EBC testing
-        // timeToReachBall.timeWhenReachBallStriker = timeToReachBall.timeWhenReachBall;  // to: get sync working
       }
+
+      // HOT FIX WM - nope
+      /*
+      if (!theTeamCommStatus.isWifiCommActive) {
+        if (theFieldBall.positionRelative.norm() < 600) {
+          teamMateRoles.captain = theRobotInfo.number;
+        }
+      }
+      */
+      // tmp. disabled for EBC testing
+      // timeToReachBall.timeWhenReachBallStriker = timeToReachBall.timeWhenReachBall;  // to: get sync working
     }  // fi: decay time 
 
     if (teamMateRoles.captain != lastTeammateRoles.captain)

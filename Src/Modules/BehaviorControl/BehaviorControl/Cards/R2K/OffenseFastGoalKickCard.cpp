@@ -75,8 +75,14 @@ class OffenseFastGoalKick : public OffenseFastGoalKickBase
   bool preconditions() const override
   {
     // OUTPUT_TEXT("offense index " << theTeammateRoles.offenseRoleIndex(theRobotInfo.number) << " nr " << theRobotInfo.number);
+    bool myCaptain;
+    if (theTeamCommStatus.isWifiCommActive)
+      myCaptain = theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive);
+    else myCaptain = theFieldBall.positionRelative.norm() < 1500;
+
     return
-      theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
+      // theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
+      myCaptain && 
       theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
       theFieldBall.endPositionOnField.x() >= theFieldDimensions.xPosOpponentGoalArea;
   }

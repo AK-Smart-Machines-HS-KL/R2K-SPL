@@ -66,22 +66,34 @@ bool TeammateRoles::isTacticalOffense(const int robotNumber) const {
 
 // online/offline variant
 // 
-bool TeammateRoles::playsTheBall(const RobotInfo * info, const bool wifiPred) const {
+bool TeammateRoles::playsTheBall(const RobotInfo* info, const bool wifiPred) const {
 
   if (info->penalty != PENALTY_NONE) return false;
-#ifndef NAO
-  return 
-    0 == TeammateRoles::offenseRoleIndex(info->number) 
-    ||
-    0 == TeammateRoles::defenseRoleIndex
-    (info->number);
-#endif // !NAO
 
+  /* HOT FIX WM variant a*/
+  /* #ifndef NAO
+  return
+    0 == TeammateRoles::offenseRoleIndex(info->number)
+    ||
+    0 == TeammateRoles::defenseRoleIndex(info->number);
+  #endif // !NAO
+  */
+
+  // HOT FIX variant 2
+  /*
   if (wifiPred)
     TeammateRoles::playsTheBall(info->number);
   else  // union of typical offline conditions, who is gonna go for the ball 8-)
-    return 0 == TeammateRoles::offenseRoleIndex(info->number);
-}  
+    // HOT FIX WM
+    return
+      0 == TeammateRoles::offenseRoleIndex(info->number)
+      ||
+      0 == TeammateRoles::defenseRoleIndex(info->number)
+    ;
+  */
+  TeammateRoles::playsTheBall(info->number);
+}
+
 
 bool TeammateRoles::playsTheBall(const int robotNumber) const {
   ASSERT(robotNumber >= Global::getSettings().lowestValidPlayerNumber && robotNumber <= Global::getSettings().highestValidPlayerNumber);
