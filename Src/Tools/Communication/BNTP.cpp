@@ -93,58 +93,6 @@ void BNTP::update() {
     
 }
 
-
-void BNTP::operator>>(BHumanMessage& m) const
-{
-
-}
-
-void BNTP::operator<<(const BHumanMessage& m)
-{
-  const unsigned receiveTimestamp = m.timestamp;
-
-  // Remember the teammate's request to respond to it later.
-  if(m.theBHumanStandardMessage.requestsNTPMessage)
-  {
-    BNTPRequest& ntpRequest = receivedNTPRequests[m.theBSPLStandardMessage.playerNum];
-    if(ntpRequest.origination < m.theBHumanStandardMessage.timestamp)
-    {
-      ntpRequest.origination = m.theBHumanStandardMessage.timestamp;
-      ntpRequest.receipt = receiveTimestamp;
-    }
-  }
-
-  if(m.theBSPLStandardMessage.playerNum < Settings::lowestValidPlayerNumber ||
-     m.theBSPLStandardMessage.playerNum > Settings::highestValidPlayerNumber)
-    return;
-
-  // Invalidate the previous synchronization if it doesn't explain the received message.
-  auto& remoteSMB = timeSyncBuffers[m.theBSPLStandardMessage.playerNum - Settings::lowestValidPlayerNumber];
-  remoteSMB.validate(m.theBHumanStandardMessage.timestamp, receiveTimestamp);
-
-  // Integrate the teammate's response (if the message contains one).
-  for(const BNTPMessage& ntpMessage : m.theBHumanStandardMessage.ntpMessages)
-  {
-    // Only use responses for this player.
-    if(ntpMessage.receiver != theRobotInfo.number)
-      continue;
-    // Ignore measurements that are normally impossible.
-    // This catches cases in which a robot gets a response for a request but has been restarted in the meantime.
-    if(receiveTimestamp < ntpMessage.requestOrigination || m.theBHumanStandardMessage.timestamp < ntpMessage.requestReceipt)
-      continue;
-    const unsigned totalRoundTrip = receiveTimestamp - ntpMessage.requestOrigination;
-    const unsigned remoteProcessingTime = m.theBHumanStandardMessage.timestamp - ntpMessage.requestReceipt;
-    if(remoteProcessingTime > totalRoundTrip)
-      continue;
-    const int offset = static_cast<int>(ntpMessage.requestReceipt - ntpMessage.requestOrigination + m.theBHumanStandardMessage.timestamp - receiveTimestamp) / 2;
-    remoteSMB.update(offset, totalRoundTrip - remoteProcessingTime, receiveTimestamp);
-  }
-
-  // Upon receiving a message from a robot that we aren't synchronized with, force sending an NTP request at next occasion.
-  if(!remoteSMB.isValid())
-    lastNTPRequestSent = 0;
-}
-
 void SynchronizationMeasurementsBuffer::update(int newOffset, unsigned newRoundTrip, unsigned receiveTimestamp)
 {
   const unsigned driftBound = 2 * (receiveTimestamp - timestamp) / clockDriftDivider;

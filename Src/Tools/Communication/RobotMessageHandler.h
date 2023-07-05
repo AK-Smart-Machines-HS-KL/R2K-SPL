@@ -34,12 +34,16 @@ public:
    */
   void startLocal(int port, unsigned localId);
 
+  void connectLocal(int port, unsigned localId);
+
   /**
    * The method starts the actual communication on the given port.
    * @param port The UDP port this handler is listening to.
    * @param subnet The subnet the handler is broadcasting to.
    */
   void start(int port, const char* subnet);
+
+  void connect(int port, const char* subnet);
 
   /**
    * The method sends the outgoing message if possible.

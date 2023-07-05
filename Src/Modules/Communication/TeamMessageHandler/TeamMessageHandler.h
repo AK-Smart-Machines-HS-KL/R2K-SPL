@@ -89,45 +89,13 @@ public:
 private:
   BNTP theBNTP;
   mutable RobotStatus theRobotStatus;
-
-  CompressedTeamCommunication::TypeRegistry teamCommunicationTypeRegistry;
   const CompressedTeamCommunication::Type* teamMessageType;
 
   // output stuff
   mutable unsigned timeLastSent = 0;
 
   void update(BHumanMessageOutputGenerator& outputGenerator) override;
-  void generateMessage(BHumanMessageOutputGenerator& outputGenerator) const;
-  void writeMessage(BHumanMessageOutputGenerator& outputGenerator, RoboCup::SPLStandardMessage* const m) const;
-
-  // input stuff
-  struct ReceivedBHumanMessage : public BHumanMessage
-  {
-    const SynchronizationMeasurementsBuffer* bSMB = nullptr;
-    unsigned toLocalTimestamp(unsigned remoteTimestamp) const override
-    {
-      if(bSMB)
-        return bSMB->getRemoteTimeInLocalTime(remoteTimestamp);
-      else
-        return 0u;
-    };
-
-    enum ErrorCode
-    {
-      //add more parsing errors if there is a need of distinguishing
-      parsingError,
-      magicNumberDidNotMatch,
-      myOwnMessage
-    } lastErrorCode;
-  } receivedMessageContainer;
-
-  static void regTeamMessage();
 
   void update(TeamData& teamData) override;
   void maintainBMateList(TeamData& teamData) const;
-
-  unsigned timeWhenLastMimimi = 0;
-  bool readSPLStandardMessage(const SPLStandardMessageBufferEntry* const m);
-  Teammate& getBMate(TeamData& teamData) const;
-  void parseMessageIntoBMate(Teammate& bMate);
 };

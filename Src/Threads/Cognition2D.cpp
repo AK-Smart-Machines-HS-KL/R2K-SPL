@@ -21,7 +21,7 @@ Cognition2D::Cognition2D()
   robotMessageHandler.startLocal(Global::getSettings().teamPort, static_cast<unsigned>(Global::getSettings().playerNumber));
 #else
   std::string bcastAddr = UdpComm::getWifiBroadcastAddress();
-  theSPLMessageHandler.start(Global::getSettings().teamPort, bcastAddr.c_str());
+  robotMessageHandler.start(Global::getSettings().teamPort, bcastAddr.c_str());
 #endif
 }
 

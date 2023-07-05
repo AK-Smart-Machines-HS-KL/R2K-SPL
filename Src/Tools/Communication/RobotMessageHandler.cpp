@@ -26,6 +26,11 @@
 void RobotMessageHandler::startLocal(int port, unsigned localId)
 {
   ASSERT(!this->port);
+  connectLocal(port, localId);
+}
+
+void RobotMessageHandler::connectLocal(int port, unsigned localId)
+{
   this->port = port;
   this->localId = localId;
 
@@ -43,6 +48,11 @@ void RobotMessageHandler::startLocal(int port, unsigned localId)
 void RobotMessageHandler::start(int port, const char* subnet)
 {
   ASSERT(!this->port);
+  connect(port, subnet);
+}
+
+void RobotMessageHandler::connect(int port, const char* subnet)
+{
   this->port = port;
 
   socket.setBlocking(false);
@@ -54,6 +64,7 @@ void RobotMessageHandler::start(int port, const char* subnet)
 
 void RobotMessageHandler::send()
 {
+  OUTPUT_TEXT("Attempting Message Send!");
   if(!port)
     return;
 
@@ -61,7 +72,21 @@ void RobotMessageHandler::send()
   msg.compile();
   size_t size = msg.compress(writeBuffer);
 
-  socket.write((char*) writeBuffer.data(), SPL_MAX_MESSAGE_BYTES); // Guarantees 128 bytes are sent
+  bool success = socket.write((char*) writeBuffer.data(), SPL_MAX_MESSAGE_BYTES); // Guarantees 128 bytes are sent
+
+  if(!success) {
+    OUTPUT_TEXT("Error sending message (" << errno << ")" << std::strerror(errno));
+    OUTPUT_TEXT("Attempting Reconnect");
+    #ifndef TARGET_ROBOT
+      startLocal(Global::getSettings().teamPort, static_cast<unsigned>(Global::getSettings().playerNumber));
+    #else
+      std::string bcastAddr = UdpComm::getWifiBroadcastAddress();
+      start(Global::getSettings().teamPort, bcastAddr.c_str());
+    #endif
+  } else {
+    OUTPUT_TEXT("Message Sent!");
+  }
+
 
   // Plot usage of data buffer in percent:
   const float usageInPercent = 100.f * size / SPL_MAX_MESSAGE_BYTES;
@@ -83,7 +108,14 @@ void RobotMessageHandler::receive()
                    : socket.read((char*) readBuffer.data(), readBuffer.size(), remoteIp);
                    
     if (size == -1) { // Error Check
-      //TODO Error handling here
+      OUTPUT_TEXT("Error recieving message (" << errno << ")" << std::strerror(errno));
+      OUTPUT_TEXT("Attempting Reconnect");
+      #ifndef TARGET_ROBOT
+        startLocal(Global::getSettings().teamPort, static_cast<unsigned>(Global::getSettings().playerNumber));
+      #else
+        std::string bcastAddr = UdpComm::getWifiBroadcastAddress();
+        start(Global::getSettings().teamPort, bcastAddr.c_str());
+      #endif
       break;
     }
 
@@ -92,14 +124,16 @@ void RobotMessageHandler::receive()
       break;
     }
 
+    OUTPUT_TEXT("Message Recieved!");
+
     RobotMessage msg;
     if (!msg.decompress(readBuffer)) { // Decompress failed 
-      // TODO: Log this
+      OUTPUT_TEXT("Error parsing message");
       continue; // Skip this Message
     }
 
     if (msg.header.senderID == Global::getSettings().playerNumber) { // Message came from myself! 
-      //continue; // Skip this Message
+      continue; // Skip this Message
     }
 
     msg.doCallbacks();

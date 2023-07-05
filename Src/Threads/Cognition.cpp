@@ -97,12 +97,6 @@ void Cognition::beforeModules()
 {
   BH_TRACE_MSG("before TeamData");
   // push teammate data in our system
-  if(Blackboard::getInstance().exists("TeamData") &&
-     static_cast<const TeamData&>(Blackboard::getInstance()["TeamData"]).generate)
-  {
-    //while(!inTeamMessages.empty())
-    //  static_cast<const TeamData&>(Blackboard::getInstance()["TeamData"]).generate(inTeamMessages.takeBack());
-  }
 
   DECLARE_PLOT("module:SPLMessageHandler:standardMessageDataBufferUsageInPercent");
 }
@@ -112,7 +106,7 @@ void Cognition::afterModules()
   if(Blackboard::getInstance().exists("BHumanMessageOutputGenerator")
      && static_cast<const BHumanMessageOutputGenerator&>(Blackboard::getInstance()["BHumanMessageOutputGenerator"]).sendThisFrame)
   {
-    BH_TRACE_MSG("before theSPLMessageHandler.send()");
+    BH_TRACE_MSG("Before Message Send");
     robotMessageHandler.send();
   }
 }

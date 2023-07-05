@@ -89,12 +89,9 @@ public:
  *
  * Implementation of the Network Time Protocol.
  */
-class BNTP : public BHumanMessageParticle<MessageID::undefined>
+class BNTP
 {
 public:
-  /** BHumanMessageParticle functions */
-  void operator>>(BHumanMessage& m) const override;
-  void operator<<(const BHumanMessage& m) override;
 
   void rcvRequest(BNTPRequestComponent *, RobotMessageHeader &);
   void rcvResponse(BNTPResponseComponent *, RobotMessageHeader &);
