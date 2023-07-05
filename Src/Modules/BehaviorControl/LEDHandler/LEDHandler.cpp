@@ -30,7 +30,8 @@ void LEDHandler::update(LEDRequest& ledRequest)
 void LEDHandler::setRightEar(LEDRequest& ledRequest)
 {
   //right ear -> battery
-  setBatteryLevelInEar(ledRequest, LEDRequest::earsRight0Deg);
+  //setBatteryLevelInEar(ledRequest, LEDRequest::earsRight0Deg);
+  setTeammatesInEar(ledRequest, LEDRequest::earsRight0Deg);
 }
 
 void LEDHandler::setLeftEar(LEDRequest& ledRequest)
@@ -267,6 +268,14 @@ void LEDHandler::setRightFoot(LEDRequest& ledRequest)
 void LEDHandler::setBatteryLevelInEar(LEDRequest& ledRequest, LEDRequest::LED baseLED)
 {
   int onLEDs = std::min(static_cast<int>(theSystemSensorData.batteryLevel / 0.1f), 9);
+
+  for(int i = 0; i <= onLEDs; ++i)
+    ledRequest.ledStates[baseLED + i] = LEDRequest::on;
+}
+
+void LEDHandler::setTeammatesInEar(LEDRequest& ledRequest, LEDRequest::LED baseLED)
+{
+  int onLEDs = std::min(static_cast<int>(theTeamData.teammates.size() / 0.5), 9);
 
   for(int i = 0; i <= onLEDs; ++i)
     ledRequest.ledStates[baseLED + i] = LEDRequest::on;
