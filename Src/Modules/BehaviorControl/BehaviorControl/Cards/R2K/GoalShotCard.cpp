@@ -68,7 +68,7 @@ class GoalShotCard : public GoalShotCardBase
   {
     return theFieldBall.positionRelative.norm() < 600
       && theFrameInfo.getTimeSince(timeLastFail) > cooldown
-      && theShots.goalShot.failureProbability < 0.50
+      && theShots.goalShot.failureProbability < 0.70
       && theFieldBall.positionOnField.x() > theRobotPose.translation.x()
       && !aBuddyIsChasingOrClearing()
     ;

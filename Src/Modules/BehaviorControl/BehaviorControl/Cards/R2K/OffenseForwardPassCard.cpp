@@ -85,7 +85,9 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
         !aBuddyIsClearingOrPassing() &&      
         theTeammateRoles.playsTheBall(&theRobotInfo,theTeamCommStatus.isWifiCommActive) &&   // I am the striker
         theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
-        // thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1 &&
+        // either a substantial delta on x - or we are at kick-off
+        ( thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1 ||
+         theExtendedGameInfo.timeSincePlayingStarted < 10000) &&
         // theObstacleModel.opponentIsTooClose(theFieldBall.positionRelative) != KickInfo::LongShotType::noKick &&  
         theTeamBehaviorStatus.teamActivity != TeamBehaviorStatus::R2K_SPARSE_GAME;
         
@@ -101,8 +103,8 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
         
         theActivitySkill(BehaviorStatus::offenseForwardPassCard);
         
-        float x = 1500;
-        float y = -1500;
+        float x = 0;
+        float y = -700;
 
         for (const auto& buddy : theTeamData.teammates)
         {
@@ -111,8 +113,8 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
                 
                 if(buddy.theRobotPose.translation.x()>theRobotPose.translation.x())
                 {
-                    x = buddy.theRobotPose.translation.x();
-                    y = buddy.theRobotPose.translation.y();
+                    x = buddy.theRobotPose.translation.x()+x;
+                    y = buddy.theRobotPose.translation.y()+y;
                     
                 }
             }
@@ -131,8 +133,8 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
       for (const auto& buddy : theTeamData.teammates) 
       {
         if (
-          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
+          // buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+          // buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard ||

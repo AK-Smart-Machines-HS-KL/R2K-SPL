@@ -79,7 +79,10 @@ class ReadyOppKickoffCard : public ReadyOppKickoffCardBase
         targetAbsolute = Vector2f(-1000, 0);
         break;
       case 1: // 
-        targetAbsolute = Vector2f(-1300, -300);
+        targetAbsolute = Vector2f(-1300, -1300);
+        break;
+      case 2: // 
+        targetAbsolute = Vector2f(-900, 1200);
         break;
       }
 

@@ -70,10 +70,10 @@ class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
 
     switch (theTeammateRoles.offenseRoleIndex(theRobotInfo.number)) {
     case 0: // right-most offense
-      targetAbsolute = Vector2f(-500, 0);
+      targetAbsolute = Vector2f(-500, 0);  // #5
       break;
     case 1: // 
-      targetAbsolute = Vector2f(-300, -2000);
+      targetAbsolute = Vector2f(-800, -2000); // #4
       break;
     case 2: // OFFENSIVE MODE - we have 3 offense
       targetAbsolute = Vector2f(-700, 2000);
