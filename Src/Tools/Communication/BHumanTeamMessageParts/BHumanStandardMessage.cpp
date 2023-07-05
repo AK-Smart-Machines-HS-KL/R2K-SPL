@@ -22,7 +22,8 @@ inline T readVal(const void*& data)
   return *reinterpret_cast<T*&>(data)++;
 }
 
-BHumanStandardMessage::BHumanStandardMessage()
+BHumanStandardMessage::BHumanStandardMessage() :
+  version(BHUMAN_STANDARD_MESSAGE_STRUCT_VERSION)
 {
   const char* init = BHUMAN_STANDARD_MESSAGE_STRUCT_HEADER;
   for(unsigned int i = 0; i < sizeof(header); ++i)
@@ -34,12 +35,12 @@ int BHumanStandardMessage::sizeOfBHumanMessage() const
   static_assert(BHUMAN_STANDARD_MESSAGE_STRUCT_VERSION == 13, "This method is not adjusted for the current message version");
 
   return sizeof(header)
+         + sizeof(version)
          + sizeof(magicNumber)
          + sizeof(timestamp)
          + sizeof(uint16_t) // size of compressedContainer (9 bits), requestsNTPMessage (1 bit), NTP reply bitset (6 bits)
          + static_cast<int>(ntpMessages.size()) * 5
          + static_cast<int>(compressedContainer.size());
-         
 }
 
 void BHumanStandardMessage::write(void* data) const
@@ -50,6 +51,7 @@ void BHumanStandardMessage::write(void* data) const
 
   for(unsigned i = 0; i < sizeof(header); ++i)
     writeVal<char>(data, header[i]);
+  writeVal<uint8_t>(data, version);
   writeVal<uint8_t>(data, magicNumber);
   writeVal<uint32_t>(data, timestamp);
 
@@ -98,6 +100,10 @@ bool BHumanStandardMessage::read(const void* data)
   for(unsigned i = 0; i < sizeof(header); ++i)
     if(header[i] != readVal<const char>(data))
       return false;
+
+  version = readVal<const uint8_t>(data);
+  if(version != BHUMAN_STANDARD_MESSAGE_STRUCT_VERSION)
+    return false;
 
   magicNumber = readVal<const uint8_t>(data);
 

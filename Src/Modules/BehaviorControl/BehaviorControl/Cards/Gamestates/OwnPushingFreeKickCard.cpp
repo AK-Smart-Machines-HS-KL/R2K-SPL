@@ -6,10 +6,12 @@
  * @date 2022-11-22
  *   
  * Notes: 
- *  - Currently Triggers for all Robots. Use this Card as a template for preconditions
- *  - Currently only calls stand  
+ *  
  * 
  * V1.1 Card migrated (Nicholas)
+ * V1.2 Added the online offline role assignment (Asrar)
+ * v1.3 (Asrar) card is  for  ballWasSeenStickyPeriod (5000msec), i.e., bot assumes ball to be at the last-seen position
+ *                 Applied this parameter by changing the postcondition().
  */
 
 #include "Representations/BehaviorControl/Skills.h"
@@ -24,6 +26,7 @@
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/BehaviorControl/TeammateRoles.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 CARD(OwnPushingFreeKickCard,
   { ,
@@ -38,12 +41,14 @@ CARD(OwnPushingFreeKickCard,
     REQUIRES(RobotInfo),
     REQUIRES(TeammateRoles),
     REQUIRES(FieldDimensions),
+    REQUIRES(TeamCommStatus),  // wifi on off?
 
     DEFINES_PARAMETERS(
     {,
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
       (Vector2f)(Vector2f(1000.0f, -340.0f)) kickTarget, // Based on 20_deg setup angle in ready card; This is a 20 degree shot
+      (int)(5000) ballWasSeenStickyPeriod,  // freeze the first decision
     }),
 });
 
@@ -54,17 +59,15 @@ class OwnPushingFreeKickCard : public OwnPushingFreeKickCardBase
    */
   bool preconditions() const override
   {
-    int i = 0;
-    for (i = 0; i < 5; i++ ) {
-      if (theTeammateRoles.roles[i] != TeammateRoles::GOALKEEPER_NORMAL &&
-        theTeammateRoles.roles[i] != TeammateRoles::GOALKEEPER_ACTIVE &&
-        theTeammateRoles.roles[i] != TeammateRoles::UNDEFINED)
-        break;
-    }
-    return theRobotInfo.number == (i+1)
-      && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
+    
+
+    
+    return 
+      theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
       && theGameInfo.setPlay == SET_PLAY_PUSHING_FREE_KICK
-      ;
+      && theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive);  // I am the striker
+
+
   }
 
   /**
@@ -72,7 +75,11 @@ class OwnPushingFreeKickCard : public OwnPushingFreeKickCardBase
    */
   bool postconditions() const override
   {
-    return !preconditions();
+    return 
+      !theFieldBall.ballWasSeen(ballWasSeenStickyPeriod)
+      ||
+      theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
+      || theGameInfo.setPlay != SET_PLAY_PUSHING_FREE_KICK;
   }
 
   void execute() override

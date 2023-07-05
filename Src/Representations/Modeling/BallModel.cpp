@@ -21,6 +21,14 @@ void BallModel::operator>>(BHumanMessage& m) const
 
   m.theBSPLStandardMessage.ball[0] = estimate.position.x();
   m.theBSPLStandardMessage.ball[1] = estimate.position.y();
+
+  if(timeWhenLastSeen && Blackboard::getInstance().exists("FrameInfo"))
+  {
+    const FrameInfo& theFrameInfo = static_cast<const FrameInfo&>(Blackboard::getInstance()["FrameInfo"]);
+    m.theBSPLStandardMessage.ballAge = theFrameInfo.getTimeSince(timeWhenLastSeen) / 1000.f;
+  }
+  else
+    m.theBSPLStandardMessage.ballAge = -1.f;
 }
 
 void BallModel::operator<<(const BHumanMessage& m)

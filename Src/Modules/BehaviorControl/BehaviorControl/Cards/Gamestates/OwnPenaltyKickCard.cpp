@@ -4,10 +4,14 @@
  * @brief Covers the Penalty Kick: Own Team has Penalty Kick
  * @version 1.1
  * @date 2023-04-18
- *
+ * @version 1.2 online: supporterIndex, offline offenseIndex 
+ *  apply in after penalty shootout only
+ * - see ReadyOwnPenaly for ingame penalty
+ * v 1.3: (Asrar) "theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)" this is for online and offline role assignment
+ *  v1.4: (Asrar) card is  for  ballWasSeenStickyPeriod (5000msec), i.e., bot assumes ball to be at the last-seen position
+ *                 Applied this parameter by changing the postcondition().
  * Notes:
- *  - Currently Triggers for all Robots. Use this Card as a template for preconditions
- *  - Currently only calls stand
+ *  - 
  *
  * 
  */
@@ -30,6 +34,7 @@
 #include "Representations/BehaviorControl/Shots.h"
 
 #include "Representations/Modeling/RobotPose.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 #include "Tools/Math/Geometry.h"
 
@@ -59,12 +64,14 @@ CARD(OwnPenaltyKickCard,
       REQUIRES(PlayerRole),
       REQUIRES(Shots),
       REQUIRES(FrameInfo),
+      REQUIRES(TeamCommStatus),  // wifi on off?
 
       DEFINES_PARAMETERS(
              {,
                 (unsigned int)(1000) initalCheckTime,
                 (bool)(false) done,
                 (Shot) currentShot,
+                (int)(5000) ballWasSeenStickyPeriod,  // freeze the first decision
              }),
     });
 
@@ -79,21 +86,10 @@ class OwnPenaltyKickCard : public OwnPenaltyKickCardBase
   }
   bool preconditions() const override
   {
-    int i;
-    for (i = 5; i > 0; i--) {
-      if (theTeammateRoles.isTacticalOffense(i))
-      {
-        break;
-      }
-    }
-
     return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
       && theGameInfo.setPlay == SET_PLAY_PENALTY_KICK
       && theGameInfo.state == STATE_PLAYING
-      // && thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters; 
-      && theRobotInfo.number == i;
-    
-
+      && theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive);  // I am the striker
   }
 
   /**
@@ -101,7 +97,10 @@ class OwnPenaltyKickCard : public OwnPenaltyKickCardBase
    */
   bool postconditions() const override
   {
-    return !preconditions();
+    return !theFieldBall.ballWasSeen(ballWasSeenStickyPeriod)
+      ||
+      theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
+      || theGameInfo.setPlay != SET_PLAY_PENALTY_KICK;
   }
 
   option

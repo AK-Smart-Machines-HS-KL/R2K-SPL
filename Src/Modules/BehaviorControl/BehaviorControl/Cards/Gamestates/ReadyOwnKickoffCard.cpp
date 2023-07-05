@@ -9,7 +9,8 @@
  * Sets up Robot 5 Behind the Ball so that it may be kicked towards the opponents Field. 
  * 
  * v1.1: Card dynamically select robot instead hardcoding number  (Adrian)
- * v1.2. Card migrated (Adrian)
+ * v1.2. Card migrated (Adrian
+ * v1.3. using offenseIndex for qualifiying (Asrar)
  */
 
 #include "Representations/BehaviorControl/DefaultPose.h"
@@ -47,7 +48,8 @@ class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
    */
   bool preconditions() const override
   {
-    return true; //  theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theGameInfo.state == STATE_READY;
+    return  theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber 
+      && theGameInfo.state == STATE_READY;
   }
 
   /**
@@ -65,26 +67,18 @@ class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
     Vector2f targetAbsolute = theDefaultPose.ownDefaultPose.translation + Vector2f(+450.f, 0);
 
     int nOffenseFound = 0;
-    int i;
-    for (i = 4; i >= 0; i--) {
-      if (theTeammateRoles.isTacticalOffense(i+1))
-      {
-        nOffenseFound++;
-        if(theRobotInfo.number == i+1 && theTeammateRoles.isTacticalOffense(theRobotInfo.number)) {
-          switch (nOffenseFound)
-          {
-          case 1:
-            targetAbsolute = Vector2f(-500, 0);
-            break;
 
-          case 2:
-            targetAbsolute = Vector2f(-700, -2000);
-            break;
-          }
-          break;
-        }
-      }
-    } 
+    switch (theTeammateRoles.offenseRoleIndex(theRobotInfo.number)) {
+    case 0: // right-most offense
+      targetAbsolute = Vector2f(-500, 0);
+      break;
+    case 1: // 
+      targetAbsolute = Vector2f(-300, -2000);
+      break;
+    case 2: // OFFENSIVE MODE - we have 3 offense
+      targetAbsolute = Vector2f(-700, 2000);
+      break;
+    }
 
     Vector2f targetRelative = theRobotPose.toRelative(targetAbsolute);
 

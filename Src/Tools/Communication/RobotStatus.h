@@ -22,4 +22,5 @@ STREAMABLE(RobotStatus, COMMA BHumanCompressedMessageParticle<RobotStatus>
   (bool)(true) hasGroundContact, /**< Whether the robot has ground contact. */
   (unsigned)(0) timeWhenLastUpright, /**< The timestamp when the robot last was upright. */
   (unsigned)(0) timeOfLastGroundContact, /**< The timestamp when the robot last had ground contact. */
+  (std::array<signed char, numOfSequenceNumbers>) sequenceNumbers, /**< The sequence numbers of the last received message per teammate (or my own). */
 });

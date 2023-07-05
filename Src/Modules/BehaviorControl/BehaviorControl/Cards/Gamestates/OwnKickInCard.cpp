@@ -2,13 +2,14 @@
  * @file OwnKickInCard.cpp
  * @author Andy Hobelsberger, Adrian Müller (R2K)
  * @brief 
- * @version 1.0
- * @date 2022-11-22
+ * @version 1.3
+ * @date 2023-05-23
  *   
  * Covers the Free Kick: Own Team has Kick in
  * added (Adrian): pre-condition: triggers for role.playBall, action: WalkToBallAndKickAtGoal
  * V1.1 Card migrated; uses goToBallAndKickAtGoal (Nicholas) 
- * v1.2. Gore hack: first DEFENSE and latest (acc. to roles[] OFFENSE qualify
+ * v1.2. (Adrian) Gore hack: first DEFENSE and latest (acc. to roles[] OFFENSE qualify
+ * v.3.  (Adrian) wo is doing the kick in differs from online vs offline  (see precondition for details)
  */
 
 
@@ -21,8 +22,10 @@
 
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Communication/GameInfo.h"
+#include "Representations/Communication/TeamData.h"
 #include "Representations/Communication/TeamInfo.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 #include "Representations/Modeling/RobotPose.h"
 
@@ -43,13 +46,16 @@ CARD(OwnKickInCard,
   REQUIRES(OwnTeamInfo),
   REQUIRES(GameInfo),
   REQUIRES(TeamBehaviorStatus),
+  REQUIRES(TeamData),
   REQUIRES(TeammateRoles),
+  REQUIRES(TeamCommStatus),  // wifi on off?
 
   DEFINES_PARAMETERS(
     { ,
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
       (Vector2f)(Vector2f(1000.0f, -340.0f)) kickTarget, // Based on 20_deg setup angle in ready card; This is a 20 degree shot
+      (int)(5000) ballWasSeenStickyPeriod,  // freeze the first decision
     }),
 
 });
@@ -58,29 +64,23 @@ class OwnKickInCard : public OwnKickInCardBase
 {
 
   /**
-   * @brief The condition that needs to be met to execute this card
+   * @brief SET_PLAY_KICK_IN: wo is doing the kick in, online/offline differ
    */
   bool preconditions() const override
   {
-    int theDefense = -1;
-    for (int i = 0; i < 5; i++) {
-      if (theTeammateRoles.isTacticalDefense(i + 1)) {
-        theDefense = i + 1;
-        break;
-      }
-    }
-    int theOffense = -1;
-    for (int j = 4; j >= 0; j--) {
-      if (theTeammateRoles.isTacticalOffense(j + 1)) {
-        theOffense = j + 1;
-        break;
-      }
-    }
+    
     return
-      // theTeammateRoles.playsTheBall(theRobotInfo.number)
-      theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
-      && theGameInfo.setPlay == SET_PLAY_KICK_IN
-      && (theRobotInfo.number == theDefense || theRobotInfo.number == theOffense);
+      theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) // I am the striker
+      && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
+      && theGameInfo.setPlay == SET_PLAY_KICK_IN 
+      && !aBuddyIsDoingPenaltyKick()
+      //  && theTeammateRoles.isTacticalDefense(theRobotInfo.number) // my recent role
+      //  && theTeammateRoles.isTacticalOffense(theRobotInfo.number)
+
+      ;
+
+    
+ 
   }
 
   /**
@@ -88,7 +88,10 @@ class OwnKickInCard : public OwnKickInCardBase
    */
   bool postconditions() const override
   {
-    return !preconditions();
+    return 
+       !theFieldBall.ballWasSeen(ballWasSeenStickyPeriod)
+        || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
+        || theGameInfo.setPlay != SET_PLAY_KICK_IN;
   }
 
   void execute() override
@@ -105,6 +108,15 @@ class OwnKickInCard : public OwnKickInCardBase
   {
   return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
   }
+  bool aBuddyIsDoingPenaltyKick() const
+    {
+      for (const auto& buddy : theTeamData.teammates) 
+      {
+        if (buddy.theBehaviorStatus.activity == BehaviorStatus::ownFreeKick)
+          return true;
+      }
+      return false;
+    }
 };
 
 MAKE_CARD(OwnKickInCard);

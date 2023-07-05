@@ -4,6 +4,9 @@
  * @brief 
  * @version 1.0
  * 
+ * Note: we have two checks for theShots.goalShot.failureProbability < x
+ * x = 0.5 in pre-cond
+ * x = 0.4 in state machine (aka "done")
  * 
  */
 
@@ -20,6 +23,7 @@
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Tools/Math/Geometry.h"
+#include "Representations/Communication/TeamData.h"
 
 // Debug Drawings
 #include "Tools/Debugging/DebugDrawings.h"
@@ -39,6 +43,7 @@ CARD(GoalShotCard,
         REQUIRES(RobotPose),
         REQUIRES(FieldBall),
         REQUIRES(FrameInfo),
+        REQUIRES(TeamData),
 
         DEFINES_PARAMETERS(
              {,
@@ -46,7 +51,7 @@ CARD(GoalShotCard,
                 (bool)(false) done,
                 (Shot) currentShot,
                 (unsigned int) (0) timeLastFail,
-                (unsigned int) (8000) cooldown,
+                (unsigned int) (6000) cooldown,
              }),
 
      });
@@ -61,10 +66,11 @@ class GoalShotCard : public GoalShotCardBase
   //always active
   bool preconditions() const override
   {
-    return theFieldBall.positionRelative.norm() < 500
+    return theFieldBall.positionRelative.norm() < 600
       && theFrameInfo.getTimeSince(timeLastFail) > cooldown
-      && theShots.goalShot.failureProbability < 0.70
+      && theShots.goalShot.failureProbability < 0.50
       && theFieldBall.positionOnField.x() > theRobotPose.translation.x()
+      && !aBuddyIsChasingOrClearing()
     ;
   }
 
@@ -75,7 +81,7 @@ class GoalShotCard : public GoalShotCardBase
 
   option
   {
-    theActivitySkill(BehaviorStatus::codeReleaseKickAtGoal);
+    theActivitySkill(BehaviorStatus::goalShotCard);
 
     initial_state(align)
     {
@@ -152,6 +158,22 @@ class GoalShotCard : public GoalShotCardBase
   void postProcess() override {
     
   }
+  bool aBuddyIsChasingOrClearing() const
+    {
+      for (const auto& buddy : theTeamData.teammates) 
+      {
+        if (// buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard )
+          // buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
+          return true;
+      }
+      return false;
+    }
 };
 
 MAKE_CARD(GoalShotCard);

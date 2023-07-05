@@ -36,6 +36,7 @@
 #include "Representations/BehaviorControl/TeammateRoles.h"
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 CARD(OffenseReceivePassCard,
      {
@@ -47,10 +48,11 @@ CARD(OffenseReceivePassCard,
     REQUIRES(FieldDimensions),
     REQUIRES(RobotPose),
     REQUIRES(TeamData),
-    REQUIRES(TeamBehaviorStatus),   // R2K
-    REQUIRES(TeammateRoles),        // R2K
-    REQUIRES(PlayerRole),           // R2K
-    REQUIRES(RobotInfo),            // R2K
+    REQUIRES(TeamBehaviorStatus),  
+    REQUIRES(TeammateRoles),       
+    REQUIRES(PlayerRole),          
+    REQUIRES(RobotInfo),           
+    REQUIRES(TeamCommStatus),
     DEFINES_PARAMETERS(
                        {,
                            (float)(0.8f) walkSpeed,
@@ -76,7 +78,7 @@ class OffenseReceivePassCard : public OffenseReceivePassCardBase
       return
         thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters &&
         aBuddyIsPassing() &&
-        !theTeammateRoles.playsTheBall(theRobotInfo.number) &&   // I am not the striker
+        !theTeammateRoles.playsTheBall(&theRobotInfo,theTeamCommStatus.isWifiCommActive) &&   // I am not the striker
         theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
         theTeamBehaviorStatus.teamActivity != TeamBehaviorStatus::R2K_SPARSE_GAME;
         
