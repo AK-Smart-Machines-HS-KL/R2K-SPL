@@ -83,7 +83,7 @@ class GoalieLongShotCard : public GoalieLongShotCardBase
   bool preconditions() const override
   {
     return
-      // theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
+      theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
       theObstacleModel.opponentIsTooClose(theFieldBall.positionRelative) != KickInfo::LongShotType::noKick &&  // see below: distace is minOppDistance
       theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) &&// my recent role
 

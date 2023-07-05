@@ -89,7 +89,14 @@ class OwnPenaltyKickCard : public OwnPenaltyKickCardBase
     return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
       && theGameInfo.setPlay == SET_PLAY_PENALTY_KICK
       && theGameInfo.state == STATE_PLAYING
-      && theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive);  // I am the striker
+      && theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)  // I am the striker
+      // HOT FIX WM
+#ifndef NAO
+      && 0 == theTeammateRoles.offenseRoleIndex(theRobotInfo.number)
+#endif
+      ;
+
+
   }
 
   /**

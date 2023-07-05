@@ -67,11 +67,20 @@ bool TeammateRoles::isTacticalOffense(const int robotNumber) const {
 // online/offline variant
 // 
 bool TeammateRoles::playsTheBall(const RobotInfo * info, const bool wifiPred) const {
+
   if (info->penalty != PENALTY_NONE) return false;
-  if (wifiPred) 
-    return TeammateRoles::playsTheBall(info->number);
+#ifndef NAO
+  return 
+    0 == TeammateRoles::offenseRoleIndex(info->number) 
+    ||
+    0 == TeammateRoles::defenseRoleIndex
+    (info->number);
+#endif // !NAO
+
+  if (wifiPred)
+    TeammateRoles::playsTheBall(info->number);
   else  // union of typical offline conditions, who is gonna go for the ball 8-)
-    return 0 == TeammateRoles::offenseRoleIndex(info->number) ||  TeammateRoles::playsTheBall(info->number);
+    return 0 == TeammateRoles::offenseRoleIndex(info->number);
 }  
 
 bool TeammateRoles::playsTheBall(const int robotNumber) const {

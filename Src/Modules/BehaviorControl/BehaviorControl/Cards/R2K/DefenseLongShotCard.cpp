@@ -100,7 +100,7 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
       (
         theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_OFFENSIVE_GAME ||
         theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME ||
-        theFieldBall.endPositionOnField.x() < -500
+        theFieldBall.endPositionOnField.x() < 500
       );
   }
 
@@ -140,6 +140,8 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
 
   bool aBuddyIsClearingOwnHalf() const
   {
+    // HOT FIX WM
+#ifdef NAO
     for (const auto& buddy : theTeamData.teammates)
     {
       if (
@@ -150,8 +152,9 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
         return true;
     }
     return false;
+#endif
+    return false;
   }
-
 };
 
 MAKE_CARD(DefenseLongShotCard);

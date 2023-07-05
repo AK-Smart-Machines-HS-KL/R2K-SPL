@@ -86,7 +86,9 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
     {
         
       return
-        !aBuddyIsClearingOrPassing() &&      
+        !aBuddyIsClearingOrPassing() &&  
+        // HOT FIX WM 
+        theFieldBall.positionOnField.x() > -1000 &&
         theTeammateRoles.playsTheBall(&theRobotInfo,theTeamCommStatus.isWifiCommActive) &&   // I am the striker
         theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
        // either a substantial delta on x - or we are at kick-off

@@ -226,14 +226,14 @@ private:
     if (opp_penalties >= 18 || (own_penalties > 18 && opp_penalties > 18)) {  //undeployed robots count as penalized; the array is 20 bots long
     // HOT FIX
     // if(true) {
-      
+   /*
       theTeamActivitySkill(TeamBehaviorStatus::R2K_SPARSE_GAME);
       teamBehaviorStatus = TeamBehaviorStatus::R2K_SPARSE_GAME;
-  
-/*    
+  */
+   
       theTeamActivitySkill(TeamBehaviorStatus::R2K_NORMAL_GAME);
       teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME;
-  */  
+ 
     }
     else {
       if (abs(own_score - opp_score)<=1) { //default: +/- 1 goal
@@ -405,8 +405,8 @@ private:
     }
 
       
-    if (theGameInfo.state == STATE_READY || theGameInfo.state == STATE_SET|| !theTeamCommStatus.isWifiCommActive){ 
-    //    theGameInfo.state == STATE_PLAYING) {
+    if (theGameInfo.state == STATE_READY || theGameInfo.state == STATE_SET|| !theTeamCommStatus.isWifiCommActive ||
+        theGameInfo.state == STATE_PLAYING){
       // HOT FIX GORE 2023 
 
     // no computation of botsLineUp etc. for these game states
@@ -610,9 +610,9 @@ private:
     theRoleSkill(lastPlayerRole);
     theTimeToReachBallSkill(lastTimeToReachBall);
     if (theGameInfo.state != STATE_READY && theGameInfo.state != STATE_SET 
-        && theTeamCommStatus.isWifiCommActive){
+        && theTeamCommStatus.isWifiCommActive
       // HOT FIX
-      // && theGameInfo.state != STATE_PLAYING) { // we sended the teammateRoles already at line 347
+      && theGameInfo.state != STATE_PLAYING) { // we sended the teammateRoles already at line 347
       theTeammateRolesSkill(lastTeammateRoles);
     }
 
