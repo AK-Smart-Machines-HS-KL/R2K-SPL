@@ -188,7 +188,7 @@ private:
             // 3 player
                 { {GN,DM,OM,UN,UN}, {GN,DR,DL,UN,UN}, {GA,DM,OM,UN,UN}, {GN,OR,OM,UN,UN} },
                 // 4 player
-                    { {GN,DR,DL,OM,UN}, {GN,DR,DL,DM,UN}, {GA,DM,OL,OM,UN}, {GN,DM,OL,OM,UN} },
+                    { {GN,DM,OR,OM,UN}, {GN,DR,DL,OM,UN}, {GA,DM,OL,OM,UN}, {GN,DM,OL,OM,UN} },
                     // 5 player
                         { {GN,DR,DL,OR,OL}, {GN,DR,DL,DM,OM}, {GA,DM,OL,OR,OM}, {GN,DM,OL,OR,OM} }
 
@@ -236,21 +236,18 @@ private:
   */  
     }
     else {
-      if (abs(own_score - opp_score)<=1) { //default: +/- 1 goal
-        
-        theTeamActivitySkill(TeamBehaviorStatus::R2K_NORMAL_GAME);
-        teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME;
-
-      }
-      if (own_score + 1 < opp_score ) {
+      if (own_score < opp_score ) {
         theTeamActivitySkill(TeamBehaviorStatus::R2K_OFFENSIVE_GAME);
         teamBehaviorStatus = TeamBehaviorStatus::R2K_OFFENSIVE_GAME;
       }
 
       // to do: add time limit, so we will not spoil our leadership in the last n minutes
-      if (own_score -1 > opp_score) {
+       else if (own_score -2 > opp_score) {
         theTeamActivitySkill(TeamBehaviorStatus::R2K_DEFENSIVE_GAME);
         teamBehaviorStatus = TeamBehaviorStatus::R2K_DEFENSIVE_GAME;
+      } else {
+        theTeamActivitySkill(TeamBehaviorStatus::R2K_NORMAL_GAME);
+        teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME;
       }
     }
 
