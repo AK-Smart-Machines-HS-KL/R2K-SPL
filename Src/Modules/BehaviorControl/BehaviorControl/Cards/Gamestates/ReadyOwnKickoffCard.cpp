@@ -73,7 +73,7 @@ class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
       targetAbsolute = Vector2f(-500, 0);
       break;
     case 1: // 
-      targetAbsolute = Vector2f(-500, -2500);
+      targetAbsolute = Vector2f(-300, -2000);
       break;
     case 2: // OFFENSIVE MODE - we have 3 offense
       targetAbsolute = Vector2f(-700, 2000);

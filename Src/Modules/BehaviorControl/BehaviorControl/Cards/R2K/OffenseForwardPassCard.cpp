@@ -13,9 +13,7 @@
  * Only the the second player from the front beginning can activate this card.
  *
  * v.1.1: increased the shoot strength from KickInfo::walkForwardsLeft to   KickInfo::walkForwardsLeftLong);
- *v.2: card now medium exclusive. 
- *      Passsing to buddy with higher supporter index OR 
- *     within 10sec after whistle
+ *
  * Note:
  *
  *
@@ -42,7 +40,6 @@
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/TeamCommStatus.h"
-#include "Representations/Infrastructure/ExtendedGameInfo.h"
 
 CARD(OffenseForwardPassCard,
      {
@@ -54,7 +51,6 @@ CARD(OffenseForwardPassCard,
     CALLS(WalkAtRelativeSpeed),
     REQUIRES(FieldBall),
     REQUIRES(FieldDimensions),
-    REQUIRES(ExtendedGameInfo),
     REQUIRES(ObstacleModel),
     REQUIRES(RobotPose),
     REQUIRES(TeamData),
@@ -89,9 +85,7 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
         !aBuddyIsClearingOrPassing() &&      
         theTeammateRoles.playsTheBall(&theRobotInfo,theTeamCommStatus.isWifiCommActive) &&   // I am the striker
         theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
-       // either a substantial delta on x - or we are at kick-off
-       ( thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1 ||
-         theExtendedGameInfo.timeSincePlayingStarted < 10000) &&
+        // thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1 &&
         // theObstacleModel.opponentIsTooClose(theFieldBall.positionRelative) != KickInfo::LongShotType::noKick &&  
         theTeamBehaviorStatus.teamActivity != TeamBehaviorStatus::R2K_SPARSE_GAME;
         
@@ -107,8 +101,8 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
         
         theActivitySkill(BehaviorStatus::offenseForwardPassCard);
         
-        float x = 0;
-        float y = -700;
+        float x = 1500;
+        float y = -1500;
 
         for (const auto& buddy : theTeamData.teammates)
         {
@@ -117,8 +111,8 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
                 
                 if(buddy.theRobotPose.translation.x()>theRobotPose.translation.x())
                 {
-                    x = buddy.theRobotPose.translation.x()+x;
-                    y = buddy.theRobotPose.translation.y()+y;
+                    x = buddy.theRobotPose.translation.x();
+                    y = buddy.theRobotPose.translation.y();
                     
                 }
             }
@@ -137,8 +131,8 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
       for (const auto& buddy : theTeamData.teammates) 
       {
         if (
-          // buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
-          // buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard ||
