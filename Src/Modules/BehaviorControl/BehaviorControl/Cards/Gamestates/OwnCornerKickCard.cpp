@@ -70,8 +70,7 @@ class OwnCornerKickCard : public OwnCornerKickCardBase
   {
    
     
-    return  
-      theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)  // I am the striker
+    return  theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)  // I am the striker
       && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
       && theGameInfo.setPlay == SET_PLAY_CORNER_KICK
       && theTeammateRoles.isTacticalOffense(theRobotInfo.number); // My recent role

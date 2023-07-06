@@ -39,9 +39,9 @@ CARD(OwnKickInCard,
   CALLS(LookForward),
   CALLS(GoToBallAndKick),
 
+  REQUIRES(FieldBall),
   REQUIRES(RobotPose),
   REQUIRES(RobotInfo),
-  REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(OwnTeamInfo),
   REQUIRES(GameInfo),
@@ -73,15 +73,10 @@ class OwnKickInCard : public OwnKickInCardBase
       theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) // I am the striker
       && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
       && theGameInfo.setPlay == SET_PLAY_KICK_IN 
-      // HOT FIX WM
-      // && !aBuddyIsDoingPenaltyKick()
-      // HOT FIX WM
-      && !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number)
-      && (
-          (theFieldBall.positionOnField.x() <0  && theTeammateRoles.isTacticalDefense(theRobotInfo.number))
-          ||
-          (theFieldBall.positionOnField.x() >= 0 && theTeammateRoles.isTacticalOffense(theRobotInfo.number))
-         )
+      && !aBuddyIsDoingPenaltyKick()
+      //  && theTeammateRoles.isTacticalDefense(theRobotInfo.number) // my recent role
+      //  && theTeammateRoles.isTacticalOffense(theRobotInfo.number)
+
       ;
 
     
@@ -93,13 +88,10 @@ class OwnKickInCard : public OwnKickInCardBase
    */
   bool postconditions() const override
   {
-    // HOT FIX WM
-    return !preconditions();
-    /*
-       ! theFieldBall.ballWasSeen(ballWasSeenStickyPeriod)
+    return 
+       !theFieldBall.ballWasSeen(ballWasSeenStickyPeriod)
         || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
         || theGameInfo.setPlay != SET_PLAY_KICK_IN;
-    */
   }
 
   void execute() override

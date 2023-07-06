@@ -65,15 +65,8 @@ class OwnPushingFreeKickCard : public OwnPushingFreeKickCardBase
     return 
       theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
       && theGameInfo.setPlay == SET_PLAY_PUSHING_FREE_KICK
-      && theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)  // I am the striker
-      && !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number)
-      // HOT FIX WM
-      && (
-        (theFieldBall.positionOnField.x() < 0 && theTeammateRoles.isTacticalDefense(theRobotInfo.number))
-        ||
-        (theFieldBall.positionOnField.x() >= 0 && theTeammateRoles.isTacticalOffense(theRobotInfo.number))
-        )
-      ;
+      && theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive);  // I am the striker
+
 
   }
 

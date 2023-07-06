@@ -143,8 +143,6 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
   }
   bool aBuddyIsClearingOwnHalf() const
   {
-    // HOT FIX WM
-#ifdef NAO
     for (const auto& buddy : theTeamData.teammates)
     {
       if (buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard)
@@ -153,9 +151,7 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
     }
     return false;
   }
-#endif
-  return false;
-  }
+  
 };
 
 MAKE_CARD(ClearOwnHalfCardGoalie);
