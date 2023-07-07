@@ -277,7 +277,7 @@ private:
 // OUTPUT_TEXT("own penalties "<< own_penalties );  // 16
     if (own_penalties != lastNrOwnPenalties) {
       recomputeLineUp = true;
-      OUTPUT_TEXT("recomputeLineUp  " << lastNrOwnPenalties << " " << own_penalties);
+      // OUTPUT_TEXT("recomputeLineUp  " << lastNrOwnPenalties << " " << own_penalties);
       lastNrOwnPenalties = own_penalties;
     }
 
