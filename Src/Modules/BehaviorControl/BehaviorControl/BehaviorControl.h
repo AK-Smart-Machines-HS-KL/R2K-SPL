@@ -69,7 +69,7 @@ public:
   BehaviorControl();
 
   void compileBehaviorControl(BehaviorStatusComponent*);
-  BehaviorStatusComponent::Compiler messageCompilerRef = BehaviorStatusComponent::addDataCompiler(std::bind(&BehaviorControl::compileBehaviorControl, this, _1));
+  BehaviorStatusComponent::Compiler messageCompilerRef = BehaviorStatusComponent::onCompile.add(std::bind(&BehaviorControl::compileBehaviorControl, this, _1));
 
   /**
    * Creates extended module info (union of this module's info and requirements of all behavior parts (cards and skills)).
