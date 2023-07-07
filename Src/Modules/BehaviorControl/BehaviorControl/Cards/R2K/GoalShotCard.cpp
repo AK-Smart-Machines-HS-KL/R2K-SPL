@@ -67,7 +67,7 @@ class GoalShotCard : public GoalShotCardBase
   bool preconditions() const override
   {
     return theFieldBall.positionRelative.norm() < 600
-      && theFrameInfo.getTimeSince(timeLastFail) > cooldown
+      && theFrameInfo.getTimeSince(timeLastFail) > (int) cooldown
       && theShots.goalShot.failureProbability < 0.70
       && theFieldBall.positionOnField.x() > theRobotPose.translation.x()
       && !aBuddyIsChasingOrClearing()

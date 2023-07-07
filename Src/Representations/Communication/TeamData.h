@@ -98,10 +98,10 @@ STREAMABLE(TeamData,
   Teammate& getBMate(int number);
 
   void rcvRobotPose(RobotPoseComponent *, RobotMessageHeader &);
-  RobotPoseComponent::Callback robotPoseCallbackRef = RobotPoseComponent::addCallback(std::bind(&TeamData::rcvRobotPose, this, _1, _2));
+  RobotPoseComponent::Callback robotPoseCallbackRef = RobotPoseComponent::onRecieve.add(std::bind(&TeamData::rcvRobotPose, this, _1, _2));
 
   void rcvBehaviorStatus(BehaviorStatusComponent *, RobotMessageHeader &);
-  BehaviorStatusComponent::Callback behaviorStatusCallbackRef = BehaviorStatusComponent::addCallback(std::bind(&TeamData::rcvBehaviorStatus, this, _1, _2));
+  BehaviorStatusComponent::Callback behaviorStatusCallbackRef = BehaviorStatusComponent::onRecieve.add(std::bind(&TeamData::rcvBehaviorStatus, this, _1, _2));
 
   void rcvMessage(RobotMessageHeader &);
   CallbackRegistry<std::function<void(RobotMessageHeader&)>>::Callback msgRecieveCallbackRef = RobotMessage::onRecieve.add(std::bind(&TeamData::rcvMessage, this, _1));

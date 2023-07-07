@@ -39,6 +39,8 @@ struct AbstractRobotMessageComponent {
    * @param buff 
    * @return size_t 
    */
+  virtual ~AbstractRobotMessageComponent() = default;
+
   virtual size_t compress(uint8_t* buff) = 0;
   virtual bool decompress(uint8_t* compressed) = 0;
   virtual void doCallbacks(RobotMessageHeader& header) = 0;
@@ -67,28 +69,21 @@ class RobotMessageComponent : public AbstractRobotMessageComponent {
   using CompilerFunc_t = std::function<void(T*)>;
 
   private:
-  static volatile ComponentRegistry registry; // = ComponentRegistry(ComponentMetadata{ T::name, T::create, T::setID });
+  static volatile ComponentRegistry registry;
   inline static int id = -1;
 
+
+  public: 
   inline static CallbackRegistry<CompilerFunc_t> onCompile = CallbackRegistry<CompilerFunc_t>();
   inline static CallbackRegistry<CallbackFunc_t> onRecieve = CallbackRegistry<CallbackFunc_t>();
 
-  public: 
   typedef typename CallbackRegistry<CallbackFunc_t>::Callback Callback;
   typedef typename CallbackRegistry<CompilerFunc_t>::Callback Compiler;
 
   inline static int priority = 0;
 
-  static Callback addCallback(CallbackFunc_t foo) {
-    return onRecieve.add(foo);
-  }
-
   void doCallbacks(RobotMessageHeader& header) {
     onRecieve.call(static_cast<T *>(this), header);
-  }
-
-  static Compiler addDataCompiler(CompilerFunc_t foo) {
-    return onCompile.add(foo);
   }
   
   void compileData() {
@@ -160,6 +155,7 @@ class RobotMessage
       }
     }
 
+    
     void compile();
 
     /**
