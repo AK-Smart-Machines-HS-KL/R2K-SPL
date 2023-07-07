@@ -76,7 +76,7 @@ void RobotPose::verify() const
 
 Vector2f RobotPose::toRelative(const Vector2f& abs) const
 {
-    return inversePose * abs;
+    return (abs - translation).rotated(-rotation);
 }
 
 Vector2f RobotPose::toAbsolute(const Vector2f& rel) const
