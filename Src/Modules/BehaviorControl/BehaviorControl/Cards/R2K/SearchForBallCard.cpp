@@ -82,8 +82,11 @@ class SearchForBallCard : public SearchForBallCardBase
   bool preconditions() const override
   {
     // return true;   // use for testing the head and body moves in a fast game
+
     int timeSinceLastStart = theFrameInfo.getTimeSince(startTime);
-    return !theFieldBall.ballWasSeen(ballNotSeenTimeout) 
+    return
+      theExtendedGameInfo.timeSincePlayingStarted > 10000 && 
+      !theFieldBall.ballWasSeen(ballNotSeenTimeout) 
       && (timeSinceLastStart < maxRuntime || timeSinceLastStart > maxRuntime + cooldown) 
       && theExtendedGameInfo.timeSinceLastPenaltyEnded > 10000;
   }
