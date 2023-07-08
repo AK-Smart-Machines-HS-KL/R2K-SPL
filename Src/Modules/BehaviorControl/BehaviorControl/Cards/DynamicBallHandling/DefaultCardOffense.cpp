@@ -19,6 +19,7 @@
 // Representations
 #include "Representations/BehaviorControl/DefaultPose.h"
 #include "Representations/Modeling/RobotPose.h"
+#include "Representations/Communication/RobotInfo.h"
 
 CARD(DefaultCardOffense,
      {
@@ -29,6 +30,7 @@ CARD(DefaultCardOffense,
 
         REQUIRES(DefaultPose),
         REQUIRES(RobotPose),
+        REQUIRES(RobotInfo),
 
         DEFINES_PARAMETERS(
              {,
@@ -65,10 +67,14 @@ class DefaultCardOffense : public DefaultCardOffenseBase
 
     theActivitySkill(BehaviorStatus::defaultBehavior);
     
-    Vector2f targetRelative = theRobotPose.toRelative(theDefaultPose.ownDefaultPose.translation);
+    Pose2f targetRelative = theRobotPose.toRelative(theDefaultPose.ownDefaultPose.translation);
+    Pose2f goaliePose(-1500.f,0.f);
+
+    if(theRobotInfo.number==1)  targetRelative = theRobotPose.toRelative(goaliePose);
 
     theLookActiveSkill(); // Head Motion Request
-    theWalkToPointSkill(Pose2f(theDefaultPose.ownDefaultPose.rotation - theRobotPose.rotation, targetRelative), 1.0f, true);     
+    
+    theWalkToPointSkill(targetRelative, 1.0f, true);     
 
   }
 };

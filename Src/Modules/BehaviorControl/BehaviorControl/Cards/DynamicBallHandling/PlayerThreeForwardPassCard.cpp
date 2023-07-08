@@ -72,7 +72,10 @@ class PlayerThreeForwardPassCard : public PlayerThreeForwardPassCardBase
         
       return //theTeammateRoles.playsTheBall(&theRobotInfo , theTeamCommStatus.isWifiCommActive) &&   // I am the striker
         theRobotInfo.number == 3
-        && theFieldBall.positionRelative.norm() < 1500
+        && theFieldBall.positionOnField.y() >= 0 
+        && theFieldBall.positionOnField.x() >= 0 
+        // && theFieldBall.positionRelative.norm() < 1500
+        
         && theFieldBall.ballWasSeen(1000);
        // theTeammateRoles.isTacticalDefense(theRobotInfo.number);
 
@@ -89,9 +92,10 @@ class PlayerThreeForwardPassCard : public PlayerThreeForwardPassCardBase
         
         theActivitySkill(BehaviorStatus::PlayerThreeForwardPass);
         
-        float x = -500.f;
-        float y = -2500.f;
+        float x = 1200.f;
+        float y = -1500.f;
 
+/*
         for (const auto& buddy : theTeamData.teammates)
         {
             if (!buddy.isPenalized && buddy.isUpright)
@@ -100,14 +104,15 @@ class PlayerThreeForwardPassCard : public PlayerThreeForwardPassCardBase
                 if(buddy.number==2)
                 {
                     OUTPUT_TEXT("actual target " << x << "  " << y);
-                    x = buddy.theRobotPose.translation.x()+500;
-                    y = buddy.theRobotPose.translation.y()-500;
+                    x = buddy.theRobotPose.translation.x();
+                    y = buddy.theRobotPose.translation.y();
                     break;
                 }
             }
         }
 
         // theGoToBallAndKickSkill(calcAngleToOffense(x,y), KickInfo::walkForwardsLeft);
+*/
         theGoToBallAndKickSkill(calcAngleToOffense(x, y), KickInfo::walkForwardsLeftLong);
     }
     

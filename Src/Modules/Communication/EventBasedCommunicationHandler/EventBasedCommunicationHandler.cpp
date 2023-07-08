@@ -52,6 +52,10 @@ void EventBasedCommunicationHandler::update(EventBasedCommunicationData& ebc){
 }
 
 int EventBasedCommunicationHandler::getOwnTeamInfoMessageBudget() {
+
+
+// HOT FIX WM 
+  return 0;
    
    // to be replaced by theOwnTeamInfo.messageBudget
   #ifdef TARGET_ROBOT

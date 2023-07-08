@@ -29,6 +29,7 @@
 #include "Representations/BehaviorControl/TeammateRoles.h"
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Representations/Infrastructure/ExtendedGameInfo.h"
 
 CARD(PlayerOneForwardPassCard,
      {
@@ -46,6 +47,7 @@ CARD(PlayerOneForwardPassCard,
     REQUIRES(TeammateRoles),        // R2K
     REQUIRES(PlayerRole),           // R2K
     REQUIRES(RobotInfo),            // R2K
+    REQUIRES(ExtendedGameInfo),
     DEFINES_PARAMETERS(
                        {,
                            (float)(0.8f) walkSpeed,
@@ -71,8 +73,9 @@ class PlayerOneForwardPassCard : public PlayerOneForwardPassCardBase
       return
         // theTeammateRoles.playsTheBall(&theRobotInfo, true) &&   // I am the striker
         theRobotInfo.number == 1
-        && theFieldBall.positionOnField.x() < 0;
-        // theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number);
+        && theFieldBall.positionOnField.x() < 0 
+              // theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number);
+        ;
 
         
     }
@@ -87,9 +90,11 @@ class PlayerOneForwardPassCard : public PlayerOneForwardPassCardBase
         
         theActivitySkill(BehaviorStatus::playerOneForwardPass);
         
-        float x = -500.f;
-        float y = -2000.f;
+        float x =  1000.f;
+        float y = -1500.f;
 
+
+/*
         for (const auto& buddy : theTeamData.teammates)
         {
             if (!buddy.isPenalized && buddy.isUpright)
@@ -98,13 +103,13 @@ class PlayerOneForwardPassCard : public PlayerOneForwardPassCardBase
                 if(buddy.number==2)
                 {
                    // OUTPUT_TEXT("actual target " << x << "  " << y);
-                    x = buddy.theRobotPose.translation.x() +500;
-                    y = buddy.theRobotPose.translation.y() +250;
+                    x = buddy.theRobotPose.translation.x() + x ;
+                    y = buddy.theRobotPose.translation.y() + y;
                     break;
                 }
             }
         }
-
+*/
         // theGoToBallAndKickSkill(calcAngleToOffense(x,y), KickInfo::walkForwardsLeft);
         // walkForwardsLeftLong: ~250
         // @param targetDirection The (robot-relative) direction in which the ball should go
@@ -112,7 +117,11 @@ class PlayerOneForwardPassCard : public PlayerOneForwardPassCardBase
         // @param alignPrecisely Whether the robot should align more precisely than usual
         // @param kickPower The amount of power (in [0, 1]) that the kick should use
     
+    if(theExtendedGameInfo.timeSincePlayingStarted < 10000)
         theGoToBallAndKickSkill(calcAngleToOffense(x, y), KickInfo::forwardFastLeft);
+        else
+        theGoToBallAndKickSkill(calcAngleToOffense(x, y), KickInfo::walkForwardsLeft);
+        
     }
     
     Angle calcAngleToOffense(float xPos, float yPos) const

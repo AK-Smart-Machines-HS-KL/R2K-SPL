@@ -76,16 +76,16 @@ class AttackerGoalShotCard : public AttackerGoalShotCardBase
   bool preconditions() const override
   {
     return
-        // theTeammateRoles.playsTheBall(theRobotInfo.number) &&   // I am the striker
-        (theRobotInfo.number == 3 || theRobotInfo.number == 2)
-        // theTeammateRoles.isTacticalOffense(theRobotInfo.number)
-        && theFieldBall.positionRelative.norm() < 2000
-        //&& !theObstacleModel.opponentIsClose()
-        && theFrameInfo.getTimeSince(timeLastFail) > cooldown
-        && theShots.goalShot.failureProbability < 0.8
-        //&& theFieldBall.positionOnField.x() > theRobotPose.translation.x()
-        && ((theExtendedGameInfo.timeSincePlayingStarted > 25000) && (theRobotInfo.number == 2)
-        || (theExtendedGameInfo.timeSincePlayingStarted > 15000) && (theRobotInfo.number == 3))
+        theExtendedGameInfo.timeSincePlayingStarted > 23000 &&
+        theFieldBall.ballWasSeen(1000) && 
+        theShots.goalShot.failureProbability < 0.6 &&
+        (
+          // theTeammateRoles.playsTheBall(theRobotInfo.number) &&   // I am the striker
+          (theRobotInfo.number == 3 && theFieldBall.positionOnField.y() >= 0 )  || 
+          (theRobotInfo.number == 2 && theFieldBall.positionOnField.y() < 0) 
+          // theTeammateRoles.isTacticalOffense(theRobotIforwardFastLeftd > 25000) && (theRobotInfo.number == 2)
+        )
+        ;
         
       
     ;
@@ -93,13 +93,18 @@ class AttackerGoalShotCard : public AttackerGoalShotCardBase
 
   bool postconditions() const override
   {
-    return done;   
+    
+  return done || 
+        (theRobotInfo.number == 2 && theFieldBall.positionOnField.y() >= 0 ) ||
+        (theRobotInfo.number == 3 && theFieldBall.positionOnField.y() < 0 )
+        // !preconditions() 
+    ;   
   }
 
   option
   {
     theActivitySkill(BehaviorStatus::codeReleaseKickAtGoal);
-
+    // OUTPUT_TEXT(theFieldBall.positionOnField.y());
     initial_state(align)
     {
       done = false;
@@ -128,7 +133,7 @@ class AttackerGoalShotCard : public AttackerGoalShotCardBase
         if(state_time > initalCheckTime) {
           currentShot = theShots.goalShot;
           OUTPUT_TEXT("Locking Target: (" << currentShot.target.x() << ", " << currentShot.target.y() << ")\n" << currentShot);
-          if (currentShot.failureProbability > 0.3) {
+          if (currentShot.failureProbability > 0.4) {
             OUTPUT_TEXT("Aborting! shot too likely to fail");
             timeLastFail = theFrameInfo.time;
             goto done;

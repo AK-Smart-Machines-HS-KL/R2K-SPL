@@ -1,4 +1,10 @@
 cs DynamicBallHandlingAttacker team1
 cs DynamicBallHandlingDefender team2
-call Includes/Fast
+call Includes/Normal
 call Includes/3vs3
+
+vf worldState
+
+vfd worldState cognition:RobotPose
+# vfd worldState module:ShotPredictor
+

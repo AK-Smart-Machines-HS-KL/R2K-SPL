@@ -263,7 +263,8 @@ private:
     if (theRobotInfo.number == 1 && theRobotInfo.penalty == PENALTY_NONE) 
       goalieIsActive = true;
      
-
+     // HOT FIX for dynamic ball handling challenge, GC inconsistent
+  activeBuddies = 3;
     // c) make a sorted, lean copy of relevant data (helper class BotOnField, see bottom of file)
     std::sort(botsLineUp.begin(), botsLineUp.end());
 
