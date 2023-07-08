@@ -68,7 +68,7 @@ class GoalShotCard : public GoalShotCardBase
   {
     return theFieldBall.positionRelative.norm() < 600
       && theFrameInfo.getTimeSince(timeLastFail) > cooldown
-      && theShots.goalShot.failureProbability < 0.70
+      && theShots.goalShot.failureProbability < 0.50
       && theFieldBall.positionOnField.x() > theRobotPose.translation.x()
       && !aBuddyIsChasingOrClearing()
     ;
@@ -111,7 +111,7 @@ class GoalShotCard : public GoalShotCardBase
         if(state_time > initalCheckTime) {
           currentShot = theShots.goalShot;
           OUTPUT_TEXT("Locking Target: (" << currentShot.target.x() << ", " << currentShot.target.y() << ")\n" << currentShot);
-          if (currentShot.failureProbability > 0.4) {
+          if (currentShot.failureProbability > 0.3) {
             OUTPUT_TEXT("Aborting! shot too likely to fail");
             timeLastFail = theFrameInfo.time;
             goto done;
@@ -162,7 +162,7 @@ class GoalShotCard : public GoalShotCardBase
     {
       for (const auto& buddy : theTeamData.teammates) 
       {
-        if (// buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
+        if (// buddy.theBehaviorStatus.activity == BehaviorStatus::OffenseChaseBallCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||

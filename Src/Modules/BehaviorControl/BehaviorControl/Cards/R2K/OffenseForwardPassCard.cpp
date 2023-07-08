@@ -80,8 +80,25 @@ CARD(OffenseForwardPassCard,
 class OffenseForwardPassCard : public OffenseForwardPassCardBase
 {
     
+    Vector2f targetAbsolute = Vector2f::Zero();
     bool preconditions() const override
     {
+        bool buddyValid = false;
+        
+        for (const auto& buddy : theTeamData.teammates)
+        {
+            if (!buddy.isPenalized && buddy.isUpright)
+            {
+                if(buddy.theRobotPose.translation.x() > theRobotPose.translation.x()) {
+                    buddyValid = true;
+                    break;
+                }
+            }
+        }
+
+        if (!buddyValid) {
+            return false;
+        }
         
       return
         !aBuddyIsClearingOrPassing() &&      
@@ -99,37 +116,40 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
     {
         return !preconditions();
     }
-    
-    void execute() override
-    {
-        
-        theActivitySkill(BehaviorStatus::offenseForwardPassCard);
-        
-        float x = 0;
-        float y = -700;
 
+    Vector2f getTarget() {
+        Vector2f target = Vector2f::Zero();
         for (const auto& buddy : theTeamData.teammates)
         {
             if (!buddy.isPenalized && buddy.isUpright)
             {
-                
-                if(buddy.theRobotPose.translation.x()>theRobotPose.translation.x())
-                {
-                    x = buddy.theRobotPose.translation.x()+x;
-                    y = buddy.theRobotPose.translation.y()+y;
-                    
+                if(buddy.theRobotPose.translation.x() > theRobotPose.translation.x()) {
+                    if(target.x() < buddy.theRobotPose.translation.x() || target == Vector2f::Zero()) {
+                        target = buddy.theRobotPose.translation;
+                    }
                 }
             }
         }
-
-        // theGoToBallAndKickSkill(calcAngleToOffense(x,y), KickInfo::walkForwardsLeft);
-        theGoToBallAndKickSkill(calcAngleToOffense(x, y), KickInfo::walkForwardsLeftLong);
+        return target;
     }
     
-    Angle calcAngleToOffense(float xPos, float yPos) const
+    void execute() override
     {
-        return (theRobotPose.inversePose * Vector2f(xPos, yPos)).angle();
+        // If we just enetered the card, grab the best passing target
+        if (targetAbsolute == Vector2f::Zero()) {
+            targetAbsolute = getTarget();
+        }
+        
+        theActivitySkill(BehaviorStatus::offenseForwardPassCard);
+
+        theGoToBallAndKickSkill(theRobotPose.toRelative(targetAbsolute).angle(), KickInfo::walkForwardsLeftLong);
     }
+
+    void reset() override
+    {
+        targetAbsolute = Vector2f::Zero();
+    }
+    
     bool aBuddyIsClearingOrPassing() const
     {
       for (const auto& buddy : theTeamData.teammates) 
