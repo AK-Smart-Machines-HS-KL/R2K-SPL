@@ -19,7 +19,6 @@ CARD(GameplayCard,
   CALLS(ArmContact),
   CALLS(ArmObstacleAvoidance),
   CALLS(CountDownHalfTime),
-  CALLS(TeamCountdown),
   REQUIRES(FrameInfo),
   REQUIRES(GameInfo),
   REQUIRES(OwnTeamInfo),
@@ -124,10 +123,6 @@ class GameplayCard : public GameplayCardBase
         dealer.deal(normalPlay)->call();
         setState("normalPlay");
 
-        #ifdef TARGET_ROBOT
-          if(stateTime <= 11000)
-            theTeamCountdownSkill(stateTime);
-        #endif
       }
 
       #ifdef TARGET_ROBOT

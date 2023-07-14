@@ -13,7 +13,6 @@
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h"
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Representations/Infrastructure/RobotHealth.h"
-#include "Representations/Infrastructure/TeamTalk.h"
 #include "Representations/Modeling/FieldCoverage.h"
 #include "Representations/Modeling/ObstacleModel.h"
 #include "Representations/Modeling/RobotPose.h"
@@ -29,7 +28,7 @@
 #include "Tools/Communication/MessageComponents/RobotPose.h"
 #include "Tools/Communication/MessageComponents/BehaviorStatus.h"
 
-STREAMABLE(Teammate, COMMA public MessageHandler
+STREAMABLE(Teammate,
 {
   const SynchronizationMeasurementsBuffer* bSMB = nullptr;
 
@@ -42,9 +41,6 @@ STREAMABLE(Teammate, COMMA public MessageHandler
   };
 
   Vector2f getEstimatedPosition(unsigned time) const;
-
-  /** MessageHandler function */
-  bool handleMessage(InMessage& message) override;
 
   ENUM(Status,
   {,
@@ -60,29 +56,16 @@ STREAMABLE(Teammate, COMMA public MessageHandler
   (bool)(false) isGoalkeeper,             /**< This is for a teammate what \c theRobotInfo.isGoalkeeper() is for the player itself. */
   (bool)(false) isPenalized,              // Derived in TeamMessageHandler
   (bool)(true) isUpright,                 // NOT SYNCED 
-  (bool)(true) hasGroundContact,          // NOT SYNCED
-  (unsigned)(0) timeWhenLastUpright,      // NOT SYNCED
-  (unsigned)(0) timeOfLastGroundContact,  // NOT SYNCED
 
   (unsigned)(0) timeWhenLastPacketSent,
   (unsigned)(0) timeWhenLastPacketReceived,
   (Status)(PENALIZED) status,             // NOT SYNCED - Partially derived in TeamMessageHandler
   (unsigned)(0) timeWhenStatusChanged,    // Derived in TeamMessageHandler
-  (signed char)(0) sequenceNumber,        // UNUSED
-  (signed char)(0) returnSequenceNumber,  // UNUSED
 
   (RobotPose) theRobotPose,               // SYNCED
   (BallModel) theBallModel,               // NOT SYNCED
-  (FrameInfo) theFrameInfo,               // NOT SYNCED
   (ObstacleModel) theObstacleModel,       // NOT SYNCED
   (BehaviorStatus) theBehaviorStatus,     // SYNCED
-  (Whistle) theWhistle,                   // NOT SYNCED
-  (TeamBehaviorStatus) theTeamBehaviorStatus, // NOT SYNCED
-
-  (RobotHealth) theRobotHealth,           // NOT SYNCED
-  (TeamTalk) theTeamTalk,                 // NOT SYNCED
-
-
 });
 
 /**
@@ -105,8 +88,7 @@ STREAMABLE(TeamData,
 
   void rcvMessage(RobotMessageHeader &);
   CallbackRegistry<std::function<void(RobotMessageHeader&)>>::Callback msgRecieveCallbackRef = RobotMessage::onRecieve.add(std::bind(&TeamData::rcvMessage, this, _1));
-
-  FUNCTION(void(const SPLStandardMessageBufferEntry* const)) generate,
+  ,
 
   (std::vector<Teammate>) teammates, /**< An unordered(!) list of all teammates that are currently communicating with me */
   (int)(0) numberOfActiveTeammates,  /**< The number of teammates (in the list) that are at not PENALIZED */

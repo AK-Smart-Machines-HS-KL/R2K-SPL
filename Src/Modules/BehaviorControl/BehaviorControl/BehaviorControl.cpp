@@ -19,7 +19,7 @@ MAKE_MODULE(BehaviorControl, behaviorControl, BehaviorControl::getExtModuleInfo)
 #define SKILL(name) (*theSkillRegistry.getSkill<Skills::name##Skill>(#name))
 
 BehaviorControl::BehaviorControl() :
-  theSkillRegistry("skills.cfg", const_cast<ActivationGraph&>(theActivationGraph), theArmMotionRequest, theBehaviorStatus, theCalibrationRequest, theHeadMotionRequest, theMotionRequest, theTeamTalk),
+  theSkillRegistry("skills.cfg", const_cast<ActivationGraph&>(theActivationGraph), theArmMotionRequest, theBehaviorStatus, theCalibrationRequest, theHeadMotionRequest, theMotionRequest),
   theCardRegistry(const_cast<ActivationGraph&>(theActivationGraph))
 {
   theSkillRegistry.checkSkills(CardCreatorBase::gatherSkillInfo(CardCreatorList<Card>::first));

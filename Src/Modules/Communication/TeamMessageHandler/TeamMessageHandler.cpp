@@ -76,7 +76,7 @@ void TeamMessageHandler::maintainBMateList(TeamData& teamData) const
       Teammate::Status newStatus = Teammate::PLAYING;
       if(theOwnTeamInfo.players[teammate.number - 1].penalty != PENALTY_NONE)
         newStatus = Teammate::PENALIZED;
-      else if(!teammate.isUpright || !teammate.hasGroundContact)
+      else if(!teammate.isUpright)
         newStatus = Teammate::FALLEN;
 
       if(newStatus != teammate.status)

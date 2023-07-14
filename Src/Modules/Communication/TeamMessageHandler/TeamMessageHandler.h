@@ -16,7 +16,6 @@
 #include "Representations/Communication/TeamInfo.h"
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Representations/Infrastructure/RobotHealth.h"
-#include "Representations/Infrastructure/TeamTalk.h"
 #include "Representations/Modeling/FieldCoverage.h"
 #include "Representations/Modeling/ObstacleModel.h"
 #include "Representations/Modeling/RobotPose.h"
@@ -59,7 +58,6 @@ MODULE(TeamMessageHandler,
   USES(RobotHealth),
   USES(RobotPose),
   USES(TeamBehaviorStatus),
-  USES(TeamTalk),
   USES(Whistle),
 
   PROVIDES(BHumanMessageOutputGenerator),
