@@ -61,6 +61,7 @@ void BeepRecognizer::update(Beep &theBeep){
   for(auto& buffer : buffers){
     buffer.reserve(bufferSize);
   }
+
   // Append current samples to buffers and sample down if necessary
   // Sample down is necessary only if sample rate is different between audio provider and this module
   ASSERT(theAudioData.sampleRate % sampleRate == 0);
@@ -77,7 +78,6 @@ void BeepRecognizer::update(Beep &theBeep){
   // Compute first channel index to access damage configuration.
   const int firstBuffer = theDamageConfigurationHead.audioChannelsDefect[0] ? 1 : 0;
 
-  // Correlate all channels with all signatures or only one if selectedName matches a whistle.
   if(buffers[firstBuffer].full() && samplesRequired <= 0)
   {
 
@@ -96,17 +96,21 @@ void BeepRecognizer::update(Beep &theBeep){
       }
     }    
 
-    int defects = 0; // Number of defect channels
-    for(size_t channel = 1; channel < buffers.size(); ++channel){
+    // decode audio data
+    for(size_t channel = firstBuffer; channel < buffers.size(); ++channel){
+
+      // if the channel is defect, skip it
       if(theDamageConfigurationHead.audioChannelsDefect[channel] || !buffers[channel].full()) {
-        ++defects;
         continue;
       }
+
+      // Decode non-defect channel
       std::vector<long> data = decode(buffers[channel]);
       for (size_t band = 0; band < data.size(); band++)
       {
         averagingBuffers[band].push_front(data[band]);
       }
+      break; // only decode first channel that is available
     }
 
     // Adjust averages for new data
@@ -131,7 +135,7 @@ void BeepRecognizer::update(Beep &theBeep){
   }
 
   // Note: I cannot get this to work I have tried so many things - Andy
-  // The idea is to draw the spectrum like the Whistle Recognizer does
+  // The idea is to draw the spectrum like the Whistle Recognizer does (which is prettyy unreliable itself)
   // COMPLEX_IMAGE("module:BeepRecognizer")
   // {
   //   Image<PixelTypes::YUYVPixel> image;
@@ -190,7 +194,7 @@ std::vector<long> BeepRecognizer::decode(const RingBuffer<AudioData::Sample>& bu
       int bucket = targetFrequency * samplesSize / sampleRate;
 
       // Check if bucket is above this peak 
-      if (amplitudes[bucket] > signalBaseline) {
+      if (getAmplitude(spectrum[bucket]) > signalBaseline) {
         data[band] = data[band] | 1 << bit;
       }
     }
@@ -200,6 +204,9 @@ std::vector<long> BeepRecognizer::decode(const RingBuffer<AudioData::Sample>& bu
 }
 
 double getAmplitude(fftw_complex& value) {
-  const Vector2d complex(value[0], value[1]);
-  return complex.norm();
+  return std::sqrt(std::pow(value[0], 2)  + std::pow(value[1], 2));
+}
+
+double getPhase(fftw_complex& value) {
+  return std::atan2(value[0], value[1]); // Phase = direction of complex number
 }

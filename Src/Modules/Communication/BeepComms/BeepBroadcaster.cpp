@@ -30,12 +30,12 @@ typedef short sample_t;
 BeepBroadcaster::BeepBroadcaster()
 {
   init_pcm();
-  startWorkers();
+  startWorker();
 }
 
 BeepBroadcaster::~BeepBroadcaster()
 {
-    stopWorkers();
+    stopWorker();
     snd_pcm_close(pcm_handle);
 }
 
@@ -80,7 +80,6 @@ void BeepBroadcaster::update(BeepCommData& beepCommData)
         beepCommData.broadcastQueue.pop_back();
         requestMessageBroadcast(1000, 0.5, message);
     }
-    
 }
 
 //play sine waves simultaneously
@@ -93,6 +92,7 @@ void BeepBroadcaster::requestMultipleFrequencies(float duration, float volume, s
    requestQueue.push_back(request); // qrite request to queue
    workerSignal.notify_one(); // notify worker of new request
 }
+
 void BeepBroadcaster::requestMessageBroadcast(float duration, float volume, int message){
     float ownBaseFrequency = baseFrequency + (theRobotInfo.number - 1) * bandWidth;
     std::vector<float> frequencies;
@@ -106,7 +106,7 @@ void BeepBroadcaster::requestMessageBroadcast(float duration, float volume, int 
     requestMultipleFrequencies(1000, 0.5, frequencies);
 };
 
-void BeepBroadcaster::startWorkers()
+void BeepBroadcaster::startWorker()
 {
     workerThread = std::thread(&BeepBroadcaster::handleBeepRequests, this);
 }
@@ -133,11 +133,11 @@ void BeepBroadcaster::init_pcm()
 
 }
 
-void BeepBroadcaster::stopWorkers()
+void BeepBroadcaster::stopWorker()
 {
-    shutdownWorkers = true;
-    workerSignal.notify_all();
-    workerThread.join();
+    shutdown = true; // tell worker thread to exit
+    workerSignal.notify_all(); // Notify worker that something happened (if they are waiting)
+    workerThread.join(); // wait for function to exit (should happen quickly)
 }
 
 void BeepBroadcaster::handleBeepRequests()
@@ -146,10 +146,9 @@ void BeepBroadcaster::handleBeepRequests()
     while (true)
     {
         workerSignal.wait(lock); // release lock and wait for signal from main thread
-        if (shutdownWorkers) break; // exit loop. lock auto releases when function exits
+        if (shutdown) break; // exit loop. lock auto releases when function exits
         BeepRequest request = requestQueue.front();
         requestQueue.pop_front();
-        lock.unlock(); // signal signature moved to this thread, release for other workers
         
         //generate superimposed sine waves as signals
         sample_t buf[BUFFER_SIZE] = {0}; // signal buffer
@@ -171,10 +170,7 @@ void BeepBroadcaster::handleBeepRequests()
                 snd_pcm_recover(pcm_handle, int(n), 1);
                 n = snd_pcm_writei(pcm_handle, &buf, toGenerate); // write data to audio buffer
             }
-        } while (signalSize > 0);
-        
-
-        lock.lock();
+        } while (signalSize > 0 && !shutdown); // exit when signal is done OR shutdown is requested
     }
 }
 

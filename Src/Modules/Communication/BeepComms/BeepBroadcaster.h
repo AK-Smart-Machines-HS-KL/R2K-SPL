@@ -53,13 +53,13 @@ private:
   std::thread workerThread;
   std::list<BeepRequest> requestQueue;
   std::condition_variable workerSignal;
-  bool shutdownWorkers = false;
+  bool shutdown = false;
 
   void update(BeepCommData& audioData) override;
   void requestMultipleFrequencies(float duration, float volume, std::vector<float> frequencies);
   void requestMessageBroadcast(float duration, float volume, int message);
-  void stopWorkers();
-  void startWorkers();
+  void stopWorker();
+  void startWorker();
   void init_pcm();
   void handleBeepRequests();
 
