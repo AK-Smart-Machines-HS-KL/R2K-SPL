@@ -45,6 +45,7 @@ CARD(SearchForBallCard,
         CALLS(LookForward),
         CALLS(LookActive),
         CALLS(Stand),
+        CALLS(LookAtBall),
         CALLS(WalkAtRelativeSpeed),
 
         REQUIRES(DefaultPose),
@@ -56,10 +57,10 @@ CARD(SearchForBallCard,
         REQUIRES(ExtendedGameInfo),
         DEFINES_PARAMETERS(
              {,
-          (int)(4000) headSweepDuration,
-          (int)(400) bodyTurnDuration,
+          (int)(2500) headSweepDuration,
+          (int)(3000) bodyTurnDuration,
           (int)(5000) ballNotSeenTimeout,
-          (int)(15000) maxRuntime,
+          (int)(10000) maxRuntime,
           (int)(10000) cooldown,
           (unsigned)(0) startTime,
              }),
@@ -102,10 +103,15 @@ class SearchForBallCard : public SearchForBallCardBase
       startTime = theFrameInfo.time;
       transition
       {
-        goto search;
+        if (std::abs(theFieldBall.positionRelative.angle()) < 10_deg) {
+          	goto search;
+        }
       }
 
-      action{}
+      action{
+        theLookAtBallSkill();
+        theWalkAtRelativeSpeedSkill(Pose2f(std::clamp(theFieldBall.positionRelative.angle() * 3.0f, -1.0f, 1.0f), 0.f, 0.f));
+      }
     }
   
     state(search)
@@ -129,14 +135,18 @@ class SearchForBallCard : public SearchForBallCardBase
       transition
       {
         srand(theRobotInfo.number);
-        if (state_time > headSweepDuration + (rand() % 10 + 0.5) * bodyTurnDuration)
+        if (state_time > bodyTurnDuration)
         goto search;
       }
 
       action
       {
-         theLookForwardSkill();
-         theWalkAtRelativeSpeedSkill(Pose2f(0.8f, 0.f, 0.f));
+        theLookForwardSkill();
+        if (theRobotPose.translation.y() > 0 ) {
+          theWalkAtRelativeSpeedSkill(Pose2f(-0.8f, 0.f, 0.f));
+        } else {
+          theWalkAtRelativeSpeedSkill(Pose2f(0.8f, 0.f, 0.f));
+        }
       }
     }
   }

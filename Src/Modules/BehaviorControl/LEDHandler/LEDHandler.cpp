@@ -275,10 +275,12 @@ void LEDHandler::setBatteryLevelInEar(LEDRequest& ledRequest, LEDRequest::LED ba
 
 void LEDHandler::setTeammatesInEar(LEDRequest& ledRequest, LEDRequest::LED baseLED)
 {
-  int onLEDs = std::min(static_cast<int>(theTeamData.teammates.size() / 0.5), 9);
+  for (auto &teammate : theTeamData.teammates)
+  {
+    ledRequest.ledStates[baseLED + 2 * (teammate.number - 1)] = LEDRequest::on;
+  }
 
-  for(int i = 0; i <= onLEDs; ++i)
-    ledRequest.ledStates[baseLED + i] = LEDRequest::on;
+  ledRequest.ledStates[baseLED + 2 * (theRobotInfo.number - 1)] = LEDRequest::on;
 }
 
 MAKE_MODULE(LEDHandler, behaviorControl);

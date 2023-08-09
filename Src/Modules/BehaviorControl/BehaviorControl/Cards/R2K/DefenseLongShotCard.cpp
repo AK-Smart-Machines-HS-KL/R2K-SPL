@@ -100,7 +100,7 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
       (
         theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_OFFENSIVE_GAME ||
         theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME ||
-        theFieldBall.endPositionOnField.x() < -500
+        theFieldBall.endPositionOnField.x() < 0
       );
   }
 
@@ -109,7 +109,7 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
     return 
     theObstacleModel.opponentIsClose(500) ||
     !theTeammateRoles.isTacticalDefense(theRobotInfo.number) ||
-    !(theFieldBall.endPositionOnField.x() < 0);
+    !(theFieldBall.endPositionOnField.x() < 200);
   }
 
  
@@ -141,7 +141,7 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
   {
     for (const auto& buddy : theTeamData.teammates)
     {
-      if (buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
+      if (buddy.theBehaviorStatus.activity == BehaviorStatus::defenseChaseBallCard ||
         buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
         buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
         buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard)

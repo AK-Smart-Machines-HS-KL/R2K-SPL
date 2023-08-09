@@ -64,7 +64,6 @@ void RobotMessageHandler::connect(int port, const char* subnet)
 
 void RobotMessageHandler::send()
 {
-  OUTPUT_TEXT("Attempting Message Send!");
   if(!port)
     return;
 
@@ -76,8 +75,6 @@ void RobotMessageHandler::send()
 
   if(!success) {
     OUTPUT_TEXT("Error sending message (" << errno << ")" << std::strerror(errno));
-  } else {
-    OUTPUT_TEXT("Message Sent!");
   }
 
 
@@ -101,7 +98,7 @@ void RobotMessageHandler::receive()
                    : socket.read((char*) readBuffer.data(), readBuffer.size(), remoteIp);
                    
     if (size == -1) { // Error Check
-      if (errno != EAGAIN && errno != EWOULDBLOCK) { // excluded errors
+      if (errno != EAGAIN && errno != EWOULDBLOCK && errno != ENOENT && errno != 0) { // excluded errors
         OUTPUT_TEXT("Error recieving message (" << errno << ")" << std::strerror(errno));
       } 
       break;
@@ -111,8 +108,6 @@ void RobotMessageHandler::receive()
     if (size == 0) {
       break;
     }
-
-    OUTPUT_TEXT("Message Recieved!");
 
     RobotMessage msg;
     if (!msg.decompress(readBuffer)) { // Decompress failed 
