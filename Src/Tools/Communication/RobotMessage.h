@@ -74,8 +74,8 @@ class RobotMessageComponent : public AbstractRobotMessageComponent {
 
 
   public: 
-  inline static CallbackRegistry<CompilerFunc_t> onCompile = CallbackRegistry<CompilerFunc_t>();
-  inline static CallbackRegistry<CallbackFunc_t> onRecieve = CallbackRegistry<CallbackFunc_t>();
+  inline thread_local static CallbackRegistry<CompilerFunc_t> onCompile = CallbackRegistry<CompilerFunc_t>();
+  inline thread_local static CallbackRegistry<CallbackFunc_t> onRecieve = CallbackRegistry<CallbackFunc_t>();
 
   typedef typename CallbackRegistry<CallbackFunc_t>::Callback Callback;
   typedef typename CallbackRegistry<CompilerFunc_t>::Callback Compiler;
@@ -126,7 +126,7 @@ class RobotMessage
   public:
   RobotMessageHeader header; 
   std::vector<std::shared_ptr<AbstractRobotMessageComponent>> componentPointers;  // Pointers to the included components. With smart pointers we don't need to worry about deleting them!
-  inline static CallbackRegistry<std::function<void(RobotMessageHeader&)>> onRecieve = CallbackRegistry<std::function<void(RobotMessageHeader&)>>();
+  inline thread_local static CallbackRegistry<std::function<void(RobotMessageHeader&)>> onRecieve = CallbackRegistry<std::function<void(RobotMessageHeader&)>>();
 
     /**
      * @brief 
