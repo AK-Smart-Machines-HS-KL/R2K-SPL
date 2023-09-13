@@ -85,21 +85,21 @@ class ChaseBallCard : public ChaseBallCardBase
     //Vergleich ob die Spielerposition in der Opponentside liegt
     //mit einem threshold damit Stürmer noch teils ins eigene Feld darf
   
-    return
-      (
-        !aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
-        theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
-        theFieldBall.positionOnField.x() > (0 - threshold)
-        // theFieldBall.positionOnField.x() >= theRobotPose.translation.x() - threshold;
-        )
-      ||
-      (theGameInfo.setPlay == SET_PLAY_NONE &&
-        !aBuddyIsChasingOrClearing() &&
-        theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
-        theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
-        theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
-        theFieldBall.endPositionOnField.x() < -500 &&
-        !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME));
+    return true;
+      //(
+      //  !aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
+      //  theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
+      //  theFieldBall.positionOnField.x() > (0 - threshold)
+      //  // theFieldBall.positionOnField.x() >= theRobotPose.translation.x() - threshold;
+      //  )
+      //||
+      //(theGameInfo.setPlay == SET_PLAY_NONE &&
+      //  !aBuddyIsChasingOrClearing() &&
+      //  theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
+      //  theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
+      //  theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
+      //  theFieldBall.endPositionOnField.x() < -500 &&
+      //  !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME));
   }
 
   bool postconditions() const override
