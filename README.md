@@ -1,9 +1,9 @@
-## R-ZWEI Kickers Codebase
+# R-ZWEI Kickers Codebase
 
 This is where the code of the team **R-ZWEI Kickers** lives. Its documentation can be found in the [Wiki of this repository](https://github.com/AK-Smart-Machines-HS-KL/R2K-SPL/wiki)
 
 
-## B-Human Code Release
+### B-Human Code Release
 
 This code is based on the official 2021 B-Human code release. Documentation for it can be found in their [public wiki](https://wiki.b-human.de/coderelease2021/).
 
