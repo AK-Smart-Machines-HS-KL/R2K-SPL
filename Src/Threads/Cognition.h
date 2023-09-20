@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "Tools/Communication/SPLMessageHandler.h" // include this first to prevent WinSock2.h/Windows.h conflicts
+#include "Tools/Communication/RobotMessageHandler.h" // include this first to prevent WinSock2.h/Windows.h conflicts
 #include "Tools/Framework/FrameExecutionUnit.h"
 
 /**
@@ -19,9 +19,7 @@
 class Cognition : public FrameExecutionUnit
 {
 private:
-  SPLMessageHandler::Buffer inTeamMessages;
-  RoboCup::SPLStandardMessage outTeamMessage;
-  SPLMessageHandler theSPLMessageHandler;
+  RobotMessageHandler robotMessageHandler;
   unsigned lastUpperFrameTime = 0; /**< The last timestamp received from the upper camera thread. */
   unsigned lastLowerFrameTime = 0; /**< The last timestamp received from the lower camera thread. */
   unsigned lastAcceptedTime = 0; /**< The timestamp of the last image accepted. */

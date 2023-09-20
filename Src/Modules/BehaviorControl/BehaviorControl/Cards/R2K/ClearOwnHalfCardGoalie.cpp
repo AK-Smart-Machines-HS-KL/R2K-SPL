@@ -97,10 +97,10 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
   {
     return
       theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
-      !aBuddyIsClearingOwnHalf() &&
+      // !aBuddyIsClearingOwnHalf() &&
       // 
       // either LongShotCard is above in the stack or add this pre-cond:
-      theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
+      // theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) && // my recent role
       theFieldBall.positionOnField.x() <= theFieldDimensions.xPosOwnGoalArea + maxDistanceFromGoalArea &&
       theFieldBall.positionOnField.y() <= theFieldDimensions.yPosLeftGoalArea + maxDistanceFromGoalArea &&

@@ -2,7 +2,8 @@ set(NAO_ROOT_DIR "${BHUMAN_PREFIX}/Src")
 set(NAO_OUTPUT_DIR "${OUTPUT_PREFIX}/Build/Linux/Nao/$<CONFIG>")
 
 file(GLOB_RECURSE NAO_SOURCES
-    "${NAO_ROOT_DIR}/Modules/*.cpp" "${NAO_ROOT_DIR}/Modules/*.h")
+    "${NAO_ROOT_DIR}/Modules/*.cpp" "${NAO_ROOT_DIR}/Modules/*.h"
+    "${NAO_ROOT_DIR}/Tools/Communication/MessageComponents/Proto/*.c") # Message Components
 file(GLOB NAO_SOURCES_ADDITIONAL
     "${NAO_ROOT_DIR}/Platform/*.cpp" "${NAO_ROOT_DIR}/Platform/*.h")
 list(APPEND NAO_SOURCES ${NAO_SOURCES_ADDITIONAL})
@@ -23,6 +24,9 @@ if(BUILD_NAO)
   set_property(TARGET Nao PROPERTY RUNTIME_OUTPUT_NAME bhuman)
   set_property(TARGET Nao PROPERTY XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
   target_include_directories(Nao PRIVATE "${NAO_ROOT_DIR}")
+  target_include_directories(Nao PRIVATE "${BHUMAN_PREFIX}/Util/span-lite/include")
+  target_include_directories(Nao PRIVATE "${BHUMAN_PREFIX}/Util/bitpacker/include/bitpacker")
+  target_include_directories(Nao PRIVATE "${BHUMAN_PREFIX}/Util/bitproto/lib/c")
   target_link_libraries(Nao PRIVATE -lrt-2.31)
   target_link_libraries(Nao PRIVATE -lpthread-2.31)
   target_link_libraries(Nao PRIVATE Eigen::Eigen)

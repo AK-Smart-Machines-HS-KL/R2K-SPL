@@ -184,13 +184,13 @@ private:
       // 1 player
         { {GN,UN,UN,UN,UN}, {GN,UN,UN,UN,UN}, {GN,UN,UN,UN,UN}, {OM,UN,UN,UN,UN} },
         // 2 player
-            { {GN,OM,UN,UN,UN}, {GN,DM,UN,UN,UN}, {GN,DM,UN,UN,UN}, {DM,OM,UN,UN,UN} },
+            { {GN,OM,UN,UN,UN}, {GN,OM,UN,UN,UN}, {GN,OM,UN,UN,UN}, {DM,OM,UN,UN,UN} },
             // 3 player
-                { {GN,DM,OM,UN,UN}, {GN,DR,DL,UN,UN}, {GA,DM,OM,UN,UN}, {GN,OR,OM,UN,UN} },
+                { {GN,DM,OM,UN,UN}, {GN,DR,DM,UN,UN}, {GA,DM,OM,UN,UN}, {GN,OR,OM,UN,UN} },
                 // 4 player
-                    { {GN,DR,DL,OM,UN}, {GN,DR,DL,DM,UN}, {GA,DM,OL,OM,UN}, {GN,DM,OL,OM,UN} },
+                    { {GN,DM,OR,OM,UN}, {GN,DR,DL,OM,UN}, {GA,DM,DL,OM,UN}, {GN,DM,OL,OM,UN} },
                     // 5 player
-                        { {GN,DR,DL,OR,OL}, {GN,DR,DL,DM,OM}, {GA,DM,OL,OR,OM}, {GN,DM,OL,OR,OM} }
+                        { {GN,DR,DL,OR,OL}, {GN,DR,DL,DM,OM}, {GA,DM,DL,OR,OM}, {GN,DM,OL,OR,OM} }
 
 
     };
@@ -236,21 +236,18 @@ private:
   */  
     }
     else {
-      if (abs(own_score - opp_score)<=1) { //default: +/- 1 goal
-        
-        theTeamActivitySkill(TeamBehaviorStatus::R2K_NORMAL_GAME);
-        teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME;
-
-      }
-      if (own_score + 1 < opp_score ) {
+      if (own_score < opp_score ) {
         theTeamActivitySkill(TeamBehaviorStatus::R2K_OFFENSIVE_GAME);
         teamBehaviorStatus = TeamBehaviorStatus::R2K_OFFENSIVE_GAME;
       }
 
       // to do: add time limit, so we will not spoil our leadership in the last n minutes
-      if (own_score -1 > opp_score) {
+       else if (own_score -2 > opp_score) {
         theTeamActivitySkill(TeamBehaviorStatus::R2K_DEFENSIVE_GAME);
         teamBehaviorStatus = TeamBehaviorStatus::R2K_DEFENSIVE_GAME;
+      } else {
+        theTeamActivitySkill(TeamBehaviorStatus::R2K_NORMAL_GAME);
+        teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME;
       }
     }
 
@@ -280,7 +277,7 @@ private:
 // OUTPUT_TEXT("own penalties "<< own_penalties );  // 16
     if (own_penalties != lastNrOwnPenalties) {
       recomputeLineUp = true;
-      OUTPUT_TEXT("recomputeLineUp  " << lastNrOwnPenalties << " " << own_penalties);
+      // OUTPUT_TEXT("recomputeLineUp  " << lastNrOwnPenalties << " " << own_penalties);
       lastNrOwnPenalties = own_penalties;
     }
 
@@ -294,8 +291,7 @@ private:
     // OUTPUT_TEXT("aB " << activeBuddies);
     // OUTPUT_TEXT("theTeamData.numberOfActiveTeammates " << theTeamData.numberOfActiveTeammates);#
 
-      if (2 >= activeBuddies) {   // setting  arbritary lineup
-        OUTPUT_TEXT("no buddies");
+      if (1 >= activeBuddies) {   // setting  arbritary lineup
         for (unsigned int j = 0; j < 4; j++) {
           botsLineUp.push_back(BotOnField(j, (float)lineUp[j] * 100));
         }

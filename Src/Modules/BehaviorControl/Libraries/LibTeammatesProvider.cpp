@@ -30,9 +30,7 @@ int LibTeammatesProvider::nonKeeperTeammatesInOwnPenaltyArea() const
     {
       if(isNear && !theLibPosition.isNearOwnPenaltyArea(teammate.theRobotPose.translation, insideDistanceThreshold, insideDistanceThreshold))
       {
-        /// breaks ties between two robots attempting to enter simultaneously
-        if(teammate.theTeamBehaviorStatus.role.playsTheBall())
-          ++teammatesInPenaltyArea;
+
       }
       else
         ++teammatesInPenaltyArea;

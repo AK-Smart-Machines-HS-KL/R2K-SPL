@@ -90,14 +90,6 @@ bool WhistleHandler::checkForWhistle() const
       data.emplace_back(&theWhistle);
   }
 
-  for(const Teammate& teammate : theTeamData.teammates)
-    if(teammate.theWhistle.channelsUsedForWhistleDetection > 0)
-    {
-      numOfChannels += teammate.theWhistle.channelsUsedForWhistleDetection;
-      if(teammate.theWhistle.lastTimeWhistleDetected > timeOfLastStateChange)
-        data.emplace_back(&teammate.theWhistle);
-    }
-
   std::sort(data.begin(), data.end(),
             [](const Whistle* w1, const Whistle* w2) -> bool
   {

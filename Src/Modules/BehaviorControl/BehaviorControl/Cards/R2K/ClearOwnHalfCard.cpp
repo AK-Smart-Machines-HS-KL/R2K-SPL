@@ -92,12 +92,12 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
   bool preconditions() const override
   {
    return
-     theGameInfo.setPlay == SET_PLAY_NONE &&
+      theGameInfo.setPlay == SET_PLAY_NONE &&  // no penalty active
       theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&  // I am the striker
       !aBuddyIsClearingOwnHalf() &&
-      theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
+      // theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
-      theFieldBall.positionOnField.x() < 500 &&
+      theFieldBall.positionOnField.x() < -500 &&
       !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME);
   }
 
@@ -138,12 +138,8 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
   {
     for (const auto& buddy : theTeamData.teammates)
     {
-      if (buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
-        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
-        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
-        buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
-        buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard ||
-        buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
+      if (
+        buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard)
         return true;
     }
     return false;

@@ -1,0 +1,15 @@
+proto Vector
+
+message Vector2 {
+    int14 x = 1
+    int14 y = 2
+}
+
+message Angle {
+    int12 milli_radians = 1
+}
+
+message Pose2 {
+    Vector2 translation = 1
+    Angle rotation = 2
+}

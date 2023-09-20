@@ -32,6 +32,12 @@ SelfLocator::~SelfLocator()
   delete samples;
 }
 
+void SelfLocator::compileRobotPose(RobotPoseComponent * comp) {
+  comp->pose.translation.x() = theRobotPose.translation.x();
+  comp->pose.translation.y() = theRobotPose.translation.y();
+  comp->pose.rotation = theRobotPose.rotation;
+}
+
 void SelfLocator::update(RobotPose& robotPose)
 {
 #ifndef NDEBUG
@@ -59,6 +65,11 @@ void SelfLocator::update(RobotPose& robotPose)
     }
   }
 #endif
+
+  // Register RobotPose Compiler
+  if(!messageCompilerRef) {
+    messageCompilerRef = RobotPoseComponent::onCompile.add(std::bind(&SelfLocator::compileRobotPose, this, _1));
+  }
 
   /* Initialize variable(s) */
   sampleSetHasBeenReset = false;
