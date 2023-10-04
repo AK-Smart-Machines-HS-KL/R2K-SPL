@@ -46,6 +46,7 @@ SKILL_IMPLEMENTATION(TIExecuteImpl,
   CALLS(Stand),
   CALLS(WalkAtRelativeSpeed),
   CALLS(GoToBallAndKick),
+  CALLS(WalkToPoint),
 });
 
 class TIExecuteImpl : public TIExecuteImplBase
@@ -64,7 +65,8 @@ class TIExecuteImpl : public TIExecuteImplBase
     // TODO: MAP(PlaybackAction::Skills::GoToTarget, theWalkToTargetSkill, ());
     // TODO: MAP(PlaybackAction::Skills::GoToBall, theGoToBallSkill, ());
     // MAP(PlaybackAction::Skills::KickAtGoal, theWalkToBallAndKickAtGoalSkill, ());
-    // MAP(PlaybackAction::Skills::WalkToBall, theWalkToBallSkill, ());
+    MAP(PlaybackAction::Skills::WalkToBall, theWalkAtRelativeSpeedSkill, (action.poseParam));
+    MAP(PlaybackAction::Skills::WalkToPoint, theWalkToPointSkill, (action.poseParam, action.floatParam, false, false, false, false));
 
     // MAP(PlaybackAction::Skills::WalkToTarget, theWalkToTargetSkill, (Pose2f(180_deg, 1000.0f, 1000.0f), action.poseParam));
     // MAP_DONE(PlaybackAction::Skills::WalkToTarget, {return false;});

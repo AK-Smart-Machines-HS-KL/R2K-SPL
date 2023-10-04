@@ -59,7 +59,7 @@ CARD(TIRecorderCard, {
 // performable actions
 const PlaybackAction standAction = PlaybackAction().setSkill(PlaybackAction::Skills::Stand);
 const PlaybackAction goalKickAction = PlaybackAction().setSkill(PlaybackAction::Skills::KickAtGoal);
-const PlaybackAction goToBallAction = PlaybackAction().setSkill(PlaybackAction::Skills::WalkToBall);
+const PlaybackAction goToBallAction = PlaybackAction().setSkill(PlaybackAction::Skills::Stand);
 
 
 class TIRecorderCard : public TIRecorderCardBase
