@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <cxxabi.h>
 #endif
+#include <cstring>
 #include <iostream>
 #include <list>
 #include <regex>
