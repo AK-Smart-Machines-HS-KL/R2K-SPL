@@ -115,7 +115,8 @@ else()
       -Wno-implicit-int-float-conversion
       -Wunreachable-code
       -Xclang
-      -fno-pch-timestamp)
+      -fno-pch-timestamp
+      -pthread)
   if(BUILD_DESKTOP)
     if(NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL arm64) # Option does not work on Apple M1, but "The Internet" says it also causes trouble on multiple other arm platforms.
       add_compile_options(-march=native)
@@ -230,9 +231,15 @@ elseif(${PLATFORM} STREQUAL "Linux")
 endif()
 
 if(BUILD_NAO)
-  add_library(Nao::PORTAUDIO::PORTAUDIO SHARED IMPORTED)
-  set_target_properties(Nao::PORTAUDIO::PORTAUDIO PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/portaudio/lib/.libs/libportaudio.so")
+  # Define the imported static library target
+  add_library(Nao::PORTAUDIO::PORTAUDIO STATIC IMPORTED)
+  
+  # Set the location of the static library
+  set_target_properties(Nao::PORTAUDIO::PORTAUDIO PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/portaudio/lib/.libs/libportaudio.a")
+  
+  # Add the necessary include directories for the library
   target_include_directories(Nao::PORTAUDIO::PORTAUDIO INTERFACE "${BHUMAN_PREFIX}/Util/portaudio/include")
+  
 elseif(${PLATFORM} STREQUAL "Linux")
   include_directories("${BHUMAN_PREFIX}/Util/portaudio/include")
   link_directories("${BHUMAN_PREFIX}/Util/portaudio/lib")
