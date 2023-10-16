@@ -12,11 +12,7 @@
 
 #include "Tools/Streams/AutoStreamable.h"
 
-STREAMABLE(AudioData,
-{
-  using Sample = float,
-
-  (unsigned)(2) channels,
-  (unsigned)(48000) sampleRate,
-  (std::vector<Sample>) samples, /**< Samples are interleaved. */
+STREAMABLE(R2KAudioData,
+{,
+    (int) dummyData,
 });
