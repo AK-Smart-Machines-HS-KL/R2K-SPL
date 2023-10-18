@@ -121,10 +121,7 @@ class ChaseBallCard : public ChaseBallCardBase
 
         action
       {
-        // theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::walkForwardsLeft);
-        // SKILL_INTERFACE(GoToBallAndDribble, (Angle) targetDirection, (bool)(false) alignPrecisely, (float)(1.f) kickPower, (bool)(true) preStepAllowed, (bool)(true) turnKickAllowed, (const Rangea&)(Rangea(0_deg, 0_deg)) directionPrecision);
-
-        theGoToBallAndDribbleSkill(calcAngleToGoal(),true);
+        // insert action here
       }
     }
 

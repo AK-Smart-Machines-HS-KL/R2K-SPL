@@ -120,8 +120,7 @@ class GoalShotCard : public GoalShotCardBase
 
       action
       {
-        theLookActiveSkill();
-        theStandSkill();
+        // insert action here
       }
     }
 
@@ -136,7 +135,7 @@ class GoalShotCard : public GoalShotCardBase
 
       action
       {
-        theGoToBallAndKickSkill(theRobotPose.toRelative(currentShot.target).angle(), currentShot.kickType.name);
+        // insert action here
       }
     }
 
@@ -144,10 +143,7 @@ class GoalShotCard : public GoalShotCardBase
     {
       action
       {
-        reset();
-        theLookActiveSkill();
-        theStandSkill();
-        done = true;
+        // insert action here
       }
     }
   }

@@ -119,8 +119,7 @@ class SearchForBallCard : public SearchForBallCardBase
 
       action
       {
-      theLookActiveSkill(true,true, false,false); // Head Motion Request
-      theStandSkill();
+        // insert action here
       }
     }
 
@@ -135,8 +134,7 @@ class SearchForBallCard : public SearchForBallCardBase
 
       action
       {
-         theLookForwardSkill();
-         theWalkAtRelativeSpeedSkill(Pose2f(0.8f, 0.f, 0.f));
+         // insert action here
       }
     }
   }
