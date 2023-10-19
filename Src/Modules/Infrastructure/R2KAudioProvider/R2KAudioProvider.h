@@ -10,7 +10,6 @@
 //#ifdef TARGET_ROBOT
 //#include <portaudio.h>
 //endif
-#include <portaudio.h>
 #include "Tools/Module/Module.h"
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Representations/Configuration/DamageConfiguration.h"
@@ -35,11 +34,12 @@ class R2KAudioProvider : public R2KAudioProviderBase
 {
 private:
   void update(R2KAudioData& r2kAudioData);
-
+  /*
   PaStream* stream = nullptr;
   PaStreamParameters inputParameters;
   unsigned noDataCount = 0;
   static std::mutex mutex;
+  */
 
 public:
   R2KAudioProvider();

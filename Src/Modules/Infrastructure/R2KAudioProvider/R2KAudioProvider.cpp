@@ -14,11 +14,12 @@ MAKE_MODULE(R2KAudioProvider, infrastructure);
 
 //#ifdef TARGET_ROBOT
 
-std::mutex R2KAudioProvider::mutex;
+//std::mutex R2KAudioProvider::mutex;
 
 
 R2KAudioProvider::R2KAudioProvider()
 {
+  /*
   // PortAudio API is not thread-safe.
   std::lock_guard<std::mutex> l(mutex);
 
@@ -28,6 +29,7 @@ R2KAudioProvider::R2KAudioProvider()
     OUTPUT_ERROR("PortAudioRecorder: Failed to initialize: " << Pa_GetErrorText(paerr) << "(" << paerr << ")");
     return;
   }
+  */
 }
 
 R2KAudioProvider::~R2KAudioProvider()
@@ -37,7 +39,7 @@ R2KAudioProvider::~R2KAudioProvider()
 
 void R2KAudioProvider::update(R2KAudioData& r2kAudioData)
 {
-  
+  /*
   DEBUG_RESPONSE_ONCE("module:R2KAudioProvider:leggo")
   {
   int numDevices = Pa_GetDeviceCount();
@@ -59,8 +61,9 @@ void R2KAudioProvider::update(R2KAudioData& r2kAudioData)
 
 
   //Pa_Terminate();
-  } // DR
   
+  } // DR
+  */
   
   r2kAudioData.dummyData = 1;
 }
