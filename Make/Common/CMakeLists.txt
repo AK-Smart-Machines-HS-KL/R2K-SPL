@@ -311,6 +311,17 @@ if(BUILD_NAO)
   set_target_properties(Nao::HDF5::HDF5 PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/hdf5/lib/V6/libhdf5.a")
 endif()
 
+if(BUILD_NAO)
+  add_library(Nao::TFLite::TFLite STATIC IMPORTED)
+  set_target_properties(Nao::TFLite::TFLite PROPERTIES 
+    INTERFACE_INCLUDE_DIRECTORIES 
+      "${BHUMAN_PREFIX}/Util/tflite-dist/include"
+  )
+  set_target_properties(Nao::TFLite::TFLite PROPERTIES 
+    IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/tflite-dist/lib/libtensorflow-lite.a"
+  )
+endif()
+
 if(BUILD_DESKTOP)
   add_library(HDF5::HDF5 STATIC IMPORTED)
   set_target_properties(HDF5::HDF5 PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${BHUMAN_PREFIX}/Util/hdf5/include")
