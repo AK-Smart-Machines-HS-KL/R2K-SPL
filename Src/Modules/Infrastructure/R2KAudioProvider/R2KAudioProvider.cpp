@@ -52,11 +52,41 @@ void R2KAudioProvider::update(R2KAudioData &r2kAudioData)
 
   // Allocate tensor buffers.
   TFLITE_MINIMAL_CHECK(interpreter->AllocateTensors() == kTfLiteOk);
+  printf("=== Pre-invoke Interpreter State ===\n");
   tflite::PrintInterpreterState(interpreter.get());
+
+  // Fill input buffers
+  int input_tensor_index = 0; // Assuming the first tensor is the input
+  TfLiteTensor* input_tensor = interpreter->tensor(interpreter->inputs()[input_tensor_index]);
+  int total_input_elements = 1;
+  for (int i = 0; i < input_tensor->dims->size; i++) {
+      total_input_elements *= input_tensor->dims->data[i];
+  }
+
+  float* input_data_ptr = interpreter->typed_input_tensor<float>(input_tensor_index);
+  for (int i = 0; i < total_input_elements; i++) {
+      input_data_ptr[i] = 1.0f; // Fill with dummy values
+  }
 
   // Run inference
   TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
+  printf("\n\n=== Post-invoke Interpreter State ===\n");
   tflite::PrintInterpreterState(interpreter.get());
+
+  // Read output buffers
+  int output_tensor_index = 0; // Assuming the first tensor is the output
+  TfLiteTensor* output_tensor = interpreter->tensor(interpreter->outputs()[output_tensor_index]);
+  int total_output_elements = 1;
+  for (int i = 0; i < output_tensor->dims->size; i++) {
+      total_output_elements *= output_tensor->dims->data[i];
+  }
+
+  float* output_data_ptr = interpreter->typed_output_tensor<float>(output_tensor_index);
+  printf("\nOutput tensor values:\n");
+  for (int i = 0; i < total_output_elements; i++) {
+      printf("%f ", output_data_ptr[i]);
+  }
+  printf("\n");
 
   r2kAudioData.dummyData = 1;
 }
