@@ -42,7 +42,7 @@ CARD(OppPushingFreeKickCard,
   CALLS(Activity),
   CALLS(LookForward),
   CALLS(GoToBallAndDribble),
-  CALLS(WalkToPose),
+  CALLS(WalkToPoint),
 
   REQUIRES(DefaultPose),
   REQUIRES(FieldBall),
@@ -92,10 +92,10 @@ class OppPushingFreeKickCard : public OppPushingFreeKickCardBase
       {
         theLookForwardSkill();
 
-        Pose2f speed = Pose2f(theGlobalOptions.walkSpeed, theGlobalOptions.walkSpeed, theGlobalOptions.walkSpeed);
-        Pose2f blockingPos = Pose2f(theFieldBall.positionRelative.angle(), theDefaultPose.ownDefaultPose.translation);
-        auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(blockingPos, true, false);
-        theWalkToPoseSkill(blockingPos, speed, obstacleAvoidance, true);
+        //Translation for walk
+        Vector2f blockingPos = theRobotPose.toRelative(theDefaultPose.ownDefaultPose.translation);
+        //Walk closer to blockingPos and face ball
+        theWalkToPointSkill(Pose2f(theFieldBall.positionRelative.angle(), blockingPos));
       }
     }
 

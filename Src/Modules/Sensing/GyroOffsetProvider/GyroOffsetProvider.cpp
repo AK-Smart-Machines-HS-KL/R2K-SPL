@@ -109,7 +109,7 @@ void GyroOffsetProvider::update(GyroOffset& gyroOffset)
         {
           float maxOffset = std::max(std::max(std::abs(gyroOffset.offset.x().toDegrees()), std::abs(gyroOffset.offset.y().toDegrees())), std::abs(gyroOffset.offset.z().toDegrees()));
           SystemCall::playSound("sirene.wav");
-          SystemCall::say((std::string("Gyro has Offset ") + TypeRegistry::getEnumName(Global::getSettings().teamColor) + " " + std::to_string(theRobotInfo.number) + " with an offset of " +  std::to_string(static_cast<int>(maxOffset)) + " degrees").c_str());
+          SystemCall::say((std::string("Gyro has Offset ") + TypeRegistry::getEnumName(Global::getSettings().fieldPlayerColour) + " " + std::to_string(theRobotInfo.number) + " with an offset of " +  std::to_string(static_cast<int>(maxOffset)) + " degrees").c_str());
           ANNOTATION("GyroOffsetProvider", "Added Offset " << gyroOffset.offset);
           OUTPUT_ERROR("GyroOffsetProvider - Added an Offset for the Gyros."); // Error, so we write it into the bhumand.log
         }
@@ -146,7 +146,7 @@ void GyroOffsetProvider::checkBodyDisconnection(GyroOffset& gyroOffset)
       gyroStuckSoundTimestamp = theFrameInfo.time;
       ANNOTATION("GyroOffsetProvider", "No body connection for " << theFrameInfo.getTimeSince(lastGyroChange) << "ms");
       SystemCall::playSound("sirene.wav");
-      SystemCall::say((std::string("Body disconnect ") + TypeRegistry::getEnumName(Global::getSettings().teamColor) + " " + std::to_string(theRobotInfo.number)).c_str());
+      SystemCall::say((std::string("Body disconnect ") + TypeRegistry::getEnumName(Global::getSettings().fieldPlayerColour) + " " + std::to_string(theRobotInfo.number)).c_str());
       OUTPUT_ERROR("Body Disconnect!");
     }
   }

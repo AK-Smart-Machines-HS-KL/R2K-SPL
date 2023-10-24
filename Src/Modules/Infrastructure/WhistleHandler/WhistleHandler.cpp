@@ -50,7 +50,7 @@ void WhistleHandler::update(GameInfo& theGameInfo)
     // before the referee finally whistles.
     kickingTeam = theBallInGoal.inOwnGoal ? theOwnTeamInfo.teamNumber : theOpponentTeamInfo.teamNumber;
     SystemCall::say((std::string("Goal for ") + TypeRegistry::getEnumName(static_cast<Settings::TeamColor>(
-      kickingTeam == theOwnTeamInfo.teamNumber ? theOpponentTeamInfo.teamColor : theOwnTeamInfo.teamColor))).c_str());
+      kickingTeam == theOwnTeamInfo.teamNumber ? theOpponentTeamInfo.fieldPlayerColour : theOwnTeamInfo.fieldPlayerColour))).c_str());
   }
 
   // Check GameController messages for wrong switch to READY. If the GameController does not
@@ -89,14 +89,6 @@ bool WhistleHandler::checkForWhistle() const
     if(theWhistle.lastTimeWhistleDetected > timeOfLastStateChange)
       data.emplace_back(&theWhistle);
   }
-
-  for(const Teammate& teammate : theTeamData.teammates)
-    if(teammate.theWhistle.channelsUsedForWhistleDetection > 0)
-    {
-      numOfChannels += teammate.theWhistle.channelsUsedForWhistleDetection;
-      if(teammate.theWhistle.lastTimeWhistleDetected > timeOfLastStateChange)
-        data.emplace_back(&teammate.theWhistle);
-    }
 
   std::sort(data.begin(), data.end(),
             [](const Whistle* w1, const Whistle* w2) -> bool

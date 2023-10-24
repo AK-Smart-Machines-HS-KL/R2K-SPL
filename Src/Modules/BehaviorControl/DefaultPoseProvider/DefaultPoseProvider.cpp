@@ -33,7 +33,7 @@ void DefaultPoseProvider::update(DefaultPose& defaultPose)
       // case TeammateRoles::OFFENSE: defaultPose.teamDefaultPoses[i] = offenseMidPose; break;
 
       case TeammateRoles::GOALKEEPER_NORMAL: defaultPose.teamDefaultPoses[i] = goaliePose; break;
-      case TeammateRoles::GOALKEEPER_ACTIVE: defaultPose.teamDefaultPoses[i] = goalieForwardPose; break;
+      case TeammateRoles::GOALKEEPER_ACTIVE: defaultPose.teamDefaultPoses[i] = goaliePose; break;
 
       case TeammateRoles::DEFENSE_LEFT: defaultPose.teamDefaultPoses[i] = defenseLeftPose; break;
       case TeammateRoles::DEFENSE_MIDDLE: defaultPose.teamDefaultPoses[i] = defenseMidPose; break;
@@ -57,10 +57,9 @@ void DefaultPoseProvider::update(DefaultPose& defaultPose)
       }
       
       defaultPose.teamDefaultPoses[i].translation.x() = defaultPose.teamDefaultPoses[i].translation.x() + offset;
-    }
-    
-    defaultPose.teamDefaultPoses[i].translation.y() = defaultPose.teamDefaultPoses[i].translation.y() + 
+      defaultPose.teamDefaultPoses[i].translation.y() = defaultPose.teamDefaultPoses[i].translation.y() + 
         (theFieldBall.endPositionOnField.y() * percentageBallAdaption);
+    }    
 
     // Scale Translation by scaleFactor
     if (autoScale)

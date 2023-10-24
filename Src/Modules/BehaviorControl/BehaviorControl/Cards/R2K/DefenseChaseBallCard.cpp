@@ -1,9 +1,9 @@
 /**
- * @file ChaseBallCard.cpp
+ * @file DefenseChaseBallCard.cpp
  * @author Niklas Schmidts, Adrian Müller   
  * @brief Allows Offenseplayer to chase the Ball and kick to goal
- * @version 1.1
- * @date 2022-09-7
+ * @version 1.2
+ * @date 2023-01-06
  * 
  * Functions, values, side effects: 
  * OffensePlayer tries to catch the ball (ie ´walks in this direction) if
@@ -17,9 +17,14 @@
  * * 
  * 
  * v1.1. avoid that our  offense bots struggle for ball. loop over buddies -> 
- *      if BehaviorStatus::chaseBallCard or clearOwnHalfCard or clearOwnHalfCardGoalie exit this card
+ *      if BehaviorStatus::DefenseChaseBallCard or clearOwnHalfCard or clearOwnHalfCardGoalie exit this card
+ * 
+ * v.1.2 card now checks wether there is an passing event active (OffenseForwardPassCard, OffenseReceivePassCard)
+ * v 1.3: (Asrar) "theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)"
+          this is for online and offline role assignment
     
- * - Check: ShootAtGoal has higher priority and takes over close to opp.goal
+ * - Check: GoalShot has higher priority and takes over close to opp.goal
+ * v 1.3 DEFENSE only x < 0 - threshold
  */
 
 // Skills - Must be included BEFORE Card Base
@@ -37,33 +42,40 @@
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/TeamData.h"
 #include "Representations/BehaviorControl/TeammateRoles.h"
+#include "Representations/Communication/GameInfo.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 
-CARD(ChaseBallCard,
+
+CARD(DefenseChaseBallCard,
      {
         ,
         CALLS(Activity),
         CALLS(LookForward),
         CALLS(GoToBallAndDribble),
         CALLS(WalkAtRelativeSpeed),
+        USES(GameInfo),
+        REQUIRES(ObstacleModel),
+        REQUIRES(TeamBehaviorStatus),
         REQUIRES(RobotPose),
         REQUIRES(RobotInfo),
         REQUIRES(FieldBall),
         REQUIRES(FieldDimensions),
         REQUIRES(TeamData),   // check behavior
         REQUIRES(TeammateRoles),
+        REQUIRES(TeamCommStatus),  // wifi on off?
 
         DEFINES_PARAMETERS(
              {,
                 //Define Params here
                 (float)(0.8f) walkSpeed,
-                (int)(7000) ballNotSeenTimeout,
+                (int)(5000) ballNotSeenTimeout,
                 (int)(1000) threshold,
              }),
 
      });
 
-class ChaseBallCard : public ChaseBallCardBase
+class DefenseChaseBallCard : public DefenseChaseBallCardBase
 {
 
   bool preconditions() const override
@@ -73,11 +85,12 @@ class ChaseBallCard : public ChaseBallCardBase
     //Vergleich ob die Spielerposition in der Opponentside liegt
     //mit einem threshold damit Stürmer noch teils ins eigene Feld darf
   
-    return 
-      !aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
-      theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
-      theRobotPose.translation.x() > (0 - threshold) &&
-      theFieldBall.positionOnField.x() >= theRobotPose.translation.x() - threshold;
+    return
+      theGameInfo.setPlay == SET_PLAY_NONE &&
+      !aBuddyIsChasingOrClearing() &&
+      theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
+      theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
+      theFieldBall.endPositionOnField.x() < -200;
   }
 
   bool postconditions() const override
@@ -87,7 +100,7 @@ class ChaseBallCard : public ChaseBallCardBase
 
   option
   {
-    theActivitySkill(BehaviorStatus::chaseBallCard);
+    theActivitySkill(BehaviorStatus::defenseChaseBallCard);
 
    initial_state(goToBallAndDribble)
     {
@@ -99,9 +112,6 @@ class ChaseBallCard : public ChaseBallCardBase
 
         action
       {
-        // theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::walkForwardsLeft);
-        // SKILL_INTERFACE(GoToBallAndDribble, (Angle) targetDirection, (bool)(false) alignPrecisely, (float)(1.f) kickPower, (bool)(true) preStepAllowed, (bool)(true) turnKickAllowed, (const Rangea&)(Rangea(0_deg, 0_deg)) directionPrecision);
-
         theGoToBallAndDribbleSkill(calcAngleToGoal(),true);
       }
     }
@@ -136,13 +146,16 @@ class ChaseBallCard : public ChaseBallCardBase
     {
       for (const auto& buddy : theTeamData.teammates) 
       {
-        if (buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
+        if (buddy.theBehaviorStatus.activity == BehaviorStatus::defenseChaseBallCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie) 
+          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard 
+          )
           return true;
       }
       return false;
     }
 };
 
-MAKE_CARD(ChaseBallCard);
+MAKE_CARD(DefenseChaseBallCard);

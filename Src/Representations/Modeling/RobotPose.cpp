@@ -76,12 +76,22 @@ void RobotPose::verify() const
 
 Vector2f RobotPose::toRelative(const Vector2f& abs) const
 {
-    return inversePose * abs;
+    return (abs - translation).rotated(-rotation);
 }
 
 Vector2f RobotPose::toAbsolute(const Vector2f& rel) const
 {
     return translation + rel.rotated(rotation);
+}
+
+Pose2f RobotPose::toRelative(const Pose2f& abs) const
+{
+    return Pose2f(abs.rotation - rotation, toRelative(abs.translation));
+}
+
+Pose2f RobotPose::toAbsolute(const Pose2f& rel) const
+{
+    return Pose2f(rel.rotation + rotation, toRelative(rel.translation));
 }
 
 void RobotPose::draw() const
@@ -104,7 +114,7 @@ void RobotPose::draw() const
     ColorRGBA::black
   };
   const ColorRGBA ownTeamColorForDrawing = colors[Blackboard::getInstance().exists("OwnTeamInfo") ?
-                                                      static_cast<const OwnTeamInfo&>(Blackboard::getInstance()["OwnTeamInfo"]).teamColor : TEAM_BLACK];
+                                                      static_cast<const OwnTeamInfo&>(Blackboard::getInstance()["OwnTeamInfo"]).fieldPlayerColour : TEAM_RED];
 
   DEBUG_DRAWING("representation:RobotPose", "drawingOnField")
   {

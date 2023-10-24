@@ -2,7 +2,8 @@ set(NAO_ROOT_DIR "${BHUMAN_PREFIX}/Src")
 set(NAO_OUTPUT_DIR "${OUTPUT_PREFIX}/Build/Linux/Nao/$<CONFIG>")
 
 file(GLOB_RECURSE NAO_SOURCES
-    "${NAO_ROOT_DIR}/Modules/*.cpp" "${NAO_ROOT_DIR}/Modules/*.h")
+    "${NAO_ROOT_DIR}/Modules/*.cpp" "${NAO_ROOT_DIR}/Modules/*.h"
+    "${NAO_ROOT_DIR}/Tools/Communication/MessageComponents/Proto/*.c") # Message Components
 file(GLOB NAO_SOURCES_ADDITIONAL
     "${NAO_ROOT_DIR}/Platform/*.cpp" "${NAO_ROOT_DIR}/Platform/*.h")
 list(APPEND NAO_SOURCES ${NAO_SOURCES_ADDITIONAL})

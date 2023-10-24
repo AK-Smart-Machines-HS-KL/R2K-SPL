@@ -32,6 +32,9 @@
  * - However, if the ball is stuck, the flag may still be set, and the player will follow the ball
  * - This behavior is ok in OFFENSIVE and SPARSE mode
  * 
+ *  v.1.3 precond: x < 0 - threshold. 
+ *      Activated !aBuddyIsClearingOwnHalf
+ *  v.1.4 Added the online & offline role assignment(Asrar)
  * ToDo: 
  * check for free shoot vector and opt. change y-coordinate
  * check whether isDone () works correctly 
@@ -45,6 +48,7 @@
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Modeling/ObstacleModel.h"
+#include "Representations/Communication/TeamData.h"
 
 #include "Representations/Modeling/RobotPose.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
@@ -56,6 +60,7 @@
 #include "Representations/BehaviorControl/TeammateRoles.h"
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 CARD(DefenseLongShotCard,
   { ,
@@ -68,12 +73,15 @@ CARD(DefenseLongShotCard,
     REQUIRES(RobotInfo),
     REQUIRES(RobotPose),
     REQUIRES(TeamBehaviorStatus),
+    REQUIRES(TeamData),
     REQUIRES(TeammateRoles),  // R2K
+    REQUIRES(TeamCommStatus),  // wifi on off?
 
     DEFINES_PARAMETERS(
     {,
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
+      (int)(-1000) offsetX,
     }),
   });
 
@@ -81,9 +89,11 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
 {
   bool preconditions() const override
   {
+    
     return
-      theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
-      theObstacleModel.opponentIsTooClose(theFieldBall.positionRelative) != KickInfo::LongShotType::noKick &&  // see below: min distance is minOppDistance
+      theTeammateRoles.playsTheBall(&theRobotInfo , theTeamCommStatus.isWifiCommActive) &&  // I am the striker
+      !theObstacleModel.opponentIsClose(1200) && // see below: min distance is minOppDistance
+      //!aBuddyIsClearingOwnHalf() &&
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
 
       //don't leave own half, unless we are in OFFENSIVE or SPARSE Mode)
@@ -96,7 +106,10 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
 
   bool postconditions() const override
   {
-    return !preconditions();
+    return 
+    theObstacleModel.opponentIsClose(500) ||
+    !theTeammateRoles.isTacticalDefense(theRobotInfo.number) ||
+    !(theFieldBall.endPositionOnField.x() < 200);
   }
 
  
@@ -123,6 +136,20 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
   {
     return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
   }
+
+  bool aBuddyIsClearingOwnHalf() const
+  {
+    for (const auto& buddy : theTeamData.teammates)
+    {
+      if (buddy.theBehaviorStatus.activity == BehaviorStatus::defenseChaseBallCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard)
+        return true;
+    }
+    return false;
+  }
+
 };
 
 MAKE_CARD(DefenseLongShotCard);

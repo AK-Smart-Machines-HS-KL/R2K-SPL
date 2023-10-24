@@ -24,6 +24,8 @@
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 
+#include "Representations/Modeling/RobotPose.h"
+
 // default actions for GORE2022
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/BehaviorControl/DefaultPose.h"
@@ -35,7 +37,7 @@ CARD(OppCornerKickCard,
   CALLS(Stand),
   CALLS(Activity),
   CALLS(LookForward),
-  CALLS(WalkToPose),
+  CALLS(WalkToPoint),
 
   REQUIRES(DefaultPose),
 	REQUIRES(FieldBall),
@@ -43,6 +45,7 @@ CARD(OppCornerKickCard,
 	REQUIRES(GlobalOptions),
   REQUIRES(LibWalk),
   REQUIRES(OwnTeamInfo),
+  REQUIRES(RobotPose),
 });
 
 class OppCornerKickCard : public OppCornerKickCardBase
@@ -80,11 +83,11 @@ class OppCornerKickCard : public OppCornerKickCardBase
       action
       {
         theLookForwardSkill();
-				
-        Pose2f speed = Pose2f(theGlobalOptions.walkSpeed, theGlobalOptions.walkSpeed, theGlobalOptions.walkSpeed);
-        Pose2f blockingPos = Pose2f(theFieldBall.positionRelative.angle(), theDefaultPose.ownDefaultPose.translation);
-        auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(blockingPos, true, false);
-        theWalkToPoseSkill(blockingPos, speed, obstacleAvoidance, true);
+
+        //Translation for walk
+        Vector2f blockingPos = theRobotPose.toRelative(theDefaultPose.ownDefaultPose.translation);
+        //Walk closer to blockingPos and face ball
+        theWalkToPointSkill(Pose2f(theFieldBall.positionRelative.angle(), blockingPos));
       }
     }
 

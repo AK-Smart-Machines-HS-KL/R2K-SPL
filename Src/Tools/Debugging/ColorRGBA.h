@@ -29,7 +29,7 @@ public:
     r(r), g(g), b(b), a(a)
   {}
 
-  static ColorRGBA fromTeamColor(int teamColor);
+  static ColorRGBA fromTeamColor(int fieldPlayerColour);
 
   ColorRGBA operator*(float scale) const;
   ColorRGBA blend(const ColorRGBA& other) const;

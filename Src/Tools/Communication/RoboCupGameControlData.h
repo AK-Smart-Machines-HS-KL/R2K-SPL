@@ -12,8 +12,6 @@
 
 namespace RoboCup
 {
-#define teamColour teamColor
 #include <RoboCupGameControlData.h>
 #include <SPLStandardMessage.h>
-#undef teamColour
 }
