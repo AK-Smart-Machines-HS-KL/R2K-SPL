@@ -45,6 +45,7 @@ target_link_libraries(SimulatedNao PRIVATE $<$<PLATFORM_ID:Linux>:flite::flite_c
     $<$<PLATFORM_ID:Linux>:flite::flite_cmulex> $<$<PLATFORM_ID:Linux>:flite::flite>)
 target_link_libraries(SimulatedNao PRIVATE $<$<PLATFORM_ID:Linux>:ALSA::ALSA>)
 target_link_libraries(SimulatedNao PRIVATE GameController::GameController)
+#target_link_libraries(SimulatedNao PRIVATE TFLite::TFLite)
 target_link_libraries(SimulatedNao PRIVATE Controller)
 if(${PLATFORM} STREQUAL macOSarm64)
   target_link_libraries(SimulatedNao PRIVATE ONNXRuntime::ONNXRuntime)

@@ -7,9 +7,13 @@
 
 #pragma once
 
-//#ifdef TARGET_ROBOT
 //#include <portaudio.h>
-//endif
+#include <tensorflow/lite/model.h>
+#include <tensorflow/lite/interpreter.h>
+#include <tensorflow/lite/kernels/register.h>
+#include <tensorflow/lite/optional_debug_tools.h>
+#include "Representations/Infrastructure/R2KAudioData.h"
+
 #include "Tools/Module/Module.h"
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Representations/Configuration/DamageConfiguration.h"
@@ -17,31 +21,25 @@
 #include <string>
 #include <mutex>
 
+
 MODULE(R2KAudioProvider,
 {,  
   REQUIRES(FrameInfo),
   PROVIDES_WITHOUT_MODIFY(R2KAudioData),
   LOADS_PARAMETERS(
   {,  
-    (std::string) deviceName, /**< Name of audio device. */
-    (unsigned) channels, /**< Number of channels to capture. */
-    (unsigned) sampleRate, /**< Sample rate to capture. */
-    (float) latency, 
+    (std::string) filename,
    }),
 });
 
 class R2KAudioProvider : public R2KAudioProviderBase
 {
-private:
-  void update(R2KAudioData& r2kAudioData);
-  /*
-  PaStream* stream = nullptr;
-  PaStreamParameters inputParameters;
-  unsigned noDataCount = 0;
-  static std::mutex mutex;
-  */
-
 public:
   R2KAudioProvider();
-  ~R2KAudioProvider();
+private:
+
+  //std::unique_ptr<tflite::FlatBufferModel> model;
+
+  void update(R2KAudioData& r2kAudioData);
 };
+

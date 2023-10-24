@@ -17,7 +17,7 @@ MAKE_MODULE(AudioProvider, infrastructure);
 
 AudioProvider::AudioProvider()
 {
-  allChannels ? channels = 4 : channels = 4;
+  allChannels ? channels = 4 : channels = 2;
   int brokenFirst = (theDamageConfigurationHead.audioChannelsDefect[0] ? 1 : 0) + (theDamageConfigurationHead.audioChannelsDefect[1] ? 1 : 0);
   int brokenSecond = (theDamageConfigurationHead.audioChannelsDefect[2] ? 1 : 0) + (theDamageConfigurationHead.audioChannelsDefect[3] ? 1 : 0);
   unsigned i;
@@ -25,7 +25,7 @@ AudioProvider::AudioProvider()
   {
     if(brokenFirst > brokenSecond)
       FAIL("Cannot handle broken microphones");
-    if(snd_pcm_open(&handle, allChannels ? "PCM_Input" : "multi", SND_PCM_STREAM_CAPTURE, 0) >= 0)
+    if(snd_pcm_open(&handle, allChannels ? "PCM_Input" : "default", SND_PCM_STREAM_CAPTURE, 0) >= 0)
       break;
     Thread::sleep(retryDelay);
   }

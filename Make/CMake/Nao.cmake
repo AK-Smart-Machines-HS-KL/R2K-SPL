@@ -23,6 +23,7 @@ if(BUILD_NAO)
   set_property(TARGET Nao PROPERTY RUNTIME_OUTPUT_NAME bhuman)
   set_property(TARGET Nao PROPERTY XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
   target_include_directories(Nao PRIVATE "${NAO_ROOT_DIR}")
+  target_link_libraries(Nao PRIVATE TFLite::TFLite)
   target_link_libraries(Nao PRIVATE -lrt-2.31)
   target_link_libraries(Nao PRIVATE -lpthread-2.31)
   target_link_libraries(Nao PRIVATE Eigen::Eigen)
@@ -30,7 +31,52 @@ if(BUILD_NAO)
   target_link_libraries(Nao PRIVATE Nao::libjpeg::libjpeg)
   target_link_libraries(Nao PRIVATE Nao::flite::flite_cmu_us_slt Nao::flite::flite_usenglish Nao::flite::flite_cmulex Nao::flite::flite)
   target_link_libraries(Nao PRIVATE Nao::ALSA::ALSA)
-  target_link_libraries(Nao PRIVATE Nao::TFLite::TFLite)
+  target_link_libraries(Nao PRIVATE FARMHASH::FARMHASH)
+  target_link_libraries(Nao PRIVATE CPUINFO::CPUINFO)
+  target_link_libraries(Nao PRIVATE XNNPACK::XNNPACK)
+  target_link_libraries(Nao PRIVATE PTHREADPOOL::PTHREADPOOL)
+  
+  target_link_libraries(Nao PRIVATE FLATBUFFERS::FLATBUFFERS)
+
+  target_link_libraries(Nao PRIVATE
+    FFT2D::libfft2d_alloc.a
+    FFT2D::libfft2d_fft4f2d.a
+    FFT2D::libfft2d_fftsg.a
+    FFT2D::libfft2d_fftsg2d.a
+    FFT2D::libfft2d_fftsg3d.a
+    FFT2D::libfft2d_shrtdct.a
+)
+  target_link_libraries(Nao PRIVATE
+    RUY::libruy_allocator.a 
+    RUY::libruy_apply_multiplier.a 
+    RUY::libruy_block_map.a 
+    RUY::libruy_blocking_counter.a 
+    RUY::libruy_context_get_ctx.a 
+    RUY::libruy_context.a 
+    RUY::libruy_cpuinfo.a 
+    RUY::libruy_ctx.a 
+    RUY::libruy_denormal.a 
+    RUY::libruy_frontend.a 
+    RUY::libruy_have_built_path_for_avx.a 
+    RUY::libruy_have_built_path_for_avx2_fma.a 
+    RUY::libruy_have_built_path_for_avx512.a 
+    RUY::libruy_kernel_arm.a 
+    RUY::libruy_kernel_avx.a 
+    RUY::libruy_kernel_avx2_fma.a 
+    RUY::libruy_kernel_avx512.a 
+    RUY::libruy_pack_arm.a 
+    RUY::libruy_pack_avx.a 
+    RUY::libruy_pack_avx2_fma.a 
+    RUY::libruy_pack_avx512.a 
+    RUY::libruy_prepacked_cache.a 
+    RUY::libruy_prepare_packed_matrices.a 
+    RUY::libruy_system_aligned_alloc.a 
+    RUY::libruy_thread_pool.a 
+    RUY::libruy_trmul.a 
+    RUY::libruy_tune.a 
+    RUY::libruy_wait.a
+  )
+ 
   target_link_libraries(Nao PRIVATE GameController::GameController)
   if(APPLE)
     target_link_libraries(Nao PRIVATE asmjitNao)

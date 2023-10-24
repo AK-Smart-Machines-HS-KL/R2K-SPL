@@ -9,7 +9,6 @@
 
 #ifdef TARGET_ROBOT
 #include <alsa/asoundlib.h>
-#include <model.h>
 #endif
 #include "Tools/Module/Module.h"
 #include "Representations/Communication/GameInfo.h"

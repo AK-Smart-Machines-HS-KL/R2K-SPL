@@ -1,79 +1,62 @@
 /**
  * @file R2KAudioProvider.cpp
- * This file implements a module that provides audio samples using PortAudio. Code from NaoDevils.
- * @author Aaron Larisch, Thomas Jäger
+ * This file implements a module that uses tflite.
+ * @author Thomas Jäger
  */
 
 #include "R2KAudioProvider.h"
-#include "Tools/Settings.h"
-#include "Platform/SystemCall.h"
-#include "Platform/Thread.h"
-#include <type_traits>
+#include "Platform/File.h"
 
 MAKE_MODULE(R2KAudioProvider, infrastructure);
 
-//#ifdef TARGET_ROBOT
+// std::mutex R2KAudioProvider::mutex;
 
-//std::mutex R2KAudioProvider::mutex;
-
+#define TFLITE_MINIMAL_CHECK(x)                              \
+  if (!(x))                                                  \
+  {                                                          \
+    fprintf(stderr, "Error at %s:%d\n", __FILE__, __LINE__); \
+    exit(1);                                                 \
+  }
 
 R2KAudioProvider::R2KAudioProvider()
 {
-  /*
-  // PortAudio API is not thread-safe.
-  std::lock_guard<std::mutex> l(mutex);
-
-  PaError paerr = Pa_Initialize();
-  if (paerr != paNoError)
-  {
-    OUTPUT_ERROR("PortAudioRecorder: Failed to initialize: " << Pa_GetErrorText(paerr) << "(" << paerr << ")");
-    return;
-  }
-  */
+  // Load model
+  //std::string filepath = std::string(File::getBHDir()) + "/Config/NeuralNets/mobilenet_v1_1.0_224_quant.tflite";
+  //std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile(filepath.c_str());
+  //TFLITE_MINIMAL_CHECK(model != nullptr);
+  //printf("tflite model path %s.\n", filepath.headName.c_str());
+  // Build the interpreter with the InterpreterBuilder.
+  // Note: all Interpreters should be built with the InterpreterBuilder,
+  // which allocates memory for the Interpreter and does various set up
+  // tasks so that the Interpreter can read the provided model.
+  //tflite::ops::builtin::BuiltinOpResolver resolver;
 }
 
-R2KAudioProvider::~R2KAudioProvider()
+void R2KAudioProvider::update(R2KAudioData &r2kAudioData)
 {
- 
-}
+  // Load model
+  std::string filepath = std::string(File::getBHDir()) + "/Config/NeuralNets/mobilenet_v1_1.0_224_quant.tflite";
+  std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile(filepath.c_str());
+  TFLITE_MINIMAL_CHECK(model != nullptr);
 
-void R2KAudioProvider::update(R2KAudioData& r2kAudioData)
-{
-  /*
-  DEBUG_RESPONSE_ONCE("module:R2KAudioProvider:leggo")
-  {
-  int numDevices = Pa_GetDeviceCount();
-  if(numDevices < 0) {
-        OUTPUT_TEXT("Failed to retrieve device count: " << Pa_GetErrorText(numDevices));
-        Pa_Terminate();
-    }
-  OUTPUT_TEXT("Number of devices:" << numDevices);
+  // Build the interpreter with the InterpreterBuilder.
+  // Note: all Interpreters should be built with the InterpreterBuilder,
+  // which allocates memory for the Interpreter and does various set up
+  // tasks so that the Interpreter can read the provided model.
   
-  for(int i = 0; i < numDevices; i++) {
+  tflite::ops::builtin::BuiltinOpResolver resolver;
+  tflite::InterpreterBuilder builder(*model, resolver);
+  std::unique_ptr<tflite::Interpreter> interpreter;
+  builder(&interpreter);
+  TFLITE_MINIMAL_CHECK(interpreter != nullptr);
 
-      const PaDeviceInfo* deviceInfo = Pa_GetDeviceInfo(i);
+  // Allocate tensor buffers.
+  TFLITE_MINIMAL_CHECK(interpreter->AllocateTensors() == kTfLiteOk);
+  tflite::PrintInterpreterState(interpreter.get());
 
-      printf("Device #%d:\n", i);
-      printf("Name: %s\n", deviceInfo->name);
-      printf("Max Input Channels: %d\n", deviceInfo->maxInputChannels);
-      printf("Max Output Channels: %d\n", deviceInfo->maxOutputChannels);
-      } 
+  // Run inference
+  TFLITE_MINIMAL_CHECK(interpreter->Invoke() == kTfLiteOk);
+  tflite::PrintInterpreterState(interpreter.get());
 
-
-  //Pa_Terminate();
-  
-  } // DR
-  */
-  
   r2kAudioData.dummyData = 1;
 }
-
-/*
-#else // !defined TARGET_ROBOT
-
-R2KAudioProvider::R2KAudioProvider() {}
-R2KAudioProvider::~R2KAudioProvider() {}
-void R2KAudioProvider::update(R2KAudioData&) {}
-
-#endif
-*/

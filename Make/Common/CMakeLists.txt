@@ -230,21 +230,6 @@ elseif(${PLATFORM} STREQUAL "Linux")
   find_package(ALSA REQUIRED)
 endif()
 
-if(BUILD_NAO)
-  # Define the imported static library target
-  add_library(Nao::PORTAUDIO::PORTAUDIO STATIC IMPORTED)
-  
-  # Set the location of the static library
-  set_target_properties(Nao::PORTAUDIO::PORTAUDIO PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/portaudio/lib/.libs/libportaudio.a")
-  
-  # Add the necessary include directories for the library
-  target_include_directories(Nao::PORTAUDIO::PORTAUDIO INTERFACE "${BHUMAN_PREFIX}/Util/portaudio/include")
-  
-elseif(${PLATFORM} STREQUAL "Linux")
-  include_directories("${BHUMAN_PREFIX}/Util/portaudio/include")
-  link_directories("${BHUMAN_PREFIX}/Util/portaudio/lib")
-endif()
-
 if(BUILD_DESKTOP)
   add_library(snappy::snappy STATIC IMPORTED)
   set_target_properties(snappy::snappy PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${BHUMAN_PREFIX}/Util/snappy/include")
@@ -275,12 +260,134 @@ if(BUILD_DESKTOP)
 endif()
 
 if(BUILD_NAO)
+  add_library(Nao::HDF5::HDF5 STATIC IMPORTED)
+  set_target_properties(Nao::HDF5::HDF5 PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${BHUMAN_PREFIX}/Util/hdf5/include")
+  set_target_properties(Nao::HDF5::HDF5 PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/hdf5/lib/V6/libhdf5.a")
+endif()
+
+# Add tflite and all deps
+if(BUILD_NAO)
+    set(FFT2D_LIBS 
+        libfft2d_alloc.a
+        libfft2d_fft4f2d.a
+        libfft2d_fftsg.a
+        libfft2d_fftsg2d.a
+        libfft2d_fftsg3d.a
+        libfft2d_shrtdct.a
+    )
+
+    foreach(LIB ${FFT2D_LIBS})
+        add_library("FFT2D::${LIB}" STATIC IMPORTED)
+        set_target_properties("FFT2D::${LIB}" PROPERTIES
+            IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/fft2d/lib/${LIB}"
+            INTERFACE_INCLUDE_DIRECTORIES "${BHUMAN_PREFIX}/Util/fft2d/include"
+        )
+    endforeach()
+endif()
+
+if(BUILD_NAO)
+add_library(PTHREADPOOL::PTHREADPOOL STATIC IMPORTED)
+set_target_properties(PTHREADPOOL::PTHREADPOOL PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${BHUMAN_PREFIX}/Util/pthreadpool/include")
+set_target_properties(PTHREADPOOL::PTHREADPOOL PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/pthreadpool/lib/libpthreadpool.a")
+endif()
+
+if(BUILD_NAO)
+add_library(XNNPACK::XNNPACK STATIC IMPORTED)
+set_target_properties(XNNPACK::XNNPACK PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${BHUMAN_PREFIX}/Util/xnnpack/include")
+set_target_properties(XNNPACK::XNNPACK PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/xnnpack/lib/libXNNPACK.a")
+endif()
+
+if(BUILD_NAO)
+add_library(FLATBUFFERS::FLATBUFFERS STATIC IMPORTED)
+set_target_properties(FLATBUFFERS::FLATBUFFERS PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${BHUMAN_PREFIX}/Util/tflite-dist/include/flatbuffers")
+set_target_properties(FLATBUFFERS::FLATBUFFERS PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/tflite-dist/include/flatbuffers/libflatbuffers.a")
+endif()
+
+if(BUILD_NAO)
+set(RUY_LIBS 
+    libruy_allocator.a 
+    libruy_apply_multiplier.a 
+    libruy_block_map.a 
+    libruy_blocking_counter.a 
+    libruy_context_get_ctx.a 
+    libruy_context.a 
+    libruy_cpuinfo.a 
+    libruy_ctx.a 
+    libruy_denormal.a 
+    libruy_frontend.a 
+    libruy_have_built_path_for_avx.a 
+    libruy_have_built_path_for_avx2_fma.a 
+    libruy_have_built_path_for_avx512.a 
+    libruy_kernel_arm.a 
+    libruy_kernel_avx.a 
+    libruy_kernel_avx2_fma.a 
+    libruy_kernel_avx512.a 
+    libruy_pack_arm.a 
+    libruy_pack_avx.a 
+    libruy_pack_avx2_fma.a 
+    libruy_pack_avx512.a 
+    libruy_prepacked_cache.a 
+    libruy_prepare_packed_matrices.a 
+    libruy_system_aligned_alloc.a 
+    libruy_thread_pool.a 
+    libruy_trmul.a 
+    libruy_tune.a 
+    libruy_wait.a
+)
+foreach(LIB ${RUY_LIBS})
+    add_library("RUY::${LIB}" STATIC IMPORTED)
+    set_target_properties("RUY::${LIB}" PROPERTIES
+        IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/tflite-dist/include/ruy/lib/${LIB}"
+        INTERFACE_INCLUDE_DIRECTORIES "${BHUMAN_PREFIX}/Util/tflite-dist/include/ruy/include"
+    )
+endforeach()
+endif()
+
+if(BUILD_NAO)
+add_library(CPUINFO::CPUINFO STATIC IMPORTED)
+set_target_properties(CPUINFO::CPUINFO PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${BHUMAN_PREFIX}/Util/cpuinfo/include")
+set_target_properties(CPUINFO::CPUINFO PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/cpuinfo/lib/libcpuinfo.a")
+endif()
+
+if(BUILD_NAO)
+add_library(FARMHASH::FARMHASH STATIC IMPORTED)
+set_target_properties(FARMHASH::FARMHASH PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${BHUMAN_PREFIX}/Util/farmhash/include")
+set_target_properties(FARMHASH::FARMHASH PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/farmhash/lib/libfarmhash.a")
+endif()
+
+if(BUILD_NAO)
+add_library(GEMMLOWP::GEMMLOWP STATIC IMPORTED)
+set_target_properties(GEMMLOWP::GEMMLOWP PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${BHUMAN_PREFIX}/Util/gemmlowp/include")
+set_target_properties(GEMMLOWP::GEMMLOWP PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/gemmlowp/lib/libeight_bit_int_gemm.a")
+endif()
+
+if(BUILD_NAO)
   add_library(Nao::FFTW::FFTW STATIC IMPORTED)
   add_library(Nao::FFTW::FFTWF STATIC IMPORTED)
   set_target_properties(Nao::FFTW::FFTW PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${BHUMAN_PREFIX}/Util/fftw-3.3")
   set_target_properties(Nao::FFTW::FFTWF PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${BHUMAN_PREFIX}/Util/fftw-3.3")
   set_target_properties(Nao::FFTW::FFTW PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/fftw-3.3/V6/libfftw3.a")
   set_target_properties(Nao::FFTW::FFTWF PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/fftw-3.3/V6/libfftw3f.a")
+endif()
+
+if(BUILD_NAO)
+add_library(TFLite::TFLite STATIC IMPORTED)
+set(TFLITE_INCLUDE_DIRS
+    "${BHUMAN_PREFIX}/Util/tflite-dist/include")
+set_target_properties(TFLite::TFLite PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${TFLITE_INCLUDE_DIRS}")
+set_target_properties(TFLite::TFLite PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/tflite-dist/lib/libtensorflow-lite.a")
+endif()
+
+# End tflite
+
+if(BUILD_DESKTOP)
+  add_library(HDF5::HDF5 STATIC IMPORTED)
+  set_target_properties(HDF5::HDF5 PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${BHUMAN_PREFIX}/Util/hdf5/include")
+  if((${PLATFORM} STREQUAL Linux) OR APPLE)
+    set_target_properties(HDF5::HDF5 PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/hdf5/lib/${PLATFORM}/libhdf5.a")
+  elseif(${PLATFORM} STREQUAL Windows)
+    set_target_properties(HDF5::HDF5 PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/hdf5/lib/${PLATFORM}/hdf5.lib")
+  endif()
 endif()
 
 if(BUILD_DESKTOP)
@@ -302,33 +409,6 @@ if(BUILD_DESKTOP)
     set_target_properties(FFTW::FFTWF PROPERTIES
         IMPORTED_IMPLIB "${BHUMAN_PREFIX}/Util/fftw-3.3/${PLATFORM}/libfftw3f-3.lib"
         IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/fftw-3.3/${PLATFORM}/libfftw3f-3.dll")
-  endif()
-endif()
-
-if(BUILD_NAO)
-  add_library(Nao::HDF5::HDF5 STATIC IMPORTED)
-  set_target_properties(Nao::HDF5::HDF5 PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${BHUMAN_PREFIX}/Util/hdf5/include")
-  set_target_properties(Nao::HDF5::HDF5 PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/hdf5/lib/V6/libhdf5.a")
-endif()
-
-if(BUILD_NAO)
-  add_library(Nao::TFLite::TFLite STATIC IMPORTED)
-  set_target_properties(Nao::TFLite::TFLite PROPERTIES 
-    INTERFACE_INCLUDE_DIRECTORIES 
-      "${BHUMAN_PREFIX}/Util/tflite-dist/include"
-  )
-  set_target_properties(Nao::TFLite::TFLite PROPERTIES 
-    IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/tflite-dist/lib/libtensorflow-lite.a"
-  )
-endif()
-
-if(BUILD_DESKTOP)
-  add_library(HDF5::HDF5 STATIC IMPORTED)
-  set_target_properties(HDF5::HDF5 PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${BHUMAN_PREFIX}/Util/hdf5/include")
-  if((${PLATFORM} STREQUAL Linux) OR APPLE)
-    set_target_properties(HDF5::HDF5 PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/hdf5/lib/${PLATFORM}/libhdf5.a")
-  elseif(${PLATFORM} STREQUAL Windows)
-    set_target_properties(HDF5::HDF5 PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/hdf5/lib/${PLATFORM}/hdf5.lib")
   endif()
 endif()
 
