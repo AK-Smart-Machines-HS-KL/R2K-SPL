@@ -14,5 +14,5 @@
 
 STREAMABLE(R2KAudioData,
 {,
-    (int) dummyData,
+    (float) dummyData,
 });

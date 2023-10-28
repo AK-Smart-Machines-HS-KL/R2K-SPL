@@ -1,13 +1,11 @@
 /**
- * @file PortAudioRecorder.h
- * This file declares a module that provides audio samples using PortAudio.
- * @author Aaron Larisch, Thomas Röfer
+ * @file R2KAudioProvider.h
+ * This file declares a module that uses tflite.
  * @author R2K Thomas
  */
 
 #pragma once
 
-//#include <portaudio.h>
 #include <tensorflow/lite/model.h>
 #include <tensorflow/lite/interpreter.h>
 #include <tensorflow/lite/kernels/register.h>
@@ -38,7 +36,8 @@ public:
   R2KAudioProvider();
 private:
 
-  //std::unique_ptr<tflite::FlatBufferModel> model;
+  std::unique_ptr<tflite::FlatBufferModel> model;
+  std::unique_ptr<tflite::Interpreter> interpreter;
 
   void update(R2KAudioData& r2kAudioData);
 };
