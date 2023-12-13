@@ -8,9 +8,9 @@
  * 
  * 
  */
-
 // Skills - Must be included BEFORE Card Base
 #include "Representations/BehaviorControl/Skills.h"
+#include "Representations/Communication/GameInfo.h"
 
 // Card Base
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
@@ -29,6 +29,8 @@ CARD(TestCard,
         CALLS(Activity),
         CALLS(LookForward),
         CALLS(Stand),
+
+        REQUIRES(GameInfo),
 
         DEFINES_PARAMETERS(
              {,
@@ -51,13 +53,17 @@ class TestCard : public TestCardBase
 
   //always active
   bool preconditions() const override
+
   {
-    return true;
+    return theGameInfo.state == STATE_PLAYING;
+    //return  theGameInfo.state == STATE_PLAYING && theGameInfo.gamePhase == ;
   }
 
   bool postconditions() const override
   {
-    return true;   // set to true, when used as default card, ie, lowest card on stack
+
+    return theGameInfo.state != STATE_PLAYING;   // set to true, when used as default card, ie, lowest card on stack
+    //return theGameInfo.state != STATE_PLAYING && theGameInfo.gamePhase != ;
   }
 
   void execute() override
@@ -65,7 +71,7 @@ class TestCard : public TestCardBase
 
     theActivitySkill(BehaviorStatus::testingBehavior);
     // std::string s = "testingBehavior";
-    // OUTPUT_TEXT(s);
+    OUTPUT_TEXT("PLAYING");
 
     // Override these skills with the skills you wish to test
     theLookForwardSkill(); // Head Motion Request
