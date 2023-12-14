@@ -1,0 +1,12 @@
+Projektbeschreibung : 18-Whistle-Detection
+-> Stage 1: Bestimmung der Entfernung
+...
+
+Name: Christoph Merkle
+
+
+Anforderungen:
+
+Ablaufplan:
+-
+-
