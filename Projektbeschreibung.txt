@@ -1,1 +1,42 @@
-projektbeschreibung
+Projektbeschreibung Armkontrolle Pointing & Gestures
+
+
+Ziel meines gewählten Projektes ist es, 
+die Roboter, die Nao´s mit ihren Armen in bestimmte Richtungen oder auf Objekte deuten zu lassen.
+Der Grund für die Implementierung dieser Funktion ist, dass das deuten auf bestimmte Objekte 
+später für In-Field Debugging genutzt werden kann.
+Ferner wäre auch denkbar diese Funktion als zusätzlichen Kommunikationskanal zwischen den Robotern zu nutzen.
+
+
+Ansätze:
+
+Vorhandene Interessante Skills:
+
+  /**
+   * ACTION SKILL
+   * This skill lets one arm point at some point.
+   * @param localPoint The point in robot-relative coordinates
+   */
+  SKILL_INTERFACE(PointAt, (const Vector3f&) localPoint);
+
+  /**
+   * ACTION SKILL
+   * This skill lets a specific arm point at some point.
+   * @param localPoint The point in robot-relative coordinates
+   * @param arm The arm that shall be used for pointing
+   */
+  SKILL_INTERFACE(PointAtWithArm, (const Vector3f&) localPoint, (Arms::Arm) arm);
+
+  /** This skill reacts to arm contact by taking the arm away. */
+  SKILL_INTERFACE(ArmContact);
+
+
+PointAt der Niedrigere Arm wird zum zeigen benutzt
+
+
+unix System time
+game time
+
+
+Klären wie die Roboter relativen Koordinaten funktionieren
+
