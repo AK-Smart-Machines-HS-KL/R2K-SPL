@@ -2,7 +2,7 @@
 *Projektbeschreibung 
 *Name: Rene Dinies
 *Datum: 18.12.2023
-*Version: 1.2
+*Version: 1.3
 *__________________________________
 
 Projekt: Spracherkennung 
@@ -11,32 +11,33 @@ Projekt: Spracherkennung
   Wir schauen uns an, wie wir Roboter mit unserer Stimme kontrollieren können. Um in das Spielgeschehen einzugereifen.
 
 - Wo wir stehen:
-  Wir prüfen gerade, wie wir Sprachmodelle wie ChatGPT nutzen können, um Roboter zu beeinflussen.
   In der Codebase gibt es keine Grundlegenden Code Stücke die man verwenden könnte.
+  Es wird eine voice recognition als open source Code benötigt.
 
 - Was wir vorhaben:
   - Technische Sachen:
-    Wir müssen die Roboter so einstellen, dass sie auf unsere Sprache hören.
-    kein großer text aufwand leichte run time 
-    nicht aufwendig nur wenig wörter erkennbar
-    signal voice filter / tiefe töne 
-    wenig abtastrate / 12 kHz / 30 fps
-    threats angeben 
+    Es wird eine leichte run time benötigt.
+    Der Roboter soll nicht viel verstehen nur Grundlegende Wörter, wie "Frohe Weihnachten".
+    Ein signal voice filter wird benötigt sodass er nicht alles wahrnimmt sondern nur die Befehle / tiefe töne 
+    Man braucht nur eine geringe abtastrate / 12 kHz / 30 fps 
+    threads angeben 
   
   - Wie wir das machen:
-    Wir schauen uns an, was wir schon an Technik und Code haben und planen, wie wir das zusammenbringen können.
+    Wir schauen uns an, was wir schon an Code haben und wo wir neuen Code herbekommen:
     In git hub/Web nach open source programmen suchen (voice recognition).
+    https://github.com/AI-TOOLKIT/VoiceBridge
+    https://fosspost.org/open-source-speech-recognition/
+    https://www.knowledgenile.com/blogs/what-are-some-of-the-best-open-source-speech-recognition-software
   	
   - Erstes Ziel:
-    Einen Roboter dazu bringen, auf einen bestimmten Befehl zu reagieren.
+    Einen Roboter dazu bringen, das er auf Frohe Weihnachten reagiert.
+    Sodass er durch 74-feature-beepcomms eine signal reaktrion ausgibt.
 
 - Was als Nächstes passiert:
-  - Ungefährer Plan:
-    Wir überlegen uns, welche Aktionen für den Roboter wichtig sind.
-  
-  - Schritte:
-    Zuerst bringen wir dem Roboter bei, auf unsere Stimme zu hören, dann fügen wir spezielle Aktionen hinzu.
-  
-  - Warum das wichtig ist:
-    So können wir erreichen, dass der Roboter auf unsere Anweisungen reagiert.
+  - Grober Plan:
+    Zusammen suchen von Code Stücken die zur voice recognition beitragen.
+    Da der Code nicht mit WSL getestet werden kann muss ein dual boot durchgeführt werden.
+    Sodass der Code auf Linux getestet werden kann.
+
+
 
