@@ -1,2 +1,40 @@
-Projektbeschreibung 
-Name: Rene Dinies
+*__________________________________
+*Projektbeschreibung 
+*Name: Rene Dinies
+*Datum: 18.12.2023
+*Version: 1.2
+*__________________________________
+
+Projekt: Spracherkennung 
+
+- Was wir machen:
+  Wir schauen uns an, wie wir Roboter mit unserer Stimme kontrollieren können.
+
+- Wo wir stehen:
+  Wir prüfen gerade, wie wir Sprachmodelle wie ChatGPT nutzen können, um Roboter zu beeinflussen.
+
+- Was wir vorhaben:
+  - Technische Sachen:
+    Wir müssen die Roboter so einstellen, dass sie auf unsere Sprache hören.
+  
+  - Wie wir das machen:
+    Wir schauen uns an, was wir schon an Technik und Code haben und planen, wie wir das zusammenbringen können.
+  	
+  - Erstes Ziel:
+    Einen Roboter dazu bringen, auf einen bestimmten Befehl zu reagieren.
+
+- Was als Nächstes passiert:
+  - Ungefährer Plan:
+    Wir überlegen uns, welche Aktionen für den Roboter wichtig sind.
+  
+  - Schritte:
+    Zuerst bringen wir dem Roboter bei, auf unsere Stimme zu hören, dann fügen wir spezielle Aktionen hinzu.
+  
+  - Warum das wichtig ist:
+    So können wir erreichen, dass der Roboter auf unsere Anweisungen reagiert.
+
+kein großer text aufwand leicht run time 
+nicht aufwendig nur wenig wörter erkennbar
+signal voice filter / tiefe töne 
+wenig abtastrate / 12 kHz / 30 fps
+threats angeben 
