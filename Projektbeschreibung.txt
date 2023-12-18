@@ -8,17 +8,24 @@
 Projekt: Spracherkennung 
 
 - Was wir machen:
-  Wir schauen uns an, wie wir Roboter mit unserer Stimme kontrollieren können.
+  Wir schauen uns an, wie wir Roboter mit unserer Stimme kontrollieren können. Um in das Spielgeschehen einzugereifen.
 
 - Wo wir stehen:
   Wir prüfen gerade, wie wir Sprachmodelle wie ChatGPT nutzen können, um Roboter zu beeinflussen.
+  In der Codebase gibt es keine Grundlegenden Code Stücke die man verwenden könnte.
 
 - Was wir vorhaben:
   - Technische Sachen:
     Wir müssen die Roboter so einstellen, dass sie auf unsere Sprache hören.
+    kein großer text aufwand leichte run time 
+    nicht aufwendig nur wenig wörter erkennbar
+    signal voice filter / tiefe töne 
+    wenig abtastrate / 12 kHz / 30 fps
+    threats angeben 
   
   - Wie wir das machen:
     Wir schauen uns an, was wir schon an Technik und Code haben und planen, wie wir das zusammenbringen können.
+    In git hub/Web nach open source programmen suchen (voice recognition).
   	
   - Erstes Ziel:
     Einen Roboter dazu bringen, auf einen bestimmten Befehl zu reagieren.
@@ -33,8 +40,3 @@ Projekt: Spracherkennung
   - Warum das wichtig ist:
     So können wir erreichen, dass der Roboter auf unsere Anweisungen reagiert.
 
-kein großer text aufwand leicht run time 
-nicht aufwendig nur wenig wörter erkennbar
-signal voice filter / tiefe töne 
-wenig abtastrate / 12 kHz / 30 fps
-threats angeben 
