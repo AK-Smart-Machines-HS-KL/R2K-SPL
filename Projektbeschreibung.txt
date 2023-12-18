@@ -1,0 +1,32 @@
+----------------------------------------------
+Projektbeschreibung 23-Audio-Kommunikation
+Datum:	18.12.2023 
+Name:	Manuel Heß
+Version: 1
+----------------------------------------------
+
+Stage 1: 23-Audio-Kommunikation
+
+- Projekt nennen:
+Die Kommunikation zwischen den Robotern zu verbessern, in dem Binäre Audio-Kommunikation eingesetzt wird,
+welche keine Bandbreite verbraucht. 
+
+- Stand der Dinge (Wo setze ich an?):
+Im Branch 74-feature-beepcomms ist bereits die funktion des Beepen hinterlegt. Ich durchsuche den Branch nach nützlichem Code
+--> Roboter können Töne abgeben, jetzt muss der Ton koordiniert werden
+
+- Ausblick auf das Projekt (Was ist zu tun?):
+  
+   - Technische Anforderungen (Was brauche ich an Technik / Algorithmik / Funktionalität?):
+	1. Roboter müssen Töne abgeben können
+	2. Roboter müssen Töne aufnehmen können
+
+   - Was muss ich technisch dafür anfassen?
+   - Was habe ich in der Codebase technisches dazu gefunden?
+   - Wie plane ich das ganze umzusetzen?
+   - Abschluss-Betonung: Was setze ich im ersten Teil des Projekts um?
+- Ablaufplan:
+   - grob
+   - Was sind meine nächsten Schritte?
+   - Was fasse ich in welcher Reihenfolge an?
+   - Welches Ziel verfolge ich dabei?
