@@ -13,8 +13,8 @@ Prof. Adrian Müller (Scientific Lead, Hybride KI), adrian.mueller@hs-kl.de
 Wilhelm Simus (Team Captain, AI, Teach-In), wisi1001@stud.hs-kl.de
 
 Studentische Projektmitglieder: 
-Emmanuel Nzeunang Nzeuwoukeng (DE3 BEng, Germersheim, *Matrikel) emnz1001@stud.hs-kl.de
-Christoph Merkle, (DE3 BEng, Germersheim, 863627), chme0010@stud.hs-kl.de
+Emmanuel Nzeunang Nzeuwoukeng (DE3 BEng, Germersheim) emnz1001@stud.hs-kl.de
+Christoph Merkle, (DE3 BEng, Germersheim), chme0010@stud.hs-kl.de
 
 Projektstart: Dezember 2023 
 Projektende: September 2024
