@@ -25,7 +25,16 @@ Im Branch 74-feature-beepcomms ist bereits die Funktion des Beepen und hinterleg
 	Ich muss Töne mit verschiedenen Frequenzen und Abspieldauer erstellen/aufnehmen
 
    - Was habe ich in der Codebase technisches dazu gefunden?
-	- In den Skill.h habe ich die Codezeile "SKILL_INTERFACE(PlaySound, (const std::string&) name);" gefunden
+	- In den Skill.h habe ich die Codezeile:
+
+   /**
+   * DEBUG SKILL
+   * This skill plays a sound file if it differs from the one that has been played in the last frame.
+   * @param name The name of the sound file
+   */
+  SKILL_INTERFACE(PlaySound, (const std::string&) name);
+	gefunden
+
 	- Der Branch 74-feature-beepcomms wird nach weiteren Funktionen durchsucht
 
    - Wie plane ich das ganze umzusetzen?
