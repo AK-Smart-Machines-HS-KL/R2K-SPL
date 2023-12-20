@@ -26,7 +26,7 @@ Im Branch 74-feature-beepcomms ist bereits die Funktion des Beepen und hinterleg
 
    - Was habe ich in der Codebase technisches dazu gefunden?
 	- In den Skill.h habe ich die Codezeile "SKILL_INTERFACE(PlaySound, (const std::string&) name);" gefunden
-	- Der Branch 74-feature.beepcomms wird nach weiteren Funktionen durchsucht
+	- Der Branch 74-feature-beepcomms wird nach weiteren Funktionen durchsucht
 
    - Wie plane ich das ganze umzusetzen?
 	Ich nehme mit meinem Handy die Töne, welche ... erzeugt wurden, auf. Die Aufgenommenen Töne spiele ich dem NAO vor
