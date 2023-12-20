@@ -2,10 +2,9 @@
  * @file projektbeschreibung Diagonalkick.txt
  * 
  * Datum: 20.12.2023
- * Version: 1.2
+ * Version: 1.3
  *
- * Diese Datei hält die Ziele und Umsetzung des Projektes Diagonalkick
- * von Felix Niehus fest.
+ * Diese Datei hält die Ziele und Umsetzung des Projektes Diagonalkick fest.
  *
  * @author Felix Niehus
  */
@@ -28,7 +27,7 @@ Beschreibung:
 
 Stand der Dinge:
    Kicks werden im Skillinterface (Skills.h) übergeben.
-   ---------- GoToBallAndKick ---------- Skill.h:370
+   -> GoToBallAndKick Skill.h:370
    * ACTION SKILL
    * This skill walks to the ball and executes a kick there.
    * Can be used to execute more Powerful or Custom Kicks
@@ -59,14 +58,16 @@ Die Umsetzung:
       - Alle Schnittstellen des Enums überprüfen.
 
    KickType Diagonalkick:
-      - Den forwardFast (KickInfo.h) aufrufen ohne den Ball auf der X-Achse zu zentrieren.
+      - Den forwardFast (KickInfo.h) aufrufen ohne den Ball auf der X-Achse zentrieren zu müssen.
+       -> LowerKamera erkennt den Ball -> Erstellt eine Boundingbox -> Diese stellt wahrscheinlich den 0 Punkt der X-Achse dar.
+       -> Der Code muss so gewandelt werden, dass er den Kick ausführt, ohne sich vorher auf die Null-Achse zu bewegen mit seinem Bein.
        -> Dadurch trifft der Roboter den Ball mit der Seite vom Fuß und schießt schräg.
 
-      - Eine Messreihe im Simulator erstellen über Variation der Fuß X-Achsen-Verschiebung von [-n, +n],
-      - um den Schusswinkel der X-Achsen-Verschiebung zuverlässig zuzuordnen.
+      - Eine Messreihe im Simulator erstellen über Variation der Fuß-X-Achsen-Verschiebung von [-n, +n],
+        um den Schusswinkel der X-Achsen-Verschiebung zuverlässig zuzuordnen.
        -> Dafür: BallPreceptFilter.h, PerceptionBall -> get parameters / set parameters.
        -> Messung der Ausführungszeit um die Dauer anzugeben.
-       -> Die Zuordnung Winkel->Verschiebung als Interpolationsfunktion der Messwerte erstellen.
+       -> Die Zuordnung Schusswinkel zu X-Achsen-Verschiebung, als Interpolationsfunktion der Messwerte erstellen.
 
       - Wiederholung als Feldtest.
        -> Dafür: LowerCameraThread.
