@@ -1,0 +1,60 @@
+(Projektbeschreibung_WhistleDetection_C-Merkle_863627_V005_20-12-2023.txt)
+
+Projektbeschreibung
+
+Roboterentwicklung und -programmierung im Hauptprojekt zur Richtungsortung im
+Teilprojekt: Whistle-Detection: Audio-Quellen Lokalisation beim NAO Roboter,
+auf Basis der RoboCup SPL (Standard Platform League) und CodeBase Release 2021.
+
+Projektträger: Arbeitskreis Smart Machines <R-ZWEI-Kickers> der Hochschule Kaiserslautern
+
+Akademische Betreuung: 
+Prof. Adrian Müller (Scientific Lead, Hybride KI), adrian.mueller@hs-kl.de
+Wilhelm Simus (Team Captain, AI, Teach-In), wisi1001@stud.hs-kl.de
+
+Studentische Projektmitglieder: 
+Emmanuel Nzeunang Nzeuwoukeng (DE3 BEng, Germersheim, *Matrikel) emnz1001@stud.hs-kl.de
+Christoph Merkle, (DE3 BEng, Germersheim), chme0010@stud.hs-kl.de
+
+Projektstart: Dezember 2023 
+Projektende: September 2024
+
+Projekt-Ziel:
+Hauptziel im Teilprojekt ist die Weiterentwicklung eines Moduls zur Lokalisation von Audioquellen, 
+welche zur Erkennung und zuverlässigen Ortung des Schiedsrichterpfiffs im eigenen Spielfeld dient. 
+Die Herausforderung liegt darin, Störungen z.B. im Fall eines Pfiffs eines der angrenzenden Spielfelder unterscheiden zu können, um kritische Spielzüge, wie z.B. eine fälschliche Unterbrechung zu minimieren, wodurch die Chance auf einen erfolgreichen Turnierverlauf steigt. 
+Das Projekt wird in mehreren Ausbaustufen (Stages) erfolgen.
+
+Stage 1 : 
+Entfernungsbestimmung durch eine Messreihe, um die Entfernung eines Audiosignals, einer Fox 40 Pfeife, basierend auf dessen Amplitude und Frequenz zu ermitteln. Lautstärke- und Frequenzunterschiede werden analysiert, um Rückschlüsse auf die Entfernung zur Audioquelle zu ziehen.
+
+Stage 2 : 
+Entwicklung eines Moduls zur Triangulation mit zwei Mikrophonen, zweier Roboter, um eine etwas genauere Aussage zur Audioquelle zu erhalten. 
+
+Stage 3 :
+Weiterentwicklung des Moduls aus Stage 2, zur Verfeinerung der Triangulation mit mehreren Mikrophonen, aus bis zu vier Nao Robotern, um die Genauigkeit der Lokalisation zu erhöhen.
+
+
+
+Grobe Konzeption/Ablauf:
+> Installation: (abgeschlossen)
+  IDE, CodeBase, Github, SSH und Funktionsumfang des Simulators antesten.
+
+> Einarbeitungsphase: (aktuell)
+  Anhand der vorliegenden Dokumentation, der CodeRelease2021.pdf, aus der R2K-Wiki, 
+  der Doku von B-Human, sowie der vorliegenden CodeBase die projektrelevanten Themen Verständnis und Übersicht erarbeiten, um auf das bereits Vorhandene aufbauen zu können. 
+
+> Nächster Schritt (aktuell):
+  Weitere Einarbeitung in CodeBase. Einstiegspunkt im STATE_SET, sowie im STATE_PLAYING in WhistleRecognizer.cpp (77ff):
+  
+  // Empty buffers when entering a state where it should be recorded.
+  const bool shouldRecord = (theGameInfo.state == STATE_SET || theGameInfo.state == STATE_PLAYING) && !soundWasPlaying;
+  
+  Trillerpfeife im STATE_SET beim Anpfiff aufzeichnen, um Referenzwerte der Amplitude/Lautstärke und Grundfrequenz mit vorhandener FFT (ggf FFT Erweiterung) auszuwerten.
+  Weitere im STATE_PLAYING auftretenden Signale/Störungen können so mit den Referenzwerten verglichen werden, um Aussagen über Lautstärke zB benachbartes Spielfeld treffen zu können.
+
+> Möglicher Ablauf:
+  -Erweiterung der vorhandenen FFT, falls nötig (Fox40 Grundfrequenz @2kHz +/- 1kHz)
+  -Verifizieren der gewonnen Erkenntnisse in der Realität mit NAO testen, ab Januar(?)2024
+ 
+
