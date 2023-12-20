@@ -1,8 +1,8 @@
 ----------------------------------------------
 Projektbeschreibung 23-Audio-Kommunikation
-Datum:	18.12.2023 
+Datum:	20.12.2023 
 Name:	Manuel Heß
-Version: 1
+Version: 1.2
 ----------------------------------------------
 
 Stage 1: 23-Audio-Kommunikation
@@ -12,7 +12,7 @@ Die Kommunikation zwischen den Robotern zu verbessern, in dem Binäre Audio-Komm
 welche keine Bandbreite verbraucht. 
 
 - Stand der Dinge (Wo setze ich an?):
-Im Branch 74-feature-beepcomms ist bereits die funktion des Beepen hinterlegt. Ich durchsuche den Branch nach nützlichem Code
+Im Branch 74-feature-beepcomms ist bereits die Funktion des Beepen und hinterlegt. Ich durchsuche den Branch nach nützlichem Code
 --> Roboter können Töne abgeben, jetzt muss der Ton koordiniert werden
 
 - Ausblick auf das Projekt (Was ist zu tun?):
@@ -22,11 +22,23 @@ Im Branch 74-feature-beepcomms ist bereits die funktion des Beepen hinterlegt. I
 	2. Roboter müssen Töne aufnehmen können
 
    - Was muss ich technisch dafür anfassen?
+	Ich muss Töne mit verschiedenen Frequenzen und Abspieldauer erstellen/aufnehmen
+
    - Was habe ich in der Codebase technisches dazu gefunden?
+	- In den Skill.h habe ich die Codezeile "SKILL_INTERFACE(PlaySound, (const std::string&) name);" gefunden
+	- Der Branch 74-feature.beepcomms wird nach weiteren Funktionen durchsucht
+
    - Wie plane ich das ganze umzusetzen?
+	Ich nehme mit meinem Handy die Töne, welche ... erzeugt wurden, auf. Die Aufgenommenen Töne spiele ich dem NAO vor
+
    - Abschluss-Betonung: Was setze ich im ersten Teil des Projekts um?
+	- Aufnehmen von Tönen
+	- Verschiedenen Tönen verschiedene Aussagen hinterlegen
+	- Töne dem NAO vorspielen 
+
 - Ablaufplan:
-   - grob
-   - Was sind meine nächsten Schritte?
-   - Was fasse ich in welcher Reihenfolge an?
-   - Welches Ziel verfolge ich dabei?
+   - Töne ertsellen und drei Spielsituationen (Leo, Hintermann, Torwart steht falsch herum) zuweisen
+   - Herausfinden wann die NAO's diese Ausrufe wirklich anwenden sollen/müssen
+   - Nachdem die Töne erstellt sind, diese einem NAO vorspielen und ihn druaf reagieren lassen, erst mit einem Licht an den Ohren und später 
+     dann mit der Aktion, welche ausgeführt werden soll
+   - Mein Ziel in dem Projekt ist es schnelle und bessere Kommunikation in der Aufstellungsphase des Spiels zu erreichen
