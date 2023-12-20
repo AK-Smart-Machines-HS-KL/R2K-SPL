@@ -1,0 +1,94 @@
+/**
+ * @file projektbeschreibung Diagonalkick.txt
+ * 
+ * Datum: 20.12.2023
+ * Version: 1.2
+ *
+ * Diese Datei hält die Ziele und Umsetzung des Projektes Diagonalkick
+ * von Felix Niehus fest.
+ *
+ * @author Felix Niehus
+ */
+
+Projektbeschreibung Motion Engine - Stage 1: Diagonalkick
+
+Bearbeitet von:
+ - Felix Niehus
+Teamkollege:
+ - Florian Legler
+
+
+Beschreibung:
+   Das Projekt soll einen Kick und KickType erstellen mit dem Namen Diagonalkick.
+   Bei einem forward Kick läuft der Roboter um den Ball herum um ihn mit der Spitze des Fußes zu treffen.
+   Der Diagonalkick soll Zeit sparen, durch erzielen des Schusswinkels auch ohne Ausrichten.
+   Der Diagonalkick soll durch das zum Ball versetzte Kicken den Ball mit der Seite vom Fuß treffen.
+   Dadurch soll der Ball Schräg vom Fuß abspringen und in die gewünschte Richtung rollen.
+
+
+Stand der Dinge:
+   Kicks werden im Skillinterface (Skills.h) übergeben.
+   ---------- GoToBallAndKick ---------- Skill.h:370
+   * ACTION SKILL
+   * This skill walks to the ball and executes a kick there.
+   * Can be used to execute more Powerful or Custom Kicks
+   * @param targetDirection The direction to which the ball should be kicked in robot-relative coordinates
+   * @param kickType The kick type that should be executed there
+   * @param alignPrecisely Whether the robot should align more precisely than usual
+   * @param length The desired length of the kick (works only for certain types of kicks)
+   * @param preStepAllowed Is a prestep for the InWalkKick allowed?
+   * @param turnKickAllowed Does the forward kick not need to align with the kick direction?
+   * @param speed The walking speed
+   * @param directionPrecision The allowed deviation of the direction in which the ball should go.
+   
+   Kicks sind als Abläufe von KeyFrames definiert (Config/KickEngine/%.kmc).
+   Diese werden von einem SkillRegistry erfasst (Skill.h).
+   GoToBallAndKick ist so ein SkillRegistry.
+
+   Der KickType ist ein Enumeintrag (KickInfo.h).
+   #  Wo ich meinem Enumeintrag die Funktion zuschreibe, die ich erzielen will ist noch unklar.
+
+Um einen KickType bereitzustellen:
+   - Den KickType Diagonalkick erstellen.
+   - Das KickType Enum erweitern.
+
+
+Die Umsetzung:
+   KickType Enum:
+      - Src/Representations/Configuration/KickInfo.h mit dem Eintrag Diagonalkick erweitern.
+      - Alle Schnittstellen des Enums überprüfen.
+
+   KickType Diagonalkick:
+      - Den forwardFast (KickInfo.h) aufrufen ohne den Ball auf der X-Achse zu zentrieren.
+       -> Dadurch trifft der Roboter den Ball mit der Seite vom Fuß und schießt schräg.
+
+      - Eine Messreihe im Simulator erstellen über Variation der Fuß X-Achsen-Verschiebung von [-n, +n],
+      - um den Schusswinkel der X-Achsen-Verschiebung zuverlässig zuzuordnen.
+       -> Dafür: BallPreceptFilter.h, PerceptionBall -> get parameters / set parameters.
+       -> Messung der Ausführungszeit um die Dauer anzugeben.
+       -> Die Zuordnung Winkel->Verschiebung als Interpolationsfunktion der Messwerte erstellen.
+
+      - Wiederholung als Feldtest.
+       -> Dafür: LowerCameraThread.
+     
+
+Technische Anforderungen:
+   - Der Kick soll möglichst Zeitsparend sein.
+    -> Erwartete Parameter:
+	alignPrecisely=false, directionPrescision=gering, preStepAllowed=false, turnKickAllowed=false
+   - Die weite / stärke des Schusses soll weitesgehend zuverlässig sein.
+    -> Parameter length.
+   - Der Abschuss Winkel sollte möglichst zuverlässig eingehalten werden [Ziel: 4grad Diskrepanz].
+    -> Parameter targetDirection.
+   - Der Roboter soll nicht umfallen.
+   - Long Shot: Abbruchbedingung bei Ausholbewegung (Erlaubtes Delta zum Ball) richtig stellen.
+    -> Umsetzung zurückgestellt, da der Kick schnell ablaufen soll und Long Shot implementationen Länger dauern.
+
+Ablaufplan:
+   - Den geeigneten KickType zur Benutzung raussuchen [wahrscheinlich forwardFast (KickInfo.h)].
+   - Diesen dann kopieren und modulieren, sodass der Roboter sich nicht mehr versucht auszurichten zum Schießen.
+   - Dann mit X-Achsen-Verschiebung zum Ball im Simulator die Messreihe entwickeln.
+   - Solange testen, bis die Ergebnisse zuverlässig sind.
+   - Feldtest mit dem neuen Schuss.
+   - Solange testen und die Messpunkte justieren, bis die Ergebnisse zuverlässig sind.
+   
