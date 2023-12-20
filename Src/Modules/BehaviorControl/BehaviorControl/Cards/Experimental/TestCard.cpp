@@ -18,23 +18,28 @@
 
 // Representations
 #include "Representations/BehaviorControl/FieldBall.h"
+#include "Representations/Modeling/BallModel.h"
+#include "Representations/Infrastructure/FrameInfo.h"
+#include "Representations/MotionControl/ArmMotionRequest.h"
+#include <Modules/Modeling/OracledWorldModelProvider/OracledWorldModelProvider.h>
 
 //#include <filesystem>
 
 // Modify this card but don't commit changes to keep it clean for other developers
 // Also don't forget to put this card at the top of your Card Stack!
 CARD(TestCard,
-     {
-        ,
-        CALLS(Activity),
-        CALLS(LookForward),
-        CALLS(Stand),
+  {
+     ,
+     CALLS(Activity),
+     CALLS(LookForward),
+     CALLS(Stand),
+     CALLS(PointAt),
 
-        REQUIRES(GameInfo),
+     REQUIRES(GameInfo),
 
-        DEFINES_PARAMETERS(
-             {,
-                //Define Params here
+     DEFINES_PARAMETERS(
+          {,
+       //bool ballSeen;
              }),
 
         /*
@@ -56,7 +61,7 @@ class TestCard : public TestCardBase
 
   {
     return theGameInfo.state == STATE_PLAYING;
-    //return  theGameInfo.state == STATE_PLAYING && theGameInfo.gamePhase == ;
+    //return  theGameInfo.state == STATE_PLAYING && theGameInfo. ;
   }
 
   bool postconditions() const override
@@ -71,8 +76,13 @@ class TestCard : public TestCardBase
 
     theActivitySkill(BehaviorStatus::testingBehavior);
     // std::string s = "testingBehavior";
-    OUTPUT_TEXT("PLAYING");
+    //bool ballSeen = theFrameInfo.getTimeSince(theBallModel.timeWhenLastSeen) < 250;
 
+    //if (ballSeen)
+      OUTPUT_TEXT("PLAYING");
+      PointAt;
+      //PointAtWithArm, (const Vector3f&) localPoint, (Arms::left));
+      //PointAtWithArm, (const Vector3f&)localPoint, (Arms::right));
     // Override these skills with the skills you wish to test
     theLookForwardSkill(); // Head Motion Request
     theStandSkill(); // Standard Motion Request

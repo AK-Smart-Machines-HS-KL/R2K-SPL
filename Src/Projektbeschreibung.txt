@@ -1,0 +1,16 @@
+Victory Dance Tim Scibisz		19.12.23
+
+Ziel ist es einen Siegestanz nach einem Torschuss auszuführen.
+Dazu verwende ich den PointAtWithArm Skill.
+theFrameInfo.getTimeSince(theBallModel.timeWhenLastSeen) kann ich kann ich als Timer verwenden.
+
+Derzeitiger Stand
+- ich arbeite an den Armbewegungen
+- der timer ist noch nicht implementiert
+
+Zeitplan
+Bis 31.12 Armbewegung fertig
+
+Fragen
+- Wie kann man einen Torschuss als precondition verwenden?
+- gibt es einen PointAt Skill mit dem man mit beiden Armen zeigt 
