@@ -2,10 +2,10 @@
 *Projektbeschreibung 
 *Name: Rene Dinies
 *Datum: 18.12.2023
-*Version: 1.3
+*Version: 1.4
 *__________________________________
 
-Projekt: Spracherkennung 
+Projekt: Direkte Kommmunikation mit dem Roboter
 
 - Was wir machen:
   Wir schauen uns an, wie wir Roboter mit unserer Stimme kontrollieren können. Um in das Spielgeschehen einzugereifen.
