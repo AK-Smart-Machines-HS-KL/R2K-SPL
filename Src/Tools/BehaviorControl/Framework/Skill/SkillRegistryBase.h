@@ -87,14 +87,14 @@ private:
   SkillInterface* getSkillInterface(const std::string& skillName);
 
   STREAMABLE(Configuration,
-  {
-    STREAMABLE(SkillImplementation,
-    {,
-      (std::string) skill, /**< The name of the skill (interface). */
-      (std::string) implementation, /**< The name of the skill implementation. */
-    }),
-    (std::vector<SkillImplementation>) skillImplementations, /**< The list of skill-implementation pairs. */
-  });
+    {
+      STREAMABLE(SkillImplementation,
+      {,
+        (std::string)skill, /**< The name of the skill (interface). */
+        (std::string)implementation, /**< The name of the skill implementation. */
+      }),
+      (std::vector<SkillImplementation>) skillImplementations, /**< The list of skill-implementation pairs. */
+    });
 
   struct SkillImplementationState
   {
