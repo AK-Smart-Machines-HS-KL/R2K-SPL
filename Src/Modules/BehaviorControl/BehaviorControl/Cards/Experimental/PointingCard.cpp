@@ -17,18 +17,21 @@
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 
 // Representations
-#include "Representations/BehaviorControl/FieldBall.h"
+//#include "Representations/BehaviorControl/FieldBall.h"
 
+#include "Representations/MotionControl/ArmMotionRequest.h"
+//#include "../../../../../Tools/Debugging/Debugging.h"
 //#include <filesystem>
 
 // Modify this card but don't commit changes to keep it clean for other developers
 // Also don't forget to put this card at the top of your Card Stack!
-CARD(TestCard,
+CARD(PointingCard,
      {
         ,
         CALLS(Activity),
         CALLS(LookForward),
         CALLS(Stand),
+        CALLS(PointAtWithArm),
 
         DEFINES_PARAMETERS(
              {,
@@ -46,7 +49,7 @@ CARD(TestCard,
 
      });
 
-class TestCard : public TestCardBase
+class PointingCard : public PointingCardBase
 {
 
   //always active
@@ -62,7 +65,9 @@ class TestCard : public TestCardBase
 
   void execute() override
   {
-
+    Vector3f localPoint = Vector3f(10.f, 12.f, 13.f);
+    OUTPUT_TEXT("Test Pointing Start");
+    PointAtWithArm(localPoint, Arms::left);
     theActivitySkill(BehaviorStatus::testingBehavior);
     // std::string s = "testingBehavior";
     // OUTPUT_TEXT(s);
@@ -74,4 +79,4 @@ class TestCard : public TestCardBase
   }
 };
 
-MAKE_CARD(TestCard);
+MAKE_CARD(PointingCard);

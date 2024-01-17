@@ -1,0 +1,82 @@
+# Configuration for simulation scenes with oracled percepts
+
+# Activate simulation time
+st on
+
+# Only a single robot displays game state
+dr debugDrawing3d:representation:GameInfo
+dr debugDrawing3d:representation:TeamInfo
+
+# In case we have more than a single robot
+robot all
+
+# Fast, because we do not compute images
+ci off
+
+# Ground truth modules
+mr GroundTruthWorldState LogDataProvider Cognition
+mr GroundTruthRobotPose OracledWorldModelProvider Cognition
+mr GroundTruthBallModel OracledWorldModelProvider Cognition
+
+# Field views need ground truth and some later deactivated modules
+call Includes/FieldViews
+
+# Select modules for simulator
+mr CameraInfo LogDataProvider Lower
+mr CameraInfo LogDataProvider Upper
+mr FrameInfo LogDataProvider Lower
+mr FrameInfo LogDataProvider Upper
+mr FrameInfo LogDataProvider Motion
+mr FsrSensorData LogDataProvider Motion
+mr InertialSensorData LogDataProvider Motion
+mr JointSensorData LogDataProvider Motion
+mr KeyStates LogDataProvider Motion
+
+# Switch to percept oracle
+mr BallPercept OracledPerceptsProvider Lower
+mr BallPercept OracledPerceptsProvider Upper
+mr CirclePercept OracledPerceptsProvider Lower
+mr CirclePercept OracledPerceptsProvider Upper
+mr FieldBoundary OracledPerceptsProvider Lower
+mr FieldBoundary OracledPerceptsProvider Upper
+mr LinesPercept OracledPerceptsProvider Lower
+mr LinesPercept OracledPerceptsProvider Upper
+mr ObstaclesFieldPercept OracledPerceptsProvider Lower
+mr ObstaclesFieldPercept OracledPerceptsProvider Upper
+mr ObstaclesImagePercept OracledPerceptsProvider Lower
+mr ObstaclesImagePercept OracledPerceptsProvider Upper
+mr PenaltyMarkPercept OracledPerceptsProvider Lower
+mr PenaltyMarkPercept OracledPerceptsProvider Upper
+
+# Representations not required anymore
+mr AutoExposureWeightTable off
+mr BallSpots off
+mr CameraImage off
+mr CameraIntrinsics off
+mr CNSImage off
+mr CNSPenaltyMarkRegions off
+mr CNSRegions off
+mr ColorScanLineRegionsHorizontal off
+mr ColorScanLineRegionsVerticalClipped off
+mr ECImage default
+mr GoalPostsPercept default
+mr JerseyClassifier off
+mr JPEGImage off
+mr ObstaclesPerceptorData off
+mr OtherFieldBoundary off
+mr OtherGoalPostsPercept off
+mr OtherObstaclesPerceptorData off
+mr PenaltyMarkRegions off
+mr RelativeFieldColors off
+mr ScanGrid off
+
+# Representations that are still required
+mr CameraStatus default
+mr FieldFeatureOverview default
+mr RobotHealth default
+
+call Includes/GameStates
+call Includes/DebugResponses
+
+dr debugDrawing3d:representation:RobotPose
+dr debugDrawing3d:representation:RobotInfo
