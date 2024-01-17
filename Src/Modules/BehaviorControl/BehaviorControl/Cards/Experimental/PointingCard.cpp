@@ -31,7 +31,9 @@ CARD(PointingCard,
         CALLS(Activity),
         CALLS(LookForward),
         CALLS(Stand),
+        CALLS(PointAt),
         CALLS(PointAtWithArm),
+
 
         DEFINES_PARAMETERS(
              {,
@@ -65,9 +67,16 @@ class PointingCard : public PointingCardBase
 
   void execute() override
   {
-    Vector3f localPoint = Vector3f(10.f, 12.f, 13.f);
     OUTPUT_TEXT("Test Pointing Start");
-    PointAtWithArm(localPoint, Arms::left);
+    
+    const Vector3f localPoint = Vector3f(100.f, 102.f, 1030.f);
+    thePointAtSkill(localPoint);
+
+
+    thePointAtWithArmSkill(Vector3f(1000.f, 0.f, 0.f), Arms::right);
+    thePointAtWithArmSkill(Vector3f(1000.f, 0.f, 1000.f), Arms::left);
+
+
     theActivitySkill(BehaviorStatus::testingBehavior);
     // std::string s = "testingBehavior";
     // OUTPUT_TEXT(s);
