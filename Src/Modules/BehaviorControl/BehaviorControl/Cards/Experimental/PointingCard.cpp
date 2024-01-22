@@ -1,9 +1,7 @@
 /**
  * @file PointingCard.cpp
  * @author Jonathan Brauch    
- * @brief This card's preconditions are always true. 
- *        Edit it for testing
- * @version 0.2
+ * @version 0.3
  * @date 2024-01-10
  * 
  * 
@@ -54,11 +52,14 @@ CARD(PointingCard,
 
 class PointingCard : public PointingCardBase
 {
+  private:
+  bool isActive = true;
 
+  public:
   //always active
   bool preconditions() const override
   {
-    return true;
+    return isActive;
   }
 
   bool postconditions() const override
@@ -92,6 +93,8 @@ class PointingCard : public PointingCardBase
 
     //thePointAtWithArmSkill(Vector3f(1000.f, 0.f, 0.f), Arms::right);
     //thePointAtWithArmSkill(Vector3f(1000.f, 0.f, 1000.f), Arms::left);
+
+    isActive = false;
 
   }
 };
