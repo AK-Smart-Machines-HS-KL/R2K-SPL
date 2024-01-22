@@ -3,7 +3,7 @@
  * @author Jonathan Brauch    
  * @brief This card's preconditions are always true. 
  *        Edit it for testing
- * @version 0.1
+ * @version 0.2
  * @date 2024-01-10
  * 
  * 
@@ -23,8 +23,7 @@
 //#include "../../../../../Tools/Debugging/Debugging.h"
 //#include <filesystem>
 
-// Modify this card but don't commit changes to keep it clean for other developers
-// Also don't forget to put this card at the top of your Card Stack!
+
 CARD(PointingCard,
      {
         ,
@@ -33,11 +32,13 @@ CARD(PointingCard,
         CALLS(Stand),
         CALLS(PointAt),
         CALLS(PointAtWithArm),
+        CALLS(TurnToPoint),
 
 
         DEFINES_PARAMETERS(
              {,
                 //Define Params here
+
              }),
 
         /*
@@ -67,23 +68,30 @@ class PointingCard : public PointingCardBase
 
   void execute() override
   {
-    OUTPUT_TEXT("Test Pointing Start");
     
-    const Vector3f localPoint = Vector3f(100.f, 102.f, 1030.f);
-    thePointAtSkill(localPoint);
-
-
-    thePointAtWithArmSkill(Vector3f(1000.f, 0.f, 0.f), Arms::right);
-    thePointAtWithArmSkill(Vector3f(1000.f, 0.f, 1000.f), Arms::left);
-
-
     theActivitySkill(BehaviorStatus::testingBehavior);
     // std::string s = "testingBehavior";
-    // OUTPUT_TEXT(s);
 
     // Override these skills with the skills you wish to test
     theLookForwardSkill(); // Head Motion Request
-    theStandSkill(); // Standard Motion Request
+   // theStandSkill(); // Standard Motion Request
+
+
+    OUTPUT_TEXT("Test pointing");
+
+    const Vector2f localPoint = Vector2f(-900.f, -500.f);
+    theTurnToPointSkill(localPoint);
+
+
+    const Vector3f localPoint1 = Vector3f(0.f, 3000.f, 355.f);
+    thePointAtSkill(localPoint1);
+
+
+
+
+
+    //thePointAtWithArmSkill(Vector3f(1000.f, 0.f, 0.f), Arms::right);
+    //thePointAtWithArmSkill(Vector3f(1000.f, 0.f, 1000.f), Arms::left);
 
   }
 };
