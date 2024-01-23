@@ -203,6 +203,9 @@ std::unique_ptr<MotionPhase> WalkToBallAndKickEngine::createKickPhase(const Moti
         const Pose2f scsCognition = hipOffset * supportInTorso.inverse() * theOdometryData.inverse() * theMotionRequest.odometryData;
 
         ball = scsCognition * theMotionRequest.ballEstimate.position;
+        //---------------------------------------------------------------------------------------------------------------------------------
+        ball.y() -= 10.f; //Achtung das y könnte vorher schon negativ sein
+        //---------------------------------------------------------------------------------------------------------------------------------
         lastStableBall = ball;
       }
 

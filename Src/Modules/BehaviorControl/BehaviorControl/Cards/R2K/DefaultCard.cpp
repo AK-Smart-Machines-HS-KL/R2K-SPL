@@ -65,14 +65,16 @@ class DefaultCard : public DefaultCardBase
   }
 
   void execute() override
+  //(Angle) targetDirection, (KickInfo::KickType) kickType, (bool) alignPrecisely, (float) kickPower, (const Pose2f&) speed, (const MotionRequest::ObstacleAvoidance&) obstacleAvoidance, (bool)(true) preStepAllowed, (bool)(true) turnKickAllowed, (const Rangea&)(Rangea(0_deg, 0_deg)) directionPrecision
   {
+    //theWalkToBallAndKickSkill();
 
     theActivitySkill(BehaviorStatus::defaultBehavior);
     
     Pose2f targetRelative = theRobotPose.toRelative(theDefaultPose.ownDefaultPose);
 
     theLookActiveSkill(); // Head Motion Request
-    theWalkToPointSkill(targetRelative, 1.0f, true);     
+    theWalkToPointSkill(targetRelative, 1.0f, true);
 
   }
 };
