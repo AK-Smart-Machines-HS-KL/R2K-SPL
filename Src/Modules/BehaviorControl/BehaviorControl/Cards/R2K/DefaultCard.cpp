@@ -12,6 +12,9 @@
 // Skills - Must be included BEFORE Card Base
 #include "Representations/BehaviorControl/Skills.h"
 
+
+#include "Representations/BehaviorControl/FieldBall.h"
+
 // Card Base
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
@@ -30,6 +33,8 @@ CARD(DefaultCard,
         CALLS(Activity),
         CALLS(LookActive),
         CALLS(WalkToPoint),
+        CALLS(GoToBallAndKick),
+        REQUIRES(FieldBall),
 
         REQUIRES(DefaultPose),
         REQUIRES(RobotPose),
@@ -37,8 +42,11 @@ CARD(DefaultCard,
         DEFINES_PARAMETERS(
              {,
                 //Define Params here
+                (bool)(false) footIsSelected,  // freeze the first decision
+                (bool)(true) leftFoot,
+                (bool)(true) shootAngleIsZero,
+                (int) (-1000) offsetX,
              }),
-
         /*
         //Optionally, Load Config params here. DEFINES and LOADS can not be used together
         LOADS_PARAMETERS(
@@ -65,9 +73,19 @@ class DefaultCard : public DefaultCardBase
   }
 
   void execute() override
-  //(Angle) targetDirection, (KickInfo::KickType) kickType, (bool) alignPrecisely, (float) kickPower, (const Pose2f&) speed, (const MotionRequest::ObstacleAvoidance&) obstacleAvoidance, (bool)(true) preStepAllowed, (bool)(true) turnKickAllowed, (const Rangea&)(Rangea(0_deg, 0_deg)) directionPrecision
   {
-    //theWalkToBallAndKickSkill();
+    int shootAngle = 0;
+    if (!footIsSelected) {  // select only once
+      footIsSelected = true;
+      leftFoot = theFieldBall.positionRelative.y() < 0; //TODO: Das muss bereits vom gewünschten winkel abhängen
+    }
+    if(leftFoot) {
+        theGoToBallAndKickSkill(shootAngle, KickInfo::diagonalFastLeft);  
+    }
+    else {
+        theGoToBallAndKickSkill(shootAngle, KickInfo::diagonalFastRight);
+    }
+    //-----------------------------------------------------
 
     theActivitySkill(BehaviorStatus::defaultBehavior);
     

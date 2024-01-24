@@ -46,6 +46,8 @@ STREAMABLE(KickInfo,
     walkForwardsLeftAlternative,
 
     // kicks up to here are used by the KickView
+    diagonalFastRight,
+    diagonalFastLeft,
     newKick,
   });
 

@@ -21,6 +21,7 @@ void WalkToBallAndKickEngine::update(WalkToBallAndKickGenerator& walkToBallAndKi
   MODIFY("module:WalkToBallAndKickGenerator", overrideKickPower);
   walkToBallAndKickGenerator.createPhase = [this](const MotionRequest& motionRequest, const MotionPhase& lastPhase)
   {
+    OUTPUT_TEXT("walkToBallAndKickGenerator createPhase lambda");
     lastPhaseWasKick = lastPhase.type == MotionPhase::kick;
 
     const bool isLeftPhase = theWalkGenerator.isNextLeftPhase(false /* TODO */, lastPhase);
@@ -68,6 +69,10 @@ void WalkToBallAndKickEngine::update(WalkToBallAndKickGenerator& walkToBallAndKi
       case KickInfo::forwardFastRightLong:
         isInPositionForKick = -ballPosition.y() > forwardFastYThreshold.min && -ballPosition.y() < forwardFastYThreshold.max && ballPosition.x() < (motionRequest.kickType == KickInfo::forwardFastRightLong ? forwardFastLongXMaxThreshold : forwardFastXThreshold.max) && ballPosition.x() > forwardFastXThreshold.min;
         isInPositionForKick &= std::abs(targetDirection + theKickInfo[motionRequest.kickType].rotationOffset) < directionThreshold;
+        break;
+      case KickInfo::diagonalFastLeft:
+      case KickInfo::diagonalFastRight:
+        isInPositionForKick = true;
         break;
       case KickInfo::walkForwardsLeft:
       case KickInfo::walkForwardsLeftLong:
@@ -173,6 +178,7 @@ void WalkToBallAndKickEngine::update(WalkToBallAndKickGenerator& walkToBallAndKi
 
 std::unique_ptr<MotionPhase> WalkToBallAndKickEngine::createKickPhase(const MotionRequest& motionRequest, const MotionPhase& lastPhase, const Angle targetDirection, const bool mirrorKick, const Rangea& precisionRange, const float kickPoseShiftY)
 {
+  OUTPUT_TEXT("WalkToBallAndKickEngine createKickPhase");
   if(theKickInfo[motionRequest.kickType].motion == MotionPhase::walk)
   {
     if(mirrorKick)
@@ -203,9 +209,6 @@ std::unique_ptr<MotionPhase> WalkToBallAndKickEngine::createKickPhase(const Moti
         const Pose2f scsCognition = hipOffset * supportInTorso.inverse() * theOdometryData.inverse() * theMotionRequest.odometryData;
 
         ball = scsCognition * theMotionRequest.ballEstimate.position;
-        //---------------------------------------------------------------------------------------------------------------------------------
-        ball.y() -= 10.f; //Achtung das y könnte vorher schon negativ sein
-        //---------------------------------------------------------------------------------------------------------------------------------
         lastStableBall = ball;
       }
 
