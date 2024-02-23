@@ -25,7 +25,6 @@
     
  * - Check: GoalShot has higher priority and takes over close to opp.goal
  * v 1.3 DEFENSE only x < 0 - threshold
- * 1 1.4: Special for onw kick off: card disabled for 5000 for #4: wait for pass
  */
 
 // Skills - Must be included BEFORE Card Base
@@ -64,7 +63,8 @@ CARD(ChaseBallCard,
         REQUIRES(FieldDimensions),
         REQUIRES(TeamData),   // check behavior
         REQUIRES(TeammateRoles),
-        REQUIRES(TeamCommStatus),  // wifi on off
+        REQUIRES(TeamCommStatus),  // wifi on off?
+
         DEFINES_PARAMETERS(
              {,
                 //Define Params here
@@ -87,20 +87,16 @@ class ChaseBallCard : public ChaseBallCardBase
   
     return
       (
-        // (theExtendedGameInfo.timeSincePlayingStarted > 9000) &&
-        !aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
+        // !aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
         theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
-        theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&
-
-        //HOT FIX WM
-        (theFieldBall.positionOnField.x() > (0 - threshold)) 
-         // theFieldBall.positionOnField.x() >= theRobotPose.translation.x() - threshold
+        (theFieldBall.endPositionOnField.x() > (0 - threshold)) &&
+        theFieldBall.endPositionOnField.x() >= theRobotPose.translation.x() - threshold
         )
       ||
       (theGameInfo.setPlay == SET_PLAY_NONE &&
         !aBuddyIsChasingOrClearing() &&
         theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
-        // theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
+        theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
         theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
         theFieldBall.endPositionOnField.x() < -500 &&
         !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME));
@@ -109,11 +105,6 @@ class ChaseBallCard : public ChaseBallCardBase
   bool postconditions() const override
   {
     return !preconditions();
-    /*
-      aBuddyIsChasingOrClearing() ||
-      (theTeammateRoles.isTacticalDefense(theRobotInfo.number) &&
-        theFieldBall.endPositionOnField.x() >= -500);
-        */
   }
 
   option
@@ -165,22 +156,18 @@ class ChaseBallCard : public ChaseBallCardBase
 
     bool aBuddyIsChasingOrClearing() const
     {
-      // HOT FIX WM
-#ifdef NAO
-      for (const auto& buddy : theTeamData.teammates)
+      for (const auto& buddy : theTeamData.teammates) 
       {
-        if (
-          buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
+        if (buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard)
-          // buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
+          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
           return true;
       }
-      return false;
-#endif
       return false;
     }
 };

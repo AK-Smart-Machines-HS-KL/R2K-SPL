@@ -93,14 +93,14 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
     return
       theTeammateRoles.playsTheBall(&theRobotInfo , theTeamCommStatus.isWifiCommActive) &&  // I am the striker
       !theObstacleModel.opponentIsClose(1200) && // see below: min distance is minOppDistance
-      !aBuddyIsClearingOwnHalf() &&
+      //!aBuddyIsClearingOwnHalf() &&
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
 
       //don't leave own half, unless we are in OFFENSIVE or SPARSE Mode)
       (
         theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_OFFENSIVE_GAME ||
         theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME ||
-        theFieldBall.endPositionOnField.x() < 500
+        theFieldBall.endPositionOnField.x() < -500
       );
   }
 
@@ -108,7 +108,6 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
   {
     return 
     theObstacleModel.opponentIsClose(500) ||
-    aBuddyIsClearingOwnHalf()||
     !theTeammateRoles.isTacticalDefense(theRobotInfo.number) ||
     !(theFieldBall.endPositionOnField.x() < 0);
   }
@@ -140,21 +139,17 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
 
   bool aBuddyIsClearingOwnHalf() const
   {
-    // HOT FIX WM
-#ifdef NAO
     for (const auto& buddy : theTeamData.teammates)
     {
-      if (
-        // buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
-        // buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+      if (buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
         buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
         buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard)
         return true;
     }
     return false;
-#endif
-    return false;
   }
+
 };
 
 MAKE_CARD(DefenseLongShotCard);

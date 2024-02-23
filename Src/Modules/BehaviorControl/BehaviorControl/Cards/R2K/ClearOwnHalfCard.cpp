@@ -94,7 +94,7 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
    return
       theGameInfo.setPlay == SET_PLAY_NONE &&  // no penalty active
       theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&  // I am the striker
-      !aBuddyIsClearingOwnHalf() &&
+       // !aBuddyIsClearingOwnHalf() &&
       // theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
       theFieldBall.positionOnField.x() < 500 &&
@@ -136,8 +136,6 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
 
   bool aBuddyIsClearingOwnHalf() const
   {
-    // HOT FIX WM
-#ifdef NAO
     for (const auto& buddy : theTeamData.teammates)
     {
       if (buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
@@ -149,9 +147,6 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
         return true;
     }
     return false;
-  }
-#endif
-  return false;
   }
 };
 

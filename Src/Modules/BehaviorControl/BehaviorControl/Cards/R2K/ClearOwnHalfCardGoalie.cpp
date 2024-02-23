@@ -84,7 +84,7 @@ CARD(ClearOwnHalfCardGoalie,
 
     DEFINES_PARAMETERS(
     {,
-      (float)(450) maxDistanceFromGoalArea,  // how far  goalie will leave the goal box
+      (float)(0) maxDistanceFromGoalArea,  // how far  goalie will leave the goal box
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
       (bool)(true) shootAngleIsZero,
@@ -96,9 +96,8 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
   bool preconditions() const override
   {
     return
-      // either goalie has the ball OR nobody else is taking care of ball close to own goal
-      (theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)||   // I am the striker
-      !aBuddyIsClearingOwnHalf()) &&
+      theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
+      // !aBuddyIsClearingOwnHalf() &&
       // 
       // either LongShotCard is above in the stack or add this pre-cond:
       // theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
@@ -143,19 +142,15 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
   }
   bool aBuddyIsClearingOwnHalf() const
   {
-    // HOT FIX WM
-#ifdef NAO
     for (const auto& buddy : theTeamData.teammates)
     {
-      if (buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard)
-        // buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie)
+      if (buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie)
         return true;
     }
     return false;
   }
-#endif
-  return false;
-  }
+  
 };
 
 MAKE_CARD(ClearOwnHalfCardGoalie);
