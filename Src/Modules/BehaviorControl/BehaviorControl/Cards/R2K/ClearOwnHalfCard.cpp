@@ -109,7 +109,6 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
  
   void execute() override
   {
-    OUTPUT_TEXT("TEST");
     theActivitySkill(BehaviorStatus::clearOwnHalfCard);
 
     if (!footIsSelected) {  // select only once

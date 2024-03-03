@@ -98,7 +98,6 @@ void WalkToBallEngine::update(WalkToBallGenerator& walkToBallGenerator)
       if(std::abs(rotationWhenStopping + modTargetInSCS.rotation / 2.f) < 5_deg && std::abs(modTargetInSCS.rotation) > 30_deg)
         modTargetInSCS.rotation = 0_deg;
     }
-
     Pose2f step;
     step.rotation = theWalkGenerator.getRotationRange(isLeftPhase, walkSpeed).clamped(modTargetInSCS.rotation);
     {

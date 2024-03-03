@@ -213,6 +213,9 @@ std::unique_ptr<MotionPhase> WalkToBallAndKickEngine::createKickPhase(const Moti
       }
 
       std::vector<DynPoint> d;
+      
+      OUTPUT_TEXT("KickMotionType: " + kick.kickMotionType);
+
       switch(kick.kickMotionType)
       {
         case KickRequest::kickForwardFast:

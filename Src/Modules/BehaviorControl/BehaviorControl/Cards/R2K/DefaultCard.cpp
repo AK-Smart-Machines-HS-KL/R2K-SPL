@@ -74,6 +74,8 @@ class DefaultCard : public DefaultCardBase
 
   void execute() override
   {
+    theActivitySkill(BehaviorStatus::defaultBehavior);
+    /*
     int shootAngle = 0;
     if (!footIsSelected) {  // select only once
       footIsSelected = true;
@@ -87,13 +89,12 @@ class DefaultCard : public DefaultCardBase
     }
     //-----------------------------------------------------
 
-    theActivitySkill(BehaviorStatus::defaultBehavior);
     
+    */
     Pose2f targetRelative = theRobotPose.toRelative(theDefaultPose.ownDefaultPose);
 
     theLookActiveSkill(); // Head Motion Request
     theWalkToPointSkill(targetRelative, 1.0f, true);
-
   }
 };
 
