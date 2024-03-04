@@ -15,7 +15,8 @@
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 
 // Representations
-//#include "Representations/BehaviorControl/FieldBall.h"
+#include "Representations/BehaviorControl/FieldBall.h"
+
 
 #include "Representations/MotionControl/ArmMotionRequest.h"
 //#include "../../../../../Tools/Debugging/Debugging.h"
@@ -31,6 +32,7 @@ CARD(PointingCard,
         CALLS(PointAt),
         CALLS(PointAtWithArm),
         CALLS(TurnToPoint),
+        REQUIRES(FieldBall),
 
 
         DEFINES_PARAMETERS(
@@ -75,28 +77,42 @@ class PointingCard : public PointingCardBase
 
     // Override these skills with the skills you wish to test
     theLookForwardSkill(); // Head Motion Request
-   // theStandSkill(); // Standard Motion Request
-
+    // theStandSkill(); // Standard Motion Request
 
     OUTPUT_TEXT("Test pointing");
+    
 
-    const Vector2f localPoint = Vector2f(-900.f, -500.f);
-    theTurnToPointSkill(localPoint);
+    // Die relative Ballposition holen
+    Vector2f ballPositionRelative = theFieldBall.recentBallPositionRelative();
 
-
-    const Vector3f localPoint1 = Vector3f(0.f, 3000.f, 355.f);
-    thePointAtSkill(localPoint1);
-
-
+    // Die relative Ballposition im theTurnToPointSkill verwenden
+    theTurnToPointSkill(ballPositionRelative);
 
 
+    // Die Z-Koordinate auf 0 setzen, um einen Vector3f zu erstellen
+    Vector3f ballPositionRelative3D(ballPositionRelative.x(), ballPositionRelative.y(), 0.0f);
+
+    // Die relative Ballposition im thePointAtSkill verwenden
+    thePointAtSkill(ballPositionRelative3D);
+
+
+    //Mit festen Koordinaten 
+
+    //const Vector2f localPoint = Vector2f(-900.f, -500.f);
+    //theTurnToPointSkill(localPoint);
+
+    //const Vector3f localPoint1 = Vector3f(0.f, 3000.f, 355.f);
+    //thePointAtSkill(localPoint1);
 
     //thePointAtWithArmSkill(Vector3f(1000.f, 0.f, 0.f), Arms::right);
     //thePointAtWithArmSkill(Vector3f(1000.f, 0.f, 1000.f), Arms::left);
 
-    isActive = false;
+    isActive = true;
 
   }
 };
 
 MAKE_CARD(PointingCard);
+
+
+
