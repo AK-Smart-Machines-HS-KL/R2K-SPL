@@ -1,8 +1,8 @@
 /**
  * @file PointingCard.cpp
  * @author Jonathan Brauch
- * @version 1.0
- * @date 2024-03-04
+ * @version 1.2
+ * @date 2024-03-06
  *
  *
  */
@@ -42,6 +42,7 @@ CARD(PointingCard,
        //Define Params here
        (int)(10000) cooldown,
        (unsigned)(0) startTime,
+       (int)(10000) maxRuntime,
     }),
 
   /*
@@ -66,56 +67,66 @@ public:
   {
     int timeSinceLastStart = theFrameInfo.getTimeSince(startTime);
 
-    return isActive && (timeSinceLastStart > cooldown); // Überprüfung der Ausführungscooldown-Zeit
+    return isActive && (timeSinceLastStart < maxRuntime || timeSinceLastStart > maxRuntime + cooldown);
   }
 
   bool postconditions() const override
   {
-    return true; // set to true, when used as the default card, i.e., the lowest card on the stack
+    return true;
   }
 
-  void execute() override
+  // Zustand und Logik für die Ausführung der PointingCard
+  option
   {
     theActivitySkill(BehaviorStatus::testingBehavior);
 
-    theLookForwardSkill(); // Head Motion Request
-    
+    initial_state(init)
+    {
+      startTime = theFrameInfo.time;
+      transition
+      {
+        if (preconditions())
+        {
+          goto pointing;
+        }
+      }
+    }
 
-    OUTPUT_TEXT("Test pointing");
+    state(pointing)
+    {
+      transition
+      {
+        goto pointing;
+      }
 
-    // Die relative Ballposition holen
-    Vector2f ballPositionRelative = theFieldBall.recentBallPositionRelative();
+      action
+      {
+      // Head Motion Request
+      theLookForwardSkill();
 
-    // Die relative Ballposition im theTurnToPointSkill verwenden
-    theTurnToPointSkill(ballPositionRelative);
+      //OUTPUT_TEXT("Test pointing");
 
-    // Die Z-Koordinate auf 0 setzen, um einen Vector3f zu erstellen
-    Vector3f ballPositionRelative3D(ballPositionRelative.x(), ballPositionRelative.y(), 0.0f);
+      // Die relative Ballposition holen
+      Vector2f ballPositionRelative = theFieldBall.recentBallPositionRelative();
 
-    // Die relative Ballposition im thePointAtSkill verwenden
-    thePointAtSkill(ballPositionRelative3D);
+      // Die relative Ballposition im theTurnToPointSkill verwenden
+      theTurnToPointSkill(ballPositionRelative);
 
+      // Die Z-Koordinate auf 0 setzen, um einen Vector3f zu erstellen
+      Vector3f ballPositionRelative3D(ballPositionRelative.x(), ballPositionRelative.y(), 0.0f);
 
-
-
-
-    //Mit festen Koordinaten
-    // const Vector2f localPoint = Vector2f(-900.f, -500.f);
-    // theTurnToPointSkill(localPoint);
-
-    // const Vector3f localPoint1 = Vector3f(0.f, 3000.f, 355.f);
-    // thePointAtSkill(localPoint1);
-
-    // thePointAtWithArmSkill(Vector3f(1000.f, 0.f, 0.f), Arms::right);
-    // thePointAtWithArmSkill(Vector3f(1000.f, 0.f, 1000.f), Arms::left);
-
-    // Aktualisieren Sie den Zeitpunkt der letzten Ausführung
+      // Die relative Ballposition im thePointAtSkill verwenden
+      thePointAtSkill(ballPositionRelative3D);
 
 
-
-    startTime = theFrameInfo.time;
+      //Mit festen Koordinaten
+      // const Vector2f localPoint = Vector2f(-900.f, -500.f);
+      // theTurnToPointSkill(localPoint);
+      // thePointAtWithArmSkill(Vector3f(1000.f, 0.f, 0.f), Arms::right);
+      // thePointAtWithArmSkill(Vector3f(1000.f, 0.f, 1000.f), Arms::left);
+   }
+ }
   }
 };
-
 
 MAKE_CARD(PointingCard);
