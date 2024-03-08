@@ -1,8 +1,8 @@
 /**
  * @file PointingCard.cpp
  * @author Jonathan Brauch
- * @version 1.2
- * @date 2024-03-06
+ * @version 1.5
+ * @date 2024-03-08
  *
  *
  */
@@ -17,6 +17,10 @@
 // Representations
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/Infrastructure/FrameInfo.h"
+#include "Representations/Communication/RobotInfo.h"
+#include "Representations/Communication/GameInfo.h"
+#include "Representations/BehaviorControl/TeamBehaviorStatus.h"
+
 
 
 #include "Representations/MotionControl/ArmMotionRequest.h"
@@ -35,6 +39,10 @@ CARD(PointingCard,
      CALLS(TurnToPoint),
      REQUIRES(FieldBall),
      REQUIRES(FrameInfo),
+     REQUIRES(RobotInfo),
+     REQUIRES(GameInfo),
+     REQUIRES(TeamBehaviorStatus),
+     REQUIRES(TeammateRoles),
 
 
      DEFINES_PARAMETERS(
@@ -67,7 +75,9 @@ public:
   {
     int timeSinceLastStart = theFrameInfo.getTimeSince(startTime);
 
-    return isActive && (timeSinceLastStart < maxRuntime || timeSinceLastStart > maxRuntime + cooldown);
+    return isActive && (timeSinceLastStart < maxRuntime || timeSinceLastStart > maxRuntime + cooldown)
+                    && theGameInfo.setPlay == SET_PLAY_CORNER_KICK
+                    && theTeammateRoles.isTacticalOffense(theRobotInfo.number);
   }
 
   bool postconditions() const override
