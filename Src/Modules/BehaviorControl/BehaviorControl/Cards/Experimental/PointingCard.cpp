@@ -2,7 +2,7 @@
  * @file PointingCard.cpp
  * @author Jonathan Brauch
  * @version 1.5
- * @date 2024-03-08
+ * @date 2024-03-21
  *
  *
  */
@@ -20,7 +20,7 @@
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h"
-
+#include "Representations/Modeling/RobotPose.h"
 
 
 #include "Representations/MotionControl/ArmMotionRequest.h"
@@ -41,8 +41,8 @@ CARD(PointingCard,
      REQUIRES(FrameInfo),
      REQUIRES(RobotInfo),
      REQUIRES(GameInfo),
-     REQUIRES(TeamBehaviorStatus),
      REQUIRES(TeammateRoles),
+     REQUIRES(RobotPose),
 
 
      DEFINES_PARAMETERS(
@@ -50,7 +50,7 @@ CARD(PointingCard,
        //Define Params here
        (int)(10000) cooldown,
        (unsigned)(0) startTime,
-       (int)(10000) maxRuntime,
+       (int)(300000) maxRuntime,
     }),
 
   /*
@@ -111,31 +111,41 @@ public:
 
       action
       {
-      // Head Motion Request
-      theLookForwardSkill();
+        // Head Motion Request
+        theLookForwardSkill();
 
-      //OUTPUT_TEXT("Test pointing");
+        //OUTPUT_TEXT("Test pointing");
 
-      // Die relative Ballposition holen
-      Vector2f ballPositionRelative = theFieldBall.recentBallPositionRelative();
+      
+        // Absolute Koordinate
+        //Vector2f absoluteCoordinate(-4500.f, 0.f);
+        Vector2f absoluteCoordinate = theFieldBall.recentBallPositionOnField();
+      
+        OUTPUT_TEXT("Absolute Coordinate: " << absoluteCoordinate.x() << ", " << absoluteCoordinate.y());
 
-      // Die relative Ballposition im theTurnToPointSkill verwenden
-      theTurnToPointSkill(ballPositionRelative);
+        // Wandele absolute Koordinate in relative Koordinate um
+        Vector2f relativeCoordinate = theRobotPose.toRelative(absoluteCoordinate);
+        OUTPUT_TEXT("Relative Coordinate: " << relativeCoordinate.x() << ", " << relativeCoordinate.y());
+       
+        // Die Z-Koordinate auf 0 setzen, um einen Vector3f zu erstellen
+        Vector3f relativeCoordinate3D(relativeCoordinate.x(), relativeCoordinate.y(), 0.f);
+       // OUTPUT_TEXT("Relative Coordinate3D: " << relativeCoordinate3D.x() << ", " << relativeCoordinate3D.y() << ", " << relativeCoordinate3D.z());
 
-      // Die Z-Koordinate auf 0 setzen, um einen Vector3f zu erstellen
-      Vector3f ballPositionRelative3D(ballPositionRelative.x(), ballPositionRelative.y(), 0.0f);
+        // Die relative Ballposition im theTurnToPointSkill verwenden
+        theTurnToPointSkill(relativeCoordinate);
+        OUTPUT_TEXT("Robot Rotation: " << theRobotPose.rotation.toDegrees());
 
-      // Die relative Ballposition im thePointAtSkill verwenden
-      thePointAtSkill(ballPositionRelative3D);
+        // Zeige auf die relative Koordinate
+        thePointAtSkill(relativeCoordinate3D);
 
 
-      //Mit festen Koordinaten
-      // const Vector2f localPoint = Vector2f(-900.f, -500.f);
-      // theTurnToPointSkill(localPoint);
-      // thePointAtWithArmSkill(Vector3f(1000.f, 0.f, 0.f), Arms::right);
-      // thePointAtWithArmSkill(Vector3f(1000.f, 0.f, 1000.f), Arms::left);
-   }
- }
+
+        // Mit festen Koordinaten
+        // theTurnToPointSkill(Vector2f(-900.f, -500.f));
+        // thePointAtWithArmSkill(Vector3f(-1000.f, 0.f, 0.f), Arms::right);
+        // thePointAtWithArmSkill(Vector3f(-1000.f, 0.f, 300.f), Arms::left);
+      }
+    }
   }
 };
 
