@@ -144,7 +144,7 @@ TEAM_CARD(R2K_TeamCard,
                   (unsigned) (STATE_INITIAL)           lastGameState,
                   (unsigned) (SET_PLAY_NONE)           lastGamePhase,
                   (int)(-1)                            lastTeamBehaviorStatus, // -1 means: not set yet
-                  (int)(2000)                          decayPlaysTheBall,
+                  (int)(1000)                          decayPlaysTheBall,
                   (unsigned)(0)                        playsTheBallHasChangedFrame,   // store the frame when this bot claims to be playing the ball
                   (TeammateRoles)(TeammateRoles())     lastTeammateRoles,
                   (TimeToReachBall)(TimeToReachBall()) lastTimeToReachBall,
@@ -351,7 +351,7 @@ private:
     // if (1 == theRobotInfo.number) pRole.role = PlayerRole::goalkeeper;
        
     pRole.numOfActiveSupporters = activeBuddies-1;
-
+   
   
    
     // d1) PlayerRole:: computing the supporterindex for each bot from left to right
@@ -390,6 +390,7 @@ private:
 
     if (theGameInfo.state == STATE_READY || theGameInfo.state ==  STATE_SET || !theTeamCommStatus.isWifiCommActive ) {
       // default settings
+
       switch (theRobotInfo.number - 1) {
         case 0: pRole.role = PlayerRole::supporter0;   break;
         case 1: pRole.role = PlayerRole::supporter1;   break;
@@ -509,14 +510,15 @@ private:
     auto buddyDist = 9000;
 
    
-    if (theFieldBall.ballWasSeen(2000))  // to be on the safe side
+    if (theFieldBall.ballWasSeen(decayPlaysTheBall))  // to be on the safe side
       dist = (int)Geometry::distance(theFieldBall.endPositionRelative, Vector2f(0, 0));
-    
+
+    // if (theRobotInfo.number == 2) OUTPUT_TEXT("dist:" << dist);
 
     TimeToReachBall timeToReachBall;
     // this code fragment does NOT sync teamwiese
-    // timeToReachBall.timeWhenReachBall = dist + theFrameInfo.time; // +offsetToFrameTimeThisBot;
-    timeToReachBall.timeWhenReachBall = myEbcWrites;
+    timeToReachBall.timeWhenReachBall = dist;//  +theFrameInfo.time; // +offsetToFrameTimeThisBot;
+    // timeToReachBall.timeWhenReachBall = myEbcWrites;
 
     minDist = dist;
   
@@ -528,7 +530,8 @@ private:
         minDist = std::min(minDist, buddyDist = (int) Geometry::distance(theFieldBall.endPositionOnField, buddy.theRobotPose.translation));
     } // rof: scan team
    
-
+    // if (theRobotInfo.number == 2)OUTPUT_TEXT("min dist:" << minDist);
+    
     // f) who plays the ball? 
     // decayed update of captain (striker), 
     // we use "captain" to store the bot who plays the ball
@@ -541,8 +544,15 @@ private:
     else {
       for (const auto& buddy : theTeamData.teammates)
       {  // compute and compare my buddies distance with minimal distance
-        buddyDist = (int)Geometry::distance(theFieldBall.endPositionOnField, buddy.theRobotPose.translation);
-        if (buddyDist == minDist) teamMateRoles.captain = buddy.number;
+
+        buddyDist = (int)Geometry::distance(theFieldBall.endPositionOnField, buddy.theRobotPose.translation);//
+        // OUTPUT_TEXT("fb dist:" << buddyDist);
+        // buddyDist = (int)Geometry::distance(buddy.theBallModel.estimate.position, buddy.theRobotPose.translation);
+        // OUTPUT_TEXT("ed dist:" << buddyDist);
+        if (buddyDist == minDist) {
+          teamMateRoles.captain = buddy.number;
+          timeToReachBall.timeWhenReachBallStriker = buddyDist; // +theFrameInfo.time; // +offsetToFrameTimeThisBot;
+        }
       } // rof: who plays the ball
 
       // or am I the striker?
@@ -551,6 +561,7 @@ private:
       if (minDist == dist) {  // i am the striker
         //  // TEMP ANTI HOT FIX
         teamMateRoles.captain = theRobotInfo.number;
+        timeToReachBall.timeWhenReachBallStriker = dist; // +theFrameInfo.time; // +offsetToFrameTimeThisBot;
         // teamMateRoles.captain = 3;
         /* 
         if (pRole.isGoalkeeper()) pRole.role = PlayerRole::goalkeeperAndBallPlayer;
@@ -580,12 +591,9 @@ private:
      )
       refreshAllData = true;
 
-
-// AM 
-    refreshAllData = true;
-
+    
     if (refreshAllData) {
-      // OUTPUT_TEXT("team data are refreshed.");
+      OUTPUT_TEXT("team data are refreshed.");
       lastGameState = theGameInfo.state;
       lastGamePhase = theGameInfo.gamePhase;
       lastTeamBehaviorStatus = teamBehaviorStatus;
