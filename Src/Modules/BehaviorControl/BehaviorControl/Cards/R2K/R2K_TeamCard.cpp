@@ -580,6 +580,10 @@ private:
      )
       refreshAllData = true;
 
+
+// AM 
+    refreshAllData = true;
+
     if (refreshAllData) {
       // OUTPUT_TEXT("team data are refreshed.");
       lastGameState = theGameInfo.state;

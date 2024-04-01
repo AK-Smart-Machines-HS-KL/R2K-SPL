@@ -121,9 +121,13 @@ void FieldBall::draw() const
   }
   if(timeUntilIntersectsOwnYAxis != std::numeric_limits<float>::max() && intersectionPositionWithOwnYAxis != Vector2f::Zero())
   {
-    CROSS("representation:FieldBall:relative", intersectionPositionWithOwnYAxis.x(), intersectionPositionWithOwnYAxis.y(), 150, 20, Drawings::solidPen, ColorRGBA::blue);
+    CROSS("representation:FieldBall:relative", intersectionPositionWithOwnYAxis.x(), intersectionPositionWithOwnYAxis.y(), 150, 20, Drawings::solidPen, ColorRGBA::cyan);
     LINE("representation:FieldBall:relative", 0.f, 0.f, intersectionPositionWithOwnYAxis.x() * 1.5f, intersectionPositionWithOwnYAxis.y() * 1.5f,
          10, Drawings::dashedPen, ColorRGBA::red);
     DRAW_TEXT("representation:FieldBall:relative", intersectionPositionWithOwnYAxis.x() * 1.5f, intersectionPositionWithOwnYAxis.y() * 1.5f, 250, ColorRGBA::blue, timeUntilIntersectsOwnYAxis);
   }
+
+
+  // added AM
+  FILLED_RECTANGLE("representation:FieldBall:global", positionOnField.x(), positionOnField.y(), positionOnField.x()+200, positionOnField.y()+200, 1, Drawings::solidPen, ColorRGBA(100, 255, 100), Drawings::solidBrush, ColorRGBA(100, 255, 100));
 }

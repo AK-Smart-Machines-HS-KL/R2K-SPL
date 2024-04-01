@@ -3,11 +3,51 @@ call Includes/Normal
 # all views are defined in another script
 call Includes/Views
 
+
+# ============  robot positions and number
+# draws assumed position; SYNCED
 dr debugDrawing3d:representation:RobotPose
 dr debugDrawing3d:representation:RobotInfo
-dr debugDrawing3d:representation:FieldBall:global
 
-dr debugDrawing3d:representation:BallModel on
+# yellow spot for each robots pos as in TeamData; this info is SYNCED
+dr debugDrawing3d:representation:TeamData:3d
+
+# white circle around the player, direction,Line from Robot to WalkTarget
+# requires FrameInfo - seems not to work
+# dr representation:FrameInfo
+# dr debugDrawing:representation:TeamData on
+
+# =============  ball positions
+# shows each bots assumption about ball pos as orange spot
+dr debugDrawing3d:representation:TeamBallModel on
+
+# orange line from bot to ball, if ball is seen
+# nice, but the ball is hard to grip
+# dr debugDrawing3d:representation:BallModel on
+
+
+# isRollingTowardsOwnGoal: goal box indicates rolling towwards own  RED )
+# added filled rectangle (blue) to show assumed relative pos in FieldBall.cpp
+dr debugDrawing:representation:FieldBall:relative on
+
+#filled rectangle (lime-green) for FieldBall.positionOnField (global ccords)
+dr debugDrawing:representation:FieldBall:global on
+
+
+# ============= for later usage
+
+# dr debugDrawing:representation:FilteredBallPercepts:field
+# motion request is required by simulation
+# dr representation:MotionRequest
+
+
+# request behavior messages
+# dr representation:ActivationGraph on 
+# dr representation:TeamActivationGraph on 
+
+# dr representation:RobotDimensions:once
+# dr representation:JointLimits:once
+
 
 
 
