@@ -1,12 +1,21 @@
+cs R2KEvalTeamB team2
+
 call Includes/Normal
+call Includes/5vs5
 
 # all views are defined in another script
 call Includes/Views
 
 
+
+
 # ============  robot positions and number
+dr debugDrawing:representation:DefaultPose:own
+// dr representation:DefaultPose:all
+
 # draws assumed position; SYNCED
 dr debugDrawing3d:representation:RobotPose
+# vfd worldState cognition:RobotPose
 dr debugDrawing3d:representation:RobotInfo
 
 # yellow spot for each robots pos as in TeamData; this info is SYNCED
@@ -23,7 +32,7 @@ dr debugDrawing3d:representation:TeamBallModel on
 
 # orange line from bot to ball, if ball is seen
 # nice, but the ball is hard to grip
-# dr debugDrawing3d:representation:BallModel on
+ # dr debugDrawing3d:representation:BallModel on
 
 
 # isRollingTowardsOwnGoal: goal box indicates rolling towwards own  RED )
@@ -33,6 +42,9 @@ dr debugDrawing:representation:FieldBall:relative on
 #filled rectangle (lime-green) for FieldBall.positionOnField (global ccords)
 dr debugDrawing:representation:FieldBall:global on
 
+
+# time consuming 
+# vfd worldState module:ShotPredictor
 
 # ============= for later usage
 

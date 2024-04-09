@@ -145,7 +145,9 @@ TEAM_CARD(R2K_TeamCard,
                   (unsigned) (SET_PLAY_NONE)           lastGamePhase,
                   (int)(-1)                            lastTeamBehaviorStatus, // -1 means: not set yet
                   (int)(1000)                          decayPlaysTheBall,
+                  (int)(3000)                          decayUpdateSupporterIndex,
                   (unsigned)(0)                        playsTheBallHasChangedFrame,   // store the frame when this bot claims to be playing the ball
+                  (unsigned)(0)                        lastUpdateSupporterIndexFrame,  // store the frame when the last update has occured
                   (TeammateRoles)(TeammateRoles())     lastTeammateRoles,
                   (TimeToReachBall)(TimeToReachBall()) lastTimeToReachBall,
                   (PlayerRole)(PlayerRole())           lastPlayerRole,
@@ -281,6 +283,11 @@ private:
       lastNrOwnPenalties = own_penalties;
     }
 
+    if (theFrameInfo.getTimeSince(lastUpdateSupporterIndexFrame) > decayUpdateSupporterIndex) {
+      lastUpdateSupporterIndexFrame = theFrameInfo.time;
+      recomputeLineUp = true;
+    }
+
     for (int i = 0; i < 5; i++)
         if (theOwnTeamInfo.players[i].penalty == PENALTY_NONE)  activeBuddies++;
 
@@ -360,29 +367,35 @@ private:
         
       // ASSERT(role.supporterIndex() - firstSupporterRole <= activeBuddies);  // we are in range supporter0 
 
-    for (auto& mate : botsLineUp)
-    {
-      count++;
-      if (theRobotPose.translation.x() <= mate.xPos)  // we are more left than rightmost
-      {
-        // pRole.role = PlayerRole::supporter4;
-        // pRole.role = static_cast<PlayerRole> (static_cast<int>(PlayerRole::firstSupporterRole) + count);
 
-        // PATCH: for communication problems
-        // switch (theRobotInfo.number - 1) {
-        switch (count) {
-        case 0: pRole.role = PlayerRole::supporter0;   break;
-        case 1: pRole.role = PlayerRole::supporter1;   break;
-        case 2: pRole.role = PlayerRole::supporter2;   break;
-        case 3: pRole.role = PlayerRole::supporter3;   break;
-        case 4: pRole.role = PlayerRole::supporter4;   break;
-        default: pRole.role = PlayerRole::none; OUTPUT_TEXT("default count: " << count);
+    // OUTPUT_TEXT("time" << theFrameInfo.getTimeSince(lastUpdateSupporterIndexFrame));
+    // if (theFrameInfo.getTimeSince(lastUpdateSupporterIndexFrame) > decayUpdateSupporterIndex) {
+    //   lastUpdateSupporterIndexFrame = theFrameInfo.time;
+      // OUTPUT_TEXT("update supporter Index");
+      for (auto& mate : botsLineUp)
+      {
+        count++;
+        if (theRobotPose.translation.x() <= mate.xPos)  // we are more left than rightmost
+        {
+          // pRole.role = PlayerRole::supporter4;
+          // pRole.role = static_cast<PlayerRole> (static_cast<int>(PlayerRole::firstSupporterRole) + count);
+
+          // PATCH: for communication problems
+          // switch (theRobotInfo.number - 1) {
+          switch (count) {
+          case 0: pRole.role = PlayerRole::supporter0;   break;
+          case 1: pRole.role = PlayerRole::supporter1;   break;
+          case 2: pRole.role = PlayerRole::supporter2;   break;
+          case 3: pRole.role = PlayerRole::supporter3;   break;
+          case 4: pRole.role = PlayerRole::supporter4;   break;
+          default: pRole.role = PlayerRole::none; OUTPUT_TEXT("default count: " << count);
+          }
+          break;  // done searching
         }
-        break;  // done searching
-      }
+      }  //rof: all bots
       // ASSERT(role.supporterIndex() - firstSupporterRole <= activeBuddies);  // we are in range supporter0 
 
-    }
+    
        
    
     // d2: static assignment , only for specific gamestates
@@ -593,7 +606,7 @@ private:
 
     
     if (refreshAllData) {
-      OUTPUT_TEXT("team data are refreshed.");
+      // OUTPUT_TEXT("team data are refreshed.");
       lastGameState = theGameInfo.state;
       lastGamePhase = theGameInfo.gamePhase;
       lastTeamBehaviorStatus = teamBehaviorStatus;

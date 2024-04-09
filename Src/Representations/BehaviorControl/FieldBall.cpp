@@ -129,5 +129,7 @@ void FieldBall::draw() const
 
 
   // added AM
-  FILLED_RECTANGLE("representation:FieldBall:global", positionOnField.x(), positionOnField.y(), positionOnField.x()+200, positionOnField.y()+200, 1, Drawings::solidPen, ColorRGBA(100, 255, 100), Drawings::solidBrush, ColorRGBA(100, 255, 100));
+  // FILLED_RECTANGLE("representation:FieldBall:global", teamPositionOnField.x(), teamPositionOnField.y(), teamPositionOnField.x() + 2000, teamPositionOnField.y() + 2000, 1, Drawings::solidPen, ColorRGBA(100, 155, 100), Drawings::solidBrush, ColorRGBA(100, 155, 100));
+  if(ballWasSeen())
+    FILLED_RECTANGLE("representation:FieldBall:global", recentBallPositionOnField().x(), recentBallPositionOnField().y(), recentBallPositionOnField().x()+200, recentBallPositionOnField().y()+200, 1, Drawings::solidPen, ColorRGBA(100, 255, 100), Drawings::solidBrush, ColorRGBA(100, 255, 100));
 }

@@ -270,7 +270,8 @@ bool EventBasedCommunicationHandler::ebcSendThisFrame(const EventBasedCommunicat
     if((theFrameInfo.getTimeSince(timeLastSent) >= flexibleInterval || theFrameInfo.time < timeLastSent)) {
       ebcLevelMonitor();
       if(myUrgencyLevel >= EBCMaxLevel){
-        if(theFrameInfo.getTimeSince(timeLastSent) >= 2 * flexibleInterval){
+        // if(theFrameInfo.getTimeSince(timeLastSent) >= 2 * flexibleInterval){
+      if(theFrameInfo.getTimeSince(timeLastSent) >= flexibleInterval){
           timeLastSent = theFrameInfo.time;
         }
         else {
