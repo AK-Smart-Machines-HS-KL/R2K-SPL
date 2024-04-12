@@ -1,12 +1,11 @@
-cs R2KEvalTeamB team2
-
 call Includes/Normal
-call Includes/5vs5
+
 
 # all views are defined in another script
 call Includes/Views
 
-
+# cs R2KEvalTeamB team2
+# call Includes/5vs5
 
 
 # ============  robot positions and number

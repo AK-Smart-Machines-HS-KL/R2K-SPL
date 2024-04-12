@@ -14,7 +14,9 @@
     </Compound>
 
     <Compound ref="robots"/>
-    <Compound ref="extras"/>
+
+    <Compound name="extras">
+    </Compound>
 
     <Compound name="balls">
       <Body ref="ball">
