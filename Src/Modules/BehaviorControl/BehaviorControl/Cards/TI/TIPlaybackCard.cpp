@@ -88,14 +88,14 @@ class TIPlaybackCard : public TIPlaybackCardBase
 
 
 		// Dont execute if the card stack is empty
-		return (!theTIPlaybackSequences.models.empty() && teachInScoreReached(theRobotInfo.number));
+		return (-1 == actionIndex && !theTIPlaybackSequences.models.empty() && thisIsATriggerPoint(theRobotInfo.number));
 			// return (teachInScoreReached(theRobotInfo.number));
 	}
 
 	bool postconditions() const override
 	{
 		// Exit the card if no more playback actions have to be done
-		return (-1 == actionIndex);
+		return !postconditions();
 	}
 
 	void execute() override
@@ -105,7 +105,7 @@ class TIPlaybackCard : public TIPlaybackCardBase
 		// OUTPUT_TEXT("ti started");
 
 		// called only one
-		if(!startTime) cardIndex = indexOfBestTeachInScore(theRobotInfo.number); // selects best sequence in playback0001.csv, plaback0002.csv,...
+		if(!startTime) cardIndex = thisIsATriggerPoint(theRobotInfo.number); // selects best sequence in playback0001.csv, plaback0002.csv,...
 		ASSERT(-1 != cardIndex); // at least one model must qualify, since teachInScoreReached() is called in pre-cond
 
 		// Figure out which action to play; sets startTime 
@@ -175,50 +175,43 @@ class TIPlaybackCard : public TIPlaybackCardBase
 		}
 	}
 
-	bool teachInScoreReached(int Number) const
-	{
+  bool thisIsATriggerPoint(int Number, bool findBestScore = false) const
+  {
+    ASSERT(!theTIPlaybackSequences.models.empty()); // has been checked in the pre-condition
 
-	  ASSERT(!theTIPlaybackSequences.models.empty());  // has been checked in the pre-condition
-	  // OUTPUT_TEXT("checking trigger for robot " << Number  );
-	  for(WorldData data : theTIPlaybackSequences.models)
-			{
-				WorldModel& model = data.trigger;
-				if(//model.robotNumber == Number && // when this is disabled, any robot close to the point of recording will trigger
-					 (Geometry::distance(theRobotPose.translation, model.robotPose.translation) <= 500))  // this is a trigger point
-					return true;
-				
-			}
-		
-		return false;
-	}
+    float minimal_distance = 500.0f;
+    int world_model_index = -1;
+    int current_bestWorldModelIndex = -1;
 
-	
-	int indexOfBestTeachInScore(int Number)
-	{
-		float minimal_distance          = 500.0f;
-		int world_model_index           = -1;  // start counting at 0
-		int current_bestWorldModelIndex = -1;
+    for (WorldData data : theTIPlaybackSequences.models)
+    {
+      WorldModel& model = data.trigger;
+      world_model_index++;
 
-		// OUTPUT_TEXT("Computing indexOfBestTeachInScore");
+      if (!findBestScore || (Geometry::distance(theRobotPose.translation, model.robotPose.translation) <= minimal_distance))
+      {
+        if (!findBestScore)
+        {
+          if (Geometry::distance(theRobotPose.translation, model.robotPose.translation) <= 500)
+            return true;
+        }
+        else
+        {
+          current_bestWorldModelIndex = world_model_index;
+          minimal_distance = Geometry::distance(theRobotPose.translation, model.robotPose.translation);
+        }
+      }
+    }
 
-		for(WorldData data : theTIPlaybackSequences.models)
-			{
-				WorldModel& model = data.trigger;
-				world_model_index++;
-				// OUTPUT_TEXT(model.fileName);
-				if( //model.robotNumber == Number && // when this is disabled, any robot close to the point of recording will trigger
-					 (Geometry::distance(theRobotPose.translation, model.robotPose.translation) <= minimal_distance)) // this is the first OR a better trigger point
-				{
-					current_bestWorldModelIndex = world_model_index;
-					minimal_distance            = Geometry::distance(theRobotPose.translation, model.robotPose.translation);  // new minimum
-				}
-			}  // rof: scan all world models
+    if (findBestScore && current_bestWorldModelIndex != -1)
+    {
+      ASSERT(current_bestWorldModelIndex >= 0);
+      OUTPUT_TEXT("trigger became active for robot " << Number << " from file " << theTIPlaybackSequences.models[current_bestWorldModelIndex].fileName);
+    }
 
-			ASSERT(current_bestWorldModelIndex >= 0);  // there must be at least one trigger point, because teachInScoreReached() was true in the pre-condition
-			OUTPUT_TEXT("trigger became active for robot " << Number << " from file " << theTIPlaybackSequences.models[current_bestWorldModelIndex].fileName);
-			
-		return current_bestWorldModelIndex;	
-	};
+    return findBestScore ? current_bestWorldModelIndex != -1 : false;
+  }
+
 };
 
 
