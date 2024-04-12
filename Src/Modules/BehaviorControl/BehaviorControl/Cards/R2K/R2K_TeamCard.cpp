@@ -144,7 +144,7 @@ TEAM_CARD(R2K_TeamCard,
                   (unsigned) (STATE_INITIAL)           lastGameState,
                   (unsigned) (SET_PLAY_NONE)           lastGamePhase,
                   (int)(-1)                            lastTeamBehaviorStatus, // -1 means: not set yet
-                  (int)(1000)                          decayPlaysTheBall,
+                  (int)(500)                           decayPlaysTheBall, // B-Huma default ballWasSeen 500
                   (int)(3000)                          decayUpdateSupporterIndex,
                   (unsigned)(0)                        playsTheBallHasChangedFrame,   // store the frame when this bot claims to be playing the ball
                   (unsigned)(0)                        lastUpdateSupporterIndexFrame,  // store the frame when the last update has occured
@@ -590,6 +590,7 @@ private:
     if (teamMateRoles.captain != lastTeammateRoles.captain)
     {  // another bot is playing the ball
       playsTheBallHasChangedFrame = theFrameInfo.time;  // reset timer
+      teamMateRoles.timestamp = theFrameInfo.time;
       // OUTPUT_TEXT(" new cap." << teamMateRoles.captain << " by " << theRobotInfo.number);
     }
 

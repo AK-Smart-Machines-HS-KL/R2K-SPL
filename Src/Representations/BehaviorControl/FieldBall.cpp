@@ -132,4 +132,6 @@ void FieldBall::draw() const
   // FILLED_RECTANGLE("representation:FieldBall:global", teamPositionOnField.x(), teamPositionOnField.y(), teamPositionOnField.x() + 2000, teamPositionOnField.y() + 2000, 1, Drawings::solidPen, ColorRGBA(100, 155, 100), Drawings::solidBrush, ColorRGBA(100, 155, 100));
   if(ballWasSeen())
     FILLED_RECTANGLE("representation:FieldBall:global", recentBallPositionOnField().x(), recentBallPositionOnField().y(), recentBallPositionOnField().x()+200, recentBallPositionOnField().y()+200, 1, Drawings::solidPen, ColorRGBA(100, 255, 100), Drawings::solidBrush, ColorRGBA(100, 255, 100));
+  else //use different color fpr team estimate
+    FILLED_RECTANGLE("representation:FieldBall:global", recentBallPositionOnField().x(), recentBallPositionOnField().y(), recentBallPositionOnField().x() + 200, recentBallPositionOnField().y() + 200, 1, Drawings::solidPen, ColorRGBA(200, 150, 50), Drawings::solidBrush, ColorRGBA(200, 155, 50));
 }
