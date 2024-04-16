@@ -142,8 +142,7 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
         }
         
         theActivitySkill(BehaviorStatus::offenseForwardPassCard);
-
-        theGoToBallAndKickSkill(theRobotPose.toRelative(targetAbsolute).angle(), KickInfo::forwardFastLeft);
+        theGoToBallAndKickSkill(theRobotPose.toRelative(targetAbsolute).angle(), KickInfo::walkForwardsLeft);
     }
 
     void reset() override

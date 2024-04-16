@@ -84,7 +84,7 @@ CARD(ClearOwnHalfCardGoalie,
 
     DEFINES_PARAMETERS(
     {,
-      (float)(0) maxDistanceFromGoalArea,  // how far  goalie will leave the goal box
+      (float)(500) maxDistanceFromGoalArea,  // how far  goalie will leave the goal box
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
       (bool)(true) shootAngleIsZero,

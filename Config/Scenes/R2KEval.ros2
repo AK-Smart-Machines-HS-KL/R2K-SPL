@@ -1,7 +1,7 @@
 <Simulation>
 
   <Include href="Includes/NaoV6H25.rsi2"/>
-  <Include href="Includes/5vsDummies.rsi2"/>
+  <Include href="Includes/5vs5.rsi2"/>
   <Include href="Includes/Ball2016SPL.rsi2"/>
   <Include href="Includes/Field2020SPL.rsi2"/>
 
@@ -14,7 +14,8 @@
     </Compound>
 
     <Compound ref="robots"/>
-    <Compound ref="extras"/>
+    <Compound name="extras/">
+    </Compound>
 
     <Compound name="balls">
       <Body ref="ball">

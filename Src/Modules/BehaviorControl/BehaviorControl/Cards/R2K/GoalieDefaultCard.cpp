@@ -33,6 +33,7 @@ CARD(GoalieDefaultCard,
         CALLS(Stand),
         CALLS(LookActive),
         CALLS(LookAtBall),
+        CALLS(LookForward),
         CALLS(WalkAtRelativeSpeed),
         REQUIRES(TeammateRoles), 
         REQUIRES(RobotInfo),
@@ -42,10 +43,12 @@ CARD(GoalieDefaultCard,
 
         DEFINES_PARAMETERS(
              {,
-                (unsigned int) (1000) ballSeenTimeout,
+                // (unsigned int) (1000) ballSeenTimeout,
                 (Vector2f) (Vector2f(-3500, 1500)) goalAreaUpperBound,
                 (Vector2f) (Vector2f(-4800, -1500)) goalAreaLowerBound,
                 (float) (2000) blockingArcDepth,
+                (int)(3000) bodyTurnDuration,
+                (int)(2500) headSweepDuration,
                 (int) (400) goalposesafetyarea,
              }),
      });
@@ -58,98 +61,123 @@ class GoalieDefaultCard : public GoalieDefaultCardBase
   Vector2f blockingArcCenter;
   float blockingArcRadius;
 
-  bool isNearGoal() const{
+  bool isNearGoal() const {
     return theRobotPose.translation.x() > goalAreaLowerBound.x()
       && theRobotPose.translation.x() < goalAreaUpperBound.x()
       && theRobotPose.translation.y() > goalAreaLowerBound.y()
-      && theRobotPose.translation.y() < goalAreaUpperBound.y();       
+      && theRobotPose.translation.y() < goalAreaUpperBound.y();
   }
 
   // Condition: Is tacticalGoalKeeper (From TeammateRoles) && is near Goal
   bool preconditions() const override
   {
-    return theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) && isNearGoal();
+    // return theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) && !isNearGoal();
+    return theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number);
   }
 
   bool postconditions() const override
   {
-    return true;   // i.e. When preconditions are false, card exits. Equivalent to !preconditions()
+    return !preconditions();   // i.e. When preconditions are false, card exits. Equivalent to !preconditions()
   }
 
   option
   {
     initial_state(init)
     {
-      // Calculate parameters for blocking positioning
-      blockingArcCenter = Vector2f(theFieldDimensions.xPosOwnGroundLine - blockingArcDepth, 0);
-      blockingArcRadius = (Vector2f(theFieldDimensions.xPosOwnGoalPost, theFieldDimensions.yPosRightGoal) - blockingArcCenter).norm();
-      lowerBlockingArcLimit = (Vector2f(theFieldDimensions.xPosOwnGoalPost, theFieldDimensions.yPosRightGoal + goalposesafetyarea) - blockingArcCenter).angle();
-      upperBlockingArcLimit = (Vector2f(theFieldDimensions.xPosOwnGoalPost, theFieldDimensions.yPosLeftGoal - goalposesafetyarea) - blockingArcCenter).angle();
+    // Calculate parameters for blocking positioning
+    blockingArcCenter = Vector2f(theFieldDimensions.xPosOwnGroundLine - blockingArcDepth, 0);
+    blockingArcRadius = (Vector2f(theFieldDimensions.xPosOwnGoalPost, theFieldDimensions.yPosRightGoal) - blockingArcCenter).norm();
+    lowerBlockingArcLimit = (Vector2f(theFieldDimensions.xPosOwnGoalPost, theFieldDimensions.yPosRightGoal + goalposesafetyarea) - blockingArcCenter).angle();
+    upperBlockingArcLimit = (Vector2f(theFieldDimensions.xPosOwnGoalPost, theFieldDimensions.yPosLeftGoal - goalposesafetyarea) - blockingArcCenter).angle();
 
-      ballPosLost = false;
+    ballPosLost = false;
 
-      transition
-      {
-        goto findBall;
-      }
+    transition
+    {
+      goto findBall;
+    }
 
-      action {
+    action
+    {
         theActivitySkill(BehaviorStatus::defaultBehavior);
-      }
+    }
     }
 
     state(findBall)
     {
       transition
       {
-        if (theFieldBall.ballWasSeen(ballSeenTimeout)) {
-           goto block; 
+        // if (theFieldBall.ballWasSeen(ballSeenTimeout)) {
+        if (theFieldBall.ballWasSeen() || !isNearGoal()) {
+           goto block;
         }
+      if (state_time > headSweepDuration) goto turnBody;
       }
 
       action
-      {        
+      {
         Angle angleToBallEstimate = Angle::normalize(theFieldBall.recentBallPositionRelative().angle());
-        
+
         if (std::abs(angleToBallEstimate) < 5_deg) {
           theStandSkill();
-        } else {
+        }
+        else {
           theWalkAtRelativeSpeedSkill(Pose2f(std::clamp((float)angleToBallEstimate, -1.0f, 1.0f)));
         }
-
         theLookActiveSkill();
         theActivitySkill(BehaviorStatus::searchingForBall);
-      }
+        }
     }
 
     state(block)
     {
       transition
       {
-        if (!theFieldBall.ballWasSeen(ballSeenTimeout)) {
-           goto findBall; 
+        // if (!theFieldBall.ballWasSeen(ballSeenTimeout)) {
+        if (!theFieldBall.ballWasSeen() && isNearGoal()) {
+           goto findBall;
         }
       }
 
       action
       {
         theActivitySkill(BehaviorStatus::blocking);
-        Angle blockingArcAngle = std::clamp((theFieldBall.positionOnField - blockingArcCenter).angle(), (float) lowerBlockingArcLimit, (float) upperBlockingArcLimit);
+        Angle blockingArcAngle = std::clamp((theFieldBall.positionOnField - blockingArcCenter).angle(), (float)lowerBlockingArcLimit, (float)upperBlockingArcLimit);
         Vector2f blockingPos = Vector2f(blockingArcRadius, 0).rotated(blockingArcAngle) + blockingArcCenter;
         Vector2f blockingPosRelative = theRobotPose.toRelative(blockingPos);
 
         theLookAtBallSkill();
-        
-        if (blockingPosRelative.norm() > 100) {
+
+        if (blockingPosRelative.norm() > 50) {
           theWalkAtRelativeSpeedSkill(Pose2f(Angle::normalize(theFieldBall.positionRelative.angle()), blockingPosRelative.normalized())); // Walk to blockingPos AND turn to ball
-        } else if (Angle::normalize(theFieldBall.positionRelative.angle()) > 5_deg) {
-          theWalkAtRelativeSpeedSkill(Pose2f(Angle::normalize(theFieldBall.positionRelative.angle()))); // Just turn to ball
-        } else {
-          theStandSkill();
         }
+        else
+          if (Angle::normalize(theFieldBall.positionRelative.angle()) > 5_deg)
+            theWalkAtRelativeSpeedSkill(Pose2f(Angle::normalize(theFieldBall.positionRelative.angle()))); // Just turn to ball
+          else
+            theStandSkill();
+       }
+    } // block
+
+    state(turnBody)
+    {
+      transition
+      {
+        if (state_time > bodyTurnDuration) goto findBall;
       }
-    }
-  }
+      action
+      {
+        theActivitySkill(BehaviorStatus::searchForBall);
+        theLookForwardSkill();
+        if (theRobotPose.translation.y() > 0)
+          theWalkAtRelativeSpeedSkill(Pose2f(-0.8f, 0.f, 0.f));
+        else
+          theWalkAtRelativeSpeedSkill(Pose2f(0.8f, 0.f, 0.f));
+      }
+    }  // turnBody
+
+  }  // option
 };
+
 
 MAKE_CARD(GoalieDefaultCard);

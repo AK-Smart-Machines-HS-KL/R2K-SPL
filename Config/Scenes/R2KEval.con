@@ -1,11 +1,12 @@
 call Includes/Normal
+call Includes/5vs5
 
 
 # all views are defined in another script
 call Includes/Views
 
-# cs R2KEvalTeamB team2
-# call Includes/5vs5
+cs R2KEvalTeamB team2
+
 
 
 # ============  robot positions and number
@@ -26,8 +27,12 @@ dr debugDrawing3d:representation:TeamData:3d
 # dr debugDrawing:representation:TeamData on
 
 # =============  ball positions
-# shows each bots assumption about ball pos as orange spot
+# shows each bots assumption about ball pos as orange spot - effective switch
 dr debugDrawing3d:representation:TeamBallModel on
+# not effective
+# dr debugDrawing:representation:TeamBallModel on
+
+# dr representation:TeamBallModel on
 
 # orange line from bot to ball, if ball is seen
 # nice, but the ball is hard to grip
@@ -36,9 +41,10 @@ dr debugDrawing3d:representation:TeamBallModel on
 
 # isRollingTowardsOwnGoal: goal box indicates rolling towwards own  RED )
 # added filled rectangle (blue) to show assumed relative pos in FieldBall.cpp
-dr debugDrawing:representation:FieldBall:relative on
+# dr debugDrawing:representation:FieldBall:relative on
 
-#filled rectangle (lime-green) for FieldBall.positionOnField (global ccords)
+# filled rectangle (lime-green) for FieldBall.positionOnField (global ccords)
+# orange: team estimation
 dr debugDrawing:representation:FieldBall:global on
 
 

@@ -125,14 +125,14 @@ TEAM_CARD(R2K_TeamCard,
     CALLS(TimeToReachBall),
     REQUIRES(FieldBall),  // ttrb
     REQUIRES(FrameInfo),  // ttrb
-    REQUIRES(TeamData),   // ttrb
+    REQUIRES(TeamData),   // ttrb teammates
     REQUIRES(GameInfo),   // ttrb, check for state change
     REQUIRES(RobotInfo),  // roles
     REQUIRES(RobotPose),  // supporterindex
     REQUIRES(TeamCommStatus),
     // USES(TeamBehaviorStatus),   // to be tested
     CALLS(TeamActivity),
-    REQUIRES(OwnTeamInfo),    // score, penalty
+    REQUIRES(OwnTeamInfo),    // score, buddies: penalty
     REQUIRES(OpponentTeamInfo),  // score, penalty
     REQUIRES(EventBasedCommunicationData),  // R2K EBC handling
 
@@ -145,7 +145,7 @@ TEAM_CARD(R2K_TeamCard,
                   (unsigned) (SET_PLAY_NONE)           lastGamePhase,
                   (int)(-1)                            lastTeamBehaviorStatus, // -1 means: not set yet
                   (int)(500)                           decayPlaysTheBall, // B-Huma default ballWasSeen 500
-                  (int)(3000)                          decayUpdateSupporterIndex,
+                  (int)(10000)                         decayUpdateSupporterIndex,
                   (unsigned)(0)                        playsTheBallHasChangedFrame,   // store the frame when this bot claims to be playing the ball
                   (unsigned)(0)                        lastUpdateSupporterIndexFrame,  // store the frame when the last update has occured
                   (TeammateRoles)(TeammateRoles())     lastTeammateRoles,
@@ -558,7 +558,9 @@ private:
       for (const auto& buddy : theTeamData.teammates)
       {  // compute and compare my buddies distance with minimal distance
 
-        buddyDist = (int)Geometry::distance(theFieldBall.endPositionOnField, buddy.theRobotPose.translation);//
+        buddyDist = (int)Geometry::distance(theFieldBall.endPositionOnField, buddy.theRobotPose.translation);//  comparing FieldBall with buddy position
+        // buddyDist = (int)Geometry::distance(buddy.theBallModel.estimate.position, buddy.theRobotPose.translation);//  comparing buddys estimate with buddy position
+        
         // OUTPUT_TEXT("fb dist:" << buddyDist);
         // buddyDist = (int)Geometry::distance(buddy.theBallModel.estimate.position, buddy.theRobotPose.translation);
         // OUTPUT_TEXT("ed dist:" << buddyDist);
