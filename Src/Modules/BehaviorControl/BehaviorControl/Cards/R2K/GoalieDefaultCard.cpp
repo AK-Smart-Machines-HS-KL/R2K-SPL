@@ -22,6 +22,7 @@
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/Configuration/FieldDimensions.h"
+#include "Representations/BehaviorControl/DefaultPose.h"
 #include "Representations/BehaviorControl/TeammateRoles.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Modeling/RobotPose.h"
@@ -35,6 +36,8 @@ CARD(GoalieDefaultCard,
         CALLS(LookAtBall),
         CALLS(LookForward),
         CALLS(WalkAtRelativeSpeed),
+        CALLS(WalkToPoint),
+        REQUIRES(DefaultPose),
         REQUIRES(TeammateRoles), 
         REQUIRES(RobotInfo),
         REQUIRES(RobotPose),
@@ -47,8 +50,8 @@ CARD(GoalieDefaultCard,
                 (Vector2f) (Vector2f(-3500, 1500)) goalAreaUpperBound,
                 (Vector2f) (Vector2f(-4800, -1500)) goalAreaLowerBound,
                 (float) (2000) blockingArcDepth,
-                (int)(3000) bodyTurnDuration,
-                (int)(2500) headSweepDuration,
+                (int)(5000) bodyTurnDuration,
+                (int)(4000) headSweepDuration,
                 (int) (400) goalposesafetyarea,
              }),
      });
@@ -77,7 +80,9 @@ class GoalieDefaultCard : public GoalieDefaultCardBase
 
   bool postconditions() const override
   {
-    return !preconditions();   // i.e. When preconditions are false, card exits. Equivalent to !preconditions()
+    // return !preconditions();   // i.e. When preconditions are false, card exits. Equivalent to !preconditions()
+    // return state_time > (headSweepDuration + bodyTurnDuration);
+    return state_time > 100;
   }
 
   option
@@ -94,7 +99,8 @@ class GoalieDefaultCard : public GoalieDefaultCardBase
 
     transition
     {
-      goto findBall;
+      goto block;
+
     }
 
     action
@@ -108,10 +114,8 @@ class GoalieDefaultCard : public GoalieDefaultCardBase
       transition
       {
         // if (theFieldBall.ballWasSeen(ballSeenTimeout)) {
-        if (theFieldBall.ballWasSeen() || !isNearGoal()) {
-           goto block;
-        }
-      if (state_time > headSweepDuration) goto turnBody;
+        if (theFieldBall.ballWasSeen() || !isNearGoal()) goto block;
+        if ((state_time > headSweepDuration) && !theFieldBall.ballWasSeen()) goto turnBody;
       }
 
       action
@@ -133,12 +137,10 @@ class GoalieDefaultCard : public GoalieDefaultCardBase
     {
       transition
       {
-        // if (!theFieldBall.ballWasSeen(ballSeenTimeout)) {
-        if (!theFieldBall.ballWasSeen() && isNearGoal()) {
-           goto findBall;
-        }
+        if (!theFieldBall.ballWasSeen()) goto findBall;
+        // if (!theFieldBall.ballWasSeen()) goto findBall;
+        // if (theFieldBall.ballWasSeen() && !isNearGoal()) goto defaultPos;
       }
-
       action
       {
         theActivitySkill(BehaviorStatus::blocking);
@@ -163,18 +165,38 @@ class GoalieDefaultCard : public GoalieDefaultCardBase
     {
       transition
       {
-        if (state_time > bodyTurnDuration) goto findBall;
+
+        if (theFieldBall.ballWasSeen()) goto block;
+        if ((state_time > (headSweepDuration + bodyTurnDuration))) goto defaultPos;
       }
       action
       {
         theActivitySkill(BehaviorStatus::searchForBall);
-        theLookForwardSkill();
+        theLookActiveSkill(); // Head Motion Request
         if (theRobotPose.translation.y() > 0)
           theWalkAtRelativeSpeedSkill(Pose2f(-0.8f, 0.f, 0.f));
         else
           theWalkAtRelativeSpeedSkill(Pose2f(0.8f, 0.f, 0.f));
       }
     }  // turnBody
+
+    state(defaultPos)
+    {
+      transition
+      {
+        // if (isNearGoal()) goto init;
+        if ((theRobotPose.translation.y() < -4200) && !theFieldBall.ballWasSeen()) goto findBall;
+        if ((theRobotPose.translation.y() < -4200) &&  theFieldBall.ballWasSeen()) goto block;
+      }
+        action
+      {
+        theActivitySkill(BehaviorStatus::searchForBall);
+        Pose2f targetRelative = theRobotPose.toRelative(theDefaultPose.ownDefaultPose);
+
+        theLookActiveSkill(); // Head Motion Request
+        theWalkToPointSkill(targetRelative, 1.0f, true);
+      }
+    }  // defaultPos
 
   }  // option
 };

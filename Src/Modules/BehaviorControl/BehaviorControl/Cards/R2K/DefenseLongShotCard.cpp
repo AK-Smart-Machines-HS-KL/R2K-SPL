@@ -145,7 +145,8 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
         buddy.theBehaviorStatus.activity == BehaviorStatus::blocking ||
         buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
         buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
-        buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard)
+        buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard)
         return true;
     }
     return false;

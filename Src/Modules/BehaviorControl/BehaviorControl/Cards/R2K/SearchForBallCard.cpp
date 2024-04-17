@@ -60,8 +60,8 @@ CARD(SearchForBallCard,
           (int)(2500) headSweepDuration,
           (int)(3000) bodyTurnDuration,
           (int)(5000) ballNotSeenTimeout,
-          (int)(10000) maxRuntime,
-          (int)(3000) cooldown,
+          (int)(9000) maxRuntime,
+          (int)(10000) cooldown,
           (unsigned)(0) startTime,
              }),
 
@@ -84,7 +84,7 @@ class SearchForBallCard : public SearchForBallCardBase
   {
     // return true;   // use for testing the head and body moves in a fast game
     int timeSinceLastStart = theFrameInfo.getTimeSince(startTime);
-    return !theFieldBall.ballWasSeen(ballNotSeenTimeout)
+    return !theFieldBall.ballWasSeen()
       && (timeSinceLastStart < maxRuntime || timeSinceLastStart > maxRuntime + cooldown)
       && theExtendedGameInfo.timeSinceLastPenaltyEnded > 10000 
       && !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number);
@@ -92,8 +92,8 @@ class SearchForBallCard : public SearchForBallCardBase
 
   bool postconditions() const override
   {
-    int timeSinceLastStart = theFrameInfo.getTimeSince(startTime);
-    return (!preconditions() || (theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) && timeSinceLastStart > cooldown));
+    //int timeSinceLastStart = theFrameInfo.getTimeSince(startTime);
+    return !preconditions();
   }
 
   option
@@ -145,9 +145,9 @@ class SearchForBallCard : public SearchForBallCardBase
       {
         theLookForwardSkill();
         if (theRobotPose.translation.y() > 0 ) {
-          theWalkAtRelativeSpeedSkill(Pose2f(-0.8f, 0.f, 0.f));
+          theWalkAtRelativeSpeedSkill(Pose2f(-2.5f, 0.f, 0.f));
         } else {
-          theWalkAtRelativeSpeedSkill(Pose2f(0.8f, 0.f, 0.f));
+          theWalkAtRelativeSpeedSkill(Pose2f(2.2f, 0.f, 0.f));
         }
       }
     }
