@@ -159,14 +159,14 @@ void EventBasedCommunicationHandler::ebcLevelMonitor(){
     //Player: I Became Striker? Send Message
         
     if(theTeammateRoles.playsTheBall(theRobotInfo.number) && !ebcIsStriker){
-      ebcImportantMessageSend();
       ebcIsStriker = true;
+      ebcImportantMessageSend();
       if(ebcDebugMessages){
         OUTPUT_TEXT("Robot Nr. " << theRobotInfo.number << ": msg: I became striker.");
       }
     }
     else if( !theTeammateRoles.playsTheBall(theRobotInfo.number) && ebcIsStriker){
-      ebcImportantMessageSend();
+      // ebcImportantMessageSend();
       ebcIsStriker = false;
       if (ebcDebugMessages) {
         OUTPUT_TEXT("Robot Nr. " << theRobotInfo.number << ": msg: I lost striker.");
@@ -270,7 +270,8 @@ bool EventBasedCommunicationHandler::ebcSendThisFrame(const EventBasedCommunicat
     if((theFrameInfo.getTimeSince(timeLastSent) >= flexibleInterval || theFrameInfo.time < timeLastSent)) {
       ebcLevelMonitor();
       if(myUrgencyLevel >= EBCMaxLevel){
-        if(theFrameInfo.getTimeSince(timeLastSent) >= 2 * flexibleInterval){
+      // if(theFrameInfo.getTimeSince(timeLastSent) >= 2 * flexibleInterval){
+      if(theFrameInfo.getTimeSince(timeLastSent) >= flexibleInterval){
           timeLastSent = theFrameInfo.time;
         }
         else {

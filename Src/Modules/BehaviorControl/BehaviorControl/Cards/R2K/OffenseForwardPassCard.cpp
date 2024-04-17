@@ -97,19 +97,19 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
         }
 
         if (!buddyValid) {
-            return false;
+            return false;  // no boot closer towards goal than me
         }
-        
-      return
-        !aBuddyIsClearingOrPassing() &&      
-        theTeammateRoles.playsTheBall(&theRobotInfo,theTeamCommStatus.isWifiCommActive) &&   // I am the striker
-        theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
-        // either a substantial delta on x - or we are at kick-off
-        ( thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1 ||
-         theExtendedGameInfo.timeSincePlayingStarted < 10000) &&
+        if(
+          !aBuddyIsClearingOrPassing() &&
+          theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
+          theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
+          // either a substantial delta on x - or we are at kick-off
+          (thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1 ||
+            theExtendedGameInfo.timeSincePlayingStarted < 10000)  // side pass at kickOff
         // theObstacleModel.opponentIsTooClose(theFieldBall.positionRelative) != KickInfo::LongShotType::noKick &&  
-        theTeamBehaviorStatus.teamActivity != TeamBehaviorStatus::R2K_SPARSE_GAME;
-        
+        // theTeamBehaviorStatus.teamActivity != TeamBehaviorStatus::R2K_SPARSE_GAME;
+          ) return true;
+        return false;
     }
     
     bool postconditions() const override
@@ -126,6 +126,7 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
                 if(buddy.theRobotPose.translation.x() > theRobotPose.translation.x()) {
                     if(target.x() < buddy.theRobotPose.translation.x() || target == Vector2f::Zero()) {
                         target = buddy.theRobotPose.translation;
+                        target.x() += 1500;
                     }
                 }
             }
@@ -141,8 +142,7 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
         }
         
         theActivitySkill(BehaviorStatus::offenseForwardPassCard);
-
-        theGoToBallAndKickSkill(theRobotPose.toRelative(targetAbsolute).angle(), KickInfo::walkForwardsLeftLong);
+        theGoToBallAndKickSkill(theRobotPose.toRelative(targetAbsolute).angle(), KickInfo::forwardFastLeft);
     }
 
     void reset() override
