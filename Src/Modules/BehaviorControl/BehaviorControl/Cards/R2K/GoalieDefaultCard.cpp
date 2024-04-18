@@ -90,7 +90,7 @@ class GoalieDefaultCard : public GoalieDefaultCardBase
     initial_state(init)
     {
     // Calculate parameters for blocking positioning
-    blockingArcCenter = Vector2f(theFieldDimensions.xPosOwnGroundLine - blockingArcDepth, 0);
+    blockingArcCenter = Vector2f(theFieldDimensions.xPosOwnGroundLine + 1000 - blockingArcDepth, 0);
     blockingArcRadius = (Vector2f(theFieldDimensions.xPosOwnGoalPost, theFieldDimensions.yPosRightGoal) - blockingArcCenter).norm();
     lowerBlockingArcLimit = (Vector2f(theFieldDimensions.xPosOwnGoalPost, theFieldDimensions.yPosRightGoal + goalposesafetyarea) - blockingArcCenter).angle();
     upperBlockingArcLimit = (Vector2f(theFieldDimensions.xPosOwnGoalPost, theFieldDimensions.yPosLeftGoal - goalposesafetyarea) - blockingArcCenter).angle();
