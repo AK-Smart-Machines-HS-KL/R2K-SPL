@@ -222,7 +222,7 @@ private:
 
     // to do: who is active - loop supp. index, number active
     // what if substitute goalie?
-    int teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME; // patch due to update errors
+    int teamBehaviorStatus = TeamBehaviorStatus::R2K_DEFENSIVE_GAME; // patch due to update errors
 
     // n vs. 2  || 3 vs 3 or less 
     if (opp_penalties >= 18 || (own_penalties > 18 && opp_penalties > 18)) {  //undeployed robots count as penalized; the array is 20 bots long
@@ -248,8 +248,8 @@ private:
         theTeamActivitySkill(TeamBehaviorStatus::R2K_DEFENSIVE_GAME);
         teamBehaviorStatus = TeamBehaviorStatus::R2K_DEFENSIVE_GAME;
       } else {
-        theTeamActivitySkill(TeamBehaviorStatus::R2K_NORMAL_GAME);
-        teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME;
+        theTeamActivitySkill(TeamBehaviorStatus::R2K_DEFENSIVE_GAME);
+        teamBehaviorStatus = TeamBehaviorStatus::R2K_DEFENSIVE_GAME;
       }
     }
 
