@@ -1,1 +1,2 @@
 call Includes/Fast
+dr debugDrawing3d:representation:RobotInfo 
