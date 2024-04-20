@@ -63,16 +63,11 @@ class TIExecuteImpl : public TIExecuteImplBase
     MAP_EXPLICIT(PlaybackAction::Skills::Stand, theStandSkill, {theStandSkill();});
     MAP(PlaybackAction::Skills::WalkAtRelativeSpeed, theWalkAtRelativeSpeedSkill, (action.poseParam));
     MAP(PlaybackAction::Skills::KickAtGoal, theGoToBallAndKickSkill, (0_deg, KickInfo::KickType::forwardFastRight));
-    // TODO: MAP(PlaybackAction::Skills::GoToTarget, theWalkToTargetSkill, ());
-    // TODO: MAP(PlaybackAction::Skills::GoToBall, theGoToBallSkill, ());
-    // MAP(PlaybackAction::Skills::KickAtGoal, theWalkToBallAndKickAtGoalSkill, ());
-    MAP(PlaybackAction::Skills::GoToTarget, theWalkToTargetSkill, (action.poseParam));
-    MAP(PlaybackAction::Skills::GoToBall, theGoToBallSkill, ());
-    MAP(PlaybackAction::Skills::KickAtGoal, theWalkToBallAndKickAtGoalSkill, ());
+ 
     MAP(PlaybackAction::Skills::WalkToBall, theWalkAtRelativeSpeedSkill, (action.poseParam));
     MAP(PlaybackAction::Skills::WalkToPoint, theWalkToPointSkill, (action.poseParam, action.floatParam, false, false, false, false));
-    MAP_DONE(PlaybackAction::Skills::GoToTarget, { return theWalkToTargetSkill.isDone(); });
-    MAP_ABORT(PlaybackAction::Skills::GoToTarget, { return theWalkToTargetSkill.isAborted(); });
+   // MAP_DONE(PlaybackAction::Skills::GoToTarget, { return theWalkToTargetSkill.isDone(); });
+    //MAP_ABORT(PlaybackAction::Skills::GoToTarget, { return theWalkToTargetSkill.isAborted(); });
 
    // MAP(PlaybackAction::Skills::WalkToTarget, theWalkToTargetSkill, (Pose2f(180_deg, 1000.0f, 1000.0f), action.poseParam));
    // MAP_DONE(PlaybackAction::Skills::WalkToTarget, {return false;});

@@ -69,7 +69,8 @@ CARD(TIPlaybackCard,
 
     DEFINES_PARAMETERS(
     {,
-					 (int)(0)startTime,              // Time when the action was started
+					 (bool)(false) onceP,
+           (int)(0)startTime,              // Time when the action was started
 					 (int)(-1)cardIndex,             // Index of the card inside the stack of worldmodels (and playbacks resp.)
 					 (int)(-1)actionIndex,            // Index of the action inside the card, ie., which playback action is active
 					 (PlaybackAction)currentAction,  // A copy of the action-data
@@ -95,7 +96,7 @@ class TIPlaybackCard : public TIPlaybackCardBase
 	bool postconditions() const override
 	{
 		// Exit the card if no more playback actions have to be done
-		return !postconditions();
+		return !preconditions();
 	}
 
 	void execute() override
@@ -176,8 +177,12 @@ class TIPlaybackCard : public TIPlaybackCardBase
 	}
 
   bool thisIsATriggerPoint(int Number, bool findBestScore = false) const
+
   {
     ASSERT(!theTIPlaybackSequences.models.empty()); // has been checked in the pre-condition
+
+    // DECLARE_DEBUG_DRAWING("representation:FieldBall:relative", "drawingOnField");
+    DECLARE_DEBUG_DRAWING("representation:TeamBallModel", "drawingOnField");
 
     float minimal_distance = 500.0f;
     int world_model_index = -1;
@@ -188,12 +193,21 @@ class TIPlaybackCard : public TIPlaybackCardBase
       WorldModel& model = data.trigger;
       world_model_index++;
 
+      /*
+      if (theRobotInfo.number == 4 && !onceP) {
+        // onceP = true;
+        CIRCLE("representation:TeamBallModel", model.robotPose.translation.x(), model.robotPose.translation.y(), 60, 20, Drawings::solidPen, ColorRGBA::white, Drawings::noBrush, ColorRGBA(255, 0, 255));
+        // OUTPUT_TEXT("Trigger Point " << world_model_index << " " << model.robotPose.translation.x() << " " << model.robotPose.translation.y());
+      }
+      */
       if (!findBestScore || (Geometry::distance(theRobotPose.translation, model.robotPose.translation) <= minimal_distance))
       {
         if (!findBestScore)
         {
-          if (Geometry::distance(theRobotPose.translation, model.robotPose.translation) <= 500)
+          if (std::abs(Geometry::distance(theRobotPose.translation, model.robotPose.translation)) <= 500) {
+            OUTPUT_TEXT("Trigger Point " << world_model_index << "for robot" << theRobotInfo.number);
             return true;
+          }
         }
         else
         {

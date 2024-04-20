@@ -85,8 +85,7 @@ STREAMABLE(PlaybackAction,
 	    WalkToPoint,
       KickAtGoal,
       WalkToBall,
-      GoToTarget, // Neu hinzugefügt
-      GoToBall, // Neu hinzugefügt
+     
     }),
 
   (PlaybackAction::Skills) skill,    // Enum value of Skill to execute
