@@ -295,7 +295,7 @@ private:
     // OUTPUT_TEXT("theTeamData.numberOfActiveTeammates " << theTeamData.numberOfActiveTeammates);#
 
       if (2 >= activeBuddies) {   // setting  arbritary lineup
-        OUTPUT_TEXT("no buddies");
+        // OUTPUT_TEXT("no buddies");
         for (unsigned int j = 0; j < 4; j++) {
           botsLineUp.push_back(BotOnField(j, (float)lineUp[j] * 100));
         }

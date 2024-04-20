@@ -53,6 +53,7 @@
 #include "Representations/Modeling/RobotPose.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
+#include "Representations/Infrastructure/FrameInfo.h"
 #include "Tools/Math/Geometry.h"
 
 CARD(TIPlaybackCard,
@@ -61,7 +62,7 @@ CARD(TIPlaybackCard,
   CALLS(LookForward),
   CALLS(Stand),
   CALLS(TIExecute),
-
+  REQUIRES(FrameInfo),
 	REQUIRES(GlobalOptions),
 	REQUIRES(RobotInfo),
 	REQUIRES(RobotPose),
@@ -76,6 +77,8 @@ CARD(TIPlaybackCard,
 					 (PlaybackAction)currentAction,  // A copy of the action-data
 					 (bool)(false)action_changed,    // used as flag: action is called the first time in execute(); reset after First usage, set again in setNextAction()
 																					 // so we can set information like the robots starting position, only once, before action starts
+           (unsigned int)(0) timeLastRun,
+           (unsigned int)(600) cooldown,
 					 // (Pose2f)(0) destPos,	// not yet
     }),
 });
@@ -88,8 +91,10 @@ class TIPlaybackCard : public TIPlaybackCardBase
 	{
 
 
+    // OUTPUT_TEXT(theFrameInfo.getTimeSince(timeLastRun));
+
 		// Dont execute if the card stack is empty
-		return (-1 == actionIndex && !theTIPlaybackSequences.models.empty() && teachInScoreReached(theRobotInfo.number));
+		return ((-1 == actionIndex || (-2 == actionIndex && theFrameInfo.getTimeSince(timeLastRun) > cooldown )) && !theTIPlaybackSequences.models.empty() && teachInScoreReached(theRobotInfo.number));
 			// return (teachInScoreReached(theRobotInfo.number));
 	}
 
@@ -97,7 +102,7 @@ class TIPlaybackCard : public TIPlaybackCardBase
 	{
 		// Exit the card if no more playback actions have to be done
 		// return !preconditions();
-    return -2 == actionIndex;
+    return 2 == actionIndex;
 	}
 
 	void execute() override
@@ -106,6 +111,7 @@ class TIPlaybackCard : public TIPlaybackCardBase
 		theActivitySkill(BehaviorStatus::testingBehavior);
 		// OUTPUT_TEXT("ti started");
 
+    // if (-2 == actionIndex && theFrameInfo.getTimeSince(timeLastRun) > cooldown) actionIndex = -1;
 		// called only one
 		if(!startTime) cardIndex = indexOfBestTeachInScore(theRobotInfo.number); // selects best sequence in playback0001.csv, plaback0002.csv,...
 		ASSERT(-1 != cardIndex); // at least one model must qualify, since teachInScoreReached() is called in pre-cond
@@ -157,6 +163,8 @@ class TIPlaybackCard : public TIPlaybackCardBase
 			OUTPUT_TEXT("Reached end of playback sequence");
 			currentAction = {};
 			actionIndex   = -2;  // set post condition
+      timeLastRun = theFrameInfo.time;
+      startTime = 0;
 			return;
 		}
 
