@@ -42,6 +42,11 @@
  * @author Adrian Müller
  * - change semantics of trigger points: any robot close to the point of recording will trigger
  * 
+ * @version 2.2
+ * @date 2024-04-22
+ * @author Adrian Müller
+ * - fixed multi triggering by checking cooldown time 
+ * - ending sequence: setting acition_index-2 == wait for cooldwon period, default -1 (== first call ever) means: start immediately
  * ToDo:
  *	include generic map for head movements
  */
@@ -78,8 +83,8 @@ CARD(TIPlaybackCard,
 					 (bool)(false)action_changed,    // used as flag: action is called the first time in execute(); reset after First usage, set again in setNextAction()
 																					 // so we can set information like the robots starting position, only once, before action starts
            (unsigned int)(0) timeLastRun,
-           (unsigned int)(600) cooldown,
-					 // (Pose2f)(0) destPos,	// not yet
+           (unsigned int)(15000) cooldown,  // waiting time, until next playback will be executed
+           (unsigned int)(500) min_distance, // radial distance bot from trigger point
     }),
 });
 
@@ -102,7 +107,7 @@ class TIPlaybackCard : public TIPlaybackCardBase
 	{
 		// Exit the card if no more playback actions have to be done
 		// return !preconditions();
-    return 2 == actionIndex;
+    return -2 == actionIndex;
 	}
 
 	void execute() override
@@ -117,7 +122,7 @@ class TIPlaybackCard : public TIPlaybackCardBase
 		ASSERT(-1 != cardIndex); // at least one model must qualify, since teachInScoreReached() is called in pre-cond
 
 		// Figure out which action to play; sets startTime 
-		setNextAction();
+		currentAction =  setNextAction();
 
 		// Playback reached the end (OR no model found, which should not happen) -> stand still
 		if(actionIndex == -1)
@@ -132,7 +137,7 @@ class TIPlaybackCard : public TIPlaybackCardBase
 		theTIExecuteSkill(currentAction);
 	}
 
-	void setNextAction()
+  PlaybackAction setNextAction()
 	{
 
 		if(!startTime)
@@ -143,7 +148,7 @@ class TIPlaybackCard : public TIPlaybackCardBase
 			actionIndex    = 0;
 		}
 		// Replay is finished, nothing more to do.
-		if(-1 == actionIndex) return;
+		if(-1 == actionIndex) return {};
 
 
 		
@@ -165,7 +170,7 @@ class TIPlaybackCard : public TIPlaybackCardBase
 			actionIndex   = -2;  // set post condition
       timeLastRun = theFrameInfo.time;
       startTime = 0;
-			return;
+			return currentAction;
 		}
 
 		// ok: we are inbetween o .. #actions-1
@@ -175,7 +180,7 @@ class TIPlaybackCard : public TIPlaybackCardBase
 			action_changed = false;
 			startTime      = state_time;
 			// OUTPUT_TEXT("Action: " + std::to_string(actionIndex));
-			// OUTPUT_TEXT("playback000" << cardIndex + 1 << " action Index and Name: " << actionIndex << " " << TypeRegistry::getEnumName(theTIPlaybackSequences.data[cardIndex].actions[actionIndex].skill));
+			OUTPUT_TEXT("playback000" << cardIndex + 1 << " action Index and Name: " << actionIndex << " " << TypeRegistry::getEnumName(theTIPlaybackSequences.data[cardIndex].actions[actionIndex].skill));
 			// OUTPUT_TEXT("remaining time" << diff);
 
 
@@ -183,74 +188,33 @@ class TIPlaybackCard : public TIPlaybackCardBase
 			// prepare check for isDone(): set exit criterion
 			// destPos = theRobotPose * theTIPlaybackSequences.data[cardIndex].actions[actionIndex].poseParam;
 		}
+    return currentAction;
 	}
 
-  /*
-  bool thisIsATriggerPoint(int Number, bool findBestScore = false) const
+
+  bool thisIsATriggerPoint(const WorldModel& model) const
 
   {
     ASSERT(!theTIPlaybackSequences.models.empty()); // has been checked in the pre-condition
+    
+    return  (std::abs(Geometry::distance(theRobotPose.translation, model.robotPose.translation)) <= min_distance);
+    // OUTPUT_TEXT("Trigger Point " << world_model_index << " for robot" << theRobotInfo.number);
 
-    // DECLARE_DEBUG_DRAWING("representation:FieldBall:relative", "drawingOnField");
-    DECLARE_DEBUG_DRAWING("representation:TeamBallModel", "drawingOnField");
 
-    float minimal_distance = 500.0f;
-    int world_model_index = -1;
-    int current_bestWorldModelIndex = -1;
-
-    for (WorldData data : theTIPlaybackSequences.models)
-    {
-      WorldModel& model = data.trigger;
-      world_model_index++;
-
-      /*
-      if (theRobotInfo.number == 4 && !onceP) {
-        // onceP = true;
-        CIRCLE("representation:TeamBallModel", model.robotPose.translation.x(), model.robotPose.translation.y(), 60, 20, Drawings::solidPen, ColorRGBA::white, Drawings::noBrush, ColorRGBA(255, 0, 255));
-        // OUTPUT_TEXT("Trigger Point " << world_model_index << " " << model.robotPose.translation.x() << " " << model.robotPose.translation.y());
-      }
-
-      if (!findBestScore || (Geometry::distance(theRobotPose.translation, model.robotPose.translation) <= minimal_distance))
-      {
-        if (!findBestScore)
-        {
-          if (std::abs(Geometry::distance(theRobotPose.translation, model.robotPose.translation)) <= 500) {
-            OUTPUT_TEXT("Trigger Point " << world_model_index << " for robot" << theRobotInfo.number);
-          }
-        }
-        else
-        {
-          current_bestWorldModelIndex = world_model_index;
-          minimal_distance = Geometry::distance(theRobotPose.translation, model.robotPose.translation);
-        }
-      }
-    }
-
-    if (findBestScore && current_bestWorldModelIndex != -1)
-    {
-      ASSERT(current_bestWorldModelIndex >= 0);
-      OUTPUT_TEXT("trigger became active for robot " << Number << " from file " << theTIPlaybackSequences.models[current_bestWorldModelIndex].fileName);
-    }
-
-    return findBestScore ? current_bestWorldModelIndex != -1 : false;
   }
 
-  */
-
-
-  bool teachInScoreReached(int Number) const
+  // param number unused yet
+  bool teachInScoreReached(int number) const
   {
     ASSERT(!theTIPlaybackSequences.models.empty());  // has been checked in the pre-condition
     // OUTPUT_TEXT("checking trigger for robot " << Number  );
     for (WorldData data : theTIPlaybackSequences.models)
     {
       WorldModel& model = data.trigger;
-      if (//model.robotNumber == Number && // when this is disabled, any robot close to the point of recording will trigger
-        (Geometry::distance(theRobotPose.translation, model.robotPose.translation) <= 500))  // this is a trigger point
+     // if (//model.robotNumber == number && // when this is disabled, any robot close to the point of recording will trigger
+      if (thisIsATriggerPoint(model))  // this is a trigger point for given world model
         return true;
-
     }
-
     return false;
   }
 
@@ -268,7 +232,7 @@ class TIPlaybackCard : public TIPlaybackCardBase
       world_model_index++;
       // OUTPUT_TEXT(model.fileName);
       if ( //model.robotNumber == Number && // when this is disabled, any robot close to the point of recording will trigger
-        (Geometry::distance(theRobotPose.translation, model.robotPose.translation) <= minimal_distance)) // this is the first OR a better trigger point
+        thisIsATriggerPoint(model)) // this is the first OR a better trigger point
       {
         current_bestWorldModelIndex = world_model_index;
         minimal_distance = Geometry::distance(theRobotPose.translation, model.robotPose.translation);  // new minimum
