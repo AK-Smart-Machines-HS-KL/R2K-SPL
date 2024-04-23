@@ -6,6 +6,8 @@
 #include <rapidcsv.h>
 #include "Tools/RingBuffer.h"
 #include "Tools/Math/Geometry.h"
+#include "Tools/Debugging/DebugDrawings.h"
+#include "Tools/Debugging/DebugDrawings3D.h"
 
 MAKE_MODULE(TIPlaybackProvider, behaviorControl);
 
@@ -23,23 +25,55 @@ TIPlaybackProvider::TIPlaybackProvider()
 {
 }
 
+
+
 void TIPlaybackProvider::update(TIPlaybackSequences &playbackData)
 {
+  // activate with:
+// dr debugDrawing3d:representation:TIPlaybackProvider 
 
-    if (!playbackData.loaded) {
-        loadTeachInData(playbackData);
-        enforceConsistency(playbackData);
-        printLoadedData(playbackData);
-        playbackData.loaded = true;
-    }
+  DEBUG_DRAWING3D("representation:TIPlaybackProvider", "field");
 
-    // dr loadTeachInData
-    DEBUG_RESPONSE_ONCE("loadTeachInData")
-    {
-        loadTeachInData(playbackData);
-        enforceConsistency(playbackData);
-        printLoadedData(playbackData);
-    }
+  for (WorldData model : playbackData.models)
+  {
+    // OUTPUT_TEXT(model.fileName);
+    // OUTPUT_TEXT(model.trigger.robotPose.translation.x() << " " << model.trigger.robotPose.translation.y());
+    SPHERE3D("representation:TIPlaybackProvider", model.trigger.robotPose.translation.x(), model.trigger.robotPose.translation.y(), 70, 70, ColorRGBA::red);
+  }
+  /* CIRCLE("representation:TIPlaybackProvider", "",
+    position.x(), position.y(), 45, 0, // pen width
+    Drawings::solidPen, ColorRGBA::black,
+    Drawings::solidBrush, violet);
+    */
+  /*
+
+  COMPLEX_DRAWING("module:TIPlaybackProvider:points") {
+    const Vector3f ballPos3d = Vector3f(100.0f, 200.0f, 0.0f);
+    SPHERE3D("module:TIPlaybackProvider:points", ballPos3d.x(), ballPos3d.y(), 350.f, 350.f, ColorRGBA(128, 64, 0));
+  }
+
+  DECLARE_DEBUG_DRAWING("module:TIPlaybackProvider", "drawingOnField");
+  DEBUG_DRAWING3D("module:TIPlaybackProvider", "field") {
+    const Vector3f ballPos3d = Vector3f(100.0f, 200.0f, 0.0f);
+    SPHERE3D("representation:TIPlaybackProvider", ballPos3d.x(), ballPos3d.y(), 350.f, 350.f, ColorRGBA(128, 64, 0));
+  }
+
+  */
+  if (!playbackData.loaded) {
+      loadTeachInData(playbackData);
+      enforceConsistency(playbackData);
+      printLoadedData(playbackData);
+      playbackData.loaded = true;
+  }
+
+  // dr loadTeachInData
+  DEBUG_RESPONSE_ONCE("loadTeachInData")
+  {
+      loadTeachInData(playbackData);
+      enforceConsistency(playbackData);
+      printLoadedData(playbackData);
+
+  }
 }
 
 void TIPlaybackProvider::printLoadedData(TIPlaybackSequences &playbackData)
@@ -50,6 +84,8 @@ void TIPlaybackProvider::printLoadedData(TIPlaybackSequences &playbackData)
     for (WorldData model : playbackData.models)
     {
         // OUTPUT_TEXT(model.fileName);
+      OUTPUT_TEXT(model.trigger.robotPose.translation.x() << " " << model.trigger.robotPose.translation.y());
+
     }
 
     OUTPUT_TEXT("-------------");
@@ -145,23 +181,23 @@ bool TIPlaybackProvider::loadWorldModel(TIPlaybackSequences &playbackData, std::
     return true;
 }
 
-bool TIPlaybackProvider::loadPlayback(TIPlaybackSequences &playbackData, std::string name, std::string path)
+bool TIPlaybackProvider::loadPlayback(TIPlaybackSequences& playbackData, std::string name, std::string path)
 {
-    try
-    {
-        PlaybackSequence data = PlaybackSequence(path, false);
+  try
+  {
+    PlaybackSequence data = PlaybackSequence(path, false);
 
-        // We dont want any empty playbacks -> abort
-        if (data.actions.empty())
-            return false;
+    // We dont want any empty playbacks -> abort
+    if (data.actions.empty())
+      return false;
 
-        // Playback is valid -> store it
-        playbackData.data.push_back(data);
-    }
-    catch (const std::exception &e)
-    {
-        OUTPUT_WARNING(e.what());
-        return false;
-    }
-    return true;
+    // Playback is valid -> store it
+    playbackData.data.push_back(data);
+  }
+  catch (const std::exception& e)
+  {
+    OUTPUT_WARNING(e.what());
+    return false;
+  }
+  return true;
 }
