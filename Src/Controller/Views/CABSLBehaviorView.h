@@ -9,7 +9,7 @@
 
 #include <SimRobot.h>
 
-class RobotConsole;
+class RobotTextConsole;
 struct ActivationGraph;
 
 /**
@@ -25,12 +25,12 @@ public:
    * @param activationGraph The graph of active options and states to be visualized.
    * @param timestamp When was the last activation graph received?
    */
-  CABSLBehaviorView(const QString& fullName, RobotConsole& console, const ActivationGraph& activationGraph, const unsigned& timestamp);
+  CABSLBehaviorView(const QString& fullName, RobotTextConsole& console, const ActivationGraph& activationGraph, const unsigned& timestamp);
 
 private:
   const QString fullName; /**< The path to this view in the scene graph */
   const QIcon icon; /**< The icon used for listing this view in the scene graph */
-  RobotConsole& console; /**< A reference to the console object. */
+  RobotTextConsole& console; /**< A reference to the console object. */
   const ActivationGraph& activationGraph; /**< The graph of active options and states. */
   const unsigned& timestamp; /**< When was the last activation graph received? */
 

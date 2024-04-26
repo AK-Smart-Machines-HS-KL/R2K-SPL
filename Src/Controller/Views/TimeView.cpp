@@ -9,7 +9,7 @@
 
 #include "TimeView.h"
 #include "Controller/RoboCupCtrl.h"
-#include "Controller/RobotConsole.h"
+#include "Controller/RobotTextConsole.h"
 #include "Platform/Time.h"
 
 #include <QApplication>
@@ -235,7 +235,7 @@ void TimeWidget::copy()
   QApplication::clipboard()->setText(selected_text);
 }
 
-TimeView::TimeView(const QString& fullName, RobotConsole& console, const TimeInfo& info) :
+TimeView::TimeView(const QString& fullName, RobotTextConsole& console, const TimeInfo& info) :
   fullName(fullName), icon(":/Icons/tag_green.png"), console(console), info(info)
 {}
 

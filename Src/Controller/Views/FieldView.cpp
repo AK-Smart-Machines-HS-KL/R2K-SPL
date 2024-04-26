@@ -18,10 +18,10 @@
 
 #include "FieldView.h"
 #include "Controller/RoboCupCtrl.h"
-#include "Controller/RobotConsole.h"
+#include "Controller/RobotTextConsole.h"
 #include "Controller/Visualization/PaintMethods.h"
 
-FieldView::FieldView(const QString& fullName, RobotConsole& console, const std::string& name) :
+FieldView::FieldView(const QString& fullName, RobotTextConsole& console, const std::string& name) :
   fullName(fullName), icon(":/Icons/tag_green.png"), console(console), name(name)
 {}
 

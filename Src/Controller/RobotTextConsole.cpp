@@ -1,12 +1,12 @@
 /**
- * @file Controller/RobotConsole.cpp
+ * @file Controller/RobotTextConsole.cpp
  *
- * Implementation of RobotConsole.
+ * Implementation of RobotTextConsole.
  *
  * @author Thomas Röfer
  */
 
-#include "RobotConsole.h"
+#include "RobotTextConsole.h"
 
 #include <algorithm>
 #include <iostream>
@@ -41,7 +41,7 @@
 
 #define PREREQUISITE(p) pollingFor = #p; if(!poll(p)) return false;
 
-bool RobotConsole::MapWriter::handleMessage(InMessage& message)
+bool RobotTextConsole::MapWriter::handleMessage(InMessage& message)
 {
   ASSERT(message.getMessageID() == idDebugDataResponse);
   std::string name, type;
@@ -51,14 +51,14 @@ bool RobotConsole::MapWriter::handleMessage(InMessage& message)
   return true;
 }
 
-bool RobotConsole::Printer::handleMessage(InMessage& message)
+bool RobotTextConsole::Printer::handleMessage(InMessage& message)
 {
   ASSERT(message.getMessageID() == idText);
   ctrl->printLn(message.text.readAll());
   return true;
 }
 
-RobotConsole::RobotConsole(const Settings& settings, const std::string& robotName, DebugReceiver<MessageQueue>* receiver, DebugSender<MessageQueue>* sender) :
+RobotTextConsole::RobotTextConsole(const Settings& settings, const std::string& robotName, DebugReceiver<MessageQueue>* receiver, DebugSender<MessageQueue>* sender) :
   ThreadFrame(settings, robotName, receiver, sender),
   logPlayer(*sender),
   typeInfo(false),
@@ -80,7 +80,7 @@ RobotConsole::RobotConsole(const Settings& settings, const std::string& robotNam
   logPlayer.setSize(0xfffffffff); // max. 64 GB
 }
 
-RobotConsole::~RobotConsole()
+RobotTextConsole::~RobotTextConsole()
 {
   SYNC;
   setGlobals();
@@ -90,7 +90,7 @@ RobotConsole::~RobotConsole()
   destructed = true;
 }
 
-void RobotConsole::init()
+void RobotTextConsole::init()
 {
   if(mode == SystemCall::remoteRobot)
   {
@@ -102,7 +102,7 @@ void RobotConsole::init()
   joystick.init();
 }
 
-void RobotConsole::addPerRobotViews()
+void RobotTextConsole::addPerRobotViews()
 {
   SimRobot::Object* category = ctrl->addCategory(QString::fromStdString(robotName), nullptr, ":/Icons/SimRobot.png");
 
@@ -135,7 +135,7 @@ void RobotConsole::addPerRobotViews()
   ctrl->addCategory("timing", category);
 }
 
-void RobotConsole::addPerThreadViews()
+void RobotTextConsole::addPerThreadViews()
 {
   SimRobot::Object* annotationCategory = ConsoleRoboCupCtrl::application->resolveObject(QString::fromStdString(robotName) + ".annotations");
   SimRobot::Object* timingCategory = ConsoleRoboCupCtrl::application->resolveObject(QString::fromStdString(robotName) + ".timing");
@@ -148,7 +148,7 @@ void RobotConsole::addPerThreadViews()
   }
 }
 
-void RobotConsole::addColorSpaceViews(const std::string& id, const std::string& name, bool user, const std::string& threadIdentifier)
+void RobotTextConsole::addColorSpaceViews(const std::string& id, const std::string& name, bool user, const std::string& threadIdentifier)
 {
   SimRobot::Object* colorSpaceCategory = ConsoleRoboCupCtrl::application->resolveObject(QString::fromStdString(robotName) + ".colorSpace");
   SimRobot::Object* nameCategory = ctrl->addCategory(name.c_str(), colorSpaceCategory);
@@ -179,13 +179,13 @@ void RobotConsole::addColorSpaceViews(const std::string& id, const std::string& 
   }
 }
 
-void RobotConsole::handleAllMessages(MessageQueue& messageQueue)
+void RobotTextConsole::handleAllMessages(MessageQueue& messageQueue)
 {
   SYNC;  // Only one thread can access *this now.
   messageQueue.handleAllMessages(*this);
 }
 
-bool RobotConsole::handleMessage(InMessage& message)
+bool RobotTextConsole::handleMessage(InMessage& message)
 {
   if(!handleMessages)
     return true;
@@ -414,7 +414,7 @@ bool RobotConsole::handleMessage(InMessage& message)
           DebugDrawing3D& debugDrawing3D = data.drawings3D[name];
           bool drawn = debugDrawing3D.drawn;
           bool flip = debugDrawing3D.flip;
-          pair.second.robotConsole = this;
+          pair.second.robotTextConsole = this;
           debugDrawing3D = pair.second;
           debugDrawing3D.drawn = drawn;
           debugDrawing3D.flip = flip;
@@ -596,7 +596,7 @@ bool RobotConsole::handleMessage(InMessage& message)
   return false;
 }
 
-void RobotConsole::update()
+void RobotTextConsole::update()
 {
   setGlobals(); // this is called in GUI thread -> set globals for this thread
   handleJoystick();
@@ -644,7 +644,7 @@ void RobotConsole::update()
   }
 }
 
-void RobotConsole::handleConsole(std::string line)
+void RobotTextConsole::handleConsole(std::string line)
 {
   setGlobals(); // this is called in GUI thread -> set globals for this thread
   for(;;)
@@ -675,7 +675,7 @@ void RobotConsole::handleConsole(std::string line)
   pollForDirectMode();
 }
 
-void RobotConsole::triggerThreads()
+void RobotTextConsole::triggerThreads()
 {
   if(mode == SystemCall::logFileReplay)
   {
@@ -690,7 +690,7 @@ void RobotConsole::triggerThreads()
   }
 }
 
-bool RobotConsole::poll(MessageID id)
+bool RobotTextConsole::poll(MessageID id)
 {
   if(id == idDebugResponse || id == idDrawingManager || id == idDrawingManager3D)
     sendModuleRequest();
@@ -777,7 +777,7 @@ bool RobotConsole::poll(MessageID id)
   }
 }
 
-void RobotConsole::pollForDirectMode()
+void RobotTextConsole::pollForDirectMode()
 {
   if(directMode)
   {
@@ -793,7 +793,7 @@ void RobotConsole::pollForDirectMode()
   }
 }
 
-bool RobotConsole::handleConsoleLine(const std::string& line)
+bool RobotTextConsole::handleConsoleLine(const std::string& line)
 {
   InConfigMemory stream(line.c_str(), line.size());
   std::string command;
@@ -994,7 +994,7 @@ bool RobotConsole::handleConsoleLine(const std::string& line)
   return true;
 }
 
-bool RobotConsole::msg(In& stream)
+bool RobotTextConsole::msg(In& stream)
 {
   std::string state;
   stream >> state;
@@ -1037,14 +1037,14 @@ bool RobotConsole::msg(In& stream)
   return false;
 }
 
-bool RobotConsole::backgroundColor(In& stream)
+bool RobotTextConsole::backgroundColor(In& stream)
 {
   stream >> background.x() >> background.y() >> background.z();
   background *= 0.01f;
   return true;
 }
 
-bool RobotConsole::debugRequest(In& stream)
+bool RobotTextConsole::debugRequest(In& stream)
 {
   std::string debugRequestString, state;
   stream >> debugRequestString >> state;
@@ -1102,7 +1102,7 @@ bool RobotConsole::debugRequest(In& stream)
     return true; \
   }
 
-bool RobotConsole::log(In& stream)
+bool RobotTextConsole::log(In& stream)
 {
   std::string command;
   stream >> command;
@@ -1752,7 +1752,7 @@ bool RobotConsole::log(In& stream)
   return false;
 }
 
-bool RobotConsole::get(In& stream, bool first, bool print)
+bool RobotTextConsole::get(In& stream, bool first, bool print)
 {
   std::string request, option;
   stream >> request >> option;
@@ -1812,7 +1812,7 @@ bool RobotConsole::get(In& stream, bool first, bool print)
   return false;
 }
 
-bool RobotConsole::DataViewWriter::handleMessage(InMessage& message)
+bool RobotTextConsole::DataViewWriter::handleMessage(InMessage& message)
 {
   std::string name, type;
   message.bin >> name >> type;
@@ -1820,14 +1820,14 @@ bool RobotConsole::DataViewWriter::handleMessage(InMessage& message)
   return handleMessage(message, type, name);
 }
 
-bool RobotConsole::DataViewWriter::handleMessage(InMessage& message, const std::string& type, const std::string& name)
+bool RobotTextConsole::DataViewWriter::handleMessage(InMessage& message, const std::string& type, const std::string& name)
 {
   auto view = pDataViews->find(name);
   ASSERT(message.getMessageID() == idDebugDataResponse);
   return view != pDataViews->end() && view->second->handleMessage(message, type, name);
 }
 
-bool RobotConsole::set(In& stream)
+bool RobotTextConsole::set(In& stream)
 {
   std::string request, option;
   stream >> request >> option;
@@ -1922,7 +1922,7 @@ bool RobotConsole::set(In& stream)
   return false;
 }
 
-void RobotConsole::printType(const std::string& type, const std::string& field)
+void RobotTextConsole::printType(const std::string& type, const std::string& field)
 {
   if(type[type.size() - 1] == ']')
   {
@@ -1956,13 +1956,13 @@ void RobotConsole::printType(const std::string& type, const std::string& field)
   }
 }
 
-bool RobotConsole::repoll(In&)
+bool RobotTextConsole::repoll(In&)
 {
   polled[idDebugResponse] = polled[idDrawingManager] = polled[idDrawingManager3D] = false;
   return true;
 }
 
-bool RobotConsole::moduleRequest(In& stream)
+bool RobotTextConsole::moduleRequest(In& stream)
 {
   SYNC;
   std::string representation, module, pattern;
@@ -2191,7 +2191,7 @@ bool RobotConsole::moduleRequest(In& stream)
   return false;
 }
 
-bool RobotConsole::moveRobot(In& stream)
+bool RobotTextConsole::moveRobot(In& stream)
 {
   SYNC;
   stream >> movePos.x() >> movePos.y();
@@ -2209,7 +2209,7 @@ bool RobotConsole::moveRobot(In& stream)
   return true;
 }
 
-bool RobotConsole::moveBall(In& stream)
+bool RobotTextConsole::moveBall(In& stream)
 {
   SYNC;
   stream >> movePos.x() >> movePos.y() >> movePos.z();
@@ -2217,7 +2217,7 @@ bool RobotConsole::moveBall(In& stream)
   return true;
 }
 
-void RobotConsole::printLn(const std::string& line)
+void RobotTextConsole::printLn(const std::string& line)
 {
   if(nullptr != ctrl)
   {
@@ -2225,7 +2225,7 @@ void RobotConsole::printLn(const std::string& line)
   }
 }
 
-bool RobotConsole::view3D(In& stream)
+bool RobotTextConsole::view3D(In& stream)
 {
   std::string buffer;
   stream >> buffer;
@@ -2301,7 +2301,7 @@ bool RobotConsole::view3D(In& stream)
   return false;
 }
 
-bool RobotConsole::viewField(In& stream)
+bool RobotTextConsole::viewField(In& stream)
 {
   std::string name;
   stream >> name;
@@ -2317,7 +2317,7 @@ bool RobotConsole::viewField(In& stream)
   return true;
 }
 
-bool RobotConsole::viewData(In& stream)
+bool RobotTextConsole::viewData(In& stream)
 {
   std::string name, option;
   stream >> name >> option;
@@ -2346,7 +2346,7 @@ bool RobotConsole::viewData(In& stream)
   return false;
 }
 
-bool RobotConsole::viewDrawing(In& stream, RobotConsole::Views& views, const char* type)
+bool RobotTextConsole::viewDrawing(In& stream, RobotTextConsole::Views& views, const char* type)
 {
   bool found = false;
   std::string view;
@@ -2436,7 +2436,7 @@ bool RobotConsole::viewDrawing(In& stream, RobotConsole::Views& views, const cha
   return found;
 }
 
-bool RobotConsole::viewImage(In& stream)
+bool RobotTextConsole::viewImage(In& stream)
 {
   std::string buffer;
   stream >> buffer;
@@ -2565,7 +2565,7 @@ bool RobotConsole::viewImage(In& stream)
   return false;
 }
 
-bool RobotConsole::viewImageCommand(In& stream)
+bool RobotTextConsole::viewImageCommand(In& stream)
 {
   std::string view;
   stream >> view;
@@ -2639,7 +2639,7 @@ bool RobotConsole::viewImageCommand(In& stream)
   return all;
 }
 
-bool RobotConsole::viewPlot(In& stream)
+bool RobotTextConsole::viewPlot(In& stream)
 {
   std::string name;
   int plotSize;
@@ -2670,7 +2670,7 @@ bool RobotConsole::viewPlot(In& stream)
   return true;
 }
 
-bool RobotConsole::kickView()
+bool RobotTextConsole::kickView()
 {
   if(ctrl->is2D)
     ctrl->printLn("The kick view is not available in the 2D simulator.");
@@ -2702,13 +2702,13 @@ bool RobotConsole::kickView()
   return false;
 }
 
-void RobotConsole::sendDebugMessage(InMessage& msg)
+void RobotTextConsole::sendDebugMessage(InMessage& msg)
 {
   SYNC;
   msg >> *debugSender;
 }
 
-std::string RobotConsole::getDebugRequest(const std::string& name)
+std::string RobotTextConsole::getDebugRequest(const std::string& name)
 {
   SYNC;
   for(const auto& i : debugRequestTable.slowIndex)
@@ -2718,11 +2718,11 @@ std::string RobotConsole::getDebugRequest(const std::string& name)
       return i.first.substr(11);
     }
   }
-  printLn("Error: RobotConsole: DebugRequest not found.");
+  printLn("Error: RobotTextConsole: DebugRequest not found.");
   return "";
 }
 
-bool RobotConsole::viewPlotDrawing(In& stream)
+bool RobotTextConsole::viewPlotDrawing(In& stream)
 {
   std::string buffer;
   stream >> buffer;
@@ -2814,7 +2814,7 @@ bool RobotConsole::viewPlotDrawing(In& stream)
   return false;
 }
 
-bool RobotConsole::joystickExecCommand(const std::string& cmd)
+bool RobotTextConsole::joystickExecCommand(const std::string& cmd)
 {
   if(cmd.empty())
     return false;
@@ -2826,7 +2826,7 @@ bool RobotConsole::joystickExecCommand(const std::string& cmd)
   return true;
 }
 
-void RobotConsole::handleJoystick()
+void RobotTextConsole::handleJoystick()
 {
   if(!joystick.update())
     return; //return if no joystick was found
@@ -2905,7 +2905,7 @@ void RobotConsole::handleJoystick()
   }
 }
 
-bool RobotConsole::joystickCommand(In& stream)
+bool RobotTextConsole::joystickCommand(In& stream)
 {
   std::string command;
   stream >> command;
@@ -2975,7 +2975,7 @@ bool RobotConsole::joystickCommand(In& stream)
   return false;
 }
 
-bool RobotConsole::joystickSpeeds(In& stream)
+bool RobotTextConsole::joystickSpeeds(In& stream)
 {
   int id;
   stream >> id;
@@ -2987,7 +2987,7 @@ bool RobotConsole::joystickSpeeds(In& stream)
   return false;
 }
 
-bool RobotConsole::joystickMaps(In& stream)
+bool RobotTextConsole::joystickMaps(In& stream)
 {
   int axis, button1, button2;
   stream >> axis >> button1 >> button2;
@@ -2999,7 +2999,7 @@ bool RobotConsole::joystickMaps(In& stream)
   return false;
 }
 
-bool RobotConsole::saveRequest(In& stream, bool first)
+bool RobotTextConsole::saveRequest(In& stream, bool first)
 {
   std::string buffer;
   std::string path;
@@ -3054,7 +3054,7 @@ bool RobotConsole::saveRequest(In& stream, bool first)
   }
 }
 
-bool RobotConsole::saveImage(In& stream)
+bool RobotTextConsole::saveImage(In& stream)
 {
   ImageExport::ExportMode exportMode = ImageExport::rgb;
   std::string buffer;
@@ -3102,7 +3102,7 @@ bool RobotConsole::saveImage(In& stream)
   }
 }
 
-void RobotConsole::handleKeyEvent(int key, bool pressed)
+void RobotTextConsole::handleKeyEvent(int key, bool pressed)
 {
   if(joystickTrace && pressed)
   {
@@ -3115,7 +3115,7 @@ void RobotConsole::handleKeyEvent(int key, bool pressed)
     ctrl->executeConsoleCommand(joystickButtonCommand[key], this);
 }
 
-std::string RobotConsole::getPathForRepresentation(const std::string& representation)
+std::string RobotTextConsole::getPathForRepresentation(const std::string& representation)
 {
   std::string fileName;
   std::unordered_map<std::string, std::string>::const_iterator i = ctrl->representationToFile.find(representation);
@@ -3134,7 +3134,7 @@ std::string RobotConsole::getPathForRepresentation(const std::string& representa
   return fileName;
 }
 
-void RobotConsole::requestDebugData(const std::string& name, bool enable)
+void RobotTextConsole::requestDebugData(const std::string& name, bool enable)
 {
   SYNC;
   DebugRequest d("debug data:" + name, enable);
@@ -3147,7 +3147,7 @@ void RobotConsole::requestDebugData(const std::string& name, bool enable)
   }
 }
 
-void RobotConsole::sendModuleRequest()
+void RobotTextConsole::sendModuleRequest()
 {
   if(moduleRequestChanged)
   {
@@ -3162,7 +3162,7 @@ void RobotConsole::sendModuleRequest()
   }
 }
 
-void RobotConsole::updateAnnotationsFromLog()
+void RobotTextConsole::updateAnnotationsFromLog()
 {
   struct Handler : public MessageHandler
   {

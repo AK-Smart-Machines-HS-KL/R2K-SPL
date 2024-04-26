@@ -22,12 +22,12 @@
 
 #include <SimRobot.h>
 #include "Controller/RoboCupCtrl.h"
-#include "Controller/RobotConsole.h"
+#include "Controller/RobotTextConsole.h"
 #include "Controller/Visualization/PaintMethods.h"
 #include "Representations/Infrastructure/CameraImage.h"
 #include "Tools/Math/Eigen.h"
 
-class RobotConsole;
+class RobotTextConsole;
 class ImageWidget;
 
 /**
@@ -51,12 +51,12 @@ public:
    * @param gain The intensity is multiplied with this factor.
    * @param ddScale The debug drawings are multiplied with this factor.
    */
-  ImageView(QString fullName, RobotConsole& console, std::string background, std::string  name, std::string threadIdentifier, float gain = 1.0f, float ddScale = 1.0f);
+  ImageView(QString fullName, RobotTextConsole& console, std::string background, std::string  name, std::string threadIdentifier, float gain = 1.0f, float ddScale = 1.0f);
 
 private:
   const QString fullName; /**< The path to this view in the scene graph */
   const QIcon icon; /**< The icon used for listing this view in the scene graph */
-  RobotConsole& console; /**< A reference to the console object. */
+  RobotTextConsole& console; /**< A reference to the console object. */
   const std::string background; /**< The name of the background image. */
   const std::string name; /**< The name of the view. */
   float gain; /**< The intensity is multiplied with this factor. */

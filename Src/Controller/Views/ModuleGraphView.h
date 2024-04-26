@@ -12,7 +12,7 @@
 
 #include <string>
 
-class RobotConsole;
+class RobotTextConsole;
 
 /**
  * A class to represent a view displaying the module layout of the thread.
@@ -25,11 +25,11 @@ public:
    * @param console The console object.
    * @param category The category of the modules of this view. If numOfCategories, show all categories.
    */
-  ModuleGraphViewObject(const QString& fullName, RobotConsole& console,
+  ModuleGraphViewObject(const QString& fullName, RobotTextConsole& console,
                         std::unordered_set<ModuleBase::Category> categories = {static_cast<ModuleBase::Category>(ModuleBase::numOfCategories)});
 
 private:
-  RobotConsole& console; /**< A reference to the console object. */
+  RobotTextConsole& console; /**< A reference to the console object. */
   std::string threadIdentifier; /**< The name of the view. */
   std::unordered_set<ModuleBase::Category> categories; /**< The category of the modules of this view. If numOfCategories, show all categories. */
   unsigned lastModulInfoTimestamp = 0; /**< Module Info timestamp when the image was created. */

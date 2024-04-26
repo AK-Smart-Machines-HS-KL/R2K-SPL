@@ -153,7 +153,7 @@ void ConsoleRoboCupCtrl::update()
 }
 
 void ConsoleRoboCupCtrl::executeFile(const std::string& name1, const std::string& name2,
-                                     bool printError, RobotConsole* console, bool scenarioAndLocationOnly)
+                                     bool printError, RobotTextConsole* console, bool scenarioAndLocationOnly)
 {
   if(nesting == 10)
     printLn("Nesting Error");
@@ -223,7 +223,7 @@ void ConsoleRoboCupCtrl::selectedObject(const SimRobot::Object& obj)
 void ConsoleRoboCupCtrl::pressedKey(int key, bool pressed)
 {
   if(key > 10)
-    for(RobotConsole* selectedConsole : selected)
+    for(RobotTextConsole* selectedConsole : selected)
       selectedConsole->handleKeyEvent(key - 11, pressed);
 }
 
@@ -248,7 +248,7 @@ void ConsoleRoboCupCtrl::setRepresentation(const std::string& representationName
   executeConsoleCommand(command);
 }
 
-void ConsoleRoboCupCtrl::executeConsoleCommand(std::string command, RobotConsole* console, bool scenarioAndLocationOnly)
+void ConsoleRoboCupCtrl::executeConsoleCommand(std::string command, RobotTextConsole* console, bool scenarioAndLocationOnly)
 {
   if(!scenarioAndLocationOnly)
     showInputDialog(command);
@@ -456,7 +456,7 @@ void ConsoleRoboCupCtrl::executeConsoleCommand(std::string command, RobotConsole
   }
   else
   {
-    for(RobotConsole* selectedConsole : selected)
+    for(RobotTextConsole* selectedConsole : selected)
       selectedConsole->handleConsole(command);
   }
   if(completion.empty() && !scenarioAndLocationOnly)
@@ -641,7 +641,7 @@ bool ConsoleRoboCupCtrl::startLogFile(In& stream)
   logFile = fileName;
   robots.push_back(new ControllerRobot(Settings(logFile), name));
   selected.clear();
-  RobotConsole* rc = robots.back()->getRobotThread();
+  RobotTextConsole* rc = robots.back()->getRobotThread();
   selected.push_back(rc);
   robots.back()->start();
   return true;
@@ -974,10 +974,10 @@ void ConsoleRoboCupCtrl::createCompletion()
       for(const auto& i : debugRequestTable->slowIndex)
         if(translate(i.first).substr(0, 5) == "plot:")
         {
-          for(int color = 0; color < RobotConsole::numOfColors; ++color)
+          for(int color = 0; color < RobotTextConsole::numOfColors; ++color)
             completion.insert(std::string("vpd ") + plotPair.first + " " +
                               translate(i.first).substr(5) + " " +
-                              TypeRegistry::getEnumName(static_cast<RobotConsole::Color>(color)));
+                              TypeRegistry::getEnumName(static_cast<RobotTextConsole::Color>(color)));
           completion.insert(std::string("vpd ") + plotPair.first + " " +
                             translate(i.first).substr(5) + " off");
         }

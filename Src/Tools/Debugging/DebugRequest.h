@@ -101,7 +101,7 @@ public:
   static void print(const char* message);
 
   friend class ConsoleRoboCupCtrl;
-  friend class RobotConsole;
+  friend class RobotTextConsole;
 };
 
 inline bool DebugRequestTable::isActive(const char* name)

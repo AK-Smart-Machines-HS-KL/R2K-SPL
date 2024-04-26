@@ -13,7 +13,7 @@
 #include <QFontMetrics>
 #include <QSettings>
 
-class RobotConsole;
+class RobotTextConsole;
 struct JointSensorData;
 struct JointRequest;
 class JointWidget;
@@ -27,7 +27,7 @@ class JointView : public SimRobot::Object
 private:
   const QString fullName; /**< The path to this view in the scene graph */
   const QIcon icon; /**< The icon used for listing this view in the scene graph */
-  RobotConsole& console; /**< A reference to the console object. */
+  RobotTextConsole& console; /**< A reference to the console object. */
   const JointSensorData& jointSensorData; /**< A reference to the jointSensorData representation of the robot console. */
   const JointRequest& jointRequest; /**< A reference to the jointRequest representation of the robot console. */
 
@@ -36,11 +36,11 @@ private:
 public:
   /**
    * @param fullName The path to this view in the scene graph.
-   * @param robotConsole The robot console which owns \c jointSensorData and \c jointRequest.
+   * @param RobotTextConsole The robot console which owns \c jointSensorData and \c jointRequest.
    * @param jointSensorData A reference to the jointSensorData representation of the robot console.
    * @param jointRequest A reference to the jointRequest representation of the robot console.
    */
-  JointView(const QString& fullName, RobotConsole& robotConsole, const JointSensorData& jointSensorData, const JointRequest& jointRequest);
+  JointView(const QString& fullName, RobotTextConsole& RobotTextConsole, const JointSensorData& jointSensorData, const JointRequest& jointRequest);
 
 private:
   /**
