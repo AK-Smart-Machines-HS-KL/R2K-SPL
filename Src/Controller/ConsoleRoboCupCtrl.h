@@ -18,6 +18,7 @@
 
 class ConsoleView;
 class RemoteRobot;
+class PythonRemoteRobot;
 
 /**
  * The class implements the SimRobot controller for RoboCup.
@@ -37,6 +38,7 @@ private:
   ConsoleView* consoleView; /**< The scene graph object that describes the console widget. */
   std::list<RobotTextConsole*> selected; /**< The currently selected simulated robot. */
   std::list<RemoteRobot*> remoteRobots; /**< The list of all remote robots. */
+  std::list<PythonRemoteRobot*> pythonRemoteRobots; /**< The list of all python remote robots. */
   std::list<std::string> textMessages; /**< A list of all text messages received in the current frame. */
   bool newLine = true; /**< States whether the last line of text was finished by a new line. */
   int nesting = 0; /**< The number of recursion level during the execution of console files. */
@@ -223,6 +225,13 @@ private:
    * @return Returns true if the parameters were correct.
    */
   bool startRemote(In& stream);
+
+  /**
+   * The function handles the console input for the "python" command.
+   * @param stream The stream containing the parameters of "python".
+   * @return Returns true if the parameters were correct.
+   */
+  bool startPythonRemote(In& stream);
 
   /**
    * The function handles the console input for the "sl" command.
