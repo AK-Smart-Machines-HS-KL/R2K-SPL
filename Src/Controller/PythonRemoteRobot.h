@@ -13,7 +13,9 @@
 class PythonRemoteRobot : public RobotTextConsole, public TcpConnection
 {
 private:
-  const std::string ip; /**< The ip of the robot. */
+  const std::string ip; /**< The ip address of the robot. */
+  const std::string pyHostIp = "192.168.50.99"; /**< The ip of the host pc. */
+  int pyHostPort = 5555; /**< The port of the host pc. */
 
 public:
   /**
@@ -54,5 +56,11 @@ private:
    * The function connects to another thread.
    */
   void connect();
+
+  private:
+  /**
+   * The function connects to host PC.
+   */
+  void connectToPC();
 
 };
