@@ -31,6 +31,17 @@ void RobotInfo::draw() const
   }
 }
 
+std::string RobotInfo::getModeAsString() const
+{
+  switch(mode)
+  {
+    case active: return "Active";
+    case calibration: return "Calibatrion";
+    case unstiff: return "Unstiff";
+    default: return "Unknown";
+  }
+}
+
 std::string RobotInfo::getPenaltyAsString() const
 {
   switch(penalty)
