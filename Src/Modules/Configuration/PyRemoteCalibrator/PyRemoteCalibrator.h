@@ -16,16 +16,12 @@ private:
     static thread_local PyRemoteCalibrator* theInstance;
 
     std::unique_ptr<CameraSettings> theCameraSettings;
+    const char* fileName = nullptr;
     
     void update(CameraSettings& cameraSettings) override;
 
-    template<typename T> void read(std::unique_ptr<T>& theRepresentation, const char* fileName = nullptr)
-    {
-        ASSERT(!theRepresentation);
-        theRepresentation = std::make_unique<T>();
-        loadModuleParameters(*theRepresentation, TypeRegistry::demangle(typeid(T).name()).c_str(), fileName);
-    }
-    
+    void read(std::unique_ptr<CameraSettings>& theRepresentation, const char* fileName);
+
 public:
   PyRemoteCalibrator();
   ~PyRemoteCalibrator();
