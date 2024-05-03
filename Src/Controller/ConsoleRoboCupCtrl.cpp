@@ -11,7 +11,6 @@
 #include "Controller/ControllerRobot.h"
 #include "Controller/LocalRobot.h"
 #include "Controller/RemoteRobot.h"
-#include "Controller/PythonRemoteRobot.h"
 #include "Controller/Views/ConsoleView.h"
 #include "Platform/File.h"
 #include "Platform/Time.h"
@@ -92,8 +91,6 @@ bool ConsoleRoboCupCtrl::compile()
     robot->getRobotThread()->handleConsole("endOfStartScript");
   for(RemoteRobot* remoteRobot : remoteRobots)
     remoteRobot->handleConsole("endOfStartScript");
-  for (PythonRemoteRobot* pythonRemoteRobot : pythonRemoteRobots)
-    pythonRemoteRobot->handleConsole("endOfStartScript");
   return true;
 }
 
@@ -117,15 +114,6 @@ ConsoleRoboCupCtrl::~ConsoleRoboCupCtrl()
     remoteRobot->stop();
     delete remoteRobot;
   }
-  for(PythonRemoteRobot* pythonRemoteRobot : pythonRemoteRobots)
-    pythonRemoteRobot->announceStop();
-  
-  for(PythonRemoteRobot* pythonRemoteRobot : pythonRemoteRobots)
-  {
-    pythonRemoteRobot->stop();
-    delete pythonRemoteRobot;
-  }
-
   stop();
   mode = SystemCall::simulatedRobot;
   Global::theSettings = nullptr;
@@ -153,9 +141,6 @@ void ConsoleRoboCupCtrl::update()
 
   for(RemoteRobot* remoteRobot : remoteRobots)
     remoteRobot->update();
-  for(PythonRemoteRobot* pythonRemoteRobot : pythonRemoteRobots)
-    pythonRemoteRobot->update();
-
   {
     SYNC;
     application->setStatusMessage(statusText);
@@ -436,15 +421,6 @@ void ConsoleRoboCupCtrl::executeConsoleCommand(std::string command, RobotTextCon
         selected.push_back(robots.front()->getRobotThread());
     }
   }
-  else if(buffer == "python")
-  {
-    if(!startPythonRemote(stream))
-    {
-      selected.clear();
-      if(!robots.empty())
-        selected.push_back(robots.front()->getRobotThread());
-    }
-  }
   else if(buffer == "sl")
   {
     if(!startLogFile(stream))
@@ -610,34 +586,6 @@ void ConsoleRoboCupCtrl::echo(In& stream)
   }
   printLn("");
 }
-
-bool ConsoleRoboCupCtrl::startPythonRemote(In& stream)
-{
-  std::string name, ip;
-  stream >> name >> ip;
-
-  mode = SystemCall::remoteRobot;
-  PythonRemoteRobot* prr = new PythonRemoteRobot(name, ip);
-  if(!prr->isClient())
-  {
-    if(ip != "")
-    {
-      delete prr;
-      Global::theSettings = nullptr;
-      printLn(std::string("No connection to ") + ip + " established!");
-      return false;
-    }
-    else
-      printLn("Waiting for a connection...");
-  }
-  selected.clear();
-  pythonRemoteRobots.push_back(prr);
-  selected.push_back(pythonRemoteRobots.back());
-  prr->addPerRobotViews();
-  prr->start();
-  return true;
-}
-
 
 bool ConsoleRoboCupCtrl::startRemote(In& stream)
 {
