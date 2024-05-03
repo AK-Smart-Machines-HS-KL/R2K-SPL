@@ -14,8 +14,6 @@ ConfigurationDataProvider::ConfigurationDataProvider()
 {
   theInstance = this;
 
-  read(theCameraSettings);
-
   theFieldDimensions = std::make_unique<FieldDimensions>();
   theFieldDimensions->load();
   theIntersectionRelations = std::make_unique<IntersectionRelations>(*theFieldDimensions);
