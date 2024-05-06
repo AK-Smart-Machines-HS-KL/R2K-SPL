@@ -31,6 +31,12 @@ def handle_client(client_socket):
             # Unpack the integer (heartbeat value)
             heartbeat_value = int.from_bytes(data, byteorder='little', signed=True)
             print(f"Received heartbeat value: {heartbeat_value}")
+            
+            # Respond with a heartbeat value
+            heartbeat_value = 40
+            heartbeat_bytes = heartbeat_value.to_bytes(4, byteorder='little', signed=True)
+            client_socket.sendall(heartbeat_bytes)
+            print(f"Sent heartbeat value: {heartbeat_value}")
 
 # Main server function
 def start_server():

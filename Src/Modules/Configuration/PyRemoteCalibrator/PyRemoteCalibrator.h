@@ -23,6 +23,8 @@ private:
 
     void read(std::unique_ptr<CameraSettings>& theRepresentation, const char* fileName);
 
+    void receiveResponse();
+
     TcpComm tcpConnection;
 
 public:

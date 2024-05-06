@@ -35,6 +35,19 @@ void PyRemoteCalibrator::read(std::unique_ptr<CameraSettings>& theRepresentation
     loadModuleParameters(*theRepresentation, TypeRegistry::demangle(typeid(CameraSettings).name()).c_str(), fileName);
 }
 
+// Receives and prints a heartbeat response from the host PC
+void PyRemoteCalibrator::receiveResponse() {
+    unsigned char buffer[4];  // Adjust to the expected integer size (e.g., 4 bytes for int)
+    if (tcpConnection.receive(buffer, sizeof(buffer), true)) {
+        int heartbeatValue = 0;
+        std::memcpy(&heartbeatValue, buffer, sizeof(heartbeatValue));  // Copy bytes to int
+        printf("Received heartbeat value: %d\n", heartbeatValue);
+    } else {
+        printf("No response received.\n");
+    }
+}
+
+
 void PyRemoteCalibrator::update(CameraSettings& cameraSettings)
 {   
     if(tcpConnection.connected())
@@ -49,6 +62,7 @@ void PyRemoteCalibrator::update(CameraSettings& cameraSettings)
         }
 
     }
+    receiveResponse();
     if(theCameraSettings)
     {
         //printf("CameraSettings updated\n");
@@ -59,7 +73,6 @@ void PyRemoteCalibrator::update(CameraSettings& cameraSettings)
 
         theCameraSettings = nullptr;
     }
-    //pySocket.sendHeartbeatToHost();
 }
 
 MAKE_MODULE(PyRemoteCalibrator, infrastructure);
