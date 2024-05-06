@@ -1,7 +1,10 @@
-# R-ZWEI Kickers Codebase
+# R-ZWEI Kickers Codebase 2023
 
 This is where the code of the team **R-ZWEI Kickers** lives. Its documentation can be found in the [Wiki of this repository](https://github.com/AK-Smart-Machines-HS-KL/R2K-SPL/wiki)
 
+### Git
+
+If you need a refreshment on your Git know-how, we recommend freshening it up with a tutorial, e.g. [this one in German](https://lerneprogrammieren.de/git/) or [this English one](https://www.w3schools.com/git/).
 
 ### B-Human Code Release
 

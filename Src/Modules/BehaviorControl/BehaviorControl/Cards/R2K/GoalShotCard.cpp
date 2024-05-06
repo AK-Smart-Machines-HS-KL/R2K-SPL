@@ -66,7 +66,10 @@ class GoalShotCard : public GoalShotCardBase
   //always active
   bool preconditions() const override
   {
-    return theFieldBall.positionRelative.norm() < 600
+    return 
+      theFieldBall.ballWasSeen() &&
+      theRobotPose.translation.x() > 1500 &&
+      theFieldBall.positionRelative.norm() < 600
       && theFrameInfo.getTimeSince(timeLastFail) > cooldown
       && theShots.goalShot.failureProbability < 0.50
       && theFieldBall.positionOnField.x() > theRobotPose.translation.x()

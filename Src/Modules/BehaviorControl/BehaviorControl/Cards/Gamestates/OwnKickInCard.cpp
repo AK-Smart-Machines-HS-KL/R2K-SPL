@@ -88,10 +88,14 @@ class OwnKickInCard : public OwnKickInCardBase
    */
   bool postconditions() const override
   {
+    /*
     return 
        !theFieldBall.ballWasSeen(ballWasSeenStickyPeriod)
         || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
         || theGameInfo.setPlay != SET_PLAY_KICK_IN;
+        */
+    // added AM
+    return !preconditions();
   }
 
   void execute() override

@@ -91,9 +91,10 @@ class DefenseCoverBackCard : public DefenseCoverBackCardBase
     float distToGoal = (ownGoal - theFieldBall.positionOnField).norm();
 
     return
+      theFieldBall.ballWasSeen()&&
       distToGoal > 1000 &&
       theGameInfo.setPlay == SET_PLAY_NONE &&
-      aBuddyIsChasingOrClearing() &&
+      !aBuddyIsChasingOrClearing() &&
       theTeammateRoles.isTacticalDefense(theRobotInfo.number); // my recent role
       
   }
@@ -140,6 +141,7 @@ class DefenseCoverBackCard : public DefenseCoverBackCardBase
       for (const auto& buddy : theTeamData.teammates) 
       {
         if (buddy.theBehaviorStatus.activity == BehaviorStatus::defenseChaseBallCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::blocking ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
