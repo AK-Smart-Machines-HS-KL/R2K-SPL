@@ -46,6 +46,7 @@ std::string RobotInfo::getPenaltyAsString() const
     case PENALTY_SPL_ILLEGAL_POSITION_IN_SET: return "Illegal Position in Set";
     case PENALTY_SUBSTITUTE: return "Substitute";
     case PENALTY_MANUAL: return "Manual";
+    case PENALTY_SPL_ILLEGAL_MOTION_IN_INITIAL: return "Thomas";
     default: return "None";
   }
 }
