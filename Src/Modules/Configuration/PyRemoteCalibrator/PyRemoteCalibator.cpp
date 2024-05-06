@@ -1,15 +1,30 @@
 #include "PyRemoteCalibrator.h"
 
+#define PY_MAX_PACKAGE_SEND_SIZE 6000000
+#define PY_MAX_PACKAGE_RECEIVE_SIZE 3000000
+
 thread_local PyRemoteCalibrator* PyRemoteCalibrator::theInstance = nullptr;
 
-PyRemoteCalibrator::PyRemoteCalibrator()
+PyRemoteCalibrator::PyRemoteCalibrator() : 
+    tcpConnection("192.168.50.99", 4242, PY_MAX_PACKAGE_SEND_SIZE, PY_MAX_PACKAGE_RECEIVE_SIZE)
 {
+    printf("PyRemoteCalibrator created\n");
+    
+    if(tcpConnection.connected())
+    {
+        printf("Connected to host\n");
+    }
+    else
+    {
+        printf("Failed to connect to host\n");
+    }
     theInstance = this;
     read(theCameraSettings, fileName);
 }
 
 PyRemoteCalibrator::~PyRemoteCalibrator()
 {
+    printf("PyRemoteCalibrator destroyed\n");
     theInstance = nullptr;
 }
 
@@ -21,15 +36,30 @@ void PyRemoteCalibrator::read(std::unique_ptr<CameraSettings>& theRepresentation
 }
 
 void PyRemoteCalibrator::update(CameraSettings& cameraSettings)
-{
+{   
+    if(tcpConnection.connected())
+    {
+        if(tcpConnection.sendHeartbeat())
+        {
+            printf("Heartbeat sent\n");
+        }
+        else
+        {
+            printf("Failed to send heartbeat\n");
+        }
+
+    }
     if(theCameraSettings)
     {
         //printf("CameraSettings updated\n");
-        CameraSettings::Collection& camera = theCameraSettings->cameras[0];
-        camera.settings[CameraSettings::Collection::CameraSetting::contrast] = 100;
+        //CameraSettings::Collection& camera = theCameraSettings->cameras[0];
+        //camera.settings[CameraSettings::Collection::CameraSetting::contrast] = 100;
         
         cameraSettings = *theCameraSettings;
 
-        //theCameraSettings = nullptr;
+        theCameraSettings = nullptr;
     }
+    //pySocket.sendHeartbeatToHost();
 }
+
+MAKE_MODULE(PyRemoteCalibrator, infrastructure);

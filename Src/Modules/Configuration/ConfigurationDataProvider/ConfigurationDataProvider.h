@@ -8,6 +8,7 @@
 
 #include "Representations/Configuration/BallSpecification.h"
 #include "Representations/Configuration/CameraCalibration.h"
+#include "Representations/Configuration/CameraSettings.h"
 #include "Representations/Configuration/DamageConfiguration.h"
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Configuration/FootOffset.h"
@@ -37,6 +38,7 @@ MODULE(ConfigurationDataProvider,
   PROVIDES(BallSpecification),
   REQUIRES(BallSpecification),
   PROVIDES(CameraCalibration),
+  PROVIDES(CameraSettings),
   PROVIDES(DamageConfigurationBody),
   PROVIDES(DamageConfigurationHead),
   PROVIDES(FieldDimensions),
@@ -63,6 +65,7 @@ private:
 
   std::unique_ptr<BallSpecification> theBallSpecification;
   std::unique_ptr<CameraCalibration> theCameraCalibration;
+  std::unique_ptr<CameraSettings> theCameraSettings;
   std::unique_ptr<DamageConfigurationBody> theDamageConfigurationBody;
   std::unique_ptr<DamageConfigurationHead> theDamageConfigurationHead;
   std::unique_ptr<FieldDimensions> theFieldDimensions;
@@ -84,6 +87,7 @@ private:
 
   void update(BallSpecification& ballSpecification) override {update(ballSpecification, theBallSpecification);}
   void update(CameraCalibration& cameraCalibration) override;
+  void update(CameraSettings& cameraSettings) override {update(cameraSettings, theCameraSettings);}
   void update(DamageConfigurationBody& damageConfigurationBody) override {update(damageConfigurationBody, theDamageConfigurationBody);}
   void update(DamageConfigurationHead& damageConfigurationHead) override {update(damageConfigurationHead, theDamageConfigurationHead);}
   void update(FieldDimensions& fieldDimensions) override {update(fieldDimensions, theFieldDimensions);}

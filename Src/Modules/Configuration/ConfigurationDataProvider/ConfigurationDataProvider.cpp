@@ -20,6 +20,7 @@ ConfigurationDataProvider::ConfigurationDataProvider()
 
   read(theBallSpecification);
   read(theCameraCalibration);
+  read(theCameraSettings);
   read(theDamageConfigurationBody);
   read(theDamageConfigurationHead);
   read(theFootOffset);

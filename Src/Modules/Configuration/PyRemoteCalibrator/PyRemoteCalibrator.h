@@ -2,6 +2,7 @@
 
 
 #include "Representations/Configuration/CameraSettings.h"
+#include "Tools/Communication/TcpComm.h"
 #include "Tools/Module/Module.h"
 
 MODULE(PyRemoteCalibrator,
@@ -22,10 +23,9 @@ private:
 
     void read(std::unique_ptr<CameraSettings>& theRepresentation, const char* fileName);
 
+    TcpComm tcpConnection;
+
 public:
   PyRemoteCalibrator();
   ~PyRemoteCalibrator();
 };
-
-
-MAKE_MODULE(PyRemoteCalibrator, infrastructure);
