@@ -35,15 +35,22 @@ void PyRemoteCalibrator::read(std::unique_ptr<CameraSettings>& theRepresentation
     loadModuleParameters(*theRepresentation, TypeRegistry::demangle(typeid(CameraSettings).name()).c_str(), fileName);
 }
 
-// Receives and prints a heartbeat response from the host PC
-void PyRemoteCalibrator::receiveResponse() {
-    unsigned char buffer[4];  // Adjust to the expected integer size (e.g., 4 bytes for int)
-    if (tcpConnection.receive(buffer, sizeof(buffer), true)) {
-        int heartbeatValue = 0;
-        std::memcpy(&heartbeatValue, buffer, sizeof(heartbeatValue));  // Copy bytes to int
-        printf("Received heartbeat value: %d\n", heartbeatValue);
-    } else {
-        printf("No response received.\n");
+// Receives and updates the contrast value from the host PC
+void PyRemoteCalibrator::receiveContrastValue() {
+    unsigned char buffer[4];  // Buffer to receive 4 bytes (int)
+    int bytesReceived = tcpConnection.receive(buffer, sizeof(buffer), false); // Non-blocking receive
+
+    if (bytesReceived > 0) {
+        int newContrastValue = 0;
+        std::memcpy(&newContrastValue, buffer, sizeof(newContrastValue));  // Copy bytes to int
+        printf("Received contrast value: %d\n", newContrastValue);
+
+        // Update the contrast setting in theCameraSettings
+        if (theCameraSettings) {
+            CameraSettings::Collection& camera = theCameraSettings->cameras[0];
+            camera.settings[CameraSettings::Collection::CameraSetting::contrast] = newContrastValue;
+            printf("Updated camera contrast to: %d\n", newContrastValue);
+        }
     }
 }
 
@@ -52,27 +59,14 @@ void PyRemoteCalibrator::update(CameraSettings& cameraSettings)
 {   
     if(tcpConnection.connected())
     {
-        if(tcpConnection.sendHeartbeat())
-        {
-            printf("Heartbeat sent\n");
-        }
-        else
-        {
-            printf("Failed to send heartbeat\n");
-        }
-
+        receiveContrastValue();
     }
-    receiveResponse();
     if(theCameraSettings)
     {
-        //printf("CameraSettings updated\n");
-        //CameraSettings::Collection& camera = theCameraSettings->cameras[0];
-        //camera.settings[CameraSettings::Collection::CameraSetting::contrast] = 100;
-        
         cameraSettings = *theCameraSettings;
-
-        theCameraSettings = nullptr;
+        //theCameraSettings = nullptr;
     }
+
 }
 
 MAKE_MODULE(PyRemoteCalibrator, infrastructure);
