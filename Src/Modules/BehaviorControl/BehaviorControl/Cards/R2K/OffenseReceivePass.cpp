@@ -78,10 +78,11 @@ class OffenseReceivePassCard : public OffenseReceivePassCardBase
       return
         thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters &&
         aBuddyIsPassing() &&
-        !theTeammateRoles.playsTheBall(&theRobotInfo,theTeamCommStatus.isWifiCommActive) &&   // I am not the striker
-        theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
+        !theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am not the striker
+        theTeammateRoles.isTacticalOffense(theRobotInfo.number);
+        /* && // my recent role
         theTeamBehaviorStatus.teamActivity != TeamBehaviorStatus::R2K_SPARSE_GAME;
-        
+        */
     }
     
     bool postconditions() const override

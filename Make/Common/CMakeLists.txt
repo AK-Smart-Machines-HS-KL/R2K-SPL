@@ -329,6 +329,10 @@ if(BUILD_DESKTOP AND (${PLATFORM} STREQUAL Linux))
   set_target_properties(flite::flite PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/flite/lib/${PLATFORM}/libflite.a")
 endif()
 
+add_library(bitproto STATIC "${BHUMAN_PREFIX}/Util/bitproto/lib/c/bitproto.c")
+target_include_directories(bitproto PUBLIC "${BHUMAN_PREFIX}/Util/bitproto/lib/c")
+set_target_properties(bitproto PROPERTIES LINKER_LANGUAGE CXX)
+
 if(NOT ${PLATFORM} STREQUAL macOSarm64)
   include("../CMake/asmjit.cmake")
   include("../CMake/CompiledNN.cmake")

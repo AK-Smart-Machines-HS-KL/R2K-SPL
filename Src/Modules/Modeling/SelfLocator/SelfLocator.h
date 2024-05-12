@@ -38,6 +38,7 @@
 #include "Representations/Configuration/StaticInitialPose.h"
 #include "Tools/Modeling/SampleSet.h"
 #include "Tools/Module/Module.h"
+#include "Tools/Communication/MessageComponents/RobotPose.h"
 
 MODULE(SelfLocator,
 {,

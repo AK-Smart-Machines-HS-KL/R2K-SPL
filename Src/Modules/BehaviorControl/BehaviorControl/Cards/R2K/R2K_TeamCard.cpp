@@ -125,14 +125,14 @@ TEAM_CARD(R2K_TeamCard,
     CALLS(TimeToReachBall),
     REQUIRES(FieldBall),  // ttrb
     REQUIRES(FrameInfo),  // ttrb
-    REQUIRES(TeamData),   // ttrb
+    REQUIRES(TeamData),   // ttrb teammates
     REQUIRES(GameInfo),   // ttrb, check for state change
     REQUIRES(RobotInfo),  // roles
     REQUIRES(RobotPose),  // supporterindex
     REQUIRES(TeamCommStatus),
     // USES(TeamBehaviorStatus),   // to be tested
     CALLS(TeamActivity),
-    REQUIRES(OwnTeamInfo),    // score, penalty
+    REQUIRES(OwnTeamInfo),    // score, buddies: penalty
     REQUIRES(OpponentTeamInfo),  // score, penalty
     REQUIRES(EventBasedCommunicationData),  // R2K EBC handling
 
@@ -144,8 +144,10 @@ TEAM_CARD(R2K_TeamCard,
                   (unsigned) (STATE_INITIAL)           lastGameState,
                   (unsigned) (SET_PLAY_NONE)           lastGamePhase,
                   (int)(-1)                            lastTeamBehaviorStatus, // -1 means: not set yet
-                  (int)(2000)                          decayPlaysTheBall,
+                  (int)(500)                           decayPlaysTheBall, // B-Huma default ballWasSeen 500
+                  (int)(10000)                         decayUpdateSupporterIndex,
                   (unsigned)(0)                        playsTheBallHasChangedFrame,   // store the frame when this bot claims to be playing the ball
+                  (unsigned)(0)                        lastUpdateSupporterIndexFrame,  // store the frame when the last update has occured
                   (TeammateRoles)(TeammateRoles())     lastTeammateRoles,
                   (TimeToReachBall)(TimeToReachBall()) lastTimeToReachBall,
                   (PlayerRole)(PlayerRole())           lastPlayerRole,
@@ -184,13 +186,13 @@ private:
       // 1 player
         { {GN,UN,UN,UN,UN}, {GN,UN,UN,UN,UN}, {GN,UN,UN,UN,UN}, {OM,UN,UN,UN,UN} },
         // 2 player
-            { {GN,OM,UN,UN,UN}, {GN,DM,UN,UN,UN}, {GN,DM,UN,UN,UN}, {DM,OM,UN,UN,UN} },
+            { {GN,OM,UN,UN,UN}, {GN,OM,UN,UN,UN}, {GN,OM,UN,UN,UN}, {DM,OM,UN,UN,UN} },
             // 3 player
-                { {GN,DM,OM,UN,UN}, {GN,DR,DL,UN,UN}, {GA,DM,OM,UN,UN}, {GN,OR,OM,UN,UN} },
+                { {GN,DM,OM,UN,UN}, {GN,DR,DM,UN,UN}, {GA,DM,OM,UN,UN}, {GN,OR,OM,UN,UN} },
                 // 4 player
-                    { {GN,DR,DL,OM,UN}, {GN,DR,DL,DM,UN}, {GA,DM,OL,OM,UN}, {GN,DM,OL,OM,UN} },
+                    { {GN,DM,OR,OM,UN}, {GN,DR,DL,OM,UN}, {GA,DM,DL,OM,UN}, {GN,DM,OL,OM,UN} },
                     // 5 player
-                        { {GN,DR,DL,OR,OL}, {GN,DR,DL,DM,OM}, {GA,DM,OL,OR,OM}, {GN,DM,OL,OR,OM} }
+                        { {GN,DR,DL,OR,OL}, {GN,DR,DL,DM,OM}, {GA,DM,DL,OR,OM}, {GN,DM,OL,OR,OM} }
 
 
     };
@@ -220,7 +222,7 @@ private:
 
     // to do: who is active - loop supp. index, number active
     // what if substitute goalie?
-    int teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME; // patch due to update errors
+    int teamBehaviorStatus = TeamBehaviorStatus::R2K_DEFENSIVE_GAME; // patch due to update errors
 
     // n vs. 2  || 3 vs 3 or less 
     if (opp_penalties >= 18 || (own_penalties > 18 && opp_penalties > 18)) {  //undeployed robots count as penalized; the array is 20 bots long
@@ -236,19 +238,16 @@ private:
   */  
     }
     else {
-      if (abs(own_score - opp_score)<=1) { //default: +/- 1 goal
-        
-        theTeamActivitySkill(TeamBehaviorStatus::R2K_NORMAL_GAME);
-        teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME;
-
-      }
-      if (own_score + 1 < opp_score ) {
+      if (own_score < opp_score ) {
         theTeamActivitySkill(TeamBehaviorStatus::R2K_OFFENSIVE_GAME);
         teamBehaviorStatus = TeamBehaviorStatus::R2K_OFFENSIVE_GAME;
       }
 
       // to do: add time limit, so we will not spoil our leadership in the last n minutes
-      if (own_score -1 > opp_score) {
+       else if (own_score -2 > opp_score) {
+        theTeamActivitySkill(TeamBehaviorStatus::R2K_DEFENSIVE_GAME);
+        teamBehaviorStatus = TeamBehaviorStatus::R2K_DEFENSIVE_GAME;
+      } else {
         theTeamActivitySkill(TeamBehaviorStatus::R2K_DEFENSIVE_GAME);
         teamBehaviorStatus = TeamBehaviorStatus::R2K_DEFENSIVE_GAME;
       }
@@ -280,8 +279,13 @@ private:
 // OUTPUT_TEXT("own penalties "<< own_penalties );  // 16
     if (own_penalties != lastNrOwnPenalties) {
       recomputeLineUp = true;
-      OUTPUT_TEXT("recomputeLineUp  " << lastNrOwnPenalties << " " << own_penalties);
+      // OUTPUT_TEXT("recomputeLineUp  " << lastNrOwnPenalties << " " << own_penalties);
       lastNrOwnPenalties = own_penalties;
+    }
+
+    if (theFrameInfo.getTimeSince(lastUpdateSupporterIndexFrame) > decayUpdateSupporterIndex) {
+      lastUpdateSupporterIndexFrame = theFrameInfo.time;
+      recomputeLineUp = true;
     }
 
     for (int i = 0; i < 5; i++)
@@ -294,8 +298,7 @@ private:
     // OUTPUT_TEXT("aB " << activeBuddies);
     // OUTPUT_TEXT("theTeamData.numberOfActiveTeammates " << theTeamData.numberOfActiveTeammates);#
 
-      if (2 >= activeBuddies) {   // setting  arbritary lineup
-        // OUTPUT_TEXT("no buddies");
+      if (1 >= activeBuddies) {   // setting  arbritary lineup
         for (unsigned int j = 0; j < 4; j++) {
           botsLineUp.push_back(BotOnField(j, (float)lineUp[j] * 100));
         }
@@ -355,7 +358,7 @@ private:
     // if (1 == theRobotInfo.number) pRole.role = PlayerRole::goalkeeper;
        
     pRole.numOfActiveSupporters = activeBuddies-1;
-
+   
   
    
     // d1) PlayerRole:: computing the supporterindex for each bot from left to right
@@ -364,29 +367,35 @@ private:
         
       // ASSERT(role.supporterIndex() - firstSupporterRole <= activeBuddies);  // we are in range supporter0 
 
-    for (auto& mate : botsLineUp)
-    {
-      count++;
-      if (theRobotPose.translation.x() <= mate.xPos)  // we are more left than rightmost
-      {
-        // pRole.role = PlayerRole::supporter4;
-        // pRole.role = static_cast<PlayerRole> (static_cast<int>(PlayerRole::firstSupporterRole) + count);
 
-        // PATCH: for communication problems
-        // switch (theRobotInfo.number - 1) {
-        switch (count) {
-        case 0: pRole.role = PlayerRole::supporter0;   break;
-        case 1: pRole.role = PlayerRole::supporter1;   break;
-        case 2: pRole.role = PlayerRole::supporter2;   break;
-        case 3: pRole.role = PlayerRole::supporter3;   break;
-        case 4: pRole.role = PlayerRole::supporter4;   break;
-        default: pRole.role = PlayerRole::none; OUTPUT_TEXT("default count: " << count);
+    // OUTPUT_TEXT("time" << theFrameInfo.getTimeSince(lastUpdateSupporterIndexFrame));
+    // if (theFrameInfo.getTimeSince(lastUpdateSupporterIndexFrame) > decayUpdateSupporterIndex) {
+    //   lastUpdateSupporterIndexFrame = theFrameInfo.time;
+      // OUTPUT_TEXT("update supporter Index");
+      for (auto& mate : botsLineUp)
+      {
+        count++;
+        if (theRobotPose.translation.x() <= mate.xPos)  // we are more left than rightmost
+        {
+          // pRole.role = PlayerRole::supporter4;
+          // pRole.role = static_cast<PlayerRole> (static_cast<int>(PlayerRole::firstSupporterRole) + count);
+
+          // PATCH: for communication problems
+          // switch (theRobotInfo.number - 1) {
+          switch (count) {
+          case 0: pRole.role = PlayerRole::supporter0;   break;
+          case 1: pRole.role = PlayerRole::supporter1;   break;
+          case 2: pRole.role = PlayerRole::supporter2;   break;
+          case 3: pRole.role = PlayerRole::supporter3;   break;
+          case 4: pRole.role = PlayerRole::supporter4;   break;
+          default: pRole.role = PlayerRole::none; OUTPUT_TEXT("default count: " << count);
+          }
+          break;  // done searching
         }
-        break;  // done searching
-      }
+      }  //rof: all bots
       // ASSERT(role.supporterIndex() - firstSupporterRole <= activeBuddies);  // we are in range supporter0 
 
-    }
+    
        
    
     // d2: static assignment , only for specific gamestates
@@ -394,6 +403,7 @@ private:
 
     if (theGameInfo.state == STATE_READY || theGameInfo.state ==  STATE_SET || !theTeamCommStatus.isWifiCommActive ) {
       // default settings
+
       switch (theRobotInfo.number - 1) {
         case 0: pRole.role = PlayerRole::supporter0;   break;
         case 1: pRole.role = PlayerRole::supporter1;   break;
@@ -513,14 +523,15 @@ private:
     auto buddyDist = 9000;
 
    
-    if (theFieldBall.ballWasSeen(2000))  // to be on the safe side
+    if (theFieldBall.ballWasSeen(decayPlaysTheBall))  // to be on the safe side
       dist = (int)Geometry::distance(theFieldBall.endPositionRelative, Vector2f(0, 0));
-    
+
+    // if (theRobotInfo.number == 2) OUTPUT_TEXT("dist:" << dist);
 
     TimeToReachBall timeToReachBall;
     // this code fragment does NOT sync teamwiese
-    // timeToReachBall.timeWhenReachBall = dist + theFrameInfo.time; // +offsetToFrameTimeThisBot;
-    timeToReachBall.timeWhenReachBall = myEbcWrites;
+    timeToReachBall.timeWhenReachBall = dist;//  +theFrameInfo.time; // +offsetToFrameTimeThisBot;
+    // timeToReachBall.timeWhenReachBall = myEbcWrites;
 
     minDist = dist;
   
@@ -532,7 +543,8 @@ private:
         minDist = std::min(minDist, buddyDist = (int) Geometry::distance(theFieldBall.endPositionOnField, buddy.theRobotPose.translation));
     } // rof: scan team
    
-
+    // if (theRobotInfo.number == 2)OUTPUT_TEXT("min dist:" << minDist);
+    
     // f) who plays the ball? 
     // decayed update of captain (striker), 
     // we use "captain" to store the bot who plays the ball
@@ -545,8 +557,17 @@ private:
     else {
       for (const auto& buddy : theTeamData.teammates)
       {  // compute and compare my buddies distance with minimal distance
-        buddyDist = (int)Geometry::distance(theFieldBall.endPositionOnField, buddy.theRobotPose.translation);
-        if (buddyDist == minDist) teamMateRoles.captain = buddy.number;
+
+        buddyDist = (int)Geometry::distance(theFieldBall.endPositionOnField, buddy.theRobotPose.translation);//  comparing FieldBall with buddy position
+        // buddyDist = (int)Geometry::distance(buddy.theBallModel.estimate.position, buddy.theRobotPose.translation);//  comparing buddys estimate with buddy position
+        
+        // OUTPUT_TEXT("fb dist:" << buddyDist);
+        // buddyDist = (int)Geometry::distance(buddy.theBallModel.estimate.position, buddy.theRobotPose.translation);
+        // OUTPUT_TEXT("ed dist:" << buddyDist);
+        if (buddyDist == minDist) {
+          teamMateRoles.captain = buddy.number;
+          timeToReachBall.timeWhenReachBallStriker = buddyDist; // +theFrameInfo.time; // +offsetToFrameTimeThisBot;
+        }
       } // rof: who plays the ball
 
       // or am I the striker?
@@ -555,6 +576,7 @@ private:
       if (minDist == dist) {  // i am the striker
         //  // TEMP ANTI HOT FIX
         teamMateRoles.captain = theRobotInfo.number;
+        timeToReachBall.timeWhenReachBallStriker = dist; // +theFrameInfo.time; // +offsetToFrameTimeThisBot;
         // teamMateRoles.captain = 3;
         /* 
         if (pRole.isGoalkeeper()) pRole.role = PlayerRole::goalkeeperAndBallPlayer;
@@ -570,6 +592,7 @@ private:
     if (teamMateRoles.captain != lastTeammateRoles.captain)
     {  // another bot is playing the ball
       playsTheBallHasChangedFrame = theFrameInfo.time;  // reset timer
+      teamMateRoles.timestamp = theFrameInfo.time;
       // OUTPUT_TEXT(" new cap." << teamMateRoles.captain << " by " << theRobotInfo.number);
     }
 
@@ -584,6 +607,7 @@ private:
      )
       refreshAllData = true;
 
+    
     if (refreshAllData) {
       // OUTPUT_TEXT("team data are refreshed.");
       lastGameState = theGameInfo.state;

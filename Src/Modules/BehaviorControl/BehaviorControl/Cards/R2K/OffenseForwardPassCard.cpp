@@ -40,6 +40,7 @@
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/TeamCommStatus.h"
+#include "Representations/Infrastructure/ExtendedGameInfo.h"
 
 CARD(OffenseForwardPassCard,
      {
@@ -59,6 +60,7 @@ CARD(OffenseForwardPassCard,
     REQUIRES(PlayerRole),           
     REQUIRES(RobotInfo),           
     REQUIRES(TeamCommStatus),
+    REQUIRES(ExtendedGameInfo),
     DEFINES_PARAMETERS(
                        {,
                            (float)(0.8f) walkSpeed,
@@ -78,52 +80,91 @@ CARD(OffenseForwardPassCard,
 class OffenseForwardPassCard : public OffenseForwardPassCardBase
 {
     
+    Vector2f targetAbsolute = Vector2f::Zero();
     bool preconditions() const override
     {
+        bool buddyValid = false;
         
-      return 
-        theTeammateRoles.playsTheBall(&theRobotInfo,theTeamCommStatus.isWifiCommActive) &&   // I am the striker
-        theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
-        thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1 &&
-        theObstacleModel.opponentIsTooClose(theFieldBall.positionRelative) != KickInfo::LongShotType::noKick &&  
-        theTeamBehaviorStatus.teamActivity != TeamBehaviorStatus::R2K_SPARSE_GAME;
-        
+        for (const auto& buddy : theTeamData.teammates)
+        {
+            if (!buddy.isPenalized && buddy.isUpright)
+            {
+                if(buddy.theRobotPose.translation.x() > theRobotPose.translation.x()) {
+                    buddyValid = true;
+                    break;
+                }
+            }
+        }
+
+        if (!buddyValid) {
+            return false;  // no boot closer towards goal than me
+        }
+        if(
+          !aBuddyIsClearingOrPassing() &&
+          theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
+          theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
+          // either a substantial delta on x - or we are at kick-off
+          (thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1 ||
+            theExtendedGameInfo.timeSincePlayingStarted < 10000)  // side pass at kickOff
+        // theObstacleModel.opponentIsTooClose(theFieldBall.positionRelative) != KickInfo::LongShotType::noKick &&  
+        // theTeamBehaviorStatus.teamActivity != TeamBehaviorStatus::R2K_SPARSE_GAME;
+          ) return true;
+        return false;
     }
     
     bool postconditions() const override
     {
         return !preconditions();
     }
-    
-    void execute() override
-    {
-        
-        theActivitySkill(BehaviorStatus::offenseForwardPassCard);
-        
-        float x;
-        float y;
 
+    Vector2f getTarget() {
+        Vector2f target = Vector2f::Zero();
         for (const auto& buddy : theTeamData.teammates)
         {
             if (!buddy.isPenalized && buddy.isUpright)
             {
-                
-                if(buddy.theRobotPose.translation.x()>theRobotPose.translation.x())
-                {
-                    x = buddy.theRobotPose.translation.x();
-                    y = buddy.theRobotPose.translation.y();
-                    
+                if(buddy.theRobotPose.translation.x() > theRobotPose.translation.x()) {
+                    if(target.x() < buddy.theRobotPose.translation.x() || target == Vector2f::Zero()) {
+                        target = buddy.theRobotPose.translation;
+                        target.x() += 1500;
+                    }
                 }
             }
         }
-
-        // theGoToBallAndKickSkill(calcAngleToOffense(x,y), KickInfo::walkForwardsLeft);
-        theGoToBallAndKickSkill(calcAngleToOffense(x, y), KickInfo::walkForwardsLeftLong);
+        return target;
     }
     
-    Angle calcAngleToOffense(float xPos, float yPos) const
+    void execute() override
     {
-        return (theRobotPose.inversePose * Vector2f(xPos, yPos)).angle();
+        // If we just enetered the card, grab the best passing target
+        if (targetAbsolute == Vector2f::Zero()) {
+            targetAbsolute = getTarget();
+        }
+        
+        theActivitySkill(BehaviorStatus::offenseForwardPassCard);
+        theGoToBallAndKickSkill(theRobotPose.toRelative(targetAbsolute).angle(), KickInfo::forwardFastLeft);
+    }
+
+    void reset() override
+    {
+        targetAbsolute = Vector2f::Zero();
+    }
+    
+    bool aBuddyIsClearingOrPassing() const
+    {
+      for (const auto& buddy : theTeamData.teammates) 
+      {
+        if (
+          // buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+          // buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard)
+          // uddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
+          return true;
+      }
+      return false;
     }
 };
 
