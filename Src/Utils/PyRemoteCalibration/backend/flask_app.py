@@ -71,22 +71,26 @@ def stop_server():
         return jsonify({"message": "Server stopped"}), 200
     return jsonify({"error": "Server not running"}), 400
 
-@app.route('/update_contrast', methods=['POST'])
-def update_contrast():
-    contrast_value = request.json.get('contrast')
-    if isinstance(contrast_value, int):
-        print(f"Contrast value updated to: {contrast_value}")
-        send_to_robot(contrast_value)
-        return jsonify({"message": "Contrast updated", "contrast": contrast_value}), 200
+@app.route('/update_camera_setting', methods=['POST'])
+def update_camera_setting():
+    data = request.json
+    setting = data.get('setting')
+    value = data.get('value')
+
+    if setting and isinstance(value, int):
+        print(f"Updating {setting} to {value}")
+        send_to_robot(setting, value)
+        return jsonify({"message": f"{setting} updated to {value}"}), 200
     else:
-        return jsonify({"error": "Invalid contrast value"}), 400
+        return jsonify({"error": "Invalid setting or value"}), 400
 
 # Function to send data to all connected robots
-def send_to_robot(contrast_value):
+def send_to_robot(setting, value):
     for client_socket in client_sockets:
         try:
-            client_socket.sendall(contrast_value.to_bytes(4, byteorder='little', signed=True))
-            print(f"Sent contrast value {contrast_value} to robot at {client_socket.getpeername()}")
+            message = f"{setting}:{value}".encode('utf-8')
+            client_socket.sendall(message)
+            print(f"Sent {setting} value {value} to robot at {client_socket.getpeername()}")
         except Exception as e:
             print(f"Error sending to robot at {client_socket.getpeername()}: {e}")
             client_sockets.remove(client_socket)

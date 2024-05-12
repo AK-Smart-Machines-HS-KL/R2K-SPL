@@ -25,6 +25,8 @@ private:
 
     void receiveContrastValue();
 
+    void receiveCameraSettings();
+
     TcpComm tcpConnection;
 
 public:

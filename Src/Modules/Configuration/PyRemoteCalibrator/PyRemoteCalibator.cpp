@@ -54,6 +54,43 @@ void PyRemoteCalibrator::receiveContrastValue() {
     }
 }
 
+// Receives and updates camera settings from the host PC
+void PyRemoteCalibrator::receiveCameraSettings() {
+    char buffer[256];  // Buffer to receive setting:value
+    int bytesReceived = tcpConnection.receive(reinterpret_cast<unsigned char*>(buffer), sizeof(buffer) - 1, false); // Non-blocking receive
+
+    if (bytesReceived > 0) {
+        buffer[bytesReceived] = '\0';  // Null-terminate the received string
+        std::string receivedData(buffer);
+
+        // Parse setting and value
+        std::istringstream iss(receivedData);
+        std::string setting;
+        int value;
+        if (std::getline(iss, setting, ':') && iss >> value) {
+            printf("Received %s value: %d\n", setting.c_str(), value);
+
+            CameraSettings::Collection& camera = theCameraSettings->cameras[0];
+            if (setting == "autoExposure") camera.settings[CameraSettings::Collection::autoExposure] = value;
+            else if (setting == "autoExposureBrightness") camera.settings[CameraSettings::Collection::autoExposureBrightness] = value;
+            else if (setting == "exposure") camera.settings[CameraSettings::Collection::exposure] = value;
+            else if (setting == "gain") camera.settings[CameraSettings::Collection::gain] = value;
+            else if (setting == "autoWhiteBalance") camera.settings[CameraSettings::Collection::autoWhiteBalance] = value;
+            else if (setting == "autoFocus") camera.settings[CameraSettings::Collection::autoFocus] = value;
+            else if (setting == "focus") camera.settings[CameraSettings::Collection::focus] = value;
+            else if (setting == "autoHue") camera.settings[CameraSettings::Collection::autoHue] = value;
+            else if (setting == "hue") camera.settings[CameraSettings::Collection::hue] = value;
+            else if (setting == "saturation") camera.settings[CameraSettings::Collection::saturation] = value;
+            else if (setting == "contrast") camera.settings[CameraSettings::Collection::contrast] = value;
+            else if (setting == "sharpness") camera.settings[CameraSettings::Collection::sharpness] = value;
+            else if (setting == "redGain") camera.settings[CameraSettings::Collection::redGain] = value;
+            else if (setting == "greenGain") camera.settings[CameraSettings::Collection::greenGain] = value;
+            else if (setting == "blueGain") camera.settings[CameraSettings::Collection::blueGain] = value;
+            printf("Updated %s to: %d\n", setting.c_str(), value);
+        }
+    }
+}
+
 
 void PyRemoteCalibrator::update(CameraSettings& cameraSettings)
 {   

@@ -3,7 +3,23 @@
     import CameraSettings from './CameraSettings.svelte';
 
     let statusMessage = "Not Connected";
-    let contrastValue = 25;
+    let cameraSettings = {
+        autoExposure: 1,                 // true (1 for checked)
+        autoExposureBrightness: 0,
+        exposure: 2000,
+        gain: 160,
+        autoWhiteBalance: 1,             // true (1 for checked)
+        autoFocus: 0,                    // false (0 for unchecked)
+        focus: 0,
+        autoHue: 0,                      // false (0 for unchecked)
+        hue: 0,
+        saturation: 80,
+        contrast: 32,
+        sharpness: 4,
+        redGain: 2048,
+        greenGain: 2048,
+        blueGain: 2048
+    };
 
     async function startConnection() {
         try {
@@ -33,15 +49,15 @@
         }
     }
 
-    async function updateContrast(event) {
-        contrastValue = parseInt(event.target.value, 10);
+    async function updateSetting(setting, value) {
+        cameraSettings[setting] = value;
         try {
-            const response = await fetch('http://localhost:5000/update_contrast', {
+            const response = await fetch('http://localhost:5000/update_camera_setting', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ contrast: contrastValue }),
+                body: JSON.stringify({ setting, value: parseInt(value) }),
             });
             const result = await response.json();
             console.log(result.message);
@@ -52,6 +68,10 @@
 </script>
 
 <style>
+    body {
+        text-align: center;
+        font-family: Arial, sans-serif;
+    }
 
     h1 {
         margin-top: 20px;
@@ -64,6 +84,10 @@
         align-items: center;
         margin-top: 20px;
     }
+
+    .setting {
+        margin: 10px;
+    }
 </style>
 
 <div class="container">
@@ -73,6 +97,6 @@
         startServer={startConnection}
         stopServer={stopConnection} />
     <CameraSettings
-        {contrastValue}
-        updateContrast={updateContrast} />
+        {cameraSettings}
+        updateSetting={updateSetting} />
 </div>
