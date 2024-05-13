@@ -56,7 +56,7 @@
     }
 
     .control-container input[type="number"] {
-        width: 60px;
+        width: 100px;
         text-align: center;
     }
 </style>

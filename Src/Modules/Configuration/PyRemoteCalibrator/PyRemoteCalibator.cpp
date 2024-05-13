@@ -54,7 +54,7 @@ void PyRemoteCalibrator::receiveContrastValue() {
     }
 }
 
-// Receives and updates camera settings from the host PC
+// Improved function to receive and update camera settings from the host PC
 void PyRemoteCalibrator::receiveCameraSettings() {
     char buffer[256];  // Buffer to receive setting:value
     int bytesReceived = tcpConnection.receive(reinterpret_cast<unsigned char*>(buffer), sizeof(buffer) - 1, false); // Non-blocking receive
@@ -63,40 +63,63 @@ void PyRemoteCalibrator::receiveCameraSettings() {
         buffer[bytesReceived] = '\0';  // Null-terminate the received string
         std::string receivedData(buffer);
 
-        // Parse setting and value
-        std::istringstream iss(receivedData);
-        std::string setting;
-        int value;
-        if (std::getline(iss, setting, ':') && iss >> value) {
-            printf("Received %s value: %d\n", setting.c_str(), value);
+        printf("Received raw data: %s\n", receivedData.c_str());  // Debugging line to show raw received data
 
-            CameraSettings::Collection& camera = theCameraSettings->cameras[0];
-            if (setting == "autoExposure") camera.settings[CameraSettings::Collection::autoExposure] = value;
-            else if (setting == "autoExposureBrightness") camera.settings[CameraSettings::Collection::autoExposureBrightness] = value;
-            else if (setting == "exposure") camera.settings[CameraSettings::Collection::exposure] = value;
-            else if (setting == "gain") camera.settings[CameraSettings::Collection::gain] = value;
-            else if (setting == "autoWhiteBalance") camera.settings[CameraSettings::Collection::autoWhiteBalance] = value;
-            else if (setting == "autoFocus") camera.settings[CameraSettings::Collection::autoFocus] = value;
-            else if (setting == "focus") camera.settings[CameraSettings::Collection::focus] = value;
-            else if (setting == "autoHue") camera.settings[CameraSettings::Collection::autoHue] = value;
-            else if (setting == "hue") camera.settings[CameraSettings::Collection::hue] = value;
-            else if (setting == "saturation") camera.settings[CameraSettings::Collection::saturation] = value;
-            else if (setting == "contrast") camera.settings[CameraSettings::Collection::contrast] = value;
-            else if (setting == "sharpness") camera.settings[CameraSettings::Collection::sharpness] = value;
-            else if (setting == "redGain") camera.settings[CameraSettings::Collection::redGain] = value;
-            else if (setting == "greenGain") camera.settings[CameraSettings::Collection::greenGain] = value;
-            else if (setting == "blueGain") camera.settings[CameraSettings::Collection::blueGain] = value;
-            printf("Updated %s to: %d\n", setting.c_str(), value);
+        // Split receivedData into setting:value pairs
+        std::istringstream iss(receivedData);
+        std::string settingValuePair;
+        while (std::getline(iss, settingValuePair, ',')) {
+            // Debugging line to show each pair before processing
+            printf("Processing pair: %s\n", settingValuePair.c_str());
+
+            // Parse each setting:value pair
+            std::istringstream pairStream(settingValuePair);
+            std::string setting;
+            std::string valueStr;
+            int value;
+
+            if (std::getline(pairStream, setting, ':') && std::getline(pairStream, valueStr)) {
+                try {
+                    value = std::stoi(valueStr);  // Convert value to integer
+                } catch (const std::invalid_argument& e) {
+                    printf("Invalid value for %s: %s\n", setting.c_str(), valueStr.c_str());
+                    continue;  // Skip invalid entries
+                }
+
+                printf("Received %s value: %d\n", setting.c_str(), value);
+
+                // Update the corresponding camera setting
+                if (theCameraSettings) {
+                    CameraSettings::Collection& camera = theCameraSettings->cameras[0];
+                    if (setting == "autoExposure") camera.settings[CameraSettings::Collection::autoExposure] = value;
+                    else if (setting == "autoExposureBrightness") camera.settings[CameraSettings::Collection::autoExposureBrightness] = value;
+                    else if (setting == "exposure") camera.settings[CameraSettings::Collection::exposure] = value;
+                    else if (setting == "gain") camera.settings[CameraSettings::Collection::gain] = value;
+                    else if (setting == "autoWhiteBalance") camera.settings[CameraSettings::Collection::autoWhiteBalance] = value;
+                    else if (setting == "autoFocus") camera.settings[CameraSettings::Collection::autoFocus] = value;
+                    else if (setting == "focus") camera.settings[CameraSettings::Collection::focus] = value;
+                    else if (setting == "autoHue") camera.settings[CameraSettings::Collection::autoHue] = value;
+                    else if (setting == "hue") camera.settings[CameraSettings::Collection::hue] = value;
+                    else if (setting == "saturation") camera.settings[CameraSettings::Collection::saturation] = value;
+                    else if (setting == "contrast") camera.settings[CameraSettings::Collection::contrast] = value;
+                    else if (setting == "sharpness") camera.settings[CameraSettings::Collection::sharpness] = value;
+                    else if (setting == "redGain") camera.settings[CameraSettings::Collection::redGain] = value;
+                    else if (setting == "greenGain") camera.settings[CameraSettings::Collection::greenGain] = value;
+                    else if (setting == "blueGain") camera.settings[CameraSettings::Collection::blueGain] = value;
+                    printf("Updated %s to: %d\n", setting.c_str(), value);
+                }
+            } else {
+                printf("Failed to parse pair: %s\n", settingValuePair.c_str());  // Debugging line for failed parsing
+            }
         }
     }
 }
-
 
 void PyRemoteCalibrator::update(CameraSettings& cameraSettings)
 {   
     if(tcpConnection.connected())
     {
-        receiveContrastValue();
+        receiveCameraSettings();
     }
     if(theCameraSettings)
     {
