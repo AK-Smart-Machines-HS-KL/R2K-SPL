@@ -1,8 +1,8 @@
 /**
  * @file PointingCard.cpp
  * @author Jonathan Brauch
- * @version 1.5
- * @date 2024-03-21
+ * @version 2.0
+ * @date 2024-05-13
  *
  *
  */
@@ -50,7 +50,7 @@ CARD(PointingCard,
        //Define Params here
        (int)(10000) cooldown,
        (unsigned)(0) startTime,
-       (int)(300000) maxRuntime,
+       (int)(10000) maxRuntime,
     }),
 
   /*
@@ -75,9 +75,9 @@ public:
   {
     int timeSinceLastStart = theFrameInfo.getTimeSince(startTime);
 
-    return isActive && (timeSinceLastStart < maxRuntime || timeSinceLastStart > maxRuntime + cooldown)
-                    && theGameInfo.setPlay == SET_PLAY_CORNER_KICK
-                    && theTeammateRoles.isTacticalOffense(theRobotInfo.number);
+    return isActive && (timeSinceLastStart < maxRuntime || timeSinceLastStart > maxRuntime + cooldown);
+    && theGameInfo.setPlay == SET_PLAY_CORNER_KICK
+    && theTeammateRoles.isTacticalOffense(theRobotInfo.number);
   }
 
   bool postconditions() const override
@@ -106,47 +106,134 @@ public:
     {
       transition
       {
-        goto pointing;
+        if (preconditions())
+        {
+          if (isBallInFieldOfView())
+          {
+            // Ball ist im zeigbaren Bereich
+            goto pointAtBall;
+          }
+          else
+          {
+            // Ball ist nicht im zeigbaren Bereich
+            goto turnToPointAndPointAtBall;
+          }
+        }
       }
 
       action
       {
         // Head Motion Request
         theLookForwardSkill();
-
-        //OUTPUT_TEXT("Test pointing");
-
-      
-        // Absolute Koordinate
-        //Vector2f absoluteCoordinate(-4500.f, 0.f);
-        Vector2f absoluteCoordinate = theFieldBall.recentBallPositionOnField();
-      
-        OUTPUT_TEXT("Absolute Coordinate: " << absoluteCoordinate.x() << ", " << absoluteCoordinate.y());
-
-        // Wandele absolute Koordinate in relative Koordinate um
-        Vector2f relativeCoordinate = theRobotPose.toRelative(absoluteCoordinate);
-        OUTPUT_TEXT("Relative Coordinate: " << relativeCoordinate.x() << ", " << relativeCoordinate.y());
-       
-        // Die Z-Koordinate auf 0 setzen, um einen Vector3f zu erstellen
-        Vector3f relativeCoordinate3D(relativeCoordinate.x(), relativeCoordinate.y(), 0.f);
-       // OUTPUT_TEXT("Relative Coordinate3D: " << relativeCoordinate3D.x() << ", " << relativeCoordinate3D.y() << ", " << relativeCoordinate3D.z());
-
-        // Die relative Ballposition im theTurnToPointSkill verwenden
-        theTurnToPointSkill(relativeCoordinate);
-        OUTPUT_TEXT("Robot Rotation: " << theRobotPose.rotation.toDegrees());
-
-        // Zeige auf die relative Koordinate
-        thePointAtSkill(relativeCoordinate3D);
-
-
-
-        // Mit festen Koordinaten
-        // theTurnToPointSkill(Vector2f(-900.f, -500.f));
-        // thePointAtWithArmSkill(Vector3f(-1000.f, 0.f, 0.f), Arms::right);
-        // thePointAtWithArmSkill(Vector3f(-1000.f, 0.f, 300.f), Arms::left);
+        theStandSkill();
       }
     }
+
+    state(pointAtBall)
+    {
+      transition
+      {
+        if (!isBallInFieldOfView())
+        {
+          // Ball ist nicht mehr im zeigbaren Bereich
+          goto turningToPoint;
+        }
+      }
+
+      action
+      {
+        theLookForwardSkill();
+        theStandSkill();
+
+        // Point at the ball
+        Vector2f ballPosition = theFieldBall.recentBallPositionOnField();
+        Vector2f relativeballPosition = theRobotPose.toRelative(ballPosition);
+        Vector3f relativeBallCoordinate3D(relativeballPosition.x(), relativeballPosition.y(), 0.f);
+        OUTPUT_TEXT("Ball Position (x, y): " << relativeballPosition.x() << ", " << relativeballPosition.y());
+        thePointAtSkill(relativeBallCoordinate3D);
+      }
+    }
+
+    state(turningToPoint)
+    {
+      transition
+      {
+        if (isBallInFieldOfView())
+        {
+          // Ball ist wieder im zeigbaren Bereich
+          goto pointAtBall;
+        }
+      }
+
+      action
+      {
+        theLookForwardSkill();
+
+      // Turn to point at the ball
+      Vector2f ballPosition = theFieldBall.recentBallPositionOnField();
+      Vector2f relativeBallPosition = theRobotPose.toRelative(ballPosition);
+      OUTPUT_TEXT("Turning to point at the ball. Relative Ball Position (x, y): " << relativeBallPosition.x() << ", " << relativeBallPosition.y());
+      theTurnToPointSkill(relativeBallPosition);
+    }
   }
+
+  state(turnToPointAndPointAtBall)
+  {
+    transition
+    {
+      if (isBallInFieldOfView())
+      {
+        // Ball ist wieder im zeigbaren Bereich
+        goto pointAtBall;
+      }
+    }
+
+    action
+    {
+      // Turn to point at the ball
+      Vector2f ballPosition = theFieldBall.recentBallPositionOnField();
+      Vector2f relativeBallPosition = theRobotPose.toRelative(ballPosition);
+      OUTPUT_TEXT("Turning to point at the ball. Relative Ball Position (x, y): " << relativeBallPosition.x() << ", " << relativeBallPosition.y());
+      theTurnToPointSkill(relativeBallPosition);
+
+      // Point at the ball
+      Vector3f relativeBallPosition3D(relativeBallPosition.x(), relativeBallPosition.y(), 0.f);
+      OUTPUT_TEXT("Pointing at the ball. Relative Ball Position (x, y, z): " << relativeBallPosition3D.x() << ", " << relativeBallPosition3D.y() << ", " << relativeBallPosition3D.z());
+      thePointAtSkill(relativeBallPosition3D);
+    }
+  }
+  }
+
+    bool isBallInFieldOfView()
+  {
+    // Berechne die Differenz der x- und y-Koordinaten zwischen Ihrer Position und der des Balls
+    double dx = theFieldBall.recentBallPositionOnField().x() - theRobotPose.translation.x();
+    double dy = theFieldBall.recentBallPositionOnField().y() - theRobotPose.translation.y();
+
+    // Berechne den Winkel des Balls relativ zur Position des Roboters
+    double angleBall = fmod((atan2(dy, dx) * (180.0 / M_PI) + 360.0), 360.0);
+    // Berücksichtige die Drehung des Roboters, um den Winkelbereich des Sichtfelds zu bestimmen
+    double rotation = theRobotPose.rotation.toDegrees();
+
+    // Berechne den minimalen und maximalen Winkel des zeigbaren Bereichs
+    double minAngle = fmod((rotation - 90.0 + 360.0), 360.0); // Annahme: Sichtfeld von 180 Grad
+    double maxAngle = fmod((rotation + 90.0 + 360.0), 360.0);
+
+    // Überprüfe, ob der Winkel des Balls innerhalb des zeigbaren Bereichs liegt
+    if (minAngle < maxAngle)
+    {
+      bool isInFOV = minAngle <= angleBall && angleBall <= maxAngle;
+      OUTPUT_TEXT("Ball is in field of view: " << (isInFOV ? "Yes" : "No"));
+      return isInFOV;
+    }
+    else
+    {
+      bool isInFOV = angleBall >= minAngle || angleBall <= maxAngle;
+      OUTPUT_TEXT("Ball is in field of view: " << (isInFOV ? "Yes" : "No"));
+      return isInFOV;
+    }
+  }
+
 };
 
 MAKE_CARD(PointingCard);
