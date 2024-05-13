@@ -67,10 +67,13 @@
     }
 </script>
 
+
 <style>
     body {
         text-align: center;
         font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
     }
 
     h1 {
@@ -78,11 +81,32 @@
         font-size: 28px;
     }
 
+    .header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .logo {
+        width: 150px;
+        height: auto;
+        margin-top: 20px;
+    }
+
+    .main-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
     .container {
         display: flex;
         flex-direction: column;
         align-items: center;
-        margin-top: 20px;
+        padding: 20px;
+        border-radius: 8px;
     }
 
     .setting {
@@ -90,13 +114,20 @@
     }
 </style>
 
-<div class="container">
+<div class="header">
+    <img src="r2k.png" alt="R-ZWEI Kickers Logo" class="logo">
     <h1>Robot Control Panel</h1>
-    <ServerControl
-        {statusMessage}
-        startServer={startConnection}
-        stopServer={stopConnection} />
-    <CameraSettings
-        {cameraSettings}
-        updateSetting={updateSetting} />
+</div>
+<div class="main-container">
+    <div class="container">
+        <ServerControl
+            {statusMessage}
+            startServer={startConnection}
+            stopServer={stopConnection} />
+    </div>
+    <div class="container">
+        <CameraSettings
+            {cameraSettings}
+            updateSetting={updateSetting} />
+    </div>
 </div>
