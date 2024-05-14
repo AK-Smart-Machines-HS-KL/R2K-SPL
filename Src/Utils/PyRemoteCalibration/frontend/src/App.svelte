@@ -21,6 +21,24 @@
         blueGain: 2048
     };
 
+    const settingKeys = [
+        'autoExposure',
+        'autoExposureBrightness',
+        'exposure',
+        'gain',
+        'autoWhiteBalance',
+        'autoFocus',
+        'focus',
+        'autoHue',
+        'hue',
+        'saturation',
+        'contrast',
+        'sharpness',
+        'redGain',
+        'greenGain',
+        'blueGain'
+    ];
+
     async function startConnection() {
         try {
             const response = await fetch('http://localhost:5000/start', {
@@ -30,7 +48,7 @@
             if (result.clients.length > 0) {
                 statusMessage = `Connected to ${result.clients.map(client => client[0]).join(', ')}`;
             } else {
-                statusMessage = "Connected but no clients";
+                statusMessage = "Listener Server started but no clients";
             }
         } catch (error) {
             console.error('Error:', error);
@@ -50,14 +68,15 @@
     }
 
     async function updateSetting(setting, value) {
-        cameraSettings[setting] = value;
+        cameraSettings[setting] = parseInt(value);
+        const settingsArray = settingKeys.map(key => cameraSettings[key]);
         try {
-            const response = await fetch('http://localhost:5000/update_camera_setting', {
+            const response = await fetch('http://localhost:5000/update_camera_settings', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ setting, value: parseInt(value) }),
+                body: JSON.stringify({ settings: settingsArray }),
             });
             const result = await response.json();
             console.log(result.message);

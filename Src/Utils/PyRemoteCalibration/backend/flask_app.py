@@ -3,6 +3,7 @@ from flask_cors import CORS
 import socket
 import threading
 import os
+from struct import pack
 
 app = Flask(__name__)
 CORS(app)
@@ -71,31 +72,65 @@ def stop_server():
         return jsonify({"message": "Server stopped"}), 200
     return jsonify({"error": "Server not running"}), 400
 
-@app.route('/update_camera_setting', methods=['POST'])
-def update_camera_setting():
+@app.route('/update_camera_settings', methods=['POST'])
+def update_camera_settings():
     data = request.json
-    setting = data.get('setting')
-    value = data.get('value')
+    settings = data.get('settings')
 
-    if setting and isinstance(value, int):
-        print(f"Updating {setting} to {value}")
-        send_to_robot(setting, value)
-        return jsonify({"message": f"{setting} updated to {value}"}), 200
-    else:
-        return jsonify({"error": "Invalid setting or value"}), 400
+    # Define the ranges and data types
+    ranges = [
+        (0, 1),           # autoExposure (1 byte)
+        (-255, 255),      # autoExposureBrightness (4 bytes, int32)
+        (0, 1048575),     # exposure (4 bytes, int32)
+        (0, 1023),        # gain (4 bytes, int32)
+        (0, 1),           # autoWhiteBalance (1 byte)
+        (0, 1),           # autoFocus (1 byte)
+        (0, 250),         # focus (4 bytes, int32)
+        (0, 1),           # autoHue (1 byte)
+        (-180, 180),      # hue (4 bytes, int32)
+        (0, 255),         # saturation (1 byte)
+        (0, 255),         # contrast (1 byte)
+        (0, 9),           # sharpness (1 byte)
+        (0, 4095),        # redGain (4 bytes, int32)
+        (0, 4095),        # greenGain (4 bytes, int32)
+        (0, 4095)         # blueGain (4 bytes, int32)
+    ]
+
+    # Ensure all settings are within the correct ranges
+    for i, (min_val, max_val) in enumerate(ranges):
+        if not (min_val <= settings[i] <= max_val):
+            return jsonify({"error": f"Setting {i} out of range"}), 400
+
+
+    def pack_data(settings, ranges):
+        packed_data = bytearray()
+        for i, (min_val, max_val) in enumerate(ranges):
+            if min_val >= -128 and max_val <= 127:  # 1 byte signed
+                packed_data.extend(pack('b', settings[i]))
+            elif min_val >= 0 and max_val <= 255:  # 1 byte unsigned
+                packed_data.extend(pack('B', settings[i]))
+            else:  # 4 bytes signed (int32)
+                packed_data.extend(pack('i', settings[i]))
+        return packed_data
+    
+    packed_data = pack_data(settings, ranges)
+
+    print(f"Packed data: {list(packed_data)}")
+    send_to_robot(packed_data)
+    return jsonify({"message": "Settings updated"}), 200
 
 # Function to send data to all connected robots
-def send_to_robot(setting, value):
+def send_to_robot(packed_data):
     for client_socket in client_sockets:
         try:
-            message = f"{setting}:{value}\n".encode('utf-8')
-            client_socket.sendall(message)
-            print(f"Sent {setting} value {value} to robot at {client_socket.getpeername()}")
+            client_socket.sendall(packed_data)
+            print(f"Sent settings to robot at {client_socket.getpeername()}")
         except Exception as e:
             print(f"Error sending to robot at {client_socket.getpeername()}: {e}")
             client_sockets.remove(client_socket)
             client_addresses.remove(client_socket.getpeername())
             client_socket.close()
+
 
 if __name__ == "__main__":
     app.run(host=HOST, port=FLASK_PORT)
