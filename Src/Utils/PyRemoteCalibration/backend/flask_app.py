@@ -88,7 +88,7 @@ def update_camera_setting():
 def send_to_robot(setting, value):
     for client_socket in client_sockets:
         try:
-            message = f"{setting}:{value}".encode('utf-8')
+            message = f"{setting}:{value}\n".encode('utf-8')
             client_socket.sendall(message)
             print(f"Sent {setting} value {value} to robot at {client_socket.getpeername()}")
         except Exception as e:
