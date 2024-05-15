@@ -35,27 +35,6 @@ void PyRemoteCalibrator::read(std::unique_ptr<CameraSettings>& theRepresentation
     loadModuleParameters(*theRepresentation, TypeRegistry::demangle(typeid(CameraSettings).name()).c_str(), fileName);
 }
 
-// Receives and updates the contrast value from the host PC
-void PyRemoteCalibrator::receiveContrastValue() {
-    unsigned char buffer[4];  // Buffer to receive 4 bytes (int)
-    int bytesReceived = tcpConnection.receive(buffer, sizeof(buffer), false); // Non-blocking receive
-
-    if (bytesReceived > 0) {
-        int newContrastValue = 0;
-        std::memcpy(&newContrastValue, buffer, sizeof(newContrastValue));  // Copy bytes to int
-        printf("Received contrast value: %d\n", newContrastValue);
-
-        // Update the contrast setting in theCameraSettings
-        if (theCameraSettings) {
-            CameraSettings::Collection& camera = theCameraSettings->cameras[0];
-            camera.settings[CameraSettings::Collection::CameraSetting::contrast] = newContrastValue;
-            printf("Updated camera contrast to: %d\n", newContrastValue);
-        }
-    }
-}
-
-
-
 void PyRemoteCalibrator::receiveSettingValue() {
     unsigned char buffer[6];  // Assume maximum needed size is 6 bytes
     int bytesReceived = tcpConnection.receive(buffer, sizeof(buffer), false);
@@ -115,6 +94,7 @@ void PyRemoteCalibrator::receiveSettingValue() {
 }
 
 void PyRemoteCalibrator::updateByteSetting(CameraSettingId id, unsigned char value) {
+    OUTPUT_TEXT("Received byte setting ID: " << id << "; Value:" << value);
     printf("Received %d to byte value %d\n", id, value);
 
     if (!theCameraSettings) return; // Check if theCameraSettings pointer is valid
@@ -141,6 +121,7 @@ void PyRemoteCalibrator::updateByteSetting(CameraSettingId id, unsigned char val
 }
 
 void PyRemoteCalibrator::updateBooleanSetting(CameraSettingId id, unsigned char value) {
+    OUTPUT_TEXT("Received boolean setting value");
     printf("Received %d to boolean value %d\n", id, value);
 
     if (!theCameraSettings) return; // Check if theCameraSettings pointer is valid
@@ -171,6 +152,7 @@ void PyRemoteCalibrator::updateBooleanSetting(CameraSettingId id, unsigned char 
 }
 
 void PyRemoteCalibrator::updateIntegerSetting(CameraSettingId id, const unsigned char* value) {
+    OUTPUT_TEXT("Received integer setting value");
     int intValue = 0;
     std::memcpy(&intValue, value, sizeof(intValue));  // Copy bytes to int
     printf("Received %d to integer value %d\n", id, intValue);
