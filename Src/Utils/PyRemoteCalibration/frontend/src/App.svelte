@@ -68,22 +68,28 @@
     }
 
     async function updateSetting(setting, value) {
-        cameraSettings[setting] = parseInt(value);
-        const settingsArray = settingKeys.map(key => cameraSettings[key]);
-        try {
-            const response = await fetch('http://localhost:5000/update_camera_settings', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ settings: settingsArray }),
-            });
-            const result = await response.json();
+    try {
+        const response = await fetch(`http://localhost:5000/update_${setting}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ [setting]: parseInt(value, 10) }), // Ensure value is an integer if required
+        });
+
+        const result = await response.json();
+        if (response.ok) {
             console.log(result.message);
-        } catch (error) {
-            console.error('Error:', error);
+            // Assuming cameraSettings is a reactive state variable
+            cameraSettings[setting] = parseInt(value, 10); // Update local state to reflect change
+            // Trigger any additional UI updates or state changes if necessary
+        } else {
+            console.error('Error:', result.error || 'Failed to update setting');
         }
+    } catch (error) {
+        console.error('Network Error:', error);
     }
+}
 </script>
 
 

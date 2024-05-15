@@ -54,85 +54,167 @@ void PyRemoteCalibrator::receiveContrastValue() {
     }
 }
 
-void PyRemoteCalibrator::receiveCameraSettings2() {
-    unsigned char buffer[40];  // Buffer to hold the message, 40 bytes to accommodate all settings
-    bool received = tcpConnection.receive(buffer, sizeof(buffer), false);  // Non-blocking receive
 
-    if (received) {
-        printf("Received data array:\n");
-        for (size_t i = 0; i < sizeof(buffer); ++i) {
-            printf("%d ", buffer[i]);
+
+void PyRemoteCalibrator::receiveSettingValue() {
+    unsigned char buffer[6];  // Assume maximum needed size is 6 bytes
+    int bytesReceived = tcpConnection.receive(buffer, sizeof(buffer), false);
+
+    if (bytesReceived > 0) {
+        // First byte is the setting ID
+        CameraSettingId settingId = static_cast<CameraSettingId>(buffer[0]);
+
+        switch (settingId) {
+            case autoExposure:
+                updateBooleanSetting(settingId, buffer[1]);
+                break;
+            case autoWhiteBalance:
+                updateBooleanSetting(settingId, buffer[1]);
+                break;
+            case autoFocus:
+                updateBooleanSetting(settingId, buffer[1]);
+                break;
+            case autoHue:
+                updateBooleanSetting(settingId, buffer[1]);
+                break;
+            case autoExposureBrightness:
+                updateIntegerSetting(settingId, buffer + 1);
+                break;
+            case exposure:
+                updateIntegerSetting(settingId, buffer + 1);
+                break;
+            case gain:
+                updateIntegerSetting(settingId, buffer + 1);
+                break;
+            case hue:
+                updateIntegerSetting(settingId, buffer + 1);
+                break;
+            case focus:
+                updateIntegerSetting(settingId, buffer + 1);
+                break;
+            case redGain:
+                updateIntegerSetting(settingId, buffer + 1);
+                break;
+            case greenGain:
+                updateIntegerSetting(settingId, buffer + 1);
+                break;
+            case blueGain:
+                updateIntegerSetting(settingId, buffer + 1);
+                break;
+            case saturation:
+                updateByteSetting(settingId, buffer[1]);
+                break;
+            case contrast:
+                updateByteSetting(settingId, buffer[1]);
+                break;
+            case sharpness:
+                updateByteSetting(settingId, buffer[1]);
+                break;
         }
-        printf("\n");
+    }
+}
 
-        // Unpack and update camera settings
-        if (theCameraSettings) {
-            CameraSettings::Collection& camera = theCameraSettings->cameras[0];
+void PyRemoteCalibrator::updateByteSetting(CameraSettingId id, unsigned char value) {
+    printf("Received %d to byte value %d\n", id, value);
 
-            size_t offset = 0;
-            camera.settings[CameraSettings::Collection::autoExposure] = buffer[offset];
-            offset += 1;
+    if (!theCameraSettings) return; // Check if theCameraSettings pointer is valid
 
-            int32_t autoExposureBrightness;
-            std::memcpy(&autoExposureBrightness, buffer + offset, sizeof(autoExposureBrightness));
-            camera.settings[CameraSettings::Collection::autoExposureBrightness] = autoExposureBrightness;
-            offset += sizeof(autoExposureBrightness);
+    CameraSettings::Collection& camera = theCameraSettings->cameras[0]; // Assuming single camera handling for simplicity
+    switch (id) {
+        case saturation:
+            camera.settings[CameraSettings::Collection::CameraSetting::saturation] = value;
+            printf("Updated saturation to: %d\n", value);
+            break;
+        case contrast:
+            camera.settings[CameraSettings::Collection::CameraSetting::contrast] = value;
+            printf("Updated contrast to: %d\n", value);
+            break;
+        case sharpness:
+            camera.settings[CameraSettings::Collection::CameraSetting::sharpness] = value;
+            printf("Updated sharpness to: %d\n", value);
+            break;
+        // Add cases for other settings that also use a single byte
+        default:
+            printf("Unsupported setting id %d\n", id);
+            break;
+    }
+}
 
-            int32_t exposure;
-            std::memcpy(&exposure, buffer + offset, sizeof(exposure));
-            camera.settings[CameraSettings::Collection::exposure] = exposure;
-            offset += sizeof(exposure);
+void PyRemoteCalibrator::updateBooleanSetting(CameraSettingId id, unsigned char value) {
+    printf("Received %d to boolean value %d\n", id, value);
 
-            int32_t gain;
-            std::memcpy(&gain, buffer + offset, sizeof(gain));
-            camera.settings[CameraSettings::Collection::gain] = gain;
-            offset += sizeof(gain);
+    if (!theCameraSettings) return; // Check if theCameraSettings pointer is valid
 
-            camera.settings[CameraSettings::Collection::autoWhiteBalance] = buffer[offset];
-            offset += 1;
+    CameraSettings::Collection& camera = theCameraSettings->cameras[0]; // Assuming single camera handling for simplicity
+    switch (id) {
+        case autoExposure:
+            camera.settings[CameraSettings::Collection::CameraSetting::autoExposure] = value;
+            printf("Updated autoExposure to: %d\n", value);
+            break;
+        case autoWhiteBalance:
+            camera.settings[CameraSettings::Collection::CameraSetting::autoWhiteBalance] = value;
+            printf("Updated autoWhiteBalance to: %d\n", value);
+            break;
+        case autoFocus:
+            camera.settings[CameraSettings::Collection::CameraSetting::autoFocus] = value;
+            printf("Updated autoFocus to: %d\n", value);
+            break;
+        case autoHue:
+            camera.settings[CameraSettings::Collection::CameraSetting::autoHue] = value;
+            printf("Updated autoHue to: %d\n", value);
+            break;
+        // Add cases for other settings that also use a single byte
+        default:
+            printf("Unsupported setting id %d\n", id);
+            break;
+    }
+}
 
-            camera.settings[CameraSettings::Collection::autoFocus] = buffer[offset];
-            offset += 1;
+void PyRemoteCalibrator::updateIntegerSetting(CameraSettingId id, const unsigned char* value) {
+    int intValue = 0;
+    std::memcpy(&intValue, value, sizeof(intValue));  // Copy bytes to int
+    printf("Received %d to integer value %d\n", id, intValue);
 
-            int32_t focus;
-            std::memcpy(&focus, buffer + offset, sizeof(focus));
-            camera.settings[CameraSettings::Collection::focus] = focus;
-            offset += sizeof(focus);
+    if (!theCameraSettings) return; // Check if theCameraSettings pointer is valid
 
-            camera.settings[CameraSettings::Collection::autoHue] = buffer[offset];
-            offset += 1;
-
-            int32_t hue;
-            std::memcpy(&hue, buffer + offset, sizeof(hue));
-            camera.settings[CameraSettings::Collection::hue] = hue;
-            offset += sizeof(hue);
-
-            camera.settings[CameraSettings::Collection::saturation] = buffer[offset];
-            offset += 1;
-
-            camera.settings[CameraSettings::Collection::contrast] = buffer[offset];
-            offset += 1;
-
-            camera.settings[CameraSettings::Collection::sharpness] = buffer[offset];
-            offset += 1;
-
-            int32_t redGain;
-            std::memcpy(&redGain, buffer + offset, sizeof(redGain));
-            camera.settings[CameraSettings::Collection::redGain] = redGain;
-            offset += sizeof(redGain);
-
-            int32_t greenGain;
-            std::memcpy(&greenGain, buffer + offset, sizeof(greenGain));
-            camera.settings[CameraSettings::Collection::greenGain] = greenGain;
-            offset += sizeof(greenGain);
-
-            int32_t blueGain;
-            std::memcpy(&blueGain, buffer + offset, sizeof(blueGain));
-            camera.settings[CameraSettings::Collection::blueGain] = blueGain;
-            offset += sizeof(blueGain);
-
-            printf("Updated camera settings successfully.\n");
-        }
+    CameraSettings::Collection& camera = theCameraSettings->cameras[0]; // Assuming single camera handling for simplicity
+    switch (id) {
+        case autoExposureBrightness:
+            camera.settings[CameraSettings::Collection::CameraSetting::autoExposureBrightness] = intValue;
+            printf("Updated autoExposureBrightness to: %d\n", intValue);
+            break;
+        case exposure:
+            camera.settings[CameraSettings::Collection::CameraSetting::exposure] = intValue;
+            printf("Updated exposure to: %d\n", intValue);
+            break;
+        case gain:
+            camera.settings[CameraSettings::Collection::CameraSetting::gain] = intValue;
+            printf("Updated gain to: %d\n", intValue);
+            break;
+        case hue:
+            camera.settings[CameraSettings::Collection::CameraSetting::hue] = intValue;
+            printf("Updated hue to: %d\n", intValue);
+            break;
+        case focus:
+            camera.settings[CameraSettings::Collection::CameraSetting::focus] = intValue;
+            printf("Updated focus to: %d\n", intValue);
+            break;
+        case redGain:
+            camera.settings[CameraSettings::Collection::CameraSetting::redGain] = intValue;
+            printf("Updated redGain to: %d\n", intValue);
+            break;
+        case greenGain:
+            camera.settings[CameraSettings::Collection::CameraSetting::greenGain] = intValue;
+            printf("Updated greenGain to: %d\n", intValue);
+            break;
+        case blueGain:
+            camera.settings[CameraSettings::Collection::CameraSetting::blueGain] = intValue;
+            printf("Updated blueGain to: %d\n", intValue);
+            break;
+        // Add cases for other settings that also use a 4-byte integer
+        default:
+            printf("Unsupported setting id %d\n", id);
+            break;
     }
 }
 
@@ -140,7 +222,7 @@ void PyRemoteCalibrator::update(CameraSettings& cameraSettings)
 {   
     if(tcpConnection.connected())
     {
-        receiveCameraSettings2();
+        receiveSettingValue();
     }
     if(theCameraSettings)
     {

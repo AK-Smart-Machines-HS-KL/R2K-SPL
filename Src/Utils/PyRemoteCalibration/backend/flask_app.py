@@ -3,7 +3,7 @@ from flask_cors import CORS
 import socket
 import threading
 import os
-from struct import pack
+import struct
 
 app = Flask(__name__)
 CORS(app)
@@ -72,64 +72,51 @@ def stop_server():
         return jsonify({"message": "Server stopped"}), 200
     return jsonify({"error": "Server not running"}), 400
 
-@app.route('/update_camera_settings', methods=['POST'])
-def update_camera_settings():
-    data = request.json
-    settings = data.get('settings')
-
-    # Define the ranges and data types
-    ranges = [
-        (0, 1),           # autoExposure (1 byte)
-        (-255, 255),      # autoExposureBrightness (4 bytes, int32)
-        (0, 1048575),     # exposure (4 bytes, int32)
-        (0, 1023),        # gain (4 bytes, int32)
-        (0, 1),           # autoWhiteBalance (1 byte)
-        (0, 1),           # autoFocus (1 byte)
-        (0, 250),         # focus (4 bytes, int32)
-        (0, 1),           # autoHue (1 byte)
-        (-180, 180),      # hue (4 bytes, int32)
-        (0, 255),         # saturation (1 byte)
-        (0, 255),         # contrast (1 byte)
-        (0, 9),           # sharpness (1 byte)
-        (0, 4095),        # redGain (4 bytes, int32)
-        (0, 4095),        # greenGain (4 bytes, int32)
-        (0, 4095)         # blueGain (4 bytes, int32)
-    ]
-
-    # Ensure all settings are within the correct ranges
-    for i, (min_val, max_val) in enumerate(ranges):
-        if not (min_val <= settings[i] <= max_val):
-            return jsonify({"error": f"Setting {i} out of range"}), 400
-
-
-    def pack_data(settings, ranges):
-        packed_data = bytearray()
-        for i, (min_val, max_val) in enumerate(ranges):
-            if min_val >= -128 and max_val <= 127:  # 1 byte signed
-                packed_data.extend(pack('b', settings[i]))
-            elif min_val >= 0 and max_val <= 255:  # 1 byte unsigned
-                packed_data.extend(pack('B', settings[i]))
-            else:  # 4 bytes signed (int32)
-                packed_data.extend(pack('i', settings[i]))
-        return packed_data
-    
-    packed_data = pack_data(settings, ranges)
-
-    print(f"Packed data: {list(packed_data)}")
-    send_to_robot(packed_data)
-    return jsonify({"message": "Settings updated"}), 200
-
-# Function to send data to all connected robots
-def send_to_robot(packed_data):
+def send_to_robot(data):
     for client_socket in client_sockets:
         try:
-            client_socket.sendall(packed_data)
-            print(f"Sent settings to robot at {client_socket.getpeername()}")
+            client_socket.sendall(data)
+            print(f"Sent to robot at {client_socket.getpeername()}: {data}")
         except Exception as e:
             print(f"Error sending to robot at {client_socket.getpeername()}: {e}")
             client_sockets.remove(client_socket)
             client_addresses.remove(client_socket.getpeername())
             client_socket.close()
+
+def create_endpoint(setting_name, setting_id, min_val, max_val, fmt):
+    @app.route(f'/update_{setting_name}', methods=['POST'], endpoint=f'update_{setting_name}')
+    def update_setting():
+        value = request.json.get(setting_name)
+        if value is None or not (min_val <= value <= max_val):
+            return jsonify({"error": f"Invalid {setting_name} value"}), 400
+        packed_id = struct.pack('B', setting_id)  # Assuming each setting ID fits in one byte
+        packed_data = struct.pack(fmt, value)
+        full_message = packed_id + packed_data  # Concatenate setting ID and data
+        send_to_robot(full_message)
+        return jsonify({"message": f"{setting_name.capitalize()} updated"}), 200
+    return update_setting
+
+# Define the settings with their properties
+settings_info = {
+    'autoExposure': (0x01, 0, 1, 'B'),
+    'autoExposureBrightness': (0x02, -255, 255, 'i'),
+    'exposure': (0x03, 0, 1048575, 'I'),
+    'gain': (0x04, 0, 1023, 'I'),
+    'autoWhiteBalance': (0x05, 0, 1, 'B'),
+    'autoFocus': (0x06, 0, 1, 'B'),
+    'focus': (0x07, 0, 250, 'I'),
+    'autoHue': (0x08, 0, 1, 'B'),
+    'hue': (0x09, -180, 180, 'i'),
+    'saturation': (0x0A, 0, 255, 'B'),
+    'contrast': (0x0B, 0, 255, 'B'),
+    'sharpness': (0x0C, 0, 9, 'B'),
+    'redGain': (0x0D, 0, 4095, 'I'),
+    'greenGain': (0x0E, 0, 4095, 'I'),
+    'blueGain': (0x0F, 0, 4095, 'I')
+}
+
+for setting, (setting_id, min_val, max_val, fmt) in settings_info.items():
+    create_endpoint(setting, setting_id, min_val, max_val, fmt)
 
 
 if __name__ == "__main__":
