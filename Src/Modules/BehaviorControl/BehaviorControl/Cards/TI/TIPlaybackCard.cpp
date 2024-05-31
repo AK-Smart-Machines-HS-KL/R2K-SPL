@@ -191,17 +191,61 @@ class TIPlaybackCard : public TIPlaybackCardBase
     return currentAction;
 	}
 
+// DCT sample:  A timeleft < 10 sec -> B robot.number = 4 or 5 && C ballDistanceToBot <= 100 EQUIV CLASS === trigger 
+//                 time left >= 10 sec
+// 
+// TODO in code
+// => if (A)
+//      if(B) 
+//         id(C) {do it sequence}
+//     else {
+//      ASSERT(timeleft >= 10sex)
+        //
 
   bool thisIsATriggerPoint(const WorldModel& model) const
-
   {
-    ASSERT(!theTIPlaybackSequences.models.empty()); // has been checked in the pre-condition
-    
-    return  (std::abs(Geometry::distance(theRobotPose.translation, model.robotPose.translation)) <= min_distance);
-    // OUTPUT_TEXT("Trigger Point " << world_model_index << " for robot" << theRobotInfo.number);
+    // Thresholds based on the pruned decision tree
+    const int distanceToGoalThreshold1 = 2800;
+    const int distanceToGoalThreshold2 = 3900;
+    const int ballPositionXThreshold1 = -1883;
+    const int ballPositionXThreshold2 = 4100;
+    const int ballPositionYThreshold = -1511;
 
+    // Implement the decision tree logic
+    if (model.distanceToGoal < distanceToGoalThreshold1)
+    {
+      if (model.ballPosition.x() < ballPositionXThreshold1)
+      {
+        if (model.ballPosition.x() >= ballPositionYThreshold)
+        {
+          return true;
+        }
+        else
+        {
+          return true;
+        }
+      }
+      else
+      {
+        return true;
+      }
+    }
+    else if (model.distanceToGoal >= distanceToGoalThreshold2)
+    {
+      return true;
+    }
+    else
+    {
+      if (model.ballPosition.x() >= ballPositionXThreshold2)
+      {
+        return true;
+      }
+    }
 
+    // If none of the conditions match, it's not a trigger point
+    return false;
   }
+
 
   // param number unused yet
   bool teachInScoreReached(int number) const
