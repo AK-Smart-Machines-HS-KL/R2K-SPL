@@ -139,9 +139,6 @@ private:
   unsigned lastTimeCirclePerceptSeen;           /**< Last time a circle percept was seen */
   bool validitiesHaveBeenUpdated;               /**< Flag that indicates that the validities of the samples have been changed this frame */
 
-  void compileRobotPose(RobotPoseComponent *);
-  RobotPoseComponent::Compiler messageCompilerRef = nullptr;
-
   /**
    * The method provides the robot pose
    *

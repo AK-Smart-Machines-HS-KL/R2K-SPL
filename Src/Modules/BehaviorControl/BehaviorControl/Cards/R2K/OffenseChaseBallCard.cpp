@@ -86,7 +86,7 @@ class OffenseChaseBallCard : public OffenseChaseBallCardBase
     //mit einem threshold damit Stürmer noch teils ins eigene Feld darf
   
     return
-
+      theFieldBall.ballWasSeen() && 
       !aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
       theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
       (theFieldBall.endPositionOnField.x() > (0 - threshold)) &&
@@ -154,8 +154,8 @@ class OffenseChaseBallCard : public OffenseChaseBallCardBase
           //buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
           //buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
           //buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard 
-          //buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard 
           //buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard
           )
           return true;
