@@ -13,6 +13,7 @@ This code is based on the official 2021 B-Human code release. Documentation for 
 Previous code releases are tagged with "coderelease&lt;year&gt;", where &lt;year&gt; is the year in which the code was released (starting with 2013).
 
 Please note that **before** you clone this repository on Windows, execute:
+
 ```
 git config --global core.autocrlf input
 git config --global core.eol lf

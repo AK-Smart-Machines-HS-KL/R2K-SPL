@@ -39,6 +39,8 @@
 #include "Views/CABSLBehaviorView.h"
 #include "Views/TimeView.h"
 
+#include "Tools/TeachIn/KeyLogger.h"
+
 #define PREREQUISITE(p) pollingFor = #p; if(!poll(p)) return false;
 
 bool RobotConsole::MapWriter::handleMessage(InMessage& message)
@@ -2837,12 +2839,35 @@ void RobotConsole::handleJoystick()
   bool buttonCommandExecuted(false);
   while(joystick.getNextEvent(buttonId, pressed))
   {
+    // protocolling the pressed controller button (excluding cursor)
+    KeyLogger::getInstance()->clearEvents();
     ASSERT(buttonId < Joystick::numOfButtons);
+
+    if(pressed){
+      KeyLogger::getInstance()->setKey(buttonId);
+    }
+    
+    /* Original BHuman Code, disabled for Card based key events
     buttonCommandExecuted |= joystickExecCommand(pressed ? joystickButtonPressCommand[buttonId] : joystickButtonReleaseCommand[buttonId]);
     if(!pressed)
       for(auto& joystickMotionCommand : joystickMotionCommands)
         joystickMotionCommand.lastCommand = "";
+    */
   }
+
+  // protocolling the cursor
+  #ifdef MACOS
+    float leftCursorY = joystick.getAxisState(1);
+    float leftCursorX = joystick.getAxisState(0);
+    float rightCursorX = joystick.getAxisState(2);
+  #else
+    float leftCursorY = joystick.getAxisState(1);
+    float leftCursorX = joystick.getAxisState(0);
+    float rightCursorX = joystick.getAxisState(3);
+  #endif
+
+    KeyLogger::getInstance()->setLeftCursor(leftCursorX, leftCursorY);
+    KeyLogger::getInstance()->setRightCursor(rightCursorX,0);
 
   // walk and move head only when there is no button command
   if(buttonCommandExecuted)

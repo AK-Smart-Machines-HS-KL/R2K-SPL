@@ -1,0 +1,36 @@
+{
+	"BUILD_DIR" : "C:/mkdir R2K/R2K-SPL/Make/Common/out/build/x64-Debug/SimRobot_autogen",
+	"CMAKE_BINARY_DIR" : "C:/mkdir R2K/R2K-SPL/Make/Common/out/build/x64-Debug",
+	"CMAKE_CURRENT_BINARY_DIR" : "C:/mkdir R2K/R2K-SPL/Make/Common/out/build/x64-Debug",
+	"CMAKE_CURRENT_SOURCE_DIR" : "C:/mkdir R2K/R2K-SPL/Make/Common",
+	"CMAKE_SOURCE_DIR" : "C:/mkdir R2K/R2K-SPL/Make/Common",
+	"INCLUDE_DIR" : "C:/mkdir R2K/R2K-SPL/Make/Common/out/build/x64-Debug/SimRobot_autogen/include",
+	"INPUTS" : 
+	[
+		"C:/mkdir R2K/R2K-SPL/Util/SimRobot/Src/SimRobot/Icons/page_paste.png",
+		"C:/mkdir R2K/R2K-SPL/Util/SimRobot/Src/SimRobot/Icons/folder_page.png",
+		"C:/mkdir R2K/R2K-SPL/Util/SimRobot/Src/SimRobot/Icons/control_step_blue.png",
+		"C:/mkdir R2K/R2K-SPL/Util/SimRobot/Src/SimRobot/Icons/cut.png",
+		"C:/mkdir R2K/R2K-SPL/Util/SimRobot/Src/SimRobot/Icons/SimRobot.png",
+		"C:/mkdir R2K/R2K-SPL/Util/SimRobot/Src/SimRobot/Icons/tag_green.png",
+		"C:/mkdir R2K/R2K-SPL/Util/SimRobot/Src/SimRobot/Icons/control_play_blue.png",
+		"C:/mkdir R2K/R2K-SPL/Util/SimRobot/Src/SimRobot/Icons/arrow_undo.png",
+		"C:/mkdir R2K/R2K-SPL/Util/SimRobot/Src/SimRobot/Icons/page_copy.png",
+		"C:/mkdir R2K/R2K-SPL/Util/SimRobot/Src/SimRobot/Icons/arrow_redo.png",
+		"C:/mkdir R2K/R2K-SPL/Util/SimRobot/Src/SimRobot/Icons/control_start_blue.png",
+		"C:/mkdir R2K/R2K-SPL/Util/SimRobot/Src/SimRobot/Icons/disk.png",
+		"C:/mkdir R2K/R2K-SPL/Util/SimRobot/Src/SimRobot/Icons/application_side_tree.png",
+		"C:/mkdir R2K/R2K-SPL/Util/SimRobot/Src/SimRobot/Icons/textfield.png",
+		"C:/mkdir R2K/R2K-SPL/Util/SimRobot/Src/SimRobot/Icons/folder.png"
+	],
+	"LOCK_FILE" : "C:/mkdir R2K/R2K-SPL/Make/Common/out/build/x64-Debug/CMakeFiles/SimRobot_autogen.dir/AutoRcc_SimRobot_SUIRACF3M4_Lock.lock",
+	"MULTI_CONFIG" : false,
+	"OPTIONS" : [ "-name", "SimRobot" ],
+	"OUTPUT_CHECKSUM" : "SUIRACF3M4",
+	"OUTPUT_NAME" : "qrc_SimRobot.cpp",
+	"RCC_EXECUTABLE" : "C:/mkdir R2K/R2K-SPL/Make/Common/../../Util/SimRobot/Util/qt/Windows/bin/rcc.exe",
+	"RCC_LIST_OPTIONS" : [ "--list" ],
+	"SETTINGS_FILE" : "C:/mkdir R2K/R2K-SPL/Make/Common/out/build/x64-Debug/CMakeFiles/SimRobot_autogen.dir/AutoRcc_SimRobot_SUIRACF3M4_Used.txt",
+	"SOURCE" : "C:/mkdir R2K/R2K-SPL/Util/SimRobot/Src/SimRobot/SimRobot.qrc",
+	"VERBOSITY" : 0
+}

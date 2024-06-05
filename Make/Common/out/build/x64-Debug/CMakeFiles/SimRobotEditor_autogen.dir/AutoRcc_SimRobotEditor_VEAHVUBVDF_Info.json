@@ -1,0 +1,23 @@
+{
+	"BUILD_DIR" : "C:/mkdir R2K/R2K-SPL/Make/Common/out/build/x64-Debug/SimRobotEditor_autogen",
+	"CMAKE_BINARY_DIR" : "C:/mkdir R2K/R2K-SPL/Make/Common/out/build/x64-Debug",
+	"CMAKE_CURRENT_BINARY_DIR" : "C:/mkdir R2K/R2K-SPL/Make/Common/out/build/x64-Debug",
+	"CMAKE_CURRENT_SOURCE_DIR" : "C:/mkdir R2K/R2K-SPL/Make/Common",
+	"CMAKE_SOURCE_DIR" : "C:/mkdir R2K/R2K-SPL/Make/Common",
+	"INCLUDE_DIR" : "C:/mkdir R2K/R2K-SPL/Make/Common/out/build/x64-Debug/SimRobotEditor_autogen/include",
+	"INPUTS" : 
+	[
+		"C:/mkdir R2K/R2K-SPL/Util/SimRobot/Src/SimRobotEditor/Icons/page_white_stack.png",
+		"C:/mkdir R2K/R2K-SPL/Util/SimRobot/Src/SimRobotEditor/Icons/page_white_text.png"
+	],
+	"LOCK_FILE" : "C:/mkdir R2K/R2K-SPL/Make/Common/out/build/x64-Debug/CMakeFiles/SimRobotEditor_autogen.dir/AutoRcc_SimRobotEditor_VEAHVUBVDF_Lock.lock",
+	"MULTI_CONFIG" : false,
+	"OPTIONS" : [ "-name", "SimRobotEditor" ],
+	"OUTPUT_CHECKSUM" : "VEAHVUBVDF",
+	"OUTPUT_NAME" : "qrc_SimRobotEditor.cpp",
+	"RCC_EXECUTABLE" : "C:/mkdir R2K/R2K-SPL/Make/Common/../../Util/SimRobot/Util/qt/Windows/bin/rcc.exe",
+	"RCC_LIST_OPTIONS" : [ "--list" ],
+	"SETTINGS_FILE" : "C:/mkdir R2K/R2K-SPL/Make/Common/out/build/x64-Debug/CMakeFiles/SimRobotEditor_autogen.dir/AutoRcc_SimRobotEditor_VEAHVUBVDF_Used.txt",
+	"SOURCE" : "C:/mkdir R2K/R2K-SPL/Util/SimRobot/Src/SimRobotEditor/SimRobotEditor.qrc",
+	"VERBOSITY" : 0
+}
