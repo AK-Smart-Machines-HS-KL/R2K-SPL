@@ -205,42 +205,53 @@ class TIPlaybackCard : public TIPlaybackCardBase
   bool thisIsATriggerPoint(const WorldModel& model) const
   {
     // Thresholds based on the pruned decision tree
-    const int distanceToGoalThreshold1 = 2800;
-    const int distanceToGoalThreshold2 = 3900;
-    const int ballPositionXThreshold1 = -1883;
-    const int ballPositionXThreshold2 = 4100;
-    const int ballPositionXThreshold = -1511;
+    const int distanceToGoalThreshold1 = 1570;
+    const int distanceToGoalThreshold2 = 1106;
+    const int ballPositionXThreshold1 = -2600;
+    const int ballPositionXThreshold2 = 3700;
+    const int ballPositionXThreshold = 1883;
 
-    // Implement the decision tree logic
+     // Implement the decision tree logic
     if (model.distanceToGoal >= distanceToGoalThreshold1) {
-      return true; // distanceToGoal >= 1.57e-9 -> True
+      if (model.ballPosition.x() < ballPositionXThreshold1){
+        OUTPUT_TEXT("kein TriggerPunkt");
+        return false;
+      }
+      else{
+        if (model.ballPosition.x() >= ballPositionXThreshold2){
+          OUTPUT_TEXT("TriggerPunkt");
+          return true;
+        }
+        else{
+          if (model.ballPosition.x() < ballPositionXThreshold){
+            OUTPUT_TEXT("kein TriggerPunkt");
+            return false;
+          }
+          else{
+            if(model.ballPosition.x() >= ballPositionXThreshold){
+              OUTPUT_TEXT("kein TriggerPunkt");
+              return false;
+            }
+            else{
+              OUTPUT_TEXT("TriggerPunkt");
+              return true;
+            }
+          }
+        }
+      }
     }
-    else {
-      if (model.distanceToGoal < distanceToGoalThreshold2) {
-        return false; // distanceToGoal < -1511 -> False
+    else{
+      if(model.distanceToGoal < distanceToGoalThreshold2){
+        OUTPUT_TEXT("kein TriggerPunkt");
+        return false;
       }
       else {
-        if (model.ballPosition.x() < ballPositionXThreshold1) {
-          if (model.ballPosition.x() >= ballPositionXThreshold2) {
-            if (model.ballPosition.x() >= ballPositionXThreshold) {
-              return true; // ballPosition.X >= 1883 -> True
-            }
-            else {
-              return false; // ballPosition.X < 1883 -> False
-            }
-          }
-          else {
-            return false; // ballPosition.X < 5.7e-6 -> False
-          }
-        }
-        else {
-          return false; // ballPosition.X >= 7.6e-6 -> False
-        }
+         OUTPUT_TEXT("TriggerPunkt");
+         return true;
       }
     }
+    
 
-    // If none of the conditions match, it's not a trigger point
-    return false;
   }
 
   // param number unused yet
