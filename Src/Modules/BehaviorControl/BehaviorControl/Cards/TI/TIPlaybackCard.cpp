@@ -209,43 +209,39 @@ class TIPlaybackCard : public TIPlaybackCardBase
     const int distanceToGoalThreshold2 = 3900;
     const int ballPositionXThreshold1 = -1883;
     const int ballPositionXThreshold2 = 4100;
-    const int ballPositionYThreshold = -1511;
+    const int ballPositionXThreshold = -1511;
 
     // Implement the decision tree logic
-    if (model.distanceToGoal < distanceToGoalThreshold1)
-    {
-      if (model.ballPosition.x() < ballPositionXThreshold1)
-      {
-        if (model.ballPosition.x() >= ballPositionYThreshold)
-        {
-          return true;
-        }
-        else
-        {
-          return true;
-        }
-      }
-      else
-      {
-        return true;
-      }
+    if (model.distanceToGoal >= distanceToGoalThreshold1) {
+      return true; // distanceToGoal >= 1.57e-9 -> True
     }
-    else if (model.distanceToGoal >= distanceToGoalThreshold2)
-    {
-      return true;
-    }
-    else
-    {
-      if (model.ballPosition.x() >= ballPositionXThreshold2)
-      {
-        return true;
+    else {
+      if (model.distanceToGoal < distanceToGoalThreshold2) {
+        return false; // distanceToGoal < -1511 -> False
+      }
+      else {
+        if (model.ballPosition.x() < ballPositionXThreshold1) {
+          if (model.ballPosition.x() >= ballPositionXThreshold2) {
+            if (model.ballPosition.x() >= ballPositionXThreshold) {
+              return true; // ballPosition.X >= 1883 -> True
+            }
+            else {
+              return false; // ballPosition.X < 1883 -> False
+            }
+          }
+          else {
+            return false; // ballPosition.X < 5.7e-6 -> False
+          }
+        }
+        else {
+          return false; // ballPosition.X >= 7.6e-6 -> False
+        }
       }
     }
 
     // If none of the conditions match, it's not a trigger point
     return false;
   }
-
 
   // param number unused yet
   bool teachInScoreReached(int number) const
