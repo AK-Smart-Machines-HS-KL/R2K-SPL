@@ -29,6 +29,9 @@ CARD(TestCard,
         CALLS(Activity),
         CALLS(LookForward),
         CALLS(Stand),
+        CALLS(LookActive),
+        CALLS(LookAtBall),
+        REQUIRES(FieldBall),
 
         DEFINES_PARAMETERS(
              {,
@@ -58,6 +61,38 @@ class TestCard : public TestCardBase
   bool postconditions() const override
   {
     return true;   // set to true, when used as default card, ie, lowest card on stack
+  }
+
+  option{
+    initial_state(start)
+    {
+      theStandSkill();
+
+      transition
+      {
+        if(!theFieldBall.ballWasSeen())
+          OUTPUT_TEXT("Ball not seen - Transitioning to STATE(lookAtBall)");
+          goto lookAtBall;
+      }
+
+      action
+      {
+        theLookAtBallSkill();
+      }
+    }
+    state(lookAtBall)
+    {
+      transition
+      {
+        if(theFieldBall.ballWasSeen())
+          OUTPUT_TEXT("Ball seen - Transitioning to STATE(start)");
+          goto start;
+      }
+      action
+      {
+        theLookActiveSkill();
+      }
+    }
   }
 
   void execute() override
