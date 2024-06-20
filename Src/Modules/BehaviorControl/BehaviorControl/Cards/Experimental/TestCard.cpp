@@ -66,7 +66,9 @@ class TestCard : public TestCardBase
   option{
     initial_state(start)
     {
+      theActivitySkill(BehaviorStatus::testingBehavior);
       theStandSkill();
+
 
       transition
       {
@@ -95,18 +97,18 @@ class TestCard : public TestCardBase
     }
   }
 
-  void execute() override
-  {
+  // void execute() override
+  // {
 
-    theActivitySkill(BehaviorStatus::testingBehavior);
-    // std::string s = "testingBehavior";
-    // OUTPUT_TEXT(s);
+  //   theActivitySkill(BehaviorStatus::testingBehavior);
+  //   // std::string s = "testingBehavior";
+  //   // OUTPUT_TEXT(s);
 
-    // Override these skills with the skills you wish to test
-    theLookForwardSkill(); // Head Motion Request
-    theStandSkill(); // Standard Motion Request
+  //   // Override these skills with the skills you wish to test
+  //   theLookForwardSkill(); // Head Motion Request
+  //   theStandSkill(); // Standard Motion Request
 
-  }
+  // }
 };
 
 MAKE_CARD(TestCard);
