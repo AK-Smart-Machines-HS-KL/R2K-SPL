@@ -64,12 +64,13 @@ class TestCard : public TestCardBase
   }
 
   option{
+
+    theActivitySkill(BehaviorStatus::testingBehavior);
+    theStandSkill();
+
     initial_state(start)
     {
-      theActivitySkill(BehaviorStatus::testingBehavior);
-      theStandSkill();
-
-
+      
       transition
       {
         if(!theFieldBall.ballWasSeen())

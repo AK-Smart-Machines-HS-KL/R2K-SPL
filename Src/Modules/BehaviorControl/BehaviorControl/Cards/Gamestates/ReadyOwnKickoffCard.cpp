@@ -33,6 +33,8 @@ CARD(ReadyOwnKickoffCard,
     CALLS(Activity),
     CALLS(LookActive),
     CALLS(WalkToPoint),
+    CALLS(LookForward),
+    CALLS(LookAtBall),
     REQUIRES(DefaultPose),
     REQUIRES(GameInfo),
     REQUIRES(OwnTeamInfo),
@@ -80,7 +82,11 @@ class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
 
     Pose2f targetRelative = theRobotPose.toRelative(targetAbsolute);
 
-    theLookActiveSkill(); // Head Motion Request
+    // theLookActiveSkill(); // Head Motion Request
+    // theLookForwardSkill(); // stop moving head
+    theLookAtBallSkill(); // Look at Ball
+
+
     theWalkToPointSkill(targetRelative, 1.0f, true);
 
   }
