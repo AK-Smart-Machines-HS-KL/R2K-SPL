@@ -1,5 +1,8 @@
 #include "KeyLogger.h"
 #include "Representations/BehaviorControl/TI/TIData.h"
+#include <rapidcsv.h>
+#include <iostream>
+#include <fstream>
 
 KeyLogger *KeyLogger::keyLoggerInstance = 0;
 
@@ -253,8 +256,32 @@ void KeyLogger::protocol(PlaybackAction* playbackAction)
         {
 					recordingStartTime = playbackAction->maxTime;
         }
-        /* ToDo: rapidCSV
-        */
+        /* ToDo: finish rapidCSV
+        
+        try {
+            rapidcsv::Document doc;
+
+            doc.SetColumnName(0, "skillName");
+            doc.SetColumnName(1, "maxTime");
+            doc.SetColumnName(2, "angleParam1");
+            doc.SetColumnName(3, "angleParam2");
+            doc.SetColumnName(4, "poseParam X");
+            doc.SetColumnName(5, "poseParam Y");
+            doc.SetColumnName(6, "poseParam R");
+            doc.SetColumnName(7, "vector3Param X");
+            doc.SetColumnName(8, "vector3Param Y");
+            doc.SetColumnName(9, "vector3Param Z");
+            doc.SetColumnName(10, "boolParam");
+            doc.SetColumnName(11, "floatParam");
+            doc.SetColumnName(12, "intParam");
+            doc.SetColumnName(13, "stringParam");
+        }
+        catch(const std::exception& e)
+        {
+            OUTPUT_WARNING(e.what());
+            return;
+        }  
+        */ 
     }
 
     mtx.unlock();

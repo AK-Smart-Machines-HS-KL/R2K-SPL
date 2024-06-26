@@ -63,7 +63,7 @@ void PlaybackSequence::save(std::string path){
 
     if(path.empty()) {
         if(fileName.empty()) {
-            OUTPUT_WARNING("File could no be saved: bad path");
+            OUTPUT_WARNING("File could not be saved: bad path");
         }
         path = fileName;
     }
@@ -198,7 +198,7 @@ void WorldData::save(std::string path){
 
     if(path.empty()) {
         if(fileName.empty()) {
-            OUTPUT_WARNING("File could no be saved: bad path");
+            OUTPUT_WARNING("File could not be saved: bad path");
         }
         path = fileName;
     }

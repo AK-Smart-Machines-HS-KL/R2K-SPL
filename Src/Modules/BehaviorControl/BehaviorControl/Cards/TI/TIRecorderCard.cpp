@@ -115,9 +115,9 @@ class TIRecorderCard : public TIRecorderCardBase
 
     speed = walkSpeed;
     //get the last pressed key
-    // int key = keyLogger->getKey();
-    // //get the Cursor Values
-
+    int key = keyLogger->getKey();
+    OUTPUT_TEXT("Key press " << key << " detected!");
+    
     // Key handling:
     handleController();
 
