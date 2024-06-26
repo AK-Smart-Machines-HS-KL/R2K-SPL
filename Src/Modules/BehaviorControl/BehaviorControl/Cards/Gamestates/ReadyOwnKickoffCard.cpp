@@ -83,8 +83,8 @@ class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
     Pose2f targetRelative = theRobotPose.toRelative(targetAbsolute);
 
     // theLookActiveSkill(); // Head Motion Request
-    // theLookForwardSkill(); // stop moving head
-    theLookAtBallSkill(); // Look at Ball
+    theLookForwardSkill(); // stop moving head
+    // theLookAtBallSkill(); // Look at Ball
 
 
     theWalkToPointSkill(targetRelative, 1.0f, true);
