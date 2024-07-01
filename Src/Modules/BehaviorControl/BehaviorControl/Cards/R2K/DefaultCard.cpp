@@ -30,6 +30,7 @@ CARD(DefaultCard,
         CALLS(Activity),
         CALLS(LookActive),
         CALLS(WalkToPoint),
+        CALLS(LookAtBall),
 
         REQUIRES(DefaultPose),
         REQUIRES(RobotPose),
@@ -71,7 +72,9 @@ class DefaultCard : public DefaultCardBase
     
     Pose2f targetRelative = theRobotPose.toRelative(theDefaultPose.ownDefaultPose);
 
-    theLookActiveSkill(); // Head Motion Request
+    // theLookActiveSkill(); // Head Motion Request
+    theLookAtBallSkill();
+
     theWalkToPointSkill(targetRelative, 1.0f, true);     
 
   }
