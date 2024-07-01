@@ -1,6 +1,7 @@
 #pragma once
 #include "Tools/Communication/RobotMessage.h"
 #include "Representations/Modeling/BallModel.h"
+// #include "Proto/FieldBall_bp.h"
 
 class BallModelComponent : public RobotMessageComponent<BallModelComponent> {
   public:

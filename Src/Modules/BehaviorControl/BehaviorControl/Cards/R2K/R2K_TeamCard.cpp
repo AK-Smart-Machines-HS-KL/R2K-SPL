@@ -534,11 +534,16 @@ private:
     // timeToReachBall.timeWhenReachBall = myEbcWrites;
 
     minDist = dist;
-  
+      
     // e) find min distance to ball for all _active_ bots
     //     check: if buddy is penalized it doens't cout
     for (const auto& buddy : theTeamData.teammates)
-    {  // compute and compare my buddies distance with minimal distance
+
+    {  
+      if (theRobotInfo.number == 1) {
+        OUTPUT_TEXT(buddy.number << " " << buddy.theBallModel.timeWhenLastSeen << " " << buddy.theBallModel.estimate.position.x() << " " << buddy.theBallModel.estimate.position.y());
+      }
+      // compute and compare my buddies distance with minimal distance
       if(!buddy.isPenalized)
         minDist = std::min(minDist, buddyDist = (int) Geometry::distance(theFieldBall.endPositionOnField, buddy.theRobotPose.translation));
     } // rof: scan team
@@ -558,7 +563,11 @@ private:
       for (const auto& buddy : theTeamData.teammates)
       {  // compute and compare my buddies distance with minimal distance
 
-        buddyDist = (int)Geometry::distance(theFieldBall.endPositionOnField, buddy.theRobotPose.translation);//  comparing FieldBall with buddy position
+
+         // OUTPUT_TEXT(theRobotInfo.number << " " << theFieldBall.teamPositionOnField.x() << " " << theFieldBall.recentBallPositionOnField().x());
+
+        buddyDist = (int)Geometry::distance(theFieldBall.recentBallPositionOnField(), buddy.theRobotPose.translation);
+        // buddyDist = (int)Geometry::distance(theFieldBall.endPositionOnField, buddy.theRobotPose.translation);//  comparing FieldBall with buddy position
         // buddyDist = (int)Geometry::distance(buddy.theBallModel.estimate.position, buddy.theRobotPose.translation);//  comparing buddys estimate with buddy position
         
         // OUTPUT_TEXT("fb dist:" << buddyDist);
@@ -639,6 +648,8 @@ private:
       // && theGameInfo.state != STATE_PLAYING) { // we sended the teammateRoles already at line 347
       theTeammateRolesSkill(lastTeammateRoles);
     }
+    // ballModel.timeWhenLastSeen = theRobotInfo.number * 10;
+    // theBallModelSkill(ballModel);
 
   }  // execute
 

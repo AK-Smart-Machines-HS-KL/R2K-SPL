@@ -9,4 +9,5 @@ MAKE_MODULE(TeamCommBufferManager, communication);
 
 void TeamCommBufferManager::update(TeamCommBuffer& buffer) { 
     buffer.pose = theRobotPose;
+    buffer.model = theBallModel;
 }

@@ -81,6 +81,7 @@ void RobotMessageHandler::send()
   // Plot usage of data buffer in percent:
   const float usageInPercent = 100.f * size / SPL_MAX_MESSAGE_BYTES;
   PLOT("module:RobotMessageHandler:messageDataUsageInPercent", usageInPercent);
+  OUTPUT_TEXT("Percent: " << usageInPercent);
 }
 
 void RobotMessageHandler::receive()
