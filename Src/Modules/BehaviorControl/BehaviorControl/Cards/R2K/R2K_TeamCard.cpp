@@ -144,7 +144,7 @@ TEAM_CARD(R2K_TeamCard,
                   (unsigned) (STATE_INITIAL)           lastGameState,
                   (unsigned) (SET_PLAY_NONE)           lastGamePhase,
                   (int)(-1)                            lastTeamBehaviorStatus, // -1 means: not set yet
-                  (int)(500)                           decayPlaysTheBall, // B-Huma default ballWasSeen 500
+                  (int)(1000)                          decayPlaysTheBall, // B-Huma default ballWasSeen 500
                   (int)(10000)                         decayUpdateSupporterIndex,
                   (unsigned)(0)                        playsTheBallHasChangedFrame,   // store the frame when this bot claims to be playing the ball
                   (unsigned)(0)                        lastUpdateSupporterIndexFrame,  // store the frame when the last update has occured
@@ -215,6 +215,7 @@ private:
     for (const auto& buddy : theOpponentTeamInfo.players) {
       if (buddy.penalty != PENALTY_NONE) opp_penalties++;
     }
+
 
     TeammateRoles teamMateRoles;
 
@@ -524,8 +525,8 @@ private:
 
    
     if (theFieldBall.ballWasSeen(decayPlaysTheBall))  // to be on the safe side
-      dist = (int)Geometry::distance(theFieldBall.endPositionRelative, Vector2f(0, 0));
-
+      // dist = (int)Geometry::distance(theFieldBall.endPositionRelative, Vector2f(0, 0));
+      dist = (int)Geometry::distance(theFieldBall.teamPositionOnField, theRobotPose.translation);  // see line 573
     // if (theRobotInfo.number == 2) OUTPUT_TEXT("dist:" << dist);
 
     TimeToReachBall timeToReachBall;
@@ -539,13 +540,15 @@ private:
     //     check: if buddy is penalized it doens't cout
     for (const auto& buddy : theTeamData.teammates)
 
-    {  
+    { // added: AM 
+      /*
       if (theRobotInfo.number == 1) {
         OUTPUT_TEXT(buddy.number << " " << buddy.theBallModel.timeWhenLastSeen << " " << buddy.theBallModel.estimate.position.x() << " " << buddy.theBallModel.estimate.position.y());
       }
+      */
       // compute and compare my buddies distance with minimal distance
       if(!buddy.isPenalized)
-        minDist = std::min(minDist, buddyDist = (int) Geometry::distance(theFieldBall.endPositionOnField, buddy.theRobotPose.translation));
+        minDist = std::min(minDist, buddyDist = (int) Geometry::distance(theFieldBall.teamPositionOnField, buddy.theRobotPose.translation)); // see line 573
     } // rof: scan team
    
     // if (theRobotInfo.number == 2)OUTPUT_TEXT("min dist:" << minDist);
@@ -557,6 +560,7 @@ private:
     // is one of my buddies the striker?
     // OUTPUT_TEXT("time " << theFrameInfo.getTimeSince(playsTheBallHasChanged));
     
+
     if (theFrameInfo.getTimeSince(playsTheBallHasChangedFrame) < decayPlaysTheBall) 
       teamMateRoles.captain = lastTeammateRoles.captain;  // nothing changed
     else {
@@ -566,7 +570,13 @@ private:
 
          // OUTPUT_TEXT(theRobotInfo.number << " " << theFieldBall.teamPositionOnField.x() << " " << theFieldBall.recentBallPositionOnField().x());
 
-        buddyDist = (int)Geometry::distance(theFieldBall.recentBallPositionOnField(), buddy.theRobotPose.translation);
+        buddyDist = (int)Geometry::distance(theFieldBall.teamPositionOnField, buddy.theRobotPose.translation);
+        /*
+        if (theRobotInfo.number == 2)
+          OUTPUT_TEXT(buddy.number << " " << buddyDist);
+        */
+        // 
+        //buddyDist = (int)Geometry::distance(theFieldBall.recentBallPositionOnField(), buddy.theRobotPose.translation);
         // buddyDist = (int)Geometry::distance(theFieldBall.endPositionOnField, buddy.theRobotPose.translation);//  comparing FieldBall with buddy position
         // buddyDist = (int)Geometry::distance(buddy.theBallModel.estimate.position, buddy.theRobotPose.translation);//  comparing buddys estimate with buddy position
         
@@ -648,8 +658,6 @@ private:
       // && theGameInfo.state != STATE_PLAYING) { // we sended the teammateRoles already at line 347
       theTeammateRolesSkill(lastTeammateRoles);
     }
-    // ballModel.timeWhenLastSeen = theRobotInfo.number * 10;
-    // theBallModelSkill(ballModel);
 
   }  // execute
 

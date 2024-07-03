@@ -3,6 +3,11 @@
 #include <cstdint>
 
 /*
+* 
+* struct Vector2 {
+    int16_t x; // 14bit
+    int16_t y; // 14bit
+
       Number of bytes to encode struct BallState
       #define BYTES_LENGTH_BALL_STATE 7
 
@@ -26,10 +31,34 @@
 size_t BallModelComponent::compress(uint8_t* buff) {
   size_t byteOffset = 0;
 
+  // last_perception
+  float lx = model.lastPerception.x();
+  memcpy(buff + byteOffset, &lx, sizeof(float));
+  byteOffset += sizeof(float);
+
+  float ly = model.lastPerception.y();
+  memcpy(buff + byteOffset, &ly, sizeof(float));
+  byteOffset += sizeof(float);
+
+
+  // estimate
+  float vx = model.estimate.velocity.x(); // 14bit
+  memcpy(buff + byteOffset, &vx, sizeof(float));
+  byteOffset += sizeof(float);
+
+  float vy = model.estimate.velocity.y(); // 14bit
+  memcpy(buff + byteOffset, &vy, sizeof(float));
+  byteOffset += sizeof(float);
+
+
+  //time
   unsigned int t = model.timeWhenLastSeen;
   memcpy(buff + byteOffset, &t, sizeof(unsigned int));
   byteOffset += sizeof(unsigned int);
 
+  unsigned int t2 = model.timeWhenDisappeared;
+  memcpy(buff + byteOffset, &t2, sizeof(unsigned int));
+  byteOffset += sizeof(unsigned int);
 
   // struct BallState estimate; // 56bit
   // BallState s = model.estimate;
@@ -41,13 +70,10 @@ size_t BallModelComponent::compress(uint8_t* buff) {
   memcpy(buff + byteOffset, &y, sizeof(float));
   byteOffset += sizeof(float);
 
-  float vx = model.estimate.velocity.x(); // 14bit
-  memcpy(buff + byteOffset, &vx, sizeof(float));
-  byteOffset += sizeof(float);
-
-  float vy = model.estimate.velocity.y(); // 14bit
-  memcpy(buff + byteOffset, &vy, sizeof(float));
-  byteOffset += sizeof(float);
+  // uint8_t seen_percentage; 
+  uint8_t sp = model.seenPercentage;
+  memcpy(buff + byteOffset, &sp, sizeof(sp));
+  byteOffset += sizeof(sp);
 
     // return getSize();
   return byteOffset;
@@ -56,34 +82,58 @@ size_t BallModelComponent::compress(uint8_t* buff) {
 bool BallModelComponent::decompress(uint8_t* compressed) {
   size_t byteOffset = 0;
 
+  // last_perception
+  float lx;
+  memcpy(&lx, compressed + byteOffset, sizeof(lx));
+  byteOffset += sizeof(lx);
+  model.lastPerception.x() = lx;
+
+  float ly;
+  memcpy(&lx, compressed + byteOffset, sizeof(ly));
+  byteOffset += sizeof(ly);
+  model.lastPerception.y() = ly;
+
+  // estimate
+  float vx;
+  memcpy(&vx, compressed + byteOffset, sizeof(float));
+  byteOffset += sizeof(vx);
+  model.estimate.velocity.x() = vx;
+
+  float vy;
+  memcpy(&vy, compressed + byteOffset, sizeof(float));
+  byteOffset += sizeof(vy);
+  model.estimate.velocity.y() = vy;
+
+  //time 
   unsigned int t;
   memcpy(&t, compressed + byteOffset, sizeof(unsigned int));
   byteOffset += sizeof(t);
   model.timeWhenLastSeen = t;
 
+  unsigned int t2;
+  memcpy(&t2, compressed + byteOffset, sizeof(unsigned int));
+  byteOffset += sizeof(t2);
+  model.timeWhenDisappeared = t2;
+
   float x;
   memcpy(&x, compressed + byteOffset, sizeof(float));
-  byteOffset += sizeof(t);
+  byteOffset += sizeof(x);
   model.estimate.position.x() = x;
 
   float y;
   memcpy(&y, compressed + byteOffset, sizeof(float));
-  byteOffset += sizeof(t);
+  byteOffset += sizeof(y);
   model.estimate.position.y() = y;
 
-  float vx;
-  memcpy(&vx, compressed + byteOffset, sizeof(float));
-  byteOffset += sizeof(t);
-  model.estimate.velocity.x() = vx;
-
-  float vy;
-  memcpy(&vy, compressed + byteOffset, sizeof(float));
-  byteOffset += sizeof(t);
-  model.estimate.velocity.y() = vy;
+  // uint8_t seen_percentage; 
+  uint8_t sp;
+  memcpy(&sp, compressed + byteOffset, sizeof(sp));
+  byteOffset += sizeof(sp);
+  model.seenPercentage = sp;
 
   return byteOffset == getSize();
 }
 
 size_t BallModelComponent::getSize() {
-    return sizeof(unsigned int) + 4 * sizeof(float);
+    return  6*sizeof(float) + 2*sizeof(unsigned int) + sizeof(uint8_t);
 }
