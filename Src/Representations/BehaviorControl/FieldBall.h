@@ -22,7 +22,7 @@ STREAMABLE(FieldBall,
   /** Was the ball seen in the given time interval?
    *  @param timeInterval time since ball must have been seen (in ms)
    */
-  bool ballWasSeen(int timeInterval = 500) const;
+  bool ballWasSeen(int timeInterval = 1000) const;
 
   /**
    * Returns the ball's position in field coordinates. If ball has been

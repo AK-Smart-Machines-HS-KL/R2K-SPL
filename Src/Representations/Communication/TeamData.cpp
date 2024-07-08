@@ -69,6 +69,7 @@ void TeamData::draw() const
 TeamData::TeamData() {
   RobotPoseComponent::priority = 1;
   BehaviorStatusComponent::priority = 1;
+  BallModelComponent::priority = 1;
 }
 
 Teammate& TeamData::getBMate(int number)
@@ -98,3 +99,10 @@ void TeamData::rcvBehaviorStatus(BehaviorStatusComponent * comp, RobotMessageHea
   auto& bmate = getBMate(header.senderID);
   bmate.theBehaviorStatus.activity = static_cast<BehaviorStatus::Activity>(comp->activity);
 }
+
+
+void TeamData::rcvBallModel(BallModelComponent* comp, RobotMessageHeader& header) {
+  auto& bmate = getBMate(header.senderID);
+  bmate.theBallModel = comp->model;
+}
+

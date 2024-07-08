@@ -11,11 +11,13 @@
 #include "Tools/Module/Module.h"
 #include "Representations/Communication/TeamCommStatus.h"
 #include "Representations/Modeling/RobotPose.h"
+#include "Representations/Modeling/BallModel.h"
 #include "Representations/Communication/TeamCommBuffer.h"
 
 MODULE(TeamCommBufferManager,
 {,
   REQUIRES(RobotPose),
+  REQUIRES(BallModel),
   PROVIDES(TeamCommBuffer),
 
   DEFINES_PARAMETERS(
