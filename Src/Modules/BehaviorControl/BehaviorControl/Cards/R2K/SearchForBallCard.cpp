@@ -103,6 +103,7 @@ class SearchForBallCard : public SearchForBallCardBase
     initial_state(init)
     {
       startTime = theFrameInfo.time;
+      // OUTPUT_TEXT(theRobotInfo.number << " has not seen the ball");
       transition
       {
         if (std::abs(theFieldBall.positionRelative.angle()) < 10_deg) {

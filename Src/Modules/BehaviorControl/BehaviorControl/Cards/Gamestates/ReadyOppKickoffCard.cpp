@@ -82,7 +82,7 @@ class ReadyOppKickoffCard : public ReadyOppKickoffCardBase
         targetAbsolute = Pose2f(0, -1300, -1300);
         break;
       case 2: // 
-        targetAbsolute = Pose2f(0, -900, 1200);
+        targetAbsolute = Pose2f(0, -900, 2000);
         break;
       }
 

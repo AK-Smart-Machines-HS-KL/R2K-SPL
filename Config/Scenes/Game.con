@@ -1,4 +1,6 @@
 call Includes/Normal
 call Includes/5vs5
+call Includes/Views
 
 dr debugDrawing3d:representation:RobotPose
+dr debugDrawing3d:representation:RobotInfo

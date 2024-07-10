@@ -93,6 +93,7 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
   {
     return
       theGameInfo.setPlay == SET_PLAY_NONE &&  // no penalty active
+      !aBuddyIsClearingOwnHalf() &&
       theTeammateRoles.playsTheBall(theRobotInfo.number);
       // theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
@@ -138,7 +139,8 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
     for (const auto& buddy : theTeamData.teammates)
     {
       if (
-        buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard)
+        buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard)
         return true;
     }
     return false;

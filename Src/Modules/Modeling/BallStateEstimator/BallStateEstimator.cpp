@@ -347,6 +347,7 @@ void BallStateEstimator::generateModel(BallModel& ballModel)
   }
   if(ballWasSeenInThisFrame)
   {
+    // OUTPUT_TEXT("ballWasSeenInThisFrame" << theFrameInfo.time);
     ballModel.timeWhenLastSeen = theFrameInfo.time;
     ballModel.lastPerception = theFilteredBallPercepts.percepts[0].positionOnField;
   }

@@ -102,7 +102,8 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
         if(
           !aBuddyIsClearingOrPassing() &&
           theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
-          theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
+          // theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
+          !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number) && // my recent role
           // either a substantial delta on x - or we are at kick-off
           (thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1 ||
             theExtendedGameInfo.timeSincePlayingStarted < 10000)  // side pass at kickOff

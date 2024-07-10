@@ -98,11 +98,11 @@ class OppKickInCard : public OppKickInCardBase
     initial_state(init)
     {
       isBlocking = true;
-      float ownDistToBall = Geometry::distance(theRobotPose.translation, theFieldBall.positionOnField);
+      float ownDistToBall = Geometry::distance(theRobotPose.translation, theFieldBall.teamPositionOnField);
 
       for(auto& teammate : theTeamData.teammates)
       {
-        if (ownDistToBall > Geometry::distance(teammate.theRobotPose.translation, theFieldBall.positionOnField)) {
+        if (ownDistToBall > Geometry::distance(teammate.theRobotPose.translation, theFieldBall.teamPositionOnField)) {
           isBlocking = false;
           break;
         }
@@ -136,9 +136,9 @@ class OppKickInCard : public OppKickInCardBase
         theLookForwardSkill();
 
         Vector2f ownGoalPos = Vector2f(theFieldDimensions.xPosOwnGoal, theFieldDimensions.yPosCenterGoal);
-        Vector2f ballToGoal = (ownGoalPos - theFieldBall.positionOnField).normalized();
+        Vector2f ballToGoal = (ownGoalPos - theFieldBall.teamPositionOnField).normalized();
         //Translation for walking
-        blockingPos = theRobotPose.toRelative(theFieldBall.positionOnField + ballToGoal * blockingDistance);
+        blockingPos = theRobotPose.toRelative(theFieldBall.teamPositionOnField + ballToGoal * blockingDistance);
         //Walk closer to blockingPos and face ball
         theWalkToPointSkill(Pose2f(theFieldBall.positionRelative.angle(), blockingPos));
       }

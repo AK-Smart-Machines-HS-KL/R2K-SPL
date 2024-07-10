@@ -72,7 +72,7 @@ CARD(DefenseCoverBackCard,
              {,
                 //Define Params here
                 (float)(0.8f) walkSpeed,
-                (int)(5000) ballNotSeenTimeout,
+                (int)(3000) ballNotSeenTimeout,
                 (int)(1000) threshold,
              }),
 
@@ -88,10 +88,10 @@ class DefenseCoverBackCard : public DefenseCoverBackCardBase
     //Vergleich ob die Spielerposition in der Opponentside liegt
     //mit einem threshold damit Stürmer noch teils ins eigene Feld darf
     Vector2f ownGoal = Vector2f(theFieldDimensions.xPosOwnGroundLine, 0);
-    float distToGoal = (ownGoal - theFieldBall.positionOnField).norm();
+    float distToGoal = (ownGoal - theFieldBall.teamPositionOnField).norm();
 
     return
-      theFieldBall.ballWasSeen()&&
+      theFieldBall.ballWasSeen(ballNotSeenTimeout)&&
       distToGoal > 1000 &&
       theGameInfo.setPlay == SET_PLAY_NONE &&
       !aBuddyIsChasingOrClearing() &&
@@ -142,7 +142,7 @@ class DefenseCoverBackCard : public DefenseCoverBackCardBase
       {
         if (buddy.theBehaviorStatus.activity == BehaviorStatus::defenseChaseBallCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::blocking ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+          //buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard 
