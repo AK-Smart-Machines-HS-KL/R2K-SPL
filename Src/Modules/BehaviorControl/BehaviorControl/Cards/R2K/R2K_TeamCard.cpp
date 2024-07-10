@@ -230,13 +230,15 @@ private:
     // HOT FIX
     // if(true) {
       
+      /*
       theTeamActivitySkill(TeamBehaviorStatus::R2K_SPARSE_GAME);
       teamBehaviorStatus = TeamBehaviorStatus::R2K_SPARSE_GAME;
+      */
   
-/*    
+
       theTeamActivitySkill(TeamBehaviorStatus::R2K_NORMAL_GAME);
       teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME;
-  */  
+   
     }
     else {
       if (own_score < opp_score ) {
