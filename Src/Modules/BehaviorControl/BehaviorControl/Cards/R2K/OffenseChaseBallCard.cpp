@@ -69,7 +69,6 @@ CARD(OffenseChaseBallCard,
              {,
                 //Define Params here
                 (float)(0.8f) walkSpeed,
-                (int)(5000) ballNotSeenTimeout,
                 (int)(1000) threshold,
              }),
 
@@ -86,11 +85,11 @@ class OffenseChaseBallCard : public OffenseChaseBallCardBase
     //mit einem threshold damit Stürmer noch teils ins eigene Feld darf
   
     return
-      theFieldBall.ballWasSeen() && 
+      theFieldBall.ballWasSeen() &&
       !aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
       theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
-      (theFieldBall.endPositionOnField.x() > (0 - threshold)) &&
-      theFieldBall.endPositionOnField.x() >= theRobotPose.translation.x() - threshold;
+      (theFieldBall.teamPositionOnField.x() > (0 - threshold)) &&
+      theFieldBall.teamPositionOnField.x() >= theRobotPose.translation.x() - threshold;
   }
 
   bool postconditions() const override
@@ -106,7 +105,7 @@ class OffenseChaseBallCard : public OffenseChaseBallCardBase
     {
       transition
       {
-        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+        if(!theFieldBall.ballWasSeen())
           goto searchForBall;
       }
 
@@ -142,7 +141,7 @@ class OffenseChaseBallCard : public OffenseChaseBallCardBase
 
     Angle calcAngleToBall() const
   {
-    return (theRobotPose.inversePose * Vector2f(theFieldBall.endPositionOnField.x(), theFieldBall.endPositionOnField.y())).angle();
+    return (theRobotPose.inversePose * Vector2f(theFieldBall.teamPositionOnField.x(), theFieldBall.teamPositionOnField.y())).angle();
   }
 
     bool aBuddyIsChasingOrClearing() const

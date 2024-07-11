@@ -127,7 +127,6 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
                 if(buddy.theRobotPose.translation.x() > theRobotPose.translation.x()) {
                     if(target.x() < buddy.theRobotPose.translation.x() || target == Vector2f::Zero()) {
                         target = buddy.theRobotPose.translation;
-                        target.x() += 1500;
                     }
                 }
             }

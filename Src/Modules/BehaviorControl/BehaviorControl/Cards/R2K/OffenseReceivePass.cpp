@@ -44,6 +44,7 @@ CARD(OffenseReceivePassCard,
     CALLS(Activity),
     CALLS(LookActive),
     CALLS(Stand),
+    CALLS(WalkToPoint),
     REQUIRES(FieldBall),
     REQUIRES(FieldDimensions),
     REQUIRES(RobotPose),
@@ -92,14 +93,18 @@ class OffenseReceivePassCard : public OffenseReceivePassCardBase
     
     void execute() override
     {
-        
-        theActivitySkill(BehaviorStatus::offenseReceivePassCard);
-        theLookActiveSkill();
-        theStandSkill();
-        
-        
+
+      theActivitySkill(BehaviorStatus::offenseReceivePassCard);
+      theLookActiveSkill();
+      // theStandSkill();
+      // added AM
+      if (theRobotPose.translation.x() > theFieldDimensions.xPosOpponentPenaltyMark)
+        theStandSkill();  // already close enough 
+      else 
+        theWalkToPointSkill(theRobotPose.toRelative(Vector2f(theRobotPose.translation.x()+1000, theRobotPose.translation.y())));
+
     }
-    
+
     Angle calcAngleToOffense(float xPos, float yPos) const
     {
         return (theRobotPose.inversePose * Vector2f(xPos, yPos)).angle();

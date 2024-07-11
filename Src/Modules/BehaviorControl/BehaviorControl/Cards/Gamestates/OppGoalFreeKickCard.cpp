@@ -82,33 +82,8 @@ class OppGoalFreeKickCard : public OppGoalFreeKickCardBase
         //Translation for walking
         Vector2f blockingPos = theRobotPose.toRelative(theDefaultPose.ownDefaultPose.translation);
         //Walk closer to blockingPos and face ball
-        theWalkToPointSkill(Pose2f(theFieldBall.positionRelative.angle(), blockingPos));
-      }
-    }
-
-    state(active)
-    {
-      transition
-      {
-
-      }
-
-      action
-      {
-
-      }
-    }
-
-    state(standby)
-    {
-      transition
-      {
-
-      }
-
-      action
-      {
-        
+        // theWalkToPointSkill(Pose2f(theFieldBall.positionRelative.angle(), blockingPos));
+        theWalkToPointSkill(Pose2f(theFieldBall.teamPositionOnField.angle(), blockingPos));
       }
     }
   }

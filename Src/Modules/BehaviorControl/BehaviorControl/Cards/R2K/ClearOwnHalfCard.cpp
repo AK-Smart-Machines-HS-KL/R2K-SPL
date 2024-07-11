@@ -94,10 +94,10 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
     return
       theGameInfo.setPlay == SET_PLAY_NONE &&  // no penalty active
       !aBuddyIsClearingOwnHalf() &&
-      theTeammateRoles.playsTheBall(theRobotInfo.number);
+      // theTeammateRoles.playsTheBall(theRobotInfo.number) &&
       // theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
-      theFieldBall.positionOnField.x() < -500 &&
+      theFieldBall.teamPositionOnField.x() < -500 &&
       !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME);
   }
 
@@ -115,7 +115,7 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
     if (!footIsSelected) {  // select only once
       footIsSelected = true;
       leftFoot = theFieldBall.positionRelative.y() < 0;
-      if (theRobotPose.translation.x() > theFieldBall.positionOnField.x())
+      if (theRobotPose.translation.x() > theFieldBall.teamPositionOnField.x())
         shootAngleIsZero = false; // take some time not too shoot at own goal or into own side 
       else
         shootAngleIsZero = true; // bot is  closer to goal than ball,  quick shot
@@ -139,6 +139,7 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
     for (const auto& buddy : theTeamData.teammates)
     {
       if (
+        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
         buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard||
         buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard)
         return true;
