@@ -59,7 +59,6 @@ CARD(SearchForBallCard,
              {,
           (int)(2500) headSweepDuration,
           (int)(3000) bodyTurnDuration,
-          (int)(5000) ballNotSeenTimeout,
           (int)(9000) maxRuntime,
           (int)(10000) cooldown,
           (unsigned)(0) startTime,
@@ -84,7 +83,7 @@ class SearchForBallCard : public SearchForBallCardBase
   {
     // return true;   // use for testing the head and body moves in a fast game
     int timeSinceLastStart = theFrameInfo.getTimeSince(startTime);
-    return !theFieldBall.ballWasSeen(ballNotSeenTimeout)
+    return !theFieldBall.ballWasSeen()
       && (timeSinceLastStart < maxRuntime || timeSinceLastStart > maxRuntime + cooldown)
       && theExtendedGameInfo.timeSinceLastPenaltyEnded > 10000 
       && !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number);

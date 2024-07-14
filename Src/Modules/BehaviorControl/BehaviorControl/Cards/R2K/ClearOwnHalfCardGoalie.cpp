@@ -96,8 +96,8 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
   bool preconditions() const override
   {
     return
-      theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
-      // !aBuddyIsClearingOwnHalf() &&
+      theTeammateRoles.playsTheBall(theRobotInfo.number) &&   // I am the striker
+      !aBuddyIsClearingOwnHalf() &&
       // 
       // either LongShotCard is above in the stack or add this pre-cond:
       // theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
@@ -144,8 +144,7 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
   {
     for (const auto& buddy : theTeamData.teammates)
     {
-      if (buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
-        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie)
+      if (buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard)
         return true;
     }
     return false;

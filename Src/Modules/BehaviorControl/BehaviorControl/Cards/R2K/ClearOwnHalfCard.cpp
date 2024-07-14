@@ -92,6 +92,7 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
   bool preconditions() const override
   {
     return
+      theTeammateRoles.playsTheBall(theRobotInfo.number) &&
       theGameInfo.setPlay == SET_PLAY_NONE &&  // no penalty active
       !aBuddyIsClearingOwnHalf() &&
       // theTeammateRoles.playsTheBall(theRobotInfo.number) &&
@@ -140,6 +141,7 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
     {
       if (
         buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
         buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard||
         buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard)
         return true;

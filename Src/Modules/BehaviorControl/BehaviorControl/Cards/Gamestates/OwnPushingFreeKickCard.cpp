@@ -75,11 +75,13 @@ class OwnPushingFreeKickCard : public OwnPushingFreeKickCardBase
    */
   bool postconditions() const override
   {
-    return 
+    return !preconditions();
+    /*
       !theFieldBall.ballWasSeen(ballWasSeenStickyPeriod)
       ||
       theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
       || theGameInfo.setPlay != SET_PLAY_PUSHING_FREE_KICK;
+      */
   }
 
   void execute() override

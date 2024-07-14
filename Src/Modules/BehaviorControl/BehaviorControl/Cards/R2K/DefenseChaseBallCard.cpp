@@ -69,7 +69,6 @@ CARD(DefenseChaseBallCard,
              {,
                 //Define Params here
                 (float)(0.8f) walkSpeed,
-                (int)(5000) ballNotSeenTimeout,
                 (int)(1000) threshold,
              }),
 
@@ -90,7 +89,7 @@ class DefenseChaseBallCard : public DefenseChaseBallCardBase
       !aBuddyIsChasingOrClearing() &&
       theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
-      theFieldBall.endPositionOnField.x() < -200;
+      theFieldBall.teamPositionOnField.x() < -200;
   }
 
   bool postconditions() const override
@@ -106,7 +105,7 @@ class DefenseChaseBallCard : public DefenseChaseBallCardBase
     {
       transition
       {
-        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+        if(!theFieldBall.ballWasSeen())
           goto searchForBall;
       }
 
@@ -139,7 +138,7 @@ class DefenseChaseBallCard : public DefenseChaseBallCardBase
 
     Angle calcAngleToBall() const
   {
-    return (theRobotPose.inversePose * Vector2f(theFieldBall.endPositionOnField.x(), theFieldBall.endPositionOnField.y())).angle();
+    return (theRobotPose.inversePose * Vector2f(theFieldBall.teamPositionOnField.x(), theFieldBall.teamPositionOnField.y())).angle();
   }
 
     bool aBuddyIsChasingOrClearing() const
