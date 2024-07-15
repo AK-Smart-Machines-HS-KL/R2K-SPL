@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Retrieve host and port from environment variables, with defaults
-HOST = os.getenv('FLASK_RUN_HOST', '127.0.0.1')
+HOST = os.getenv('FLASK_RUN_HOST', '0.0.0.0')
 FLASK_PORT = int(os.getenv('FLASK_RUN_PORT', 5000))
 LISTENER_PORT = int(os.getenv('LISTENER_PORT', 4242))
 
