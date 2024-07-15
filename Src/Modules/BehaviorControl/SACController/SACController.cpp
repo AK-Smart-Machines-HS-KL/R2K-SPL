@@ -3,7 +3,7 @@
 thread_local SACController* SACController::theInstance = nullptr;
 
 SACController::SACController() : 
-    tcpConnection("192.168.50.99", 5050, 0, 0)
+    tcpConnection("10.0.50.99", 5050, 0, 0)
 {
     printf("SACController created\n");
     
@@ -27,7 +27,6 @@ SACController::~SACController()
 void SACController::update(DummyRepresentation& dummyRepresentation)
 {
     dummyRepresentation.dummy = 1;
-    printf("SACController update\n");
 }
 
 MAKE_MODULE(SACController, behaviorControl);
