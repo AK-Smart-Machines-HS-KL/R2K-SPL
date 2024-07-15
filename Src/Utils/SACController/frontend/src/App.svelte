@@ -1,5 +1,7 @@
 <script>
     import ServerControl from './ServerControl.svelte';
+    import RobotControl from './RobotControl.svelte';
+    import BehaviorControl from './BehaviorControl.svelte';
 
     let statusMessage = "Not Connected";
     
@@ -81,6 +83,7 @@
 
 <div class="header">
     <img src="r2k.png" alt="R-ZWEI Kickers Logo" class="logo">
+    <img src="robocup-logo.png" alt="RoboCup Logo" class="logo">
     <h1>Shared Autonomy Challenge</h1>
 </div>
 <div class="main-container">
@@ -89,5 +92,11 @@
             {statusMessage}
             startServer={startConnection}
             stopServer={stopConnection} />
+    </div>
+        <div class="container">
+        <RobotControl />
+    </div>
+        <div class="container">
+        <BehaviorControl />
     </div>
 </div>
