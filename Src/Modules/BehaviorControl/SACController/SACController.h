@@ -1,14 +1,14 @@
 #pragma once
 
 
-# include "Representations/Infrastructure/DummyRepresentation.h"
+# include "Representations/BehaviorControl/SACCommands.h"
 #include "Tools/Communication/TcpComm.h"
 #include "Tools/Module/Module.h"
 
 
 MODULE(SACController,
 {,
-  PROVIDES(DummyRepresentation),
+  PROVIDES(SACCommands),
 });
 
 class SACController : public SACControllerBase
@@ -19,7 +19,7 @@ private:
 
     TcpComm tcpConnection;
 
-    void update(DummyRepresentation& dummyRepresentation) override;
+    void update(SACCommands& SACCommands) override;
 
 public:
   SACController();

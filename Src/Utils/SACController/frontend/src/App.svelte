@@ -2,6 +2,7 @@
     import ServerControl from './ServerControl.svelte';
     import RobotControl from './RobotControl.svelte';
     import BehaviorControl from './BehaviorControl.svelte';
+    import ModeControl from './ModeControl.svelte';
 
     let statusMessage = "Not Connected";
     
@@ -92,6 +93,9 @@
             {statusMessage}
             startServer={startConnection}
             stopServer={stopConnection} />
+    </div>
+        <div class="container">
+        <ModeControl />
     </div>
         <div class="container">
         <RobotControl />

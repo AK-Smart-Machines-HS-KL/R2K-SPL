@@ -1,14 +1,16 @@
 #include "SACController.h"
+#include "Platform/SystemCall.h"
 
 thread_local SACController* SACController::theInstance = nullptr;
 
 SACController::SACController() : 
-    tcpConnection("10.0.50.99", 5050, 0, 0)
+    tcpConnection("192.168.50.99", 5050, 0, 0)
 {
     printf("SACController created\n");
     
     if(tcpConnection.connected())
     {
+        SystemCall::say("SAC");
         printf("Connected to host\n");
     }
     else
@@ -24,9 +26,9 @@ SACController::~SACController()
     theInstance = nullptr;
 }
 
-void SACController::update(DummyRepresentation& dummyRepresentation)
+void SACController::update(SACCommands& saccommands)
 {
-    dummyRepresentation.dummy = 1;
+    saccommands.mode = 1;
 }
 
 MAKE_MODULE(SACController, behaviorControl);
