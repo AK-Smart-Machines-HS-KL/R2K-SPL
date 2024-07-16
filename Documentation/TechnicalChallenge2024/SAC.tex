@@ -15,57 +15,66 @@
 	\setlength{\parindent}{0pt}
 	\pagestyle{empty}
 	\maketitle
-	%\newpage
-	%\tableofcontents
 	\newpage
+	%\tableofcontents
 	\pagestyle{headings}
-	
-	\section{The Challenge 2024: Shared Autonomy}
-	
-	In the 2024 technical challenge, the teams have to develop a mixed team that consists of one human-operated Nao robot and one fully autonomous Nao.
-	This challenge will consist of matches of two vs two robots on the standard SPL field. 
-	
-	\subsection{The Goal}
-	
-	This challenge takes a step towards the goal of enabling robots to play on the same field as agents with human level intelligence.
-	To level the playing field in terms of physical embodiment, all players will be Nao robots.
-	However, each team will have one of their robots be remotely operated by a human to provide human-level intelligence for robot control.
-	The other robot will be fully autonomous in accordance with the main SPL competition rules.\\
-	
-	For further references and exact rules, see \href{https://spl.robocup.org/wp-content/uploads/SPL-Challenges-2024.pdf}{\textcolor{blue}{the official challenge rules}} provided by the technical committee.
-	
-	\section{Our approach}
-	
-	- We have web app / interface / browser\\
-	- Backend: communicates with robot via TCP\\
-	- ...\\
-	- send byte commands to robot\\
-	- on robot side: module for receiving and interpreting human OP commands\\
-	
-	\begin{figure}[h]
-		\centering
-		\includegraphics[width=\textwidth]{img/SAC}
-		\caption{The Interface for the shared autonomy challenge consists of four distinct Control modules}
-	\end{figure}
-	
-	\subsection{Tactical Overview}
-	
-	- Robot Mode Control (allows toggling between autonomous walk and full human control)\\
-	- Direction Control: Interface for full human walk control\\
-	- Behavior Control: manual card selection from behavior stack (BHuman skills and cards framework)\\
-	
-	\subsection{Technical Overview}
-	
-	- Frontend: Minimalist Web-App based on Svelte\\
-	- Backend: Python Flask Server\\
-	- works like REST-interface using endpoints for different control interfaces\\
-	- Server converts commands from frontend to byte-msgs and sends them to the bot\\
-	- On robot side there's a module which interprets the byte msgs and writes the commands in the representation, s.t. other modules can gather/use/access this information and cards or skills can be parameterized
-	
-	\section{Future Enhancements}
-	
-	- Fine tuning of inter-robot comms: trigger sending msgs from one bot to another\\
-	- better tactics / more flashed out tactical view
+
+\section{The Challenge 2024: Shared Autonomy}
+
+In the 2024 technical challenge, teams must create a mixed team comprising one human-operated Nao robot and one 
+fully autonomous Nao robot. Matches will be played in a two vs. two format on the standard SPL field.
+
+\subsection{The Goal}
+
+The challenge aims to progress towards enabling robots to operate alongside agents with human-level intelligence. 
+To ensure a level playing field in terms of physical capabilities, all participants will use Nao robots. 
+Each team will have one robot remotely operated by a human, providing human-level intelligence, 
+while the other robot will function autonomously, adhering to the main SPL competition rules.
+
+For further references and exact rules, see 
+\href{https://spl.robocup.org/wp-content/uploads/SPL-Challenges-2024.pdf}{\textcolor{blue}{the official challenge rules}} 
+provided by the technical committee.
+
+\section{Our Approach}
+
+Our approach involves developing a sophisticated web-based interface to control the robots and facilitate communication. 
+The backend system communicates with the robots via TCP, sending byte commands that are interpreted and 
+executed by the robots.
+
+\vspace{0.75cm}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{img/SAC}
+\caption{The Interface for the shared autonomy challenge consists of four distinct control modules.}
+\end{figure}
+
+\subsection{Tactical Overview}
+
+The interface is divided into several control modules:
+- **Robot Mode Control**: This module allows switching between autonomous operation and full human control.
+- **Direction Control**: Provides an interface for complete human control over the robot's movements.
+- **Behavior Control**: Enables manual selection of behaviors from a prepared card stack using the BHuman skills and cards framework.
+
+\newpage
+\subsection{Technical Overview}
+
+Our system is based on a minimalist web-app using Svelte for the frontend and a Python Flask server for the backend. The server acts as a REST interface, converting commands from the frontend to byte messages sent to the robot. The robot-side module interprets these messages, integrating the commands into its representation for use by other modules and parameterizing skills or behaviors.
+
+\section{Future Enhancements}
+
+To further enhance our system, we plan to improve inter-robot communication by enabling message exchanges between robots. 
+Additionally, we aim to refine our tactical capabilities, offering more sophisticated and nuanced control options. \\
+
+\textbf{Roadmap}
+
+\begin{enumerate}
+    \item \textbf{Inter-Robot Communication}: Implement triggers for message exchanges between robots to coordinate actions and strategies.
+    \item \textbf{Enhanced Tactics}: Develop advanced tactical views and strategies to optimize robot performance in various scenarios.
+    \item \textbf{User Interface Improvements}: Enhance the web interface to provide more intuitive and user-friendly controls.
+\end{enumerate}
+
+\end{document}
 	
 	
 \end{document}
