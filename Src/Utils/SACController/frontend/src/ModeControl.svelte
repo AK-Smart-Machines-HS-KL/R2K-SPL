@@ -2,18 +2,30 @@
     let modeMessage = "Select Mode";
     let selectedMode = "";
 
-    function selectMode(mode) {
-        selectedMode = mode;
-    }
-
-    function sendModeCommand() {
+    async function sendModeCommand() {
         if (selectedMode) {
             modeMessage = `Mode set to: ${selectedMode}`;
             // Add logic to send the selected mode to the robot
-            console.log(modeMessage);
+            try {
+                const response = await fetch('http://localhost:5000/mode', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ mode: selectedMode })
+                });
+                const result = await response.json();
+                console.log(result);
+            } catch (error) {
+                console.error('Error:', error);
+            }
         } else {
             modeMessage = "Please select a mode first";
         }
+    }
+
+    function selectMode(mode) {
+        selectedMode = mode;
     }
 </script>
 

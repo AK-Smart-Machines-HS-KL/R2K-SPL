@@ -20,8 +20,24 @@
     function selectBehavior(behavior) {
         behaviorMessage = `Selected behavior: ${behavior}`;
         activeBehavior = behavior;
-        // Add logic to send the selected behavior to the robot
+        sendBehavior(behavior);
         console.log(behaviorMessage);
+    }
+
+    async function sendBehavior(behavior) {
+        try {
+            const response = await fetch('http://localhost:5000/behavior', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ behavior })
+            });
+            const result = await response.json();
+            console.log(result);
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
 </script>
 

@@ -18,7 +18,7 @@ CARD(GameControlCard,
   LOADS_PARAMETERS(
   {,
     (DeckOfCards<CardRegistry>) deck, /**< The deck from which a card is played. */
-    (DeckOfCards<CardRegistry>) sacDeck /**< The deck from which a card is played if the robot is human-controlled. */,
+    (DeckOfCards<CardRegistry>) sacDeck, /**< The deck from which a card is played if the robot is human-controlled. */
 
   }),
 });

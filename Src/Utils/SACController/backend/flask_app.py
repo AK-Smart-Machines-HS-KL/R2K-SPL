@@ -1,8 +1,9 @@
-from flask import Flask, jsonify
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import socket
 import threading
 import os
+import struct
 
 app = Flask(__name__)
 CORS(app)
@@ -10,7 +11,7 @@ CORS(app)
 # Retrieve host and port from environment variables, with defaults
 HOST = os.getenv('FLASK_RUN_HOST', '0.0.0.0')
 FLASK_PORT = int(os.getenv('FLASK_RUN_PORT', 5000))
-LISTENER_PORT = int(os.getenv('LISTENER_PORT', 5050))
+LISTENER_PORT = int(os.getenv('LISTENER_PORT', 4242))
 
 # Global variables
 server_socket = None
@@ -71,6 +72,32 @@ def stop_server():
         return jsonify({"message": "Server stopped"}), 200
     return jsonify({"error": "Server not running"}), 400
 
+def send_to_robot(data):
+    for client_socket in client_sockets:
+        try:
+            client_socket.sendall(data)
+            print(f"Sent to robot at {client_socket.getpeername()}: {data}")
+        except Exception as e:
+            print(f"Error sending to robot at {client_socket.getpeername()}: {e}")
+            client_sockets.remove(client_socket)
+            client_addresses.remove(client_socket.getpeername())
+            client_socket.close()
+
+@app.route('/behavior', methods=['POST'])
+def update_behavior():
+    behavior = request.json.get('behavior')
+    if not behavior:
+        return jsonify({"error": "No behavior provided"}), 400
+    
+    # Convert the behavior string to bytes
+    behavior_bytes = behavior.encode('utf-8')
+    
+    # Pack the data to send to the robot
+    packed_id = struct.pack('B', 0x02)  # Assuming 0x02 is the ID for behavior commands
+    full_message = packed_id + behavior_bytes  # Concatenate ID and data
+    
+    send_to_robot(full_message)
+    return jsonify({"message": f"Behavior updated to {behavior}"}), 200
 
 if __name__ == "__main__":
     app.run(host=HOST, port=FLASK_PORT)

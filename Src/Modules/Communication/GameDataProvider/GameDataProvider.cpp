@@ -160,7 +160,7 @@ void GameDataProvider::handleButtons()
   
   if(theEnhancedKeyStates.hitStreak[KeyStates::headRear])
   {
-    std::string output = "I am in state " + theGameInfo.getStateAsString();
+    std::string output = "You are the best operator!";
     SystemCall::say(output.c_str());
   }
 
