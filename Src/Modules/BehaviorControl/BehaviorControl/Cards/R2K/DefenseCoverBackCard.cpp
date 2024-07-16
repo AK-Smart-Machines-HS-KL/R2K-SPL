@@ -82,6 +82,22 @@ class DefenseCoverBackCard : public DefenseCoverBackCardBase
 
   bool preconditions() const override
   {  
+    bool buddyValid = false;
+        
+    for (const auto& buddy : theTeamData.teammates)
+      {
+        if (!buddy.isPenalized && buddy.isUpright)
+          {
+              if(buddy.theRobotPose.translation.x() > theRobotPose.translation.x()) {
+                  buddyValid = true;
+                  break;
+            }
+          }
+      }
+
+    if (!buddyValid) {
+        return false;  // no boot closer towards goal than me
+    }
     //Abfragen Spielerposition
    
     //Vergleich ob die Spielerposition in der Opponentside liegt
