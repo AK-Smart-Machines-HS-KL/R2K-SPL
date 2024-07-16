@@ -97,10 +97,12 @@ class OwnPenaltyKickCard : public OwnPenaltyKickCardBase
    */
   bool postconditions() const override
   {
-    return !theFieldBall.ballWasSeen(ballWasSeenStickyPeriod)
+    return !preconditions();
+      /* !theFieldBall.ballWasSeen(ballWasSeenStickyPeriod)
       ||
       theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
       || theGameInfo.setPlay != SET_PLAY_PENALTY_KICK;
+      */
   }
 
   option

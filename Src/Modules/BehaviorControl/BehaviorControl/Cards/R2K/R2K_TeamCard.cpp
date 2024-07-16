@@ -144,7 +144,7 @@ TEAM_CARD(R2K_TeamCard,
                   (unsigned) (STATE_INITIAL)           lastGameState,
                   (unsigned) (SET_PLAY_NONE)           lastGamePhase,
                   (int)(-1)                            lastTeamBehaviorStatus, // -1 means: not set yet
-                  (int)(1000)                          decayPlaysTheBall, // B-Huma default ballWasSeen 500
+                  (int)(500)                           decayPlaysTheBall, // B-Huma default ballWasSeen 500
                   (int)(10000)                         decayUpdateSupporterIndex,
                   (unsigned)(0)                        playsTheBallHasChangedFrame,   // store the frame when this bot claims to be playing the ball
                   (unsigned)(0)                        lastUpdateSupporterIndexFrame,  // store the frame when the last update has occured
@@ -526,8 +526,9 @@ private:
     auto buddyDist = 9000;
 
    
-    if (theFieldBall.ballWasSeen(decayPlaysTheBall))  // to be on the safe side
+    // if (theFieldBall.ballWasSeen(decayPlaysTheBall))  // to be on the safe side
       // dist = (int)Geometry::distance(theFieldBall.endPositionRelative, Vector2f(0, 0));
+    if (theFieldBall.ballWasSeen())  // to be on the safe side
       dist = (int)Geometry::distance(theFieldBall.teamPositionOnField, theRobotPose.translation);  // see line 573
     // if (theRobotInfo.number == 2) OUTPUT_TEXT("dist:" << dist);
 

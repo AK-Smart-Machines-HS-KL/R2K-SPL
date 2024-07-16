@@ -72,7 +72,6 @@ CARD(DefenseCoverBackCard,
              {,
                 //Define Params here
                 (float)(0.8f) walkSpeed,
-                (int)(3000) ballNotSeenTimeout,
                 (int)(1000) threshold,
              }),
 
@@ -91,7 +90,7 @@ class DefenseCoverBackCard : public DefenseCoverBackCardBase
     float distToGoal = (ownGoal - theFieldBall.teamPositionOnField).norm();
 
     return
-      theFieldBall.ballWasSeen(ballNotSeenTimeout)&&
+      theFieldBall.ballWasSeen()&&
       distToGoal > 1000 &&
       theGameInfo.setPlay == SET_PLAY_NONE &&
       !aBuddyIsChasingOrClearing() &&
@@ -133,7 +132,7 @@ class DefenseCoverBackCard : public DefenseCoverBackCardBase
 
     Angle calcAngleToBall() const
   {
-    return (theRobotPose.inversePose * Vector2f(theFieldBall.endPositionOnField.x(), theFieldBall.endPositionOnField.y())).angle();
+    return (theRobotPose.inversePose * Vector2f(theFieldBall.teamPositionOnField.x(), theFieldBall.teamPositionOnField.y())).angle();
   }
 
     bool aBuddyIsChasingOrClearing() const

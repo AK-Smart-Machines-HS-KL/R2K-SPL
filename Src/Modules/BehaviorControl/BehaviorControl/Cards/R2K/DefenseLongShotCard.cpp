@@ -91,7 +91,7 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
   {
     
     return
-      theTeammateRoles.playsTheBall(&theRobotInfo , theTeamCommStatus.isWifiCommActive) &&  // I am the striker
+      theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // I am the striker
       !theObstacleModel.opponentIsClose(1200) && // see below: min distance is minOppDistance
       !aBuddyIsClearingOwnHalf() &&
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
@@ -100,7 +100,7 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
       (
         theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_OFFENSIVE_GAME ||
         theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME ||
-        theFieldBall.endPositionOnField.x() < 0
+        theFieldBall.teamPositionOnField.x() < 0
       );
   }
 
@@ -109,7 +109,7 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
     return 
     theObstacleModel.opponentIsClose(500) ||
     !theTeammateRoles.isTacticalDefense(theRobotInfo.number) ||
-    !(theFieldBall.endPositionOnField.x() < 200);
+    !(theFieldBall.teamPositionOnField.x() < 200);
   }
 
  
@@ -142,12 +142,12 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
     for (const auto& buddy : theTeamData.teammates)
     {
       if (buddy.theBehaviorStatus.activity == BehaviorStatus::defenseChaseBallCard ||
-        buddy.theBehaviorStatus.activity == BehaviorStatus::blocking ||
-        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+        // buddy.theBehaviorStatus.activity == BehaviorStatus::blocking ||
+        // buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
         buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
         buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
-        buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
-        buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard)
+        buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard)
+        // buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard)
         return true;
     }
     return false;

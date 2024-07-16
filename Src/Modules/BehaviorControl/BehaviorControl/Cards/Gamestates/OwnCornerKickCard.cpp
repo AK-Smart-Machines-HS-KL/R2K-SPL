@@ -56,7 +56,7 @@ CARD(OwnCornerKickCard,
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
       (Vector2f)(Vector2f(1000.0f, -340.0f)) kickTarget, // Based on 20_deg setup angle in ready card; This is a 20 degree shot
-      (int)(5000) ballWasSeenStickyPeriod,  // freeze the first decision
+      // (int)(5000) ballWasSeenStickyPeriod,  // freeze the first decision
     }),
 });
 
@@ -81,11 +81,13 @@ class OwnCornerKickCard : public OwnCornerKickCardBase
    */
   bool postconditions() const override
   {
-    return 
+    return !preconditions();
+      /*
       !theFieldBall.ballWasSeen(ballWasSeenStickyPeriod)
       ||
       theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
       || theGameInfo.setPlay != SET_PLAY_CORNER_KICK;
+      */
   }
 
   void execute() override
