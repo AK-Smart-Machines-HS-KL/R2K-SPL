@@ -34,3 +34,6 @@ Thumbs.db
 /Util/Buildchain/macOS/include
 /Util/Buildchain/macOS/lib
 /Util/WSL
+/Src/Utils/SACController/backend/env
+/Src/Utils/SACController/frontend/node_modules
+/Src/Utils/SACController/frontend/public/build
