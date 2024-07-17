@@ -4,7 +4,7 @@
 thread_local SACController* SACController::theInstance = nullptr;
 
 SACController::SACController() : 
-    tcpConnection("192.168.50.99", 5050, 0, 0)
+    tcpConnection("10.0.50.99", 5050, 0, 0)
 {
     printf("SACController created\n");
     
@@ -41,7 +41,8 @@ enum DirectionId {
 enum BehaviorId {
     InitialCard = 0,
     SearchForBallCard,
-    SACCard
+    SACCard,
+    GoToBallPassToMateCard
 };
 
 void SACController::update(SACCommands& saccommands)
@@ -76,6 +77,9 @@ void SACController::receiveMessage(SACCommands& saccommands) {
                     break;
                 case SACCard:
                     OUTPUT_TEXT("Received behavior: SACCard\n");
+                    break;
+                case GoToBallPassToMateCard:
+                    OUTPUT_TEXT("Received behavior: GoToBallPassToMateCard\n");
                     break;
                 default:
                     OUTPUT_TEXT("Unknown behavior ID\n");

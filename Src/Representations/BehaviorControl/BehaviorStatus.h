@@ -66,6 +66,7 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanCompressedMessageParticle<Behavior
     searchForBall,  // R2K
 
     SAC, // Robocup 2024
+    passToMate,
   });
 
   /**

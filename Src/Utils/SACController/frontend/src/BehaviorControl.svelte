@@ -5,7 +5,8 @@
     const behaviors = [
     "InitialCard",
     "SearchForBallCard",
-    "SACCard"
+    "SACCard",
+    "GoToBallPassToMateCard"
     ];
 
     function selectBehavior(behavior) {

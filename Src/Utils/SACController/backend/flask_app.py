@@ -22,7 +22,8 @@ client_addresses = []  # Store client addresses
 behavior_mapping = {
     "InitialCard": 0,
     "SearchForBallCard": 1,
-    "SACCard": 2
+    "SACCard": 2,
+    "GoToBallPassToMateCard": 3
 }
 
 # Function to handle a connected client
