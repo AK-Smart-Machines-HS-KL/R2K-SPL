@@ -106,10 +106,11 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
 
   bool postconditions() const override
   {
-    return 
-    theObstacleModel.opponentIsClose(500) ||
+    return !preconditions();
+/*    theObstacleModel.opponentIsClose(500) ||
     !theTeammateRoles.isTacticalDefense(theRobotInfo.number) ||
     !(theFieldBall.teamPositionOnField.x() < 200);
+    */
   }
 
  
