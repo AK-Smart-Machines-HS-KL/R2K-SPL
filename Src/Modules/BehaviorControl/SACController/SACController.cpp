@@ -51,20 +51,30 @@ enum BehaviorId {
     offenseReceivePassCard
 };
 
-void SACController::receiveMessage() {
+void SACController::update(SACCommands& saccommands)
+{
+    if(tcpConnection.connected())
+    {
+        receiveMessage(saccommands);
+    }
+}
+
+void SACController::receiveMessage(SACCommands& saccommands) {
     unsigned char buffer[2];  // Adjust buffer size if necessary
     int bytesReceived = tcpConnection.receive(buffer, sizeof(buffer), false);
 
     if (bytesReceived > 0) {
         // First byte is the message ID
         unsigned char messageId = buffer[0];
+        // Second byte is the value (behavior ID, mode, or direction ID)
+        unsigned char messageValue = buffer[1];
 
         // Check the message ID to determine if it's a behavior, mode, or direction
         if (messageId == 0x02) {
-            // Second byte is the behavior ID
-            BehaviorId behaviorId = static_cast<BehaviorId>(buffer[1]);
+            // Behavior ID
+            saccommands.cardIdx = messageValue;  // Update cardIdx
 
-            switch (behaviorId) {
+            switch (messageValue) {
                 case defenseChaseBallCard:
                     OUTPUT_TEXT("Received behavior: defenseChaseBallCard\n");
                     break;
@@ -106,23 +116,21 @@ void SACController::receiveMessage() {
                     break;
             }
         } else if (messageId == 0x03) {
-            // Second byte is the mode
-            unsigned char mode = buffer[1];
+            // Mode
+            saccommands.mode = messageValue;  // Update mode
 
-            if (mode == 0) {
+            if (messageValue == 0) {
                 OUTPUT_TEXT("Received mode: 0 (Auto mode)\n");
-                // Handle mode 0
-            } else if (mode == 1) {
+            } else if (messageValue == 1) {
                 OUTPUT_TEXT("Received mode: 1 (Human Operator Mode)\n");
-                // Handle mode 1
             } else {
                 OUTPUT_TEXT("Unknown mode\n");
             }
         } else if (messageId == 0x04) {
-            // Second byte is the direction ID
-            DirectionId directionId = static_cast<DirectionId>(buffer[1]);
-
-            switch (directionId) {
+            // Direction ID
+            saccommands.direction = messageValue;  // Update direction
+            
+            switch (messageValue) {
                 case Stop:
                     OUTPUT_TEXT("Received direction: Stop\n");
                     break;
@@ -143,7 +151,7 @@ void SACController::receiveMessage() {
                     break;
                 case Rightwards:
                     OUTPUT_TEXT("Received direction: Rightwards\n");
-                    break;    
+                    break;
                 default:
                     OUTPUT_TEXT("Unknown direction ID\n");
                     break;
@@ -151,14 +159,6 @@ void SACController::receiveMessage() {
         } else {
             OUTPUT_TEXT("Unknown message ID\n");
         }
-    }
-}
-
-void SACController::update(SACCommands& saccommands)
-{
-    if(tcpConnection.connected())
-    {
-        receiveMessage();
     }
 }
 

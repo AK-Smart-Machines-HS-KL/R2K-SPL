@@ -19,9 +19,9 @@ private:
 
     TcpComm tcpConnection;
 
-    void update(SACCommands& SACCommands) override;
+    void update(SACCommands& sacCommands) override;
 
-    void receiveMessage();
+    void receiveMessage(SACCommands& sacCommands);
 
 public:
   SACController();
