@@ -33,7 +33,9 @@ enum DirectionId {
     Left,
     Right,
     Leftwards,
-    Rightwards
+    Rightwards,
+    Kick,
+    Dribble
 };
 
 enum BehaviorId {
@@ -67,10 +69,10 @@ void SACController::receiveMessage(SACCommands& saccommands) {
 
             switch (messageValue) {
                 case InitialCard:
-                    OUTPUT_TEXT("Received behavior: defenseChaseBallCard\n");
+                    OUTPUT_TEXT("Received behavior: InitialCard\n");
                     break;
                 case SearchForBallCard:
-                    OUTPUT_TEXT("Received behavior: offenseChaseBallCard\n");
+                    OUTPUT_TEXT("Received behavior: SearchForBallCard\n");
                     break;
                 case SACCard:
                     OUTPUT_TEXT("Received behavior: SACCard\n");
@@ -115,6 +117,12 @@ void SACController::receiveMessage(SACCommands& saccommands) {
                     break;
                 case Rightwards:
                     OUTPUT_TEXT("Received direction: Rightwards\n");
+                    break;
+                case Kick:
+                    OUTPUT_TEXT("Received direction: Kick\n");
+                    break;
+                case Dribble:
+                    OUTPUT_TEXT("Received direction: Dribble\n");
                     break;
                 default:
                     OUTPUT_TEXT("Unknown direction ID\n");

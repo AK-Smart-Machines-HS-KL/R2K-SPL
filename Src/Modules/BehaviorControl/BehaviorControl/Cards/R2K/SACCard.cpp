@@ -9,6 +9,8 @@ CARD(SACCard,
   CALLS(Say),
   CALLS(Stand),
   CALLS(WalkAtRelativeSpeed),
+  CALLS(GoToBallAndKick),
+  CALLS(GoToBallAndDribble),
   REQUIRES(SACCommands),
 });
 
@@ -35,20 +37,49 @@ class SACCard : public SACCardBase
     if(theSACCommands.direction == 0)
       theStandSkill();
     else if(theSACCommands.direction == 1)
+    {
+      theLookForwardSkill();
       theWalkAtRelativeSpeedSkill(Pose2f(0.f, 1.f, 0.f));
+    }
     else if(theSACCommands.direction == 2)
+    {
+      theLookForwardSkill();
       theWalkAtRelativeSpeedSkill(Pose2f(0.f, -1.f, 0.f));
+    }
     else if(theSACCommands.direction == 3)
+    {
+      theLookForwardSkill();
       theWalkAtRelativeSpeedSkill(Pose2f(0.f, 0.f, 1.f));
+
+    }
     else if(theSACCommands.direction == 4)
+      {
+      theLookForwardSkill();
       theWalkAtRelativeSpeedSkill(Pose2f(0.f, 0.f, -1.f));
+      }
     else if(theSACCommands.direction == 5)
+    {
+      theLookForwardSkill();
       theWalkAtRelativeSpeedSkill(Pose2f(1.f, 0.f, 0.f));
+
+    }
     else if(theSACCommands.direction == 6)
+    {
+      theLookForwardSkill();
       theWalkAtRelativeSpeedSkill(Pose2f(-1.f, 0.f, 0.f));
-    else
-      OUTPUT_TEXT("Invalid direction");
-    
+
+    }
+    else if(theSACCommands.direction == 7)
+    {
+      theGoToBallAndKickSkill(0, KickInfo::forwardFastLeft);
+      if(theGoToBallAndDribbleSkill.isDone())
+      {
+        theStandSkill();
+        theLookForwardSkill();
+      }
+    }
+    else if(theSACCommands.direction == 8)
+      theGoToBallAndDribbleSkill(0);
   }
 };
 
