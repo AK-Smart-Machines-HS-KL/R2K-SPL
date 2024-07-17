@@ -77,6 +77,8 @@ CARD(OffenseForwardPassCard,
     
 });
 
+float buddyDist = 0;
+
 class OffenseForwardPassCard : public OffenseForwardPassCardBase
 {
     
@@ -119,6 +121,7 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
     }
 
     Vector2f getTarget() {
+
         Vector2f target = Vector2f::Zero();
         for (const auto& buddy : theTeamData.teammates)
         {
@@ -127,10 +130,12 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
                 if(buddy.theRobotPose.translation.x() > theRobotPose.translation.x()) {
                     if(target.x() < buddy.theRobotPose.translation.x() || target == Vector2f::Zero()) {
                         target = buddy.theRobotPose.translation; 
+                        buddyDist = (int)Geometry::distance(target,theRobotPose.translation);
                     }
                 }
             }
         }
+        // OUTPUT_TEXT(buddyDist);
         target.x() += 250 ;
         target.y() = target.y()/2; // pass into center
         
@@ -143,9 +148,11 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
         if (targetAbsolute == Vector2f::Zero()) {
             targetAbsolute = getTarget();
         }
-        
+              
         theActivitySkill(BehaviorStatus::offenseForwardPassCard);
-        theGoToBallAndKickSkill(theRobotPose.toRelative(targetAbsolute).angle(), KickInfo::forwardFastLeft);
+        
+        theGoToBallAndKickSkill(theRobotPose.toRelative(targetAbsolute).angle(), KickInfo::forwardFastLeft, true, buddyDist);
+       
     }
 
     void reset() override
