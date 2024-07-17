@@ -11,12 +11,28 @@ CORS(app)
 # Retrieve host and port from environment variables, with defaults
 HOST = os.getenv('FLASK_RUN_HOST', '0.0.0.0')
 FLASK_PORT = int(os.getenv('FLASK_RUN_PORT', 5000))
-LISTENER_PORT = int(os.getenv('LISTENER_PORT', 4242))
+LISTENER_PORT = int(os.getenv('LISTENER_PORT', 5050))
 
 # Global variables
 server_socket = None
 client_sockets = []
 client_addresses = []  # Store client addresses
+
+# Mapping of behaviors to integers
+behavior_mapping = {
+    "defenseChaseBallCard": 0,
+    "offenseChaseBallCard": 1,
+    "clearOwnHalfCard": 2,
+    "clearOwnHalfCardGoalie": 3,
+    "defenseCard": 4,
+    "defenseLongShotCard": 5,
+    "dive": 6,
+    "goalShotCard": 7,
+    "goalieLongShotCard": 8,
+    "offenseFastGoalKick": 9,
+    "offenseForwardPassCard": 10,
+    "offenseReceivePassCard": 11
+}
 
 # Function to handle a connected client
 def handle_client(client_socket):
@@ -86,18 +102,18 @@ def send_to_robot(data):
 @app.route('/behavior', methods=['POST'])
 def update_behavior():
     behavior = request.json.get('behavior')
-    if not behavior:
-        return jsonify({"error": "No behavior provided"}), 400
+    if not behavior or behavior not in behavior_mapping:
+        return jsonify({"error": "Invalid or missing behavior"}), 400
     
-    # Convert the behavior string to bytes
-    behavior_bytes = behavior.encode('utf-8')
+    behavior_int = behavior_mapping[behavior]
     
-    # Pack the data to send to the robot
+    # Pack the behavior integer to send to the robot
     packed_id = struct.pack('B', 0x02)  # Assuming 0x02 is the ID for behavior commands
-    full_message = packed_id + behavior_bytes  # Concatenate ID and data
+    packed_data = struct.pack('B', behavior_int)
+    full_message = packed_id + packed_data  # Concatenate ID and data
     
     send_to_robot(full_message)
-    return jsonify({"message": f"Behavior updated to {behavior}"}), 200
+    return jsonify({"message": f"Behavior updated to {behavior} ({behavior_int})"}), 200
 
 if __name__ == "__main__":
     app.run(host=HOST, port=FLASK_PORT)

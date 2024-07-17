@@ -4,7 +4,7 @@
 thread_local SACController* SACController::theInstance = nullptr;
 
 SACController::SACController() : 
-    tcpConnection("192.168.50.99", 4242, 0, 0)
+    tcpConnection("192.168.50.99", 5050, 0, 0)
 {
     printf("SACController created\n");
     
@@ -26,9 +26,82 @@ SACController::~SACController()
     theInstance = nullptr;
 }
 
+enum BehaviorId {
+    defenseChaseBallCard = 0,
+    offenseChaseBallCard,
+    clearOwnHalfCard,
+    clearOwnHalfCardGoalie,
+    defenseCard,
+    defenseLongShotCard,
+    dive,
+    goalShotCard,
+    goalieLongShotCard,
+    offenseFastGoalKick,
+    offenseForwardPassCard,
+    offenseReceivePassCard
+};
+
+void SACController::receiveBehavior() {
+    unsigned char buffer[2];  // Adjust buffer size if necessary
+    int bytesReceived = tcpConnection.receive(buffer, sizeof(buffer), false);
+
+    if (bytesReceived > 0) {
+        // First byte is the message ID
+        unsigned char messageId = buffer[0];
+
+        // Second byte is the behavior ID
+        BehaviorId behaviorId = static_cast<BehaviorId>(buffer[1]);
+
+        switch (behaviorId) {
+            case defenseChaseBallCard:
+                OUTPUT_TEXT("Received behavior: defenseChaseBallCard\n");
+                break;
+            case offenseChaseBallCard:
+                OUTPUT_TEXT("Received behavior: offenseChaseBallCard\n");
+                break;
+            case clearOwnHalfCard:
+                OUTPUT_TEXT("Received behavior: clearOwnHalfCard\n");
+                break;
+            case clearOwnHalfCardGoalie:
+                OUTPUT_TEXT("Received behavior: clearOwnHalfCardGoalie\n");
+                break;
+            case defenseCard:
+                OUTPUT_TEXT("Received behavior: defenseCard\n");
+                break;
+            case defenseLongShotCard:
+                OUTPUT_TEXT("Received behavior: defenseLongShotCard\n");
+                break;
+            case dive:
+                OUTPUT_TEXT("Received behavior: dive\n");
+                break;
+            case goalShotCard:
+                OUTPUT_TEXT("Received behavior: goalShotCard\n");
+                break;
+            case goalieLongShotCard:
+                OUTPUT_TEXT("Received behavior: goalieLongShotCard\n");
+                break;
+            case offenseFastGoalKick:
+                OUTPUT_TEXT("Received behavior: offenseFastGoalKick\n");
+                break;
+            case offenseForwardPassCard:
+                OUTPUT_TEXT("Received behavior: offenseForwardPassCard\n");
+                break;
+            case offenseReceivePassCard:
+                OUTPUT_TEXT("Received behavior: offenseReceivePassCard\n");
+                break;
+            default:
+                OUTPUT_TEXT("Unknown behavior ID\n");
+                break;
+        }
+    }
+}
+
 void SACController::update(SACCommands& saccommands)
 {
-    saccommands.mode = 1;
+    if(tcpConnection.connected())
+    {
+        receiveBehavior();
+    }
 }
 
 MAKE_MODULE(SACController, behaviorControl);
