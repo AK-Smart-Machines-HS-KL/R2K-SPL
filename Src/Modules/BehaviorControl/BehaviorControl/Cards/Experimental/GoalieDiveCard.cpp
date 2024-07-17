@@ -62,7 +62,8 @@ class GoalieDiveCard : public GoalieDiveCardBase
     // goalie can dive in both left & right directions
     // after dive the goalie will stand
 
-    theInterceptBallSkill((unsigned)(bit(Interception::jumpRight) | bit(Interception::jumpLeft) | bit(Interception::walk) | bit(Interception::stand) | bit(Interception::genuflectStand)));
+    theInterceptBallSkill((unsigned)( bit(Interception::walk) | bit(Interception::stand) | bit(Interception::genuflectStand)),true,true);
+
   }
 };
 
