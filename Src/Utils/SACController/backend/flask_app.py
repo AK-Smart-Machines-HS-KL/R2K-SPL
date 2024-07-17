@@ -20,18 +20,9 @@ client_addresses = []  # Store client addresses
 
 # Mapping of behaviors to integers
 behavior_mapping = {
-    "defenseChaseBallCard": 0,
-    "offenseChaseBallCard": 1,
-    "clearOwnHalfCard": 2,
-    "clearOwnHalfCardGoalie": 3,
-    "defenseCard": 4,
-    "defenseLongShotCard": 5,
-    "dive": 6,
-    "goalShotCard": 7,
-    "goalieLongShotCard": 8,
-    "offenseFastGoalKick": 9,
-    "offenseForwardPassCard": 10,
-    "offenseReceivePassCard": 11
+    "InitialCard": 0,
+    "SearchForBallCard": 1,
+    "SACCard": 2
 }
 
 # Function to handle a connected client

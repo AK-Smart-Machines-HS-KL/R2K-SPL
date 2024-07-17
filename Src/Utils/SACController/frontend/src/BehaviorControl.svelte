@@ -3,18 +3,9 @@
     let activeBehavior = "";
 
     const behaviors = [
-        "defenseChaseBallCard",      
-        "offenseChaseBallCard",      
-        "clearOwnHalfCard",  
-        "clearOwnHalfCardGoalie",
-        "defenseCard",        
-        "defenseLongShotCard",
-        "dive",
-        "goalShotCard",
-        "goalieLongShotCard", 
-        "offenseFastGoalKick",
-        "offenseForwardPassCard",
-        "offenseReceivePassCard"
+    "InitialCard",
+    "SearchForBallCard",
+    "SACCard"
     ];
 
     function selectBehavior(behavior) {

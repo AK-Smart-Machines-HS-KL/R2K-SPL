@@ -37,18 +37,9 @@ enum DirectionId {
 };
 
 enum BehaviorId {
-    defenseChaseBallCard = 0,
-    offenseChaseBallCard,
-    clearOwnHalfCard,
-    clearOwnHalfCardGoalie,
-    defenseCard,
-    defenseLongShotCard,
-    dive,
-    goalShotCard,
-    goalieLongShotCard,
-    offenseFastGoalKick,
-    offenseForwardPassCard,
-    offenseReceivePassCard
+    InitialCard = 0,
+    SearchForBallCard,
+    SACCard
 };
 
 void SACController::update(SACCommands& saccommands)
@@ -75,41 +66,14 @@ void SACController::receiveMessage(SACCommands& saccommands) {
             saccommands.cardIdx = messageValue;  // Update cardIdx
 
             switch (messageValue) {
-                case defenseChaseBallCard:
+                case InitialCard:
                     OUTPUT_TEXT("Received behavior: defenseChaseBallCard\n");
                     break;
-                case offenseChaseBallCard:
+                case SearchForBallCard:
                     OUTPUT_TEXT("Received behavior: offenseChaseBallCard\n");
                     break;
-                case clearOwnHalfCard:
-                    OUTPUT_TEXT("Received behavior: clearOwnHalfCard\n");
-                    break;
-                case clearOwnHalfCardGoalie:
-                    OUTPUT_TEXT("Received behavior: clearOwnHalfCardGoalie\n");
-                    break;
-                case defenseCard:
-                    OUTPUT_TEXT("Received behavior: defenseCard\n");
-                    break;
-                case defenseLongShotCard:
-                    OUTPUT_TEXT("Received behavior: defenseLongShotCard\n");
-                    break;
-                case dive:
-                    OUTPUT_TEXT("Received behavior: dive\n");
-                    break;
-                case goalShotCard:
-                    OUTPUT_TEXT("Received behavior: goalShotCard\n");
-                    break;
-                case goalieLongShotCard:
-                    OUTPUT_TEXT("Received behavior: goalieLongShotCard\n");
-                    break;
-                case offenseFastGoalKick:
-                    OUTPUT_TEXT("Received behavior: offenseFastGoalKick\n");
-                    break;
-                case offenseForwardPassCard:
-                    OUTPUT_TEXT("Received behavior: offenseForwardPassCard\n");
-                    break;
-                case offenseReceivePassCard:
-                    OUTPUT_TEXT("Received behavior: offenseReceivePassCard\n");
+                case SACCard:
+                    OUTPUT_TEXT("Received behavior: SACCard\n");
                     break;
                 default:
                     OUTPUT_TEXT("Unknown behavior ID\n");
