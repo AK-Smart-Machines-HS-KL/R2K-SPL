@@ -1,13 +1,45 @@
 <script>
-    let directionMessage = "Stopped";
+let directionMessage = "Stopped";
     let activeMoveDirection = "";
     let activeTurnDirection = "";
+
+    const directionMapping = {
+        "Stop": 0,
+        "Forward": 1,
+        "Backward": 2,
+        "Left": 3,
+        "Right": 4,
+        "Turn Left": 5,
+        "Turn Right": 6
+    };
+
+    async function sendDirectionCommand(direction) {
+        const directionValue = directionMapping[direction];
+        if (directionValue !== undefined) {
+            directionMessage = `Direction set to: ${direction}`;
+            // Add logic to send the direction command to the robot
+            try {
+                const response = await fetch('http://localhost:5000/direction', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ direction: directionValue })
+                });
+                const result = await response.json();
+                console.log(result);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    }
 
     function move(direction) {
         directionMessage = `Moving ${direction}`;
         activeMoveDirection = direction;
         activeTurnDirection = "";
-        // Add logic to send the move command to the robot for the specified direction
+        sendDirectionCommand(direction);
+        updateButtonStyles();
         console.log(directionMessage);
     }
 
@@ -15,7 +47,8 @@
         directionMessage = `Turning ${direction}`;
         activeTurnDirection = direction;
         activeMoveDirection = "";
-        // Add logic to send the turn command to the robot for the specified direction
+        sendDirectionCommand(`Turn ${direction}`);
+        updateButtonStyles();
         console.log(directionMessage);
     }
 
@@ -23,8 +56,21 @@
         directionMessage = "Stopped";
         activeMoveDirection = "";
         activeTurnDirection = "";
-        // Add logic to send stop command to the robot
+        sendDirectionCommand("Stop");
+        updateButtonStyles();
         console.log(directionMessage);
+    }
+
+    function updateButtonStyles() {
+        document.querySelectorAll('.button-group button').forEach(button => {
+            button.classList.remove('active');
+        });
+        if (activeMoveDirection) {
+            document.querySelector(`button[data-direction="${activeMoveDirection}"]`).classList.add('active');
+        }
+        if (activeTurnDirection) {
+            document.querySelector(`button[data-direction="Turn ${activeTurnDirection}"]`).classList.add('active');
+        }
     }
 </script>
 

@@ -115,5 +115,33 @@ def update_behavior():
     send_to_robot(full_message)
     return jsonify({"message": f"Behavior updated to {behavior} ({behavior_int})"}), 200
 
+@app.route('/mode', methods=['POST'])
+def update_mode():
+    mode = request.json.get('mode')
+    if mode not in [0, 1]:
+        return jsonify({"error": "Invalid mode value"}), 400
+    
+    # Pack the mode integer to send to the robot
+    packed_id = struct.pack('B', 0x03)  # Assuming 0x03 is the ID for mode commands
+    packed_data = struct.pack('B', mode)
+    full_message = packed_id + packed_data  # Concatenate ID and data
+    
+    send_to_robot(full_message)
+    return jsonify({"message": f"Mode updated to {mode}"}), 200
+
+@app.route('/direction', methods=['POST'])
+def update_direction():
+    direction = request.json.get('direction')
+    if direction not in [0, 1, 2, 3, 4, 5, 6]:
+        return jsonify({"error": "Invalid direction value"}), 400
+    
+    # Pack the direction integer to send to the robot
+    packed_id = struct.pack('B', 0x04)  # Assuming 0x04 is the ID for direction commands
+    packed_data = struct.pack('B', direction)
+    full_message = packed_id + packed_data  # Concatenate ID and data
+    
+    send_to_robot(full_message)
+    return jsonify({"message": f"Direction updated to {direction}"}), 200
+
 if __name__ == "__main__":
     app.run(host=HOST, port=FLASK_PORT)

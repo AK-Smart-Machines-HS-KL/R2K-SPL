@@ -1,9 +1,15 @@
 <script>
-    let modeMessage = "Select Mode";
+        let modeMessage = "Select Mode";
     let selectedMode = "";
 
+    const modeMapping = {
+        "Auto": 0,
+        "Operator": 1
+    };
+
     async function sendModeCommand() {
-        if (selectedMode) {
+        if (selectedMode !== "") {
+            const modeValue = modeMapping[selectedMode];
             modeMessage = `Mode set to: ${selectedMode}`;
             // Add logic to send the selected mode to the robot
             try {
@@ -12,7 +18,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ mode: selectedMode })
+                    body: JSON.stringify({ mode: modeValue })
                 });
                 const result = await response.json();
                 console.log(result);
@@ -26,6 +32,16 @@
 
     function selectMode(mode) {
         selectedMode = mode;
+        updateButtonStyles();
+    }
+
+    function updateButtonStyles() {
+        document.querySelectorAll('.mode-selection button').forEach(button => {
+            button.classList.remove('active');
+        });
+        if (selectedMode) {
+            document.querySelector(`.mode-selection button[data-mode="${selectedMode}"]`).classList.add('active');
+        }
     }
 </script>
 

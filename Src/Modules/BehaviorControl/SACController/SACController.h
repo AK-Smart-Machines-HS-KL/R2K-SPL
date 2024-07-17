@@ -21,7 +21,7 @@ private:
 
     void update(SACCommands& SACCommands) override;
 
-    void receiveBehavior();
+    void receiveMessage();
 
 public:
   SACController();

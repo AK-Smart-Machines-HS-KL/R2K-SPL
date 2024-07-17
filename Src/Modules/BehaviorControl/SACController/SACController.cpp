@@ -26,6 +26,16 @@ SACController::~SACController()
     theInstance = nullptr;
 }
 
+enum DirectionId {
+    Stop = 0,
+    Forward,
+    Backward,
+    Left,
+    Right,
+    Leftwards,
+    Rightwards
+};
+
 enum BehaviorId {
     defenseChaseBallCard = 0,
     offenseChaseBallCard,
@@ -41,7 +51,7 @@ enum BehaviorId {
     offenseReceivePassCard
 };
 
-void SACController::receiveBehavior() {
+void SACController::receiveMessage() {
     unsigned char buffer[2];  // Adjust buffer size if necessary
     int bytesReceived = tcpConnection.receive(buffer, sizeof(buffer), false);
 
@@ -49,49 +59,97 @@ void SACController::receiveBehavior() {
         // First byte is the message ID
         unsigned char messageId = buffer[0];
 
-        // Second byte is the behavior ID
-        BehaviorId behaviorId = static_cast<BehaviorId>(buffer[1]);
+        // Check the message ID to determine if it's a behavior, mode, or direction
+        if (messageId == 0x02) {
+            // Second byte is the behavior ID
+            BehaviorId behaviorId = static_cast<BehaviorId>(buffer[1]);
 
-        switch (behaviorId) {
-            case defenseChaseBallCard:
-                OUTPUT_TEXT("Received behavior: defenseChaseBallCard\n");
-                break;
-            case offenseChaseBallCard:
-                OUTPUT_TEXT("Received behavior: offenseChaseBallCard\n");
-                break;
-            case clearOwnHalfCard:
-                OUTPUT_TEXT("Received behavior: clearOwnHalfCard\n");
-                break;
-            case clearOwnHalfCardGoalie:
-                OUTPUT_TEXT("Received behavior: clearOwnHalfCardGoalie\n");
-                break;
-            case defenseCard:
-                OUTPUT_TEXT("Received behavior: defenseCard\n");
-                break;
-            case defenseLongShotCard:
-                OUTPUT_TEXT("Received behavior: defenseLongShotCard\n");
-                break;
-            case dive:
-                OUTPUT_TEXT("Received behavior: dive\n");
-                break;
-            case goalShotCard:
-                OUTPUT_TEXT("Received behavior: goalShotCard\n");
-                break;
-            case goalieLongShotCard:
-                OUTPUT_TEXT("Received behavior: goalieLongShotCard\n");
-                break;
-            case offenseFastGoalKick:
-                OUTPUT_TEXT("Received behavior: offenseFastGoalKick\n");
-                break;
-            case offenseForwardPassCard:
-                OUTPUT_TEXT("Received behavior: offenseForwardPassCard\n");
-                break;
-            case offenseReceivePassCard:
-                OUTPUT_TEXT("Received behavior: offenseReceivePassCard\n");
-                break;
-            default:
-                OUTPUT_TEXT("Unknown behavior ID\n");
-                break;
+            switch (behaviorId) {
+                case defenseChaseBallCard:
+                    OUTPUT_TEXT("Received behavior: defenseChaseBallCard\n");
+                    break;
+                case offenseChaseBallCard:
+                    OUTPUT_TEXT("Received behavior: offenseChaseBallCard\n");
+                    break;
+                case clearOwnHalfCard:
+                    OUTPUT_TEXT("Received behavior: clearOwnHalfCard\n");
+                    break;
+                case clearOwnHalfCardGoalie:
+                    OUTPUT_TEXT("Received behavior: clearOwnHalfCardGoalie\n");
+                    break;
+                case defenseCard:
+                    OUTPUT_TEXT("Received behavior: defenseCard\n");
+                    break;
+                case defenseLongShotCard:
+                    OUTPUT_TEXT("Received behavior: defenseLongShotCard\n");
+                    break;
+                case dive:
+                    OUTPUT_TEXT("Received behavior: dive\n");
+                    break;
+                case goalShotCard:
+                    OUTPUT_TEXT("Received behavior: goalShotCard\n");
+                    break;
+                case goalieLongShotCard:
+                    OUTPUT_TEXT("Received behavior: goalieLongShotCard\n");
+                    break;
+                case offenseFastGoalKick:
+                    OUTPUT_TEXT("Received behavior: offenseFastGoalKick\n");
+                    break;
+                case offenseForwardPassCard:
+                    OUTPUT_TEXT("Received behavior: offenseForwardPassCard\n");
+                    break;
+                case offenseReceivePassCard:
+                    OUTPUT_TEXT("Received behavior: offenseReceivePassCard\n");
+                    break;
+                default:
+                    OUTPUT_TEXT("Unknown behavior ID\n");
+                    break;
+            }
+        } else if (messageId == 0x03) {
+            // Second byte is the mode
+            unsigned char mode = buffer[1];
+
+            if (mode == 0) {
+                OUTPUT_TEXT("Received mode: 0 (Auto mode)\n");
+                // Handle mode 0
+            } else if (mode == 1) {
+                OUTPUT_TEXT("Received mode: 1 (Human Operator Mode)\n");
+                // Handle mode 1
+            } else {
+                OUTPUT_TEXT("Unknown mode\n");
+            }
+        } else if (messageId == 0x04) {
+            // Second byte is the direction ID
+            DirectionId directionId = static_cast<DirectionId>(buffer[1]);
+
+            switch (directionId) {
+                case Stop:
+                    OUTPUT_TEXT("Received direction: Stop\n");
+                    break;
+                case Forward:
+                    OUTPUT_TEXT("Received direction: Forward\n");
+                    break;
+                case Backward:
+                    OUTPUT_TEXT("Received direction: Backward\n");
+                    break;
+                case Left:
+                    OUTPUT_TEXT("Received direction: Left\n");
+                    break;
+                case Right:
+                    OUTPUT_TEXT("Received direction: Right\n");
+                    break;
+                case Leftwards:
+                    OUTPUT_TEXT("Received direction: Leftwards\n");
+                    break;
+                case Rightwards:
+                    OUTPUT_TEXT("Received direction: Rightwards\n");
+                    break;    
+                default:
+                    OUTPUT_TEXT("Unknown direction ID\n");
+                    break;
+            }
+        } else {
+            OUTPUT_TEXT("Unknown message ID\n");
         }
     }
 }
@@ -100,7 +158,7 @@ void SACController::update(SACCommands& saccommands)
 {
     if(tcpConnection.connected())
     {
-        receiveBehavior();
+        receiveMessage();
     }
 }
 
