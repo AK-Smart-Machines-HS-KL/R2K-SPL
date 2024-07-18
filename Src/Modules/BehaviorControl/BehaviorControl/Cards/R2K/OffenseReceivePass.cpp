@@ -101,7 +101,7 @@ class OffenseReceivePassCard : public OffenseReceivePassCardBase
       if (theRobotPose.translation.x() > theFieldDimensions.xPosOpponentPenaltyMark)
         theStandSkill();  // already close enough 
       else 
-        theWalkToPointSkill(theRobotPose.toRelative(Vector2f(theRobotPose.translation.x()+1000, theRobotPose.translation.y())));
+        theWalkToPointSkill(theRobotPose.toRelative(Vector2f(theRobotPose.translation.x()+500, theRobotPose.translation.y())));
 
     }
 
