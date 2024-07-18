@@ -62,6 +62,13 @@ class SACCard : public SACCardBase
     else if(theSACCommands.direction == 7)
     {
       theGoToBallAndKickSkill(0, KickInfo::forwardFastLeft);
+      /* 
+        Vector2f target = Vector2f::Zero();
+        arget = buddy.theRobotPose.translation; 
+        buddyDist = (int)Geometry::distance(target,theRobotPose.translation);
+                 
+        theGoToBallAndKickSkill(0, KickInfo::forwardFastLeft, true, buddyDist);
+        */
     }
     else if(theSACCommands.direction == 8)
       theGoToBallAndDribbleSkill(0);
