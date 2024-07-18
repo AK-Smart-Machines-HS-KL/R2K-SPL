@@ -130,9 +130,9 @@ class DefenseCoverBackCard : public DefenseCoverBackCardBase
     theActivitySkill(BehaviorStatus::blocking);
     theLookAtBallSkill();
     
-    if (target.translation.norm() > 600) {  // I am far
+    if (target.translation.norm() > 1200) {  // I am far: was: 600
       theWalkToPointSkill(target); 
-    } else if(target.translation.norm() > 100 || target.rotation > 10_deg) {    // I am close
+    } else if(target.translation.norm() > 600 || target.rotation > 10_deg) {    // I am close was: 100
       Pose2f normedTargetDirection = Pose2f(std::clamp((float) target.rotation, -1.0f, 1.0f) , target.translation.normalized());
       theWalkAtRelativeSpeedSkill(normedTargetDirection);
     } else { // I have arrived
