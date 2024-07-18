@@ -6,20 +6,20 @@
       <Rotation z="90degree"/>
     </Body>
     <Body ref="Nao" name="robot3">
-      <Translation x="2.25" y="-3" z="320mm"/>
-      <Rotation z="72.43degree"/>
+      <Translation x="2.9" y="-3" z="320mm"/>
+      <Rotation z="90degree"/>
     </Body>
     <Body ref="Nao" name="robot5">
-      <Translation x="0.75" y="-3" z="320mm"/>
-      <Rotation z="104degree"/>
+      <Translation x="1.9" y="-3" z="320mm"/>
+      <Rotation z="90degree"/>
     </Body>
     <Body ref="Nao" name="robot4">
-      <Translation x="0.75" y="3" z="320mm"/>
-      <Rotation z="-104degree"/>
+      <Translation x="2.4" y="3" z="320mm"/>
+      <Rotation z="-90degree"/>
     </Body>
     <Body ref="Nao" name="robot2">
-      <Translation x="2.25" y="3" z="320mm"/>
-      <Rotation z="-72.43degree"/>
+      <Translation x="3.4" y="3" z="320mm"/>
+      <Rotation z="-90degree"/>
     </Body>
 
     <Body ref="Nao" name="robot7">
