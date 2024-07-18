@@ -124,7 +124,7 @@ def update_mode():
 @app.route('/direction', methods=['POST'])
 def update_direction():
     direction = request.json.get('direction')
-    if direction not in [0, 1, 2, 3, 4, 5, 6, 7, 8]:
+    if direction not in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]:
         return jsonify({"error": "Invalid direction value"}), 400
     
     # Pack the direction integer to send to the robot

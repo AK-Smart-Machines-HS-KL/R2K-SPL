@@ -35,7 +35,8 @@ enum DirectionId {
     Leftwards,
     Rightwards,
     Kick,
-    Dribble
+    Dribble,
+    GetUp
 };
 
 enum BehaviorId {
@@ -127,6 +128,9 @@ void SACController::receiveMessage(SACCommands& saccommands) {
                     break;
                 case Dribble:
                     OUTPUT_TEXT("Received direction: Dribble\n");
+                    break;
+                case GetUp:
+                    OUTPUT_TEXT("Received action getUp");
                     break;
                 default:
                     OUTPUT_TEXT("Unknown direction ID\n");

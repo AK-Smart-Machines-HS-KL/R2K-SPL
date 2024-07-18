@@ -13,7 +13,8 @@ const directionMapping = {
     "Turn Left": 5,
     "Turn Right": 6,
     "Kick": 7,
-    "Dribble": 8
+    "Dribble": 8,
+    "GetUp": 9
 };
 
 async function sendDirectionCommand(direction) {
@@ -150,6 +151,8 @@ button.active {
     <div class="button-group">
         <button class:active={activeMoveDirection === "Kick"} on:click={() => action("Kick")}>Kick</button>
         <button class:active={activeMoveDirection === "Dribble"} on:click={() => action("Dribble")}>Dribble</button>
+        <button class:active={activeMoveDirection === "GetUp"} on:click={() => action("GetUp")}>Dribble</button>
+
     </div>
     <div class="status">{directionMessage}</div>
 </div>
