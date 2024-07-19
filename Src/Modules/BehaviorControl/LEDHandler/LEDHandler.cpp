@@ -136,12 +136,21 @@ void LEDHandler::setLeftEye(LEDRequest& ledRequest)
   {
     bool ballSeen = theFrameInfo.getTimeSince(theBallModel.timeWhenLastSeen) < 250;
     bool featureSeen = theFrameInfo.getTimeSince(theFieldFeatureOverview.combinedStatus.lastSeen) < 250;
+    bool isBallCarrier = theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive);
 
-    if(ballSeen && featureSeen)
-      setEyeColor(ledRequest, true, red, LEDRequest::on);
-    else if(ballSeen)
+    if(ballSeen && featureSeen && isBallCarrier)
       setEyeColor(ledRequest, true, white, LEDRequest::on);
+    else if(ballSeen && featureSeen)
+      setEyeColor(ledRequest, true, yellow, LEDRequest::on);
+    else if(ballSeen && isBallCarrier)
+      setEyeColor(ledRequest, true, magenta, LEDRequest::on);
+    else if(featureSeen && isBallCarrier)
+      setEyeColor(ledRequest, true, yellow, LEDRequest::on);
+    else if(ballSeen)
+      setEyeColor(ledRequest, true, red, LEDRequest::on);
     else if(featureSeen)
+      setEyeColor(ledRequest, true, green, LEDRequest::on);
+    else if(isBallCarrier)
       setEyeColor(ledRequest, true, blue, LEDRequest::on);
   }
 }

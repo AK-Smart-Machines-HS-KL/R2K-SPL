@@ -19,6 +19,7 @@
 #include "Representations/Sensing/GroundContactState.h"
 #include "Tools/Module/Module.h"
 #include "Representations/Infrastructure/RobotHealth.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 MODULE(LEDHandler,
 {,
@@ -33,6 +34,8 @@ MODULE(LEDHandler,
   USES(RobotHealth),
   REQUIRES(SystemSensorData),
   REQUIRES(TeamBehaviorStatus),
+  REQUIRES(TeammateRoles),
+  REQUIRES(TeamCommStatus),
   REQUIRES(TeamData),
   PROVIDES(LEDRequest),
   DEFINES_PARAMETERS(
