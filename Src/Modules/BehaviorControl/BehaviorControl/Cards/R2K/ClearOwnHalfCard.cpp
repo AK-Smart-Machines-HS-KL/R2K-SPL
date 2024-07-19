@@ -92,7 +92,7 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
   bool preconditions() const override
   {
     return
-      theTeammateRoles.playsTheBall(theRobotInfo.number) &&
+      // theTeammateRoles.playsTheBall(theRobotInfo.number) &&
       theGameInfo.setPlay == SET_PLAY_NONE &&  // no penalty active
       !aBuddyIsClearingOwnHalf() &&
       // theTeammateRoles.playsTheBall(theRobotInfo.number) &&
