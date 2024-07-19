@@ -20,6 +20,7 @@ CARD(SetCard,
   CALLS(Activity),
   CALLS(LookActive),
   CALLS(LookAtPoint),
+  CALLS(LookAtBall),
   CALLS(LookForward),
   CALLS(Stand),
   REQUIRES(BallSpecification),
@@ -46,7 +47,8 @@ class SetCard : public SetCardBase
   {
     theActivitySkill(BehaviorStatus::set);
     theStandSkill(/* high: */ true);
-    theLookActiveSkill();
+    //theLookActiveSkill();
+    theLookAtBallSkill();
     
   }
 };
