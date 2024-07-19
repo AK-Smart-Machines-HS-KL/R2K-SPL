@@ -108,6 +108,7 @@ class DefenseCoverBackCard : public DefenseCoverBackCardBase
     return
       theFieldBall.ballWasSeen()&&
       distToGoal > 1000 &&
+      distToBall() > 1000 &&
       theGameInfo.setPlay == SET_PLAY_NONE &&
       !aBuddyIsChasingOrClearing() &&
       theTeammateRoles.isTacticalDefense(theRobotInfo.number); // my recent role
@@ -150,6 +151,10 @@ class DefenseCoverBackCard : public DefenseCoverBackCardBase
   {
     return (theRobotPose.inversePose * Vector2f(theFieldBall.teamPositionOnField.x(), theFieldBall.teamPositionOnField.y())).angle();
   }
+    int distToBall() const
+   {
+    return (int)Geometry::distance(theFieldBall.teamPositionOnField, theRobotPose.translation); 
+  } 
 
     bool aBuddyIsChasingOrClearing() const
     {
