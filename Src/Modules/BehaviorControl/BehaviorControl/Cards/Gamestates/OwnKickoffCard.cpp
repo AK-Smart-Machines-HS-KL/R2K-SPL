@@ -95,7 +95,7 @@ class OwnKickoffCard : public OwnKickoffCardBase
  
   Angle calcAngleToGoal() const
   {
-    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, -550.f)).angle();
+    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, -480.f)).angle();
   }
 };
 
