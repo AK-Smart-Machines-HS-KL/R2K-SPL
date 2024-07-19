@@ -145,7 +145,7 @@ void LEDHandler::setLeftEye(LEDRequest& ledRequest)
     else if(ballSeen && isBallCarrier)
       setEyeColor(ledRequest, true, magenta, LEDRequest::on);
     else if(featureSeen && isBallCarrier)
-      setEyeColor(ledRequest, true, yellow, LEDRequest::on);
+      setEyeColor(ledRequest, true, cyan, LEDRequest::on);
     else if(ballSeen)
       setEyeColor(ledRequest, true, red, LEDRequest::on);
     else if(featureSeen)
