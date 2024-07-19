@@ -4,7 +4,7 @@
 thread_local SACController* SACController::theInstance = nullptr;
 
 SACController::SACController() : 
-    tcpConnection("10.0.50.99", 5050, 0, 0)
+    tcpConnection("192.168.50.99", 5050, 0, 0)
 {
     printf("SACController created\n");
     
@@ -124,12 +124,6 @@ void SACController::receiveMessage(SACCommands& saccommands) {
                     OUTPUT_TEXT("Received direction: Rightwards\n");
                     break;
                 case Kick:
-                    OUTPUT_TEXT("Received direction: Kick\n");
-                    break;
-                case Dribble:
-                    OUTPUT_TEXT("Received direction: Dribble\n");
-                    break;
-                case GetUp:
                     OUTPUT_TEXT("Received action getUp");
                     break;
                 default:

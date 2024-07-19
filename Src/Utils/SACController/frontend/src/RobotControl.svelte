@@ -151,7 +151,7 @@ button.active {
     <div class="button-group">
         <button class:active={activeMoveDirection === "Kick"} on:click={() => action("Kick")}>Kick</button>
         <button class:active={activeMoveDirection === "Dribble"} on:click={() => action("Dribble")}>Dribble</button>
-        <button class:active={activeMoveDirection === "GetUp"} on:click={() => action("GetUp")}>Dribble</button>
+        <button class:active={activeMoveDirection === "GetUp"} on:click={() => action("GetUp")}>GetUp</button>
 
     </div>
     <div class="status">{directionMessage}</div>

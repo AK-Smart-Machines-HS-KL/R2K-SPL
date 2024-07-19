@@ -1,3 +1,6 @@
+
+#include "Representations/Modeling/RobotPose.h"
+#include "Representations/Communication/TeamData.h"
 #include "Representations/BehaviorControl/SACCommands.h"
 #include "Representations/BehaviorControl/Skills.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
@@ -11,6 +14,9 @@ CARD(SACCard,
   CALLS(WalkAtRelativeSpeed),
   CALLS(GoToBallAndKick),
   CALLS(GoToBallAndDribble),
+  CALLS(GetUpEngine),
+  REQUIRES(TeamData),
+  REQUIRES(RobotPose),
   REQUIRES(SACCommands),
 });
 
@@ -61,17 +67,19 @@ class SACCard : public SACCardBase
     }
     else if(theSACCommands.direction == 7)
     {
-      theGoToBallAndKickSkill(0, KickInfo::forwardFastLeft);
-      /* 
+      for (const auto& buddy : theTeamData.teammates)
+      {
         Vector2f target = Vector2f::Zero();
-        arget = buddy.theRobotPose.translation; 
-        buddyDist = (int)Geometry::distance(target,theRobotPose.translation);
+        target = buddy.theRobotPose.translation; 
+        int buddyDist = (int)Geometry::distance(target, theRobotPose.translation);
                  
         theGoToBallAndKickSkill(0, KickInfo::forwardFastLeft, true, buddyDist);
-        */
+      }
     }
     else if(theSACCommands.direction == 8)
       theGoToBallAndDribbleSkill(0);
+    else if (theSACCommands.direction == 9)
+      theGetUpEngineSkill();   
   }
 };
 
