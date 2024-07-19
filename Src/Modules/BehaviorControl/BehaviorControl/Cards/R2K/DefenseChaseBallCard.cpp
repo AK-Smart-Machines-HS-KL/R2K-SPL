@@ -87,7 +87,7 @@ class DefenseChaseBallCard : public DefenseChaseBallCardBase
     return
       theGameInfo.setPlay == SET_PLAY_NONE &&
       !aBuddyIsChasingOrClearing() &&
-      theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
+      // theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
       theFieldBall.teamPositionOnField.x() < -200;
   }
