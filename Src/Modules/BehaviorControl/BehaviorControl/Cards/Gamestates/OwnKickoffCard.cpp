@@ -180,24 +180,32 @@ class OwnKickoffCard : public OwnKickoffCardBase
     state(passRight)
     {
       action
-      {
-        if (!footIsSelected) {  // select only once
-          footIsSelected = true;
-          leftFoot = theFieldBall.positionRelative.y() < 0;
+      { // no long shot possible
+        int dist = (int)Geometry::distance(theFieldBall.teamPositionOnField, theRobotPose.translation);  
+        if(dist < 1500) {  // ball is on the center pos
+          if (!footIsSelected) {  // select only once
+            footIsSelected = true;
+            leftFoot = theFieldBall.positionRelative.y() < 0;
+          }
+          KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeftLong : KickInfo::forwardFastRightLong;
+          // theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true); 
+          theGoToBallAndKickSkill(calcAngleToPass(), KickInfo::forwardFastLeft, true, 2500);
+          done = true;
         }
-        KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeftLong : KickInfo::forwardFastRightLong;
-        // theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true); 
-        theGoToBallAndKickSkill(calcAngleToPass(), KickInfo::forwardFastLeft, true, 2500);
-        done = true;
+        else { // i am the passing target ie right defender
+         auto target = Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f);
+         theWalkToPointSkill(target, 1.0f, false,false,false);   
+         theLookActiveSkill();
+        }
       }
     }
   }
 
-  Angle calcAngleToPass() const
-    {
-      return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, -3500.f)).angle();
-    }
-
+   Angle calcAngleToPass() const
+      {
+        return (theRobotPose.inversePose * Vector2f(1000.f, -3500.f)).angle();
+      }
+      
   bool aBuddyIsChasingOrClearing() const
     {
       for (const auto& buddy : theTeamData.teammates) 
