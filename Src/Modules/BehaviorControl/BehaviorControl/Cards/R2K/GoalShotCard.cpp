@@ -55,7 +55,7 @@ CARD(GoalShotCard,
                 (bool)(false) done,
                 (Shot) currentShot,
                 (unsigned int) (0) timeLastFail,
-                (unsigned int) (3000) cooldown,
+                (unsigned int) (4000) cooldown,
              }),
 
      });
@@ -74,8 +74,8 @@ class GoalShotCard : public GoalShotCardBase
       // theFieldBall.ballWasSeen() &&
       theTeammateRoles.playsTheBall(theRobotInfo.number) &&
       theRobotPose.translation.x() > 100 &&
-      theRobotPose.translation.x() < (theFieldDimensions.xPosOpponentGroundLine-1000) &&
-      theFieldBall.positionRelative.norm() < 600
+      theRobotPose.translation.x() < (theFieldDimensions.xPosOpponentGroundLine-1500) &&
+      theFieldBall.positionRelative.norm() < 400
       && theFrameInfo.getTimeSince(timeLastFail) > cooldown
       && theShots.goalShot.failureProbability < 0.70
       && theFieldBall.teamPositionOnField.x() > theRobotPose.translation.x()
