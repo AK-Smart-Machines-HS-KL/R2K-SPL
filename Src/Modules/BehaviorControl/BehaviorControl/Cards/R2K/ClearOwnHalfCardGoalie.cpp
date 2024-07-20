@@ -96,8 +96,8 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
   bool preconditions() const override
   {
     return
-      theTeammateRoles.playsTheBall(theRobotInfo.number) &&   // I am the striker
-      !aBuddyIsClearingOwnHalf() &&
+      // theTeammateRoles.playsTheBall(theRobotInfo.number) &&   // I am the striker
+      // !aBuddyIsClearingOwnHalf() &&
       // 
       // either LongShotCard is above in the stack or add this pre-cond:
       // theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
