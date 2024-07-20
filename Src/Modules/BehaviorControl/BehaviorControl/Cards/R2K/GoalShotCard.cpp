@@ -41,9 +41,11 @@ CARD(GoalShotCard,
         CALLS(WalkAtRelativeSpeed),
         REQUIRES(Shots),
         REQUIRES(RobotPose),
+        REQUIRES(RobotInfo),   
         REQUIRES(FieldBall),
         REQUIRES(FrameInfo),
         REQUIRES(TeamData),
+        REQUIRES(TeammateRoles),  
 
         DEFINES_PARAMETERS(
              {,
@@ -51,7 +53,7 @@ CARD(GoalShotCard,
                 (bool)(false) done,
                 (Shot) currentShot,
                 (unsigned int) (0) timeLastFail,
-                (unsigned int) (6000) cooldown,
+                (unsigned int) (3000) cooldown,
              }),
 
      });
@@ -67,12 +69,13 @@ class GoalShotCard : public GoalShotCardBase
   bool preconditions() const override
   {
     return 
-      theFieldBall.ballWasSeen() &&
-      theRobotPose.translation.x() > 1500 &&
+      // theFieldBall.ballWasSeen() &&
+      theTeammateRoles.playsTheBall(theRobotInfo.number) &&
+      theRobotPose.translation.x() > 100 &&
       theFieldBall.positionRelative.norm() < 600
       && theFrameInfo.getTimeSince(timeLastFail) > cooldown
       && theShots.goalShot.failureProbability < 0.70
-      && theFieldBall.positionOnField.x() > theRobotPose.translation.x()
+      && theFieldBall.teamPositionOnField.x() > theRobotPose.translation.x()
       && !aBuddyIsChasingOrClearing()
     ;
   }
@@ -166,11 +169,11 @@ class GoalShotCard : public GoalShotCardBase
       for (const auto& buddy : theTeamData.teammates) 
       {
         if (// buddy.theBehaviorStatus.activity == BehaviorStatus::OffenseChaseBallCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
+          // buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+          // buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard ||
+          // buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard )
           // buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
           return true;

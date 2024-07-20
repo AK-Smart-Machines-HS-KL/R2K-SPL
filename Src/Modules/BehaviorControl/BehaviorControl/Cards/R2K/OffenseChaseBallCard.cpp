@@ -85,7 +85,7 @@ class OffenseChaseBallCard : public OffenseChaseBallCardBase
     //mit einem threshold damit Stürmer noch teils ins eigene Feld darf
   
     return
-      theFieldBall.ballWasSeen() &&
+      // theFieldBall.ballWasSeen() &&
       theTeammateRoles.playsTheBall(theRobotInfo.number) &&
       !aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
       theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
