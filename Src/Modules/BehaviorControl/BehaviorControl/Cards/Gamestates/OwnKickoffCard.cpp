@@ -100,7 +100,7 @@ class OwnKickoffCard : public OwnKickoffCardBase
   }
   bool postconditions() const override
   {
-    return done;   
+    return done || theExtendedGameInfo.timeSincePlayingStarted > 15000 ;   
   }
 
   option
@@ -149,6 +149,7 @@ class OwnKickoffCard : public OwnKickoffCardBase
       {
         theLookActiveSkill();
         theStandSkill();
+
       }
     }
 
@@ -196,6 +197,7 @@ class OwnKickoffCard : public OwnKickoffCardBase
          auto target = Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f);
          theWalkToPointSkill(target, 1.0f, false,false,false);   
          theLookActiveSkill();
+          done = true;
         }
       }
     }
@@ -203,7 +205,7 @@ class OwnKickoffCard : public OwnKickoffCardBase
 
    Angle calcAngleToPass() const
       {
-        return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, -4000.f)).angle();
+        return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, -3500.f)).angle();
       }
       
   bool aBuddyIsChasingOrClearing() const

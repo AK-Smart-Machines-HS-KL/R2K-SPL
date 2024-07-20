@@ -12,6 +12,7 @@
 
 // Skills - Must be included BEFORE Card Base
 #include "Representations/BehaviorControl/Skills.h"
+#include "Representations/Configuration/FieldDimensions.h"
 
 // Card Base
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
@@ -36,9 +37,9 @@ CARD(GoalShotCard,
         CALLS(Activity),
         CALLS(LookActive),
         CALLS(GoToBallAndKick),
-        CALLS(Stand),
         CALLS(WalkToPoint),
         CALLS(WalkAtRelativeSpeed),
+        CALLS(Stand),
         REQUIRES(Shots),
         REQUIRES(RobotPose),
         REQUIRES(RobotInfo),   
@@ -46,6 +47,7 @@ CARD(GoalShotCard,
         REQUIRES(FrameInfo),
         REQUIRES(TeamData),
         REQUIRES(TeammateRoles),  
+        REQUIRES(FieldDimensions),
 
         DEFINES_PARAMETERS(
              {,
@@ -72,6 +74,7 @@ class GoalShotCard : public GoalShotCardBase
       // theFieldBall.ballWasSeen() &&
       theTeammateRoles.playsTheBall(theRobotInfo.number) &&
       theRobotPose.translation.x() > 100 &&
+      theRobotPose.translation.x() < (theFieldDimensions.xPosOpponentGroundLine-1000) &&
       theFieldBall.positionRelative.norm() < 600
       && theFrameInfo.getTimeSince(timeLastFail) > cooldown
       && theShots.goalShot.failureProbability < 0.70
