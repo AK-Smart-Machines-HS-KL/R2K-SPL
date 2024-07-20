@@ -76,10 +76,10 @@ class ReadyOppKickoffCard : public ReadyOppKickoffCardBase
 
       switch (theTeammateRoles.offenseRoleIndex(theRobotInfo.number)) {
       case 0: // right-most offense
-        targetAbsolute = Pose2f(0, -1000, 0);
+        targetAbsolute = Pose2f(0, -1100, 0); // #5 waits in front of center circle
         break;
       case 1: // 
-        targetAbsolute = Pose2f(0, -1300, -1300);
+        targetAbsolute = Pose2f(0, -1300, -1300); // #4 waits behind #5 a bit to the right
         break;
       case 2: // 
         targetAbsolute = Pose2f(0, -900, 2000);

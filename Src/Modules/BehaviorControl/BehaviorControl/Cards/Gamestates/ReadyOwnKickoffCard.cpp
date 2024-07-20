@@ -68,12 +68,12 @@ class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
 
     switch (theTeammateRoles.offenseRoleIndex(theRobotInfo.number)) {
     case 0: // right-most offense
-      targetAbsolute = Pose2f(0, -500, 0);  // #5
+      targetAbsolute = Pose2f(0, -500, 0);  // #5 goes into center circle
       break;
     case 1: // 
-      targetAbsolute = Pose2f(0, -1000, -2500); // #4
+      targetAbsolute = Pose2f(0, -1000, -2500); // #4 waits on right edge 1m before the middle line
       break;
-    case 2: // OFFENSIVE MODE - we have 3 offense
+    case 2: // OFFENSIVE MODE - we have 3 offense, #3 waits on left side, a bit further back than the first two
       targetAbsolute = Pose2f(0, -1100, 700);
       break;
     }
