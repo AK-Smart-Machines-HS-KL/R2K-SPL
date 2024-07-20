@@ -205,7 +205,7 @@ class OwnKickoffCard : public OwnKickoffCardBase
 
    Angle calcAngleToPass() const
       {
-        return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, -3500.f)).angle();
+        return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 3500.f)).angle();
       }
       
   bool aBuddyIsChasingOrClearing() const
