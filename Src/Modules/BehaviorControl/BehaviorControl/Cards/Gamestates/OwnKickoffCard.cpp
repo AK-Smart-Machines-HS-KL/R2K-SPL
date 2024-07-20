@@ -90,12 +90,13 @@ class OwnKickoffCard : public OwnKickoffCardBase
       leftFoot = theFieldBall.positionRelative.y() < 0;
     }
     KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeftLong : KickInfo::forwardFastRightLong;
-    theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true); 
+    // theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true); 
+    theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::forwardFastLeft, true, 2500);
     }
  
   Angle calcAngleToGoal() const
   {
-    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, -480.f)).angle();
+    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, -3500.f)).angle();
   }
 };
 
