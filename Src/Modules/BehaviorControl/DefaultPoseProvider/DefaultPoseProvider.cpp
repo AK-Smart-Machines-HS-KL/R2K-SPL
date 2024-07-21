@@ -50,7 +50,7 @@ void DefaultPoseProvider::update(DefaultPose& defaultPose)
       float offset = 0; // local offset var for readability
       switch (theTeamBehaviorStatus.teamActivity)
       {
-        case TeamBehaviorStatus::R2K_DEFENSIVE_GAME : offset = offsetDefense;
+        case TeamBehaviorStatus::R2K_DEFENSIVE_GAME : offset = 0; // offsetDefense;
         break;
         case TeamBehaviorStatus::R2K_OFFENSIVE_GAME : offset = offsetOffense;
         break;

@@ -49,7 +49,7 @@ CARD(OwnGoalFreeKickCard,
   DEFINES_PARAMETERS(
 	{
 		,
-		(Vector2f)(Vector2f(1000.0f, -340.0f))kickTarget,  // Based on 20_deg setup angle in ready card; This is a 20 degree shot
+		(Vector2f)(Vector2f(2000.0f, -2040.0f))kickTarget,  // Based on 20_deg setup angle in ready card; This is a 20 degree shot
 	}),
 });
 
