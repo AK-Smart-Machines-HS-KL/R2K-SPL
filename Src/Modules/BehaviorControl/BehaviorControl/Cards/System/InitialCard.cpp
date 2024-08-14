@@ -10,12 +10,20 @@
 #include "Representations/Communication/GameInfo.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 
+#include "Representations/BehaviorControl/FieldBall.h"
+#include "Representations/Modeling/RobotPose.h"
+
+
 CARD(InitialCard,
 {,
   CALLS(Activity),
-  CALLS(LookAtAngles),
+  CALLS(LookActive),
+  CALLS(PointAt),
+  CALLS(PointAtWithArm),
   CALLS(Stand),
   REQUIRES(GameInfo),
+  REQUIRES(FieldBall),
+  REQUIRES(RobotPose),
 });
 
 class InitialCard : public InitialCardBase
@@ -33,8 +41,16 @@ class InitialCard : public InitialCardBase
   void execute() override
   {
     theActivitySkill(BehaviorStatus::initial);
-    theLookAtAnglesSkill(0.f, 0.f, 150_deg);
+    // theLookAtAnglesSkill(0.f, 0.f, 150_deg);
+    theLookActiveSkill();
     theStandSkill(/* high: */ true);
+
+    Vector2f PointPosition = theFieldBall.recentBallPositionOnField();
+
+    Vector2f relativePointPosition = theRobotPose.toRelative(PointPosition);
+    Vector3f relativePointCoordinate3D(2 * relativePointPosition.x() , 2* relativePointPosition.y() , 0.f);
+    OUTPUT_TEXT("Point Position (x, y): " << relativePointPosition.x() << ", " << relativePointPosition.y());
+    thePointAtSkill(relativePointCoordinate3D);
   }
 };
 

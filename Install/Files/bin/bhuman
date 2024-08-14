@@ -74,7 +74,8 @@ LOGFILE="${LOGDIR}/bhumand_(${COUNTER}).log"
 if ${DEBUG}; then
   gdb "${BINARY}"
 elif ${BACKGROUND}; then
-  "${BINARY}" -w 2>&1 | mawk -W interactive -F '\n' '{print strftime("%H:%M:%S", systime()) " " $0}' >"${LOGFILE}"
+    #  "${BINARY}" -w 2>&1 | mawk -W interactive -F '\n' '{print strftime("%H:%M:%S", systime()) " " $0}' >"${LOGFILE}"
+  "${BINARY}" -w 2>&1 | mawk -W interactive -F '\n' '{print strftime("%H:%M:%S", systime()) " " $0}' > "/dev/null"
 else
   "${BINARY}" -w 2>&1 | mawk -W interactive -F '\n' '{print strftime("%H:%M:%S", systime()) " " $0}' | tee "${LOGFILE}"
 fi
