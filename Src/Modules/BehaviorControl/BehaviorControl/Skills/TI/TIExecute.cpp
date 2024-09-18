@@ -65,7 +65,8 @@ class TIExecuteImpl : public TIExecuteImplBase
     MAP(PlaybackAction::Skills::KickAtGoal, theGoToBallAndKickSkill, (0_deg, KickInfo::KickType::forwardFastRight));
  
     MAP(PlaybackAction::Skills::WalkToBall, theWalkAtRelativeSpeedSkill, (action.poseParam));
-    MAP(PlaybackAction::Skills::WalkToPoint, theWalkToPointSkill, (action.poseParam, action.floatParam, false, false, false, false));
+    // theWalkToPointSkill(Pose2f(0.f, 0.f, theFieldBall.intersectionPositionWithOwnYAxis.y()), 1.f, /* rough: */ false, /* disableObstacleAvoidance: */ false, /* disableAligning: */ true);
+    MAP(PlaybackAction::Skills::WalkToPoint, theWalkToPointSkill, (action.poseParam, action.floatParam, true, false, false, true));
    // MAP_DONE(PlaybackAction::Skills::GoToTarget, { return theWalkToTargetSkill.isDone(); });
     //MAP_ABORT(PlaybackAction::Skills::GoToTarget, { return theWalkToTargetSkill.isAborted(); });
 

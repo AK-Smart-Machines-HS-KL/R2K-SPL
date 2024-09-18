@@ -32,7 +32,13 @@
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/Math/Pose3f.h"
 #include "Representations/Communication/RobotInfo.h"
+#include "Representations/Modeling/RobotPose.h"
 #include "Representations/BehaviorControl/FieldBall.h"
+
+#include "Representations/Communication/TeamInfo.h"
+
+#include "Representations/Communication/TeamData.h"
+#include "Representations/Communication/TeamInfo.h"
 
 #include "Representations/BehaviorControl/TI/TIData.h"
 #include "Representations/BehaviorControl/TI/TIRecorderData.h"
@@ -45,7 +51,9 @@ CARD(TIRecorderCard, {
   CALLS(TIExecute),
   CALLS(Stand),
   REQUIRES(RobotInfo),
+  REQUIRES(RobotPose),
   REQUIRES(FrameInfo),
+  REQUIRES(TeamData),
   REQUIRES(TIRecorderData),
   DEFINES_PARAMETERS({
       ,
@@ -59,7 +67,8 @@ CARD(TIRecorderCard, {
 // performable actions
 const PlaybackAction standAction = PlaybackAction().setSkill(PlaybackAction::Skills::Stand);
 const PlaybackAction goalKickAction = PlaybackAction().setSkill(PlaybackAction::Skills::KickAtGoal);
-const PlaybackAction goToBallAction = PlaybackAction().setSkill(PlaybackAction::Skills::Stand);
+const PlaybackAction goToBallAction = PlaybackAction().setSkill(PlaybackAction::Skills::WalkToBall);
+const PlaybackAction goToPointAction = PlaybackAction().setSkill(PlaybackAction::Skills::WalkToPoint);
 
 
 class TIRecorderCard : public TIRecorderCardBase
@@ -77,10 +86,17 @@ class TIRecorderCard : public TIRecorderCardBase
   public:
   PlaybackAction currentAction = PlaybackAction();
 
+
+  /* unmapped skills (s. TIExecute.cpp
+  * theWalkAtRelativeSpeedSkill, (action.poseParam));
+  * ? theGoToBallAndKickSkill, (0_deg, KickInfo::KickType::forwardFastRight));
+  */
+
   TIRecorderCard() {
 	  actionCallbacks[Keys::Circle] = standAction;
     actionCallbacks[Keys::Triangle] = goalKickAction;
     actionCallbacks[Keys::Square] = goToBallAction;
+    actionCallbacks[Keys::Cross] = goToPointAction;  //WalkToPoint
 
     specialCallbacks[Keys::Share] = [&]() {if(theTIRecorderData.recording) {theTIRecorderData.stop();} else {theTIRecorderData.start();}}; // toggle recording
     specialCallbacks[Keys::L1] = [&]() {theTIRecorderData.save();}; // save
@@ -90,7 +106,7 @@ class TIRecorderCard : public TIRecorderCardBase
   bool preconditions() const override
   {
     if(theRobotInfo.number == keyLogger->getRobotNumber() && keyLogger->isStartPressed()) {
-      OUTPUT_TEXT("TIRecording triggered");
+      OUTPUT_TEXT("TIRecording triggered for robot " << theRobotInfo.number);
       keyLogger->clearEvents();
       return true;
     }
@@ -121,7 +137,27 @@ class TIRecorderCard : public TIRecorderCardBase
     // Key handling:
     handleController();
 
-    theLookForwardSkill(); //TI does not currently support head motion requests.
+    // OUTPUT_TEXT("target " << theTeamData.teammates[5].theRobotPose.translation.x() << theTeamData.teammates[5].theRobotPose.translation.y());
+    /*
+    if(currentAction.skill == PlaybackAction::Skills::Default || 
+       currentAction.skill == PlaybackAction::Skills::Stand ||
+       currentAction.skill == PlaybackAction::Skills::WalkAtRelativeSpeed ||
+       currentAction.skill == PlaybackAction::Skills::KickAtGoal)
+       */
+    if (currentAction.skill != PlaybackAction::Skills::KickAtGoal)
+      theLookForwardSkill(); //TI does not currently support head motion requests.
+    
+    if (currentAction.skill == PlaybackAction::Skills::WalkToPoint) {
+
+      float dest_x = theTeamData.teammates[4].theRobotPose.translation.x();
+      float dest_y = theTeamData.teammates[4].theRobotPose.translation.y();
+      // OUTPUT_TEXT("x " << dest_x << " " << dest_y);
+
+      Pose2f targetAbsolute = Pose2f(calcAngleToDest(dest_x,dest_y),dest_x,dest_y);
+      const Pose2f targetRelative = theRobotPose.inversePose * targetAbsolute;
+      setAction(currentAction.setPose(targetRelative).setFloat(1.f));
+    }
+    
     theTIExecuteSkill(currentAction);
   }
 
@@ -175,6 +211,14 @@ class TIRecorderCard : public TIRecorderCardBase
         }
       }
     }
+  }
+
+
+  //  Pose2f targetAbsolute = Pose2f(theRobotPose.inversePose * Vector2f(theTeamData.teammates[5].theRobotPose.translation.x(), theTeamData.teammates[5].theRobotPose.translation.y())).angle();
+  Angle calcAngleToDest(float x, float y) const
+  {
+    // return (theRobotPose.inversePose * Vector2f(theTeamData.teammates[4].theRobotPose.translation.x(), theTeamData.teammates[4].theRobotPose.translation.y())).angle();
+    return  (theRobotPose.inversePose * Vector2f(x, y)).angle();
   }
 };
 

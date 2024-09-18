@@ -142,6 +142,7 @@ WorldData::WorldData(std::string file, bool isRelative) {
             WorldModel world;
             // use name from path instead?
             world.gameState = doc.GetCell<int>("gameState", i);
+            world.setPlay= doc.GetCell<int>("setPlay", i);
             world.timeLeft = doc.GetCell<uint32_t>("timeLeft", i);
             world.robotNumber = doc.GetCell<int>("robotNumber", i);
             world.robotPose.translation.x() = doc.GetCell<float>("robotPose X", i);
