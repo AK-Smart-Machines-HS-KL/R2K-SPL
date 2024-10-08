@@ -1,0 +1,36 @@
+\section{Getting Started with B-Human's Codebase}
+
+\subsection{Setting up the work environment}
+
+\subsubsection{Windows 10}
+
+This OS is soon to be deprecated, still most our Develop-machines are building the software using this OS.
+
+\paragraph{CMake} B-Human's software is built using a CMake-pipeline. Installing CMake is therefore essential
+
+\paragraph{Git} Version Control in our software is managed using Git.
+
+\paragraph{Visual Studio 2019} We're currently working using the VS2019 Community edition IDE. However, this IDE has recently been replaced by the 2022 variant and downloads of the former version can no longer be accessed. How to setup the newer version has to properly be researched, but I think it's analogous to the previous version.
+
+\paragraph{WSL} Windows Subsystem Linux is necessary for building some parts of the code.
+
+\paragraph{VSCode} This IDE can alternatively be used for building the code on WSL, the subsystem OS. However, we've not been able to do so on every machine so far. A proper Howto has to be researched and documented.
+
+\subsubsection{Windows 11}
+
+Basically this is almost the same as Windows 10. Because of design changes in the OS some things do not look like they did back then. Also the gtest-library fails when building on this OS for some machines. This library tests the correct implementations of macros by BHuman \dots We're currently investigating how to fix this.
+
+\subsubsection{Linux Ubuntu 20.02}
+
+The tools to be installed are similar to those on Windows. However you don't have to find most first but can just use one sudo apt install script to list most.
+
+\subsubsection{Linux Ubuntu 22.04}
+Same as Ubuntu 20, but some things (e.g. gtest-library) do not work right away.
+
+\subsection{Using the simulator environment SimRobot}
+
+\subsection{Deploying software on the NAO robots}
+
+\subsubsection{Deployment via the BHuman User Shell(BUSH)}
+
+\subsubsection{Deployment using a USB-Flasher}
