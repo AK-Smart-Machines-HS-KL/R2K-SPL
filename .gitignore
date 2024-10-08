@@ -34,3 +34,8 @@ Thumbs.db
 /Util/Buildchain/macOS/include
 /Util/Buildchain/macOS/lib
 /Util/WSL
+*.aux
+*.synctex.gz
+*.log
+*.toc
+/CodeRelease2024/main.pdf
