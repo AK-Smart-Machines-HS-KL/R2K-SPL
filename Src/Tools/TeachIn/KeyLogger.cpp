@@ -206,7 +206,7 @@ void KeyLogger::toggleStart()
 {
     if (keyPressedJustNow(Keys::Start, 500))
     {
-        startGamepadControl = !startGamepadControl;
+      startGamepadControl = !startGamepadControl;
     }
 }
 
@@ -265,6 +265,7 @@ void KeyLogger::saveProtocol()
     /* ToDo: rapidCSV
     saving stuff
     */
+  OUTPUT_TEXT("saving stuff");
 }
 
 void KeyLogger::setRobotName(std::string name)

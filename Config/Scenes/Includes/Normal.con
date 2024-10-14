@@ -29,3 +29,8 @@ mr JPEGImage off
 
 call Includes/GameStates
 call Includes/DebugResponses
+
+
+# TeachIn
+dr debugDrawing3d:representation:TeamBallModel
+dr debugDrawing3d:representation:TIPlaybackProvider

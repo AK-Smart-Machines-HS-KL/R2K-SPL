@@ -172,7 +172,7 @@ class R2K_TeamCard : public R2K_TeamCardBase
 private:
   int myEbcWrites = 0;  // tnmp. hack for tracing ebc
   bool recomputeLineUp = false; // check for fresh penalties
-  std::vector<int> lineUp = {1,2,3,4,5};
+  std::vector<int> lineUp = {1,2,3,4,5,6};
 
   void execute() override
   {
@@ -289,13 +289,18 @@ private:
       recomputeLineUp = true;
     }
 
-    for (int i = 0; i < 5; i++)
+      
+    for (int i = 0; i < 7; i++)
         if (theOwnTeamInfo.players[i].penalty == PENALTY_NONE)  activeBuddies++;
 
-    // 
+    // #6 and #7 are used as markers for teach-in, so far.
+    // This cut-off below is subject to change whenever this code shall be used for 7vs7 games
+    if (activeBuddies > 5) {
+      // OUTPUT_TEXT("more than 5 players found" << activeBuddies);
+      activeBuddies = 5;
+    }
 
     if(recomputeLineUp){
-
     // OUTPUT_TEXT("aB " << activeBuddies);
     // OUTPUT_TEXT("theTeamData.numberOfActiveTeammates " << theTeamData.numberOfActiveTeammates);#
 
@@ -307,7 +312,7 @@ private:
       else {  // do a real computation    
        
         for (const auto& buddy : theTeamData.teammates) {
-           
+          if(buddy.number < 6)  // see comment above #6 and #6 are markers fpr teachin
           if(!buddy.isPenalized)  { 
             // OUTPUT_TEXT("pb " << buddy.number <<  buddy.theRobotPose.translation.x());
             botsLineUp.push_back(BotOnField(buddy.number, buddy.theRobotPose.translation.x()));
@@ -411,7 +416,7 @@ private:
         case 2: pRole.role = PlayerRole::supporter2;   break;
         case 3: pRole.role = PlayerRole::supporter3;   break;
         case 4: pRole.role = PlayerRole::supporter4;   break;
-        default: pRole.role = PlayerRole::none; OUTPUT_TEXT("default count: " << count);
+        default: pRole.role = PlayerRole::none; // OUTPUT_TEXT("default count: " << count);
       }
     }
 

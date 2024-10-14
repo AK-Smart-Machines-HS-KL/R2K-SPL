@@ -109,9 +109,10 @@ WorldModel TIRecorderProvider::getWorldModel() {
     model.robotNumber=theRobotInfo.number;
     model.setPlay = theGameInfo.setPlay;
     model.gameState = theGameInfo.state;
-    model.ballPosition = theGroundTruthWorldState.balls.size() == 0 ? 
-        Vector2f(0, 0) :  
-        Vector2f(theGroundTruthWorldState.balls[0].position.x(),theGroundTruthWorldState.balls[0].position.y()); /* */
+    model.ballPosition = theGroundTruthWorldState.balls.size() == 0 ?
+      Vector2f(0, 0) :
+      // Vector2f(theGroundTruthWorldState.balls[0].position.x(),theGroundTruthWorldState.balls[0].position.y()); /* */
+      theFieldBall.endPositionOnField;
     model.ballIsNear = ballIsNearTreshold > Geometry::distance(model.robotPose.translation,model.ballPosition);
     model.ballDistanceToGoal = Geometry::distance(Vector2f(theFieldDimensions.xPosOpponentGoalPost, theFieldDimensions.yPosCenterGoal),model.ballPosition);
     model.ballDistanceToBot  = Geometry::distance(model.robotPose.translation,model.ballPosition);

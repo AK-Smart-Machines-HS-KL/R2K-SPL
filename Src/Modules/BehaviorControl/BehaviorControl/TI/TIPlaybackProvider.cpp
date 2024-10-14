@@ -36,9 +36,17 @@ void TIPlaybackProvider::update(TIPlaybackSequences &playbackData)
 
   for (WorldData model : playbackData.models)
   {
-    // OUTPUT_TEXT(model.fileName);
+
+
     // OUTPUT_TEXT(model.trigger.robotPose.translation.x() << " " << model.trigger.robotPose.translation.y());
-    SPHERE3D("representation:TIPlaybackProvider", model.trigger.robotPose.translation.x(), model.trigger.robotPose.translation.y(), 70, 70, ColorRGBA::red);
+    // if(-1 == model.fileName.find("Standard"))
+    if (model.trigger.setPlay == SET_PLAY_CORNER_KICK)
+      CYLINDER3D("representation:TIPlaybackProvider", model.trigger.robotPose.translation.x(), model.trigger.robotPose.translation.y(), -1.f, 0.f, 0.f, 0.f, (int)model.trigger.ballDistanceToBot/10, 2,  ColorRGBA::yellow);
+
+      // RECTANGLE("representation:TIPlaybackProvider", 100, 100, 200, 200, 20, Drawings::solidPen, ColorRGBA::yellow);
+    else
+      CYLINDER3D("representation:TIPlaybackProvider", model.trigger.robotPose.translation.x(), model.trigger.robotPose.translation.y(), -1.f, 0.f, 0.f, 0.f, std::max(50,(int)model.trigger.ballDistanceToBot/10), 2, ColorRGBA::gray);
+      // CYLINDER3D("representation:TIPlaybackProvider", model.trigger.robotPose.translation.x(), model.trigger.robotPose.translation.y(), 100, 0.f, 0.f, 0.f, 50, 2, ColorRGBA::red);
   }
   /* CIRCLE("representation:TIPlaybackProvider", "",
     position.x(), position.y(), 45, 0, // pen width
@@ -78,6 +86,7 @@ void TIPlaybackProvider::update(TIPlaybackSequences &playbackData)
 
 void TIPlaybackProvider::printLoadedData(TIPlaybackSequences &playbackData)
 {
+    if (theRobotInfo.number != 1) return; // do not tell this info 5 times
     OUTPUT_TEXT("Worldmodel:");
 
     // Print the names of all loaded worldmodels to the console
@@ -100,7 +109,8 @@ void TIPlaybackProvider::printLoadedData(TIPlaybackSequences &playbackData)
 
 void TIPlaybackProvider::loadTeachInData(TIPlaybackSequences &playbackData)
 {
-    // Get all sub-directories inside the TeachIn directory
+
+        // Get all sub-directories inside the TeachIn directory
     std::string teachInDir = std::string(File::getBHDir()) + "/Config/TeachIn/";
     std::list<std::string> subDirs = File::getSubDirs(teachInDir);
 
@@ -111,7 +121,8 @@ void TIPlaybackProvider::loadTeachInData(TIPlaybackSequences &playbackData)
         for (std::string file : files)
         {
             std::string name = dir + "/" + file;
-            OUTPUT_TEXT("Loading: " + name);
+            if (theRobotInfo.number == 1)  // do not tell this info 5 timesOUTPUT_TEXT("Loading: " + name);
+              OUTPUT_TEXT("Loading: " + name);
 
             std::string fullPath = teachInDir + name;
 
@@ -123,7 +134,8 @@ void TIPlaybackProvider::loadTeachInData(TIPlaybackSequences &playbackData)
 
             // Loading failed
             if (!wasLoaded)
-                {OUTPUT_ERROR(name + " is corrupted.");}
+                { if (theRobotInfo.number == 1)  // do not tell this info 5 timesOUTPUT_TEXT("Loading: " + name);
+                    OUTPUT_ERROR(name + " is corrupted.");}
         }
     }
 }

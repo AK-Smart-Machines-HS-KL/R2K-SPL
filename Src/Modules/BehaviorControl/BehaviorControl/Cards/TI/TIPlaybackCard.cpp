@@ -54,6 +54,7 @@
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/BehaviorControl/TI/TIPlaybackData.h"
 #include "Representations/Configuration/GlobalOptions.h" 
+#include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Modeling/RobotPose.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
@@ -69,6 +70,7 @@ CARD(TIPlaybackCard,
   CALLS(TIExecute),
   REQUIRES(FrameInfo),
 	REQUIRES(GlobalOptions),
+  REQUIRES(GameInfo),
 	REQUIRES(RobotInfo),
 	REQUIRES(RobotPose),
   REQUIRES(TIPlaybackSequences),
@@ -133,7 +135,8 @@ class TIPlaybackCard : public TIPlaybackCardBase
 		}
 
 		// TODO: Better Conditions for action Execution
-		theLookForwardSkill();  // ToDo: this is just a generic action to prevent MEEKs
+    if(currentAction.skill != PlaybackAction::Skills::KickAtGoal)
+		  theLookForwardSkill();  // ToDo: this is just a generic action to prevent MEEKs
 		theTIExecuteSkill(currentAction);
 	}
 
@@ -180,7 +183,7 @@ class TIPlaybackCard : public TIPlaybackCardBase
 			action_changed = false;
 			startTime      = state_time;
 			// OUTPUT_TEXT("Action: " + std::to_string(actionIndex));
-			OUTPUT_TEXT("playback000" << cardIndex + 1 << " action Index and Name: " << actionIndex << " " << TypeRegistry::getEnumName(theTIPlaybackSequences.data[cardIndex].actions[actionIndex].skill));
+			// OUTPUT_TEXT("playback000" << cardIndex + 1 << " action Index and Name: " << actionIndex << " " << TypeRegistry::getEnumName(theTIPlaybackSequences.data[cardIndex].actions[actionIndex].skill));
 			// OUTPUT_TEXT("remaining time" << diff);
 
 
@@ -197,7 +200,10 @@ class TIPlaybackCard : public TIPlaybackCardBase
   {
     ASSERT(!theTIPlaybackSequences.models.empty()); // has been checked in the pre-condition
     
-    return  (std::abs(Geometry::distance(theRobotPose.translation, model.robotPose.translation)) <= min_distance);
+    return  (model.setPlay == theGameInfo.setPlay &&
+       std::abs(Geometry::distance(theRobotPose.translation, model.robotPose.translation)) <= min_distance);
+
+
     // OUTPUT_TEXT("Trigger Point " << world_model_index << " for robot" << theRobotInfo.number);
 
 
