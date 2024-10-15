@@ -1,4 +1,4 @@
-# R-ZWEI Kickers Codebase 2023
+# R-ZWEI Kickers Codebase 2024
 
 This is where the code of the team **R-ZWEI Kickers** lives. Its documentation can be found in the [Wiki of this repository](https://github.com/AK-Smart-Machines-HS-KL/R2K-SPL/wiki)
 
