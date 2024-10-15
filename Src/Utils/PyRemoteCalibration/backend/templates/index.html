@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Control</title>
+    <style>
+        /* Basic CSS Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:disabled {
+            background-color: #c4c4c4;
+            cursor: not-allowed;
+        }
+
+        .status {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Server Control</h1>
+    <button id="startButton" onclick="startServer()">Start Server</button>
+    <button id="stopButton" onclick="stopServer()">Stop Server</button>
+    <div class="status" id="status">Status: Not Started</div>
+
+    <script>
+        async function startServer() {
+            try {
+                const response = await fetch('/start', { method: 'POST' });
+                const result = await response.json();
+                document.getElementById('status').innerText = `Status: ${result.message || result.error}`;
+                toggleButtons(true);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to start server');
+            }
+        }
+
+        async function stopServer() {
+            try {
+                const response = await fetch('/stop', { method: 'POST' });
+                const result = await response.json();
+                document.getElementById('status').innerText = `Status: ${result.message || result.error}`;
+                toggleButtons(false);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to stop server');
+            }
+        }
+
+        function toggleButtons(isRunning) {
+            document.getElementById('startButton').disabled = isRunning;
+            document.getElementById('stopButton').disabled = !isRunning;
+        }
+    </script>
+</body>
+
+</html>

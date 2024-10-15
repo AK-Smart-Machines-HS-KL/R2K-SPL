@@ -1,3 +1,4 @@
+env*
 *.ps1
 .*
 !.gitignore
@@ -34,3 +35,8 @@ Thumbs.db
 /Util/Buildchain/macOS/include
 /Util/Buildchain/macOS/lib
 /Util/WSL
+*.aux
+*.toc
+*.synctex.gz
+*.log
+*.out

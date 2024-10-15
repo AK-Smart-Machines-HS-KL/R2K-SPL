@@ -22,7 +22,7 @@ struct FsrSensorData;
 struct InertialSensorData;
 struct KeyStates;
 struct SystemSensorData;
-class RobotConsole;
+class RobotTextConsole;
 class SensorWidget;
 
 /**
@@ -34,7 +34,7 @@ class SensorView : public SimRobot::Object
 private:
   const QString fullName; /**< The path to this view in the scene graph */
   const QIcon icon; /**< The icon used for listing this view in the scene graph */
-  RobotConsole& console; /**< A reference to the console object. */
+  RobotTextConsole& console; /**< A reference to the console object. */
   const FsrSensorData& fsrSensorData;
   const InertialSensorData& inertialSensorData;
   const KeyStates& keyStates;
@@ -46,9 +46,9 @@ private:
 public:
   /**
    * @param fullName The path to this view in the scene graph
-   * @param robotConsole The robot console which owns \c sensorData.
+   * @param RobotTextConsole The robot console which owns \c sensorData.
    */
-  SensorView(const QString& fullName, RobotConsole& robotConsole, const FsrSensorData& fsrSensorData,
+  SensorView(const QString& fullName, RobotTextConsole& RobotTextConsole, const FsrSensorData& fsrSensorData,
              const InertialSensorData& inertialSensorData, const KeyStates& keyStates,
              const SystemSensorData& systemSensorData, const unsigned& timestamp);
 

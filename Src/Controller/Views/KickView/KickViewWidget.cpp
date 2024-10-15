@@ -6,7 +6,7 @@
  * @author <a href="mailto:judy@tzi.de">Judith Müller</a>
  */
 
-#include "Controller/RobotConsole.h"
+#include "Controller/RobotTextConsole.h"
 
 #include "KickViewWidget.h"
 #include "Tools/Streams/InStreams.h"

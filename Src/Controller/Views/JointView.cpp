@@ -4,7 +4,7 @@
  * @author Colin Graf
  */
 
-#include "Controller/RobotConsole.h"
+#include "Controller/RobotTextConsole.h"
 
 #include "JointView.h"
 #include "Controller/RoboCupCtrl.h"
@@ -166,8 +166,8 @@ JointHeaderedWidget::JointHeaderedWidget(JointView& sensorView)
   connect(getHeaderView(), SIGNAL(sectionResized(int, int, int)), jointWidget, SLOT(forceUpdate()));
 }
 
-JointView::JointView(const QString& fullName, RobotConsole& robotConsole, const JointSensorData& jointSensorData, const JointRequest& jointRequest) :
-  fullName(fullName), icon(":/Icons/tag_green.png"), console(robotConsole), jointSensorData(jointSensorData), jointRequest(jointRequest)
+JointView::JointView(const QString& fullName, RobotTextConsole& RobotTextConsole, const JointSensorData& jointSensorData, const JointRequest& jointRequest) :
+  fullName(fullName), icon(":/Icons/tag_green.png"), console(RobotTextConsole), jointSensorData(jointSensorData), jointRequest(jointRequest)
 {}
 
 SimRobot::Widget* JointView::createWidget()

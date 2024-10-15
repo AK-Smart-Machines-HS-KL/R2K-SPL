@@ -6,7 +6,7 @@
  * @author <a href="mailto:tlaue@uni-bremen.de">Tim Laue</a>
  */
 
-#include "Controller/RobotConsole.h"
+#include "Controller/RobotTextConsole.h"
 #include <Platform/OpenGL.h>
 #include "DebugDrawing3D.h"
 #include "Platform/BHAssert.h"
@@ -27,7 +27,7 @@ const DebugDrawing3D& DebugDrawing3D::operator=(const DebugDrawing3D& other)
   scale = other.scale;
   rotate = other.rotate;
   trans = other.trans;
-  robotConsole = other.robotConsole;
+  robotTextConsole = other.robotTextConsole;
   return *this += other;
 }
 
@@ -56,9 +56,9 @@ DebugDrawing3D::DebugDrawing3D(const DebugDrawing3D* pDebugDrawing3D)
 
 void DebugDrawing3D::draw()
 {
-  if(robotConsole)
+  if(robotTextConsole)
   {
-    SYNC_WITH(*robotConsole);
+    SYNC_WITH(*robotTextConsole);
     draw2();
   }
   else

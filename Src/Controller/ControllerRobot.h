@@ -32,7 +32,7 @@ public:
     robotThread->update();
   }
 
-  RobotConsole* getRobotThread() const { return robotThread; }
+  RobotTextConsole* getRobotThread() const { return robotThread; }
 
 private:
   LocalRobot* robotThread;

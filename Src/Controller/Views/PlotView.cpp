@@ -13,7 +13,7 @@
 #include <QFileDialog>
 #include <QTextStream>
 
-#include "Controller/RobotConsole.h"
+#include "Controller/RobotTextConsole.h"
 #include "Controller/RoboCupCtrl.h"
 #include "PlotView.h"
 #include <algorithm>
@@ -51,7 +51,7 @@ bool PlotWidget::needsRepaint() const
 {
   SYNC_WITH(plotView.console);
 
-  for(const RobotConsole::Layer& layer : plotView.console.plotViews[plotView.name])
+  for(const RobotTextConsole::Layer& layer : plotView.console.plotViews[plotView.name])
     if(plotView.console.plots[layer.layer].timestamp > lastTimestamp)
       return true;
   return false;
@@ -242,8 +242,8 @@ void PlotWidget::paint(QPainter& painter)
     if(antialiasing)
       painter.setRenderHints(QPainter::Antialiasing | QPainter::HighQualityAntialiasing);
     int legendWidth = 0;
-    const std::list<RobotConsole::Layer>& plotList = plotView.console.plotViews[plotView.name];
-    for(const RobotConsole::Layer& layer : plotList)
+    const std::list<RobotTextConsole::Layer>& plotList = plotView.console.plotViews[plotView.name];
+    for(const RobotTextConsole::Layer& layer : plotList)
     {
       const std::list<float>& list = plotView.console.plots[layer.layer].points;
       size_t numOfPoints = std::min(list.size(), static_cast<size_t>(plotView.plotSize));
@@ -293,7 +293,7 @@ void PlotWidget::paint(QPainter& painter)
       painter.setPen(blackPen);
       painter.setBrush(QBrush(QColor(0xff, 0xff, 0xff, 0x99)));
       painter.drawRect(legendRect);
-      for(const RobotConsole::Layer& layer : plotList)
+      for(const RobotTextConsole::Layer& layer : plotList)
       {
         painter.setPen(blackPen);
         painter.drawText(rect, Qt::AlignLeft, tr(layer.description.c_str()));
@@ -312,7 +312,7 @@ void PlotWidget::determineMinMaxValue()
   bool started = false;
   {
     SYNC_WITH(plotView.console);
-    const std::list<RobotConsole::Layer>& plotList = plotView.console.plotViews[plotView.name];
+    const std::list<RobotTextConsole::Layer>& plotList = plotView.console.plotViews[plotView.name];
     for(const auto& layer : plotList)
     {
       const std::list<float>& list = plotView.console.plots[layer.layer].points;
@@ -387,9 +387,9 @@ void PlotWidget::exportAsGnuplot()
   int numOfPoints = plotView.plotSize;
   int numOfPlots = 0;
   {
-    const std::list<RobotConsole::Layer>& plotList(plotView.console.plotViews[plotView.name]);
+    const std::list<RobotTextConsole::Layer>& plotList(plotView.console.plotViews[plotView.name]);
     numOfPlots = static_cast<int>(plotList.size());
-    for(const RobotConsole::Layer& layer : plotList)
+    for(const RobotTextConsole::Layer& layer : plotList)
     {
       const std::list<float>& list = plotView.console.plots[layer.layer].points;
       int curNumOfPoints = std::min(static_cast<int>(list.size()), static_cast<int>(plotView.plotSize));
@@ -404,9 +404,9 @@ void PlotWidget::exportAsGnuplot()
     data[i].resize(numOfPlots);
 
   {
-    const std::list<RobotConsole::Layer>& plotList = plotView.console.plotViews[plotView.name];
+    const std::list<RobotTextConsole::Layer>& plotList = plotView.console.plotViews[plotView.name];
     int currentPlot = 0;
-    for(const RobotConsole::Layer& layer : plotList)
+    for(const RobotTextConsole::Layer& layer : plotList)
     {
       const std::list<float>& list = plotView.console.plots[layer.layer].points;
       std::list<float>::const_reverse_iterator k = list.rbegin();
@@ -442,9 +442,9 @@ void PlotWidget::exportAsGnuplot()
   out << "set yrange [" << plotView.minValue << ":" << plotView.maxValue << "]\n";
   out << "set terminal postscript eps enhanced color\n";
   out << "set output \"" << fileInfo.baseName() << ".eps\"\n";
-  const std::list<RobotConsole::Layer>& plotList(plotView.console.plotViews[plotView.name]);
+  const std::list<RobotTextConsole::Layer>& plotList(plotView.console.plotViews[plotView.name]);
   int currentPlot = 0;
-  for(const RobotConsole::Layer& layer : plotList)
+  for(const RobotTextConsole::Layer& layer : plotList)
   {
     if(currentPlot == 0)
       out << "plot ";
@@ -502,7 +502,7 @@ void PlotWidget::update()
     QWidget::update();
 }
 
-PlotView::PlotView(const QString& fullName, RobotConsole& console, const std::string& name,
+PlotView::PlotView(const QString& fullName, RobotTextConsole& console, const std::string& name,
                    unsigned int plotSize, float minValue, float maxValue,
                    const std::string& yUnit, const std::string& xUnit, float xScale) :
   fullName(fullName), icon(":/Icons/tag_green.png"), console(console), name(name), plotSize(plotSize),

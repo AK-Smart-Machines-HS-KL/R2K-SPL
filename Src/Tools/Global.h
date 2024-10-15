@@ -109,5 +109,5 @@ public:
   friend class ThreadFrame; // The class ThreadFrame can set these pointers.
   friend class Robot; // The class Robot can set theSettings.
   friend class ConsoleRoboCupCtrl; // The class ConsoleRoboCupCtrl can set theSettings.
-  friend class RobotConsole; // The class RobotConsole can set theDebugOut.
+  friend class RobotTextConsole; // The class RobotTextConsole can set theDebugOut.
 };

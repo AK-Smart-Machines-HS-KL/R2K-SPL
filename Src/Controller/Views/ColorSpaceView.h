@@ -11,7 +11,7 @@
 #include "View3D.h"
 #include "Tools/Streams/Enum.h"
 
-class RobotConsole;
+class RobotTextConsole;
 
 /**
  * @class ColorSpaceView
@@ -42,7 +42,7 @@ public:
    * @param ch The channel to display (1..3) or 0 to display all channels.
    * @param b The background color.
    */
-  ColorSpaceView(const QString& fullName, RobotConsole& c, const std::string& n, ColorModel cm, int ch, const Vector3f& b, const std::string& threadIdentifier);
+  ColorSpaceView(const QString& fullName, RobotTextConsole& c, const std::string& n, ColorModel cm, int ch, const Vector3f& b, const std::string& threadIdentifier);
 
   /**
    * The function returns the name of a channel in a certain color model as string.
@@ -81,7 +81,7 @@ protected:
   float getViewDistance() const override { return channel ? 5.0f : 8.0f; }
 
 private:
-  RobotConsole& console; /**< A reference to the console object. */
+  RobotTextConsole& console; /**< A reference to the console object. */
   std::string name; /**< The name of the image. */
   ColorModel colorModel; /**< The color model in which the image should be displayed by this view. */
   int channel; /**< The channel to display (1..3) or 0 to display all channels. */

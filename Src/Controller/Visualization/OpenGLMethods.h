@@ -9,7 +9,7 @@
 
 #include "Tools/Debugging/DebugImages.h"
 
-class RobotConsole;
+class RobotTextConsole;
 
 /**
  * @namespace OpenGLMethods
@@ -31,10 +31,10 @@ namespace OpenGLMethods
   }
 
   /** writes the pixels of the image between y1 and y2 to an openGL list*/
-  void paintImagePixelsToOpenGLList(RobotConsole& console, const DebugImage& image, int colorModel, int zComponent, bool polygon, int listID, int x1, int x2, int y1, int y2);
+  void paintImagePixelsToOpenGLList(RobotTextConsole& console, const DebugImage& image, int colorModel, int zComponent, bool polygon, int listID, int x1, int x2, int y1, int y2);
 
   /** writes the pixels of the image to an openGL list*/
-  inline void paintImagePixelsToOpenGLList(RobotConsole& console, const DebugImage& image, int colorModel, int zComponent, bool polygon, int listID)
+  inline void paintImagePixelsToOpenGLList(RobotTextConsole& console, const DebugImage& image, int colorModel, int zComponent, bool polygon, int listID)
   {
     paintImagePixelsToOpenGLList(console, image, colorModel, zComponent, polygon, listID, 0, image.getImageWidth(), 0, image.height);
   }

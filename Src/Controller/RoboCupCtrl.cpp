@@ -10,7 +10,7 @@
 
 #include "RoboCupCtrl.h"
 #include "ControllerRobot.h"
-#include "RobotConsole.h"
+#include "RobotTextConsole.h"
 #include "Platform/Time.h"
 #include "Tools/Settings.h"
 

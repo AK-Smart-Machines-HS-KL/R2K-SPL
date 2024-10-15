@@ -18,7 +18,7 @@
 #include "Threads/Debug.h"
 
 LocalRobot::LocalRobot(const Settings& settings, const std::string& robotName, Debug* debug) :
-  RobotConsole(settings, robotName, connectReceiverWithRobot(debug), connectSenderWithRobot(debug)),
+  RobotTextConsole(settings, robotName, connectReceiverWithRobot(debug), connectSenderWithRobot(debug)),
   updatedSignal(1)
 {
   mode = static_cast<ConsoleRoboCupCtrl*>(RoboCupCtrl::controller)->getMode();
@@ -184,7 +184,7 @@ bool LocalRobot::main()
 
 void LocalRobot::update()
 {
-  RobotConsole::update();
+  RobotTextConsole::update();
 
   updatedSignal.wait();
 
@@ -199,8 +199,8 @@ void LocalRobot::update()
         threadData[threadIdentifier].logAcknowledged = false;
       if(puppet)
       {
-        if(RobotConsole::jointSensorData.timestamp)
-          simulatedRobot->setJointRequest(reinterpret_cast<JointRequest&>(RobotConsole::jointSensorData));
+        if(RobotTextConsole::jointSensorData.timestamp)
+          simulatedRobot->setJointRequest(reinterpret_cast<JointRequest&>(RobotTextConsole::jointSensorData));
         else
           simulatedRobot->getAndSetJointData(jointRequest, jointSensorData);
       }

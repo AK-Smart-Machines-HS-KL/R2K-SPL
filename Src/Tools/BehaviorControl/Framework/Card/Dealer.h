@@ -82,6 +82,23 @@ public:
     lastCard = nextCard;
     return nextCard;
   }
+    /**
+   * Deals a card from the deck. The card with the index of the param idx is dealt.
+   * @tparam Registry The registry from which to obtain cards.
+   * @param deck The deck from which to select a card.
+   * @param idx The index of the card to be dealt.
+   * @return The selected card.
+   */
+  template<typename Registry>
+  CardBase* deal_by_idx(const DeckOfCards<Registry>& deck, int idx)
+  {
+    CardBase* nextCard = nullptr;
+    nextCard = deck[idx];
+    ASSERT(nextCard);
+    lastCard = nextCard;
+    return nextCard;
+  }
+
   /** Lets the dealer forget the previously dealt card. */
   void reset()
   {

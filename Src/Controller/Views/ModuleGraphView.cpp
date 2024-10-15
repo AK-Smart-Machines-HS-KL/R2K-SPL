@@ -6,12 +6,12 @@
  */
 
 #include "ModuleGraphView.h"
-#include "Controller/RobotConsole.h"
+#include "Controller/RobotTextConsole.h"
 
 #include <sstream>
 #include <algorithm>
 
-ModuleGraphViewObject::ModuleGraphViewObject(const QString& fullName, RobotConsole& console,  std::unordered_set<ModuleBase::Category> categories) :
+ModuleGraphViewObject::ModuleGraphViewObject(const QString& fullName, RobotTextConsole& console,  std::unordered_set<ModuleBase::Category> categories) :
   DotViewObject(fullName), console(console), categories(categories)
 {}
 

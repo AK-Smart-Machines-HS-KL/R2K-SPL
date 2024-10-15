@@ -115,7 +115,8 @@ else()
       -Wno-implicit-int-float-conversion
       -Wunreachable-code
       -Xclang
-      -fno-pch-timestamp)
+      -fno-pch-timestamp
+      -w)
   if(BUILD_DESKTOP)
     if(NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL arm64) # Option does not work on Apple M1, but "The Internet" says it also causes trouble on multiple other arm platforms.
       add_compile_options(-march=native)

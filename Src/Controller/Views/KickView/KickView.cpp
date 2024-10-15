@@ -9,7 +9,7 @@
 #include <QHeaderView>
 #include <QFileDialog>
 #include <QMessageBox>
-#include "Controller/RobotConsole.h"
+#include "Controller/RobotTextConsole.h"
 #include "KickView.h"
 #include "KickViewWidget.h"
 #include "Platform/File.h"
@@ -345,7 +345,7 @@ void KickViewHeaderedWidget::redoChanges()
     emit redoAvailable(false);
 }
 
-KickView::KickView(const QString& fullName, RobotConsole& console, const MotionRequest& motionRequest, const JointAngles& jointAngles, const FrameInfo& frameInfo,
+KickView::KickView(const QString& fullName, RobotTextConsole& console, const MotionRequest& motionRequest, const JointAngles& jointAngles, const FrameInfo& frameInfo,
                    const JointLimits& jointLimits, const RobotDimensions& robotDimensions, const std::string& mr, SimRobotCore2::Body* robot) :
   fullName(fullName), console(console), frameInfo(frameInfo), jointAngles(jointAngles), jointLimits(jointLimits),
   motionRequest(motionRequest), robotDimensions(robotDimensions), motionRequestCommand(mr), robot(robot)
