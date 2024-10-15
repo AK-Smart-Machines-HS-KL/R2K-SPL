@@ -4,3 +4,7 @@ call Includes/Normal
 call Includes/Views
 
 dr debugDrawing3d:representation:RobotPose
+dr debugDrawing3d:representation:RobotInfo
+
+# vp orientationX 200 -10 10
+# vpd orientationX module:RobotMessageHandler:messageDataUsageInPercent

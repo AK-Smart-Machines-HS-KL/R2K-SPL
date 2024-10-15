@@ -84,7 +84,7 @@ class SearchForBallCard : public SearchForBallCardBase
   {
     // return true;   // use for testing the head and body moves in a fast game
     int timeSinceLastStart = theFrameInfo.getTimeSince(startTime);
-    return !theFieldBall.ballWasSeen()
+    return !theFieldBall.ballWasSeen(ballNotSeenTimeout)
       && (timeSinceLastStart < maxRuntime || timeSinceLastStart > maxRuntime + cooldown)
       && theExtendedGameInfo.timeSinceLastPenaltyEnded > 10000 
       && !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number);

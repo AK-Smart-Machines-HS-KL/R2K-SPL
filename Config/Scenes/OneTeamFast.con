@@ -1,1 +1,6 @@
 call Includes/Fast
+dr debugDrawing3d:representation:RobotInfo 
+dr debugDrawing3d:representation:TeamBallModel
+dr debugDrawing3d:representation:TIPlaybackProvider
+
+

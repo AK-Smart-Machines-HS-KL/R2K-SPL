@@ -1,4 +1,5 @@
 env*
+*.ps1
 .*
 !.gitignore
 !.editorconfig

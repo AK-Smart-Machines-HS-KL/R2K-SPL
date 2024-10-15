@@ -15,6 +15,7 @@
 #include "Platform/File.h"
 #include "Platform/Time.h"
 #include "Tools/FunctionList.h"
+#include "Tools/TeachIn/KeyLogger.h"
 
 #include <SimRobotEditor.h>
 
@@ -212,6 +213,10 @@ void ConsoleRoboCupCtrl::selectedObject(const SimRobot::Object& obj)
     if(robotName == robot->getName())
     {
       selected.clear();
+
+      // granting information to selected bot for keyLogger
+      KeyLogger::getInstance()->setRobotName(robot->getName());
+
       selected.push_back(robot->getRobotThread());
       printLn("robot " + robot->getName());
       return;
@@ -474,6 +479,9 @@ bool ConsoleRoboCupCtrl::selectRobot(const std::string& name)
   for(ControllerRobot* robot : robots)
     if(name == robot->getName())
     {
+      // granting information to selected bot for keyLogger
+      KeyLogger::getInstance()->setRobotName(robot->getName());
+      
       selected.push_back(robot->getRobotThread());
       return true;
     }

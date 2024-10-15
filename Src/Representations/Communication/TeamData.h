@@ -8,13 +8,13 @@
 
 #pragma once
 
-#include "Representations/Modeling/BallModel.h"
 #include "Representations/BehaviorControl/BehaviorStatus.h"
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h"
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Representations/Infrastructure/RobotHealth.h"
 #include "Representations/Modeling/FieldCoverage.h"
 #include "Representations/Modeling/ObstacleModel.h"
+#include "Representations/Modeling/BallModel.h"
 #include "Representations/Modeling/RobotPose.h"
 #include "Representations/Modeling/Whistle.h"
 
@@ -26,6 +26,7 @@
 
 #include "Tools/Communication/BNTP.h"
 #include "Tools/Communication/MessageComponents/RobotPose.h"
+#include "Tools/Communication/MessageComponents/BallModel.h"
 #include "Tools/Communication/MessageComponents/BehaviorStatus.h"
 
 STREAMABLE(Teammate,
@@ -82,6 +83,9 @@ STREAMABLE(TeamData,
 
   void rcvRobotPose(RobotPoseComponent *, RobotMessageHeader &);
   RobotPoseComponent::Callback robotPoseCallbackRef = RobotPoseComponent::onRecieve.add(std::bind(&TeamData::rcvRobotPose, this, _1, _2));
+
+  void rcvBallModel(BallModelComponent *, RobotMessageHeader&);
+  BallModelComponent::Callback ballModelCallbackRef = BallModelComponent::onRecieve.add(std::bind(&TeamData::rcvBallModel, this, _1, _2));
 
   void rcvBehaviorStatus(BehaviorStatusComponent *, RobotMessageHeader &);
   BehaviorStatusComponent::Callback behaviorStatusCallbackRef = BehaviorStatusComponent::onRecieve.add(std::bind(&TeamData::rcvBehaviorStatus, this, _1, _2));
