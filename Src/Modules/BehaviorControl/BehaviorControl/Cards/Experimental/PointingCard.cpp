@@ -13,6 +13,7 @@
 // Card Base
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
+#include "Modules\Infrastructure\WhistleHandler\WhistleHandler.h"
 
 // Representations
 #include "Representations/BehaviorControl/FieldBall.h"
@@ -64,11 +65,16 @@ public:
   // always active
   bool preconditions() const override
   {
-    int timeSinceLastStart = theFrameInfo.getTimeSince(startTime);
+    WhistleHandler whistleHandler;
+     return whistleHandler.isWhistleDetected();
+    
+     
+    
+    //int timeSinceLastStart = theFrameInfo.getTimeSince(startTime);
 
-    return isActive && (timeSinceLastStart < maxRuntime || timeSinceLastStart > maxRuntime + cooldown)
-      && theGameInfo.setPlay == SET_PLAY_CORNER_KICK
-      && theTeammateRoles.isTacticalOffense(theRobotInfo.number);
+    //return isActive && (timeSinceLastStart < maxRuntime || timeSinceLastStart > maxRuntime + cooldown);
+    //  && theGameInfo.setPlay == SET_PLAY_CORNER_KICK
+    //  && theTeammateRoles.isTacticalOffense(theRobotInfo.number);
   }
 
   bool postconditions() const override
@@ -162,8 +168,8 @@ public:
       Vector2f PointPosition = theFieldBall.recentBallPositionOnField();
 
       Vector2f relativePointPosition = theRobotPose.toRelative(PointPosition);
-      OUTPUT_TEXT("Turning to point (x, y):  " << relativePointPosition.x() << ", " << relativePointPosition.y());
-      OUTPUT_TEXT("Robot Position: " << -theRobotPose.translation.x() << ", " << -theRobotPose.translation.y() << ", " << 180 + theRobotPose.rotation.toDegrees());
+      //OUTPUT_TEXT("Turning to point (x, y):  " << relativePointPosition.x() << ", " << relativePointPosition.y());
+      //OUTPUT_TEXT("Robot Position: " << -theRobotPose.translation.x() << ", " << -theRobotPose.translation.y() << ", " << 180 + theRobotPose.rotation.toDegrees());
       theTurnToPointSkill(relativePointPosition);
     }
   }

@@ -48,6 +48,10 @@ MODULE(WhistleHandler,
 
 class WhistleHandler : public WhistleHandlerBase
 {
+public:
+  bool isWhistleDetected();
+
+
 private:
   unsigned timeOfLastStateChange = 0; /**< The time when the effective game state last changed. */
   uint8_t lastGameState = STATE_INITIAL; /**< The previous raw game state. */

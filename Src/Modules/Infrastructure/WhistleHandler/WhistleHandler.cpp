@@ -137,3 +137,8 @@ bool WhistleHandler::checkForBallPosition()
   //was in goal in the last 5 seconds
   return !checkBallForGoal || theBallInGoal.timeSinceLastInGoal <= acceptBallInGoalDelay;
 }
+
+
+bool WhistleHandler::isWhistleDetected() {
+  return checkForWhistle();
+}
