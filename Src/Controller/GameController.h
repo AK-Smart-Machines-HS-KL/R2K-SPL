@@ -138,7 +138,7 @@ public:
    * @param stream The stream that provides the parameters.
    * @return Were the parameters correct?
    */
-  bool handleRobotConsole(int robot, In& stream);
+  bool handleRobotTextConsole(int robot, In& stream);
 
   /** Executes the automatic referee. */
   void referee();

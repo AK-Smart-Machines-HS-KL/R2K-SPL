@@ -102,9 +102,4 @@ public:
    */
   bool connected() const { return transferSocket > 0; }
 
-  /**
-   * The functions sends a heartbeat.
-   * @return Was the heartbeat successfully sent?
-   */
-  bool sendHeartbeat();
 };

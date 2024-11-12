@@ -235,10 +235,3 @@ bool TcpComm::send(const unsigned char* buffer, int size)
     return false;
   }
 }
-
-bool TcpComm::sendHeartbeat()
-{
-  ASSERT(connected());
-  int empty = 42;
-  return send(reinterpret_cast<unsigned char*>(&empty), sizeof(empty));
-}
