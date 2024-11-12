@@ -894,7 +894,7 @@ bool RobotTextConsole::handleConsoleLine(const std::string& line)
     result = repoll(stream);
   }
   else if(command == "pr" && mode == SystemCall::simulatedRobot)
-    result = ctrl->gameController.handleRobotConsole(std::atoi(robotName.substr(5).c_str()) - 1, stream);
+    result = ctrl->gameController.handleRobotTextConsole(std::atoi(robotName.substr(5).c_str()) - 1, stream);
   else if(command == "save")
   {
     PREREQUISITE(idModuleTable);

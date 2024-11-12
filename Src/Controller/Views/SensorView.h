@@ -46,9 +46,9 @@ private:
 public:
   /**
    * @param fullName The path to this view in the scene graph
-   * @param RobotTextConsole The robot console which owns \c sensorData.
+   * @param robotTextConsole The robot console which owns \c sensorData.
    */
-  SensorView(const QString& fullName, RobotTextConsole& RobotTextConsole, const FsrSensorData& fsrSensorData,
+  SensorView(const QString& fullName, RobotTextConsole& robotTextConsole, const FsrSensorData& fsrSensorData,
              const InertialSensorData& inertialSensorData, const KeyStates& keyStates,
              const SystemSensorData& systemSensorData, const unsigned& timestamp);
 

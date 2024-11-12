@@ -36,11 +36,11 @@ private:
 public:
   /**
    * @param fullName The path to this view in the scene graph.
-   * @param RobotTextConsole The robot console which owns \c jointSensorData and \c jointRequest.
+   * @param robotTextConsole The robot console which owns \c jointSensorData and \c jointRequest.
    * @param jointSensorData A reference to the jointSensorData representation of the robot console.
    * @param jointRequest A reference to the jointRequest representation of the robot console.
    */
-  JointView(const QString& fullName, RobotTextConsole& RobotTextConsole, const JointSensorData& jointSensorData, const JointRequest& jointRequest);
+  JointView(const QString& fullName, RobotTextConsole& robotTextConsole, const JointSensorData& jointSensorData, const JointRequest& jointRequest);
 
 private:
   /**
