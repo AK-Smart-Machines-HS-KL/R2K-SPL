@@ -20,6 +20,8 @@
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h"
 #include "Representations/Modeling/RobotPose.h"
+#include "Platform/SystemCall.h"
+
 
 
 #include "Representations/MotionControl/ArmMotionRequest.h"
@@ -58,21 +60,18 @@ class SidelineTrainerBotCard : public SidelineTrainerBotCardBase
 {
 private:
   bool isActive = true;
+  bool ballCalled = false;
 
 public:
   // always active
   bool preconditions() const override
   {
-    int timeSinceLastStart = theFrameInfo.getTimeSince(startTime);
-
-    return isActive && (timeSinceLastStart < maxRuntime || timeSinceLastStart > maxRuntime + cooldown)
-      && theGameInfo.state == STATE_PLAYING
-      && theTeammateRoles.isTacticalOffense(theRobotInfo.number);
+    return true;
   }
 
   bool postconditions() const override
   {
-    return true;
+    return !preconditions();
   }
 
 
@@ -88,6 +87,10 @@ public:
       {
         if (preconditions())
         {
+          if (!ballCalled) {
+            SystemCall::say("There's the ball!");
+            ballCalled = true;
+          }
           goto pointing;
         }
       }
@@ -138,7 +141,7 @@ public:
 
         Vector2f relativePointPosition = theRobotPose.toRelative(PointPosition);
         Vector3f relativePointCoordinate3D(relativePointPosition.x(), relativePointPosition.y(), 0.f);
-        OUTPUT_TEXT("Point Position (x, y): " << relativePointPosition.x() << ", " << relativePointPosition.y());
+        //OUTPUT_TEXT("Point Position (x, y): " << relativePointPosition.x() << ", " << relativePointPosition.y());
         thePointAtSkill(relativePointCoordinate3D);
       }
     }
@@ -155,6 +158,7 @@ public:
 
       action
       {
+        theStandSkill();
         theLookForwardSkill();
 
       //Vector2f PointPosition(-4500.f, 0.f);
@@ -163,7 +167,7 @@ public:
       Vector2f relativePointPosition = theRobotPose.toRelative(PointPosition);
       //OUTPUT_TEXT("Turning to point (x, y):  " << relativePointPosition.x() << ", " << relativePointPosition.y());
       //OUTPUT_TEXT("Robot Position: " << -theRobotPose.translation.x() << ", " << -theRobotPose.translation.y() << ", " << 180 + theRobotPose.rotation.toDegrees());
-      theTurnToPointSkill(relativePointPosition);
+      //theTurnToPointSkill(relativePointPosition);
     }
   }
   }

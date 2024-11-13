@@ -12,12 +12,14 @@
 
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/Modeling/RobotPose.h"
+#include "Platform/SystemCall.h"
 
+bool awakeCalled = false;
 
 CARD(InitialCard,
 {,
   CALLS(Activity),
-  CALLS(LookActive),
+  CALLS(LookForward),
   CALLS(PointAt),
   CALLS(PointAtWithArm),
   CALLS(Stand),
@@ -42,15 +44,20 @@ class InitialCard : public InitialCardBase
   {
     theActivitySkill(BehaviorStatus::initial);
     // theLookAtAnglesSkill(0.f, 0.f, 150_deg);
-    theLookActiveSkill();
+    theLookForwardSkill();
     theStandSkill(/* high: */ true);
 
     Vector2f PointPosition = theFieldBall.recentBallPositionOnField();
 
     Vector2f relativePointPosition = theRobotPose.toRelative(PointPosition);
     Vector3f relativePointCoordinate3D(2 * relativePointPosition.x() , 2* relativePointPosition.y() , 0.f);
-    OUTPUT_TEXT("Point Position (x, y): " << relativePointPosition.x() << ", " << relativePointPosition.y());
-    thePointAtSkill(relativePointCoordinate3D);
+    //OUTPUT_TEXT("Point Position (x, y): " << relativePointPosition.x() << ", " << relativePointPosition.y());
+    //thePointAtSkill(relativePointCoordinate3D);
+    if (!awakeCalled){
+        SystemCall::say("I'm wide awake!");
+        awakeCalled = true;
+        OUTPUT_TEXT("Awake call!");
+    }
   }
 };
 
