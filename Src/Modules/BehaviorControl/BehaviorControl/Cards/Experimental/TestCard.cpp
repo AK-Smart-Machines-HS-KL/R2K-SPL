@@ -15,9 +15,16 @@
 // Card Base
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
+#include "Modules\Infrastructure\WhistleHandler\WhistleHandler.h"
 
 // Representations
 #include "Representations/BehaviorControl/FieldBall.h"
+#include "Representations/Infrastructure/FrameInfo.h"
+#include "Representations/Communication/RobotInfo.h"
+#include "Representations/Communication/GameInfo.h"
+#include "Representations/BehaviorControl/TeamBehaviorStatus.h"
+#include "Representations/Modeling/RobotPose.h"
+#include "Platform/SystemCall.h"
 
 //#include <filesystem>
 
@@ -29,10 +36,13 @@ CARD(TestCard,
         CALLS(Activity),
         CALLS(LookForward),
         CALLS(Stand),
+        REQUIRES(FrameInfo),
+        REQUIRES(Whistle),
 
         DEFINES_PARAMETERS(
              {,
                 //Define Params here
+          
              }),
 
         /*
@@ -71,6 +81,24 @@ class TestCard : public TestCardBase
     theLookForwardSkill(); // Head Motion Request
     theStandSkill(); // Standard Motion Request
 
+    SystemCall::playSound("Whistle.wav");
+
+      const int whistleTimeout = 5000;         // Timeout 
+      const float confidenceThreshold = 0.5f;  // Schwellwert 
+
+      // Überprüfung der Pfeifenerkennung
+      if (theFrameInfo.getTimeSince(theWhistle.lastTimeWhistleDetected) < whistleTimeout &&
+        theWhistle.confidenceOfLastWhistleDetection >= confidenceThreshold)
+      {
+        OUTPUT_TEXT("I heard a whistle " << theWhistle.confidenceOfLastWhistleDetection);
+        SystemCall::say("I heard a whistle");
+      }
+      else
+      {
+        OUTPUT_TEXT("No whistle detected " << theWhistle.lastTimeWhistleDetected);
+        SystemCall::say("No whistle detected");
+      }
+    
   }
 };
 

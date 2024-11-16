@@ -9,6 +9,7 @@
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/Communication/GameInfo.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
+#include "Platform/SystemCall.h"
 
 CARD(InitialCard,
   { ,
@@ -35,6 +36,7 @@ class InitialCard : public InitialCardBase
     theActivitySkill(BehaviorStatus::initial);
     theLookAtAnglesSkill(0.f, 0.f, 150_deg);
     theStandSkill(/* high: */ true);
+
   }
 };
 
