@@ -22,6 +22,7 @@
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h"
 #include "Representations/Modeling/RobotPose.h"
+#include "Platform/SystemCall.h"
 
 
 #include "Representations/MotionControl/ArmMotionRequest.h"
@@ -44,6 +45,7 @@ CARD(PointingCard,
      REQUIRES(GameInfo),
      REQUIRES(TeammateRoles),
      REQUIRES(RobotPose),
+     REQUIRES(Whistle),
 
 
      DEFINES_PARAMETERS(
@@ -52,6 +54,9 @@ CARD(PointingCard,
        (int)(10000) cooldown,
        (unsigned)(0) startTime,
        (int)(10000) maxRuntime,
+       (bool)(false) say,
+       (int)(2000) whistleTimeout,
+       (float)(0.5f) confidenceThreshold,
     }),
 
   });
@@ -65,16 +70,24 @@ public:
   // always active
   bool preconditions() const override
   {
-    WhistleHandler whistleHandler;
-     return whistleHandler.isWhistleDetected();
-    
-     
-    
-    //int timeSinceLastStart = theFrameInfo.getTimeSince(startTime);
+    // Überprüfen, ob eine Pfeife erkannt wurde
+    bool whistleDetected = (theFrameInfo.getTimeSince(theWhistle.lastTimeWhistleDetected) < whistleTimeout) &&
+      (theWhistle.confidenceOfLastWhistleDetection >= confidenceThreshold);
 
-    //return isActive && (timeSinceLastStart < maxRuntime || timeSinceLastStart > maxRuntime + cooldown);
+    int timeSinceLastStart = theFrameInfo.getTimeSince(startTime);
+
+    return whistleDetected && isActive && (timeSinceLastStart < maxRuntime || timeSinceLastStart > maxRuntime + cooldown);
+    /*
+    //WhistleHandler whistleHandler;
+     //return whistleHandler.isWhistleDetected();
+    
+    
+    int timeSinceLastStart = theFrameInfo.getTimeSince(startTime);
+
+    return isActive && (timeSinceLastStart < maxRuntime || timeSinceLastStart > maxRuntime + cooldown);
     //  && theGameInfo.setPlay == SET_PLAY_CORNER_KICK
     //  && theTeammateRoles.isTacticalOffense(theRobotInfo.number);
+    */
   }
 
   bool postconditions() const override
@@ -163,7 +176,12 @@ public:
       action
       {
         theLookForwardSkill();
-
+      if (!say) {
+        SystemCall::say("ready");
+        SystemCall::say("set");
+        SystemCall::say("playing");
+        say = true;
+      }
       //Vector2f PointPosition(-4500.f, 0.f);
       Vector2f PointPosition = theFieldBall.recentBallPositionOnField();
 
