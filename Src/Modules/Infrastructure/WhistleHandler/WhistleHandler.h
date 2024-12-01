@@ -20,38 +20,34 @@
 #include "Representations/Modeling/BallInGoal.h"
 
 MODULE(WhistleHandler,
-{,
-  USES(FieldBall),
-  REQUIRES(BallInGoal),
-  REQUIRES(FieldDimensions),
-  REQUIRES(FrameInfo),
-  REQUIRES(OpponentTeamInfo),
-  REQUIRES(OwnTeamInfo),
-  REQUIRES(RawGameInfo),
-  REQUIRES(TeamData),
-  REQUIRES(Whistle),
-  PROVIDES(GameInfo),
-  LOADS_PARAMETERS(
-  {,
-    (int) maxTimeDifference, /**< Time window size of all whistles considered together in ms. */
-    (float) minAvgConfidence, /**< Minimum confidence of all considered whistles required for a detection. */
-    (bool) useWhistleAfterGoal, /**< Whether the whistle can switch the state to ready. */
-    (int) ignoreWhistleAfterKickOff, /**< Time whistles are ignored after switching to playing after a kick-off (in ms). */
-    (int) ignoreWhistleAfterPenaltyKick, /**< Time whistles are ignored after switching to playing after the begin of a penalty kick (in ms). */
-    (bool) checkBallForGoal, /**< Consider ball position when checking whether a goal was announced. */
-    (int) acceptBallInGoalDelay, /**< Time in ms since when a ball has to have been seen in a goal, to accept as a valid goal when referee whistles */
-    (int) gameControllerDelay, /**< Delay after which the GameController should send a changed game state (in ms).*/
-    (int) gameControllerOperatorDelay, /**< Delay with which the operator of the GameController enters the referee's decisions. */
-    (int) acceptPastWhistleDelay, /**< How old can whistles be to be accepted after canceling READY (in ms)? */
-  }),
-});
+  { ,
+    USES(FieldBall),
+    REQUIRES(BallInGoal),
+    REQUIRES(FieldDimensions),
+    REQUIRES(FrameInfo),
+    REQUIRES(OpponentTeamInfo),
+    REQUIRES(OwnTeamInfo),
+    REQUIRES(RawGameInfo),
+    REQUIRES(TeamData),
+    REQUIRES(Whistle),
+    PROVIDES(GameInfo),
+    LOADS_PARAMETERS(
+    {,
+      (int)maxTimeDifference, /**< Time window size of all whistles considered together in ms. */
+      (float)minAvgConfidence, /**< Minimum confidence of all considered whistles required for a detection. */
+      (bool)useWhistleAfterGoal, /**< Whether the whistle can switch the state to ready. */
+      (int)ignoreWhistleAfterKickOff, /**< Time whistles are ignored after switching to playing after a kick-off (in ms). */
+      (int)ignoreWhistleAfterPenaltyKick, /**< Time whistles are ignored after switching to playing after the begin of a penalty kick (in ms). */
+      (bool)checkBallForGoal, /**< Consider ball position when checking whether a goal was announced. */
+      (int)acceptBallInGoalDelay, /**< Time in ms since when a ball has to have been seen in a goal, to accept as a valid goal when referee whistles */
+      (int)gameControllerDelay, /**< Delay after which the GameController should send a changed game state (in ms).*/
+      (int)gameControllerOperatorDelay, /**< Delay with which the operator of the GameController enters the referee's decisions. */
+      (int)acceptPastWhistleDelay, /**< How old can whistles be to be accepted after canceling READY (in ms)? */
+    }),
+  });
 
 class WhistleHandler : public WhistleHandlerBase
 {
-public:
-  bool isWhistleDetected();
-
-
 private:
   unsigned timeOfLastStateChange = 0; /**< The time when the effective game state last changed. */
   uint8_t lastGameState = STATE_INITIAL; /**< The previous raw game state. */
