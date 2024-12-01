@@ -1,6 +1,6 @@
 /**
  * @file PointingCard.cpp
- * @author Jonathan Brauch
+ * @author Jobr1005@stud.hs-kl.de
  * @date 2024-12-01
  *
  *
@@ -52,6 +52,9 @@ CARD(PointingCard,
         (int)(90) fieldOfViewAngle,
         (int)(3000) whistleTimeout,
         (float)(0.5f) confidenceThreshold,
+
+        //Um auf festen Punkt zu zeigen
+        //(Vector2f)(-4500.f, 0.f) pointPosition,
      }),
 
   });
@@ -91,6 +94,7 @@ public:
 
     return isActive && (timeSinceLastStart < maxRuntime || timeSinceLastStart > maxRuntime + cooldown);
     */
+
   }
 
   bool postconditions() const override
@@ -156,10 +160,10 @@ public:
         theLookForwardSkill();
         theStandSkill();
 
-        //Vector2f pointposition(-4500.f, 0.f);
-        Vector2f pointposition = theFieldBall.recentBallPositionOnField();
+        //Um auf Ball zu zeigen
+        Vector2f pointPosition = theFieldBall.recentBallPositionOnField();
 
-        Vector2f relativePointPosition = theRobotPose.toRelative(pointposition);
+        Vector2f relativePointPosition = theRobotPose.toRelative(pointPosition);
         Vector3f relativePointCoordinate3D(relativePointPosition.x(), relativePointPosition.y(), 0.f);
         //OUTPUT_TEXT("Point Position (x, y): " << relativePointPosition.x() << ", " << relativePointPosition.y());
         thePointAtSkill(relativePointCoordinate3D);
@@ -180,13 +184,13 @@ public:
       {
         theLookForwardSkill();
 
-      //Vector2f pointposition(-4500.f, 0.f);
-      Vector2f pointposition = theFieldBall.recentBallPositionOnField();
+        //Um auf Ball zu zeigen
+        Vector2f pointPosition = theFieldBall.recentBallPositionOnField();
 
-      Vector2f relativePointPosition = theRobotPose.toRelative(pointposition);
-      //OUTPUT_TEXT("Turning to point (x, y):  " << relativePointPosition.x() << ", " << relativePointPosition.y());
-      //OUTPUT_TEXT("Robot Position: " << -theRobotPose.translation.x() << ", " << -theRobotPose.translation.y() << ", " << 180 + theRobotPose.rotation.toDegrees());
-      theTurnToPointSkill(relativePointPosition);
+        Vector2f relativePointPosition = theRobotPose.toRelative(pointPosition);
+        //OUTPUT_TEXT("Turning to point (x, y):  " << relativePointPosition.x() << ", " << relativePointPosition.y());
+        //OUTPUT_TEXT("Robot Position: " << -theRobotPose.translation.x() << ", " << -theRobotPose.translation.y() << ", " << 180 + theRobotPose.rotation.toDegrees());
+        theTurnToPointSkill(relativePointPosition);
       }
     }
   }
@@ -194,26 +198,26 @@ public:
   bool isPointInFieldOfView()
   {
 
-  //Vector2f pointposition(-4500.f, 0.f);
-  Vector2f pointposition = theFieldBall.recentBallPositionOnField();
+    //Um auf Ball zu zeigen
+    Vector2f pointPosition = theFieldBall.recentBallPositionOnField();
 
-  // Berechne die Differenz der x- und y-Koordinaten zwischen Ihrer Position und der des Punktes
-  double dx = pointposition.x() - theRobotPose.translation.x();
-  double dy = pointposition.y() - theRobotPose.translation.y();
+    // Berechne die Differenz der x- und y-Koordinaten zwischen Ihrer Position und der des Punktes
+    double dx = pointPosition.x() - theRobotPose.translation.x();
+    double dy = pointPosition.y() - theRobotPose.translation.y();
 
-  // Berechne den Winkel des Punktes relativ zur Position des Roboters
-  double anglePoint = fmod((atan2(dy, dx) * (180.0 / M_PI) + 360.0), 360.0);
-  double rotation = theRobotPose.rotation.toDegrees();
+    // Berechne den Winkel des Punktes relativ zur Position des Roboters
+    double anglePoint = fmod((atan2(dy, dx) * (180.0 / M_PI) + 360.0), 360.0);
+    double rotation = theRobotPose.rotation.toDegrees();
 
-  // Berechne den minimalen und maximalen Winkel des zeigbaren Bereichs
-  double minAngle = fmod((rotation - fieldOfViewAngle + 360.0), 360.0);
-  double maxAngle = fmod((rotation + fieldOfViewAngle + 360.0), 360.0);
+    // Berechne den minimalen und maximalen Winkel des zeigbaren Bereichs
+    double minAngle = fmod((rotation - fieldOfViewAngle + 360.0), 360.0);
+    double maxAngle = fmod((rotation + fieldOfViewAngle + 360.0), 360.0);
 
-  // Überprüfe, ob der Winkel des Balls innerhalb des zeigbaren Bereichs liegt
-  if (minAngle < maxAngle)
-    return minAngle <= anglePoint && anglePoint <= maxAngle;
-  else
-    return anglePoint >= minAngle || anglePoint <= maxAngle;
+    // Überprüfe, ob der Winkel des Balls innerhalb des zeigbaren Bereichs liegt
+    if (minAngle < maxAngle)
+      return minAngle <= anglePoint && anglePoint <= maxAngle;
+    else
+      return anglePoint >= minAngle || anglePoint <= maxAngle;
   }
 
 };
