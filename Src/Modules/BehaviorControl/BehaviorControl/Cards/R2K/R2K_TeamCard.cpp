@@ -184,9 +184,9 @@ private:
       //      R2K_NORMAL_GAME, R2K_DEFENSIVE_GAME,R2K_OFFENSIVE_GAME, R2K_SPARSE_GAME
 
       // 1 player
-        { {GN,UN,UN,UN,UN}, {GN,UN,UN,UN,UN}, {GN,UN,UN,UN,UN}, {OM,UN,UN,UN,UN} },
+        { {GN,UN,UN,UN,UN}, {GN,UN,UN,UN,UN}, {GA,UN,UN,UN,UN}, {OM,UN,UN,UN,UN} },
         // 2 player
-            { {GN,OM,UN,UN,UN}, {GN,OM,UN,UN,UN}, {GN,OM,UN,UN,UN}, {DM,OM,UN,UN,UN} },
+            { {GN,OM,UN,UN,UN}, {GN,OM,UN,UN,UN}, {GA,OM,UN,UN,UN}, {DM,OM,UN,UN,UN} },
             // 3 player
                 { {GN,DM,OM,UN,UN}, {GN,DR,DM,UN,UN}, {GA,DM,OM,UN,UN}, {GN,OR,OM,UN,UN} },
                 // 4 player
