@@ -8,6 +8,9 @@
  * Makes the Offensive and Defensive robots wait until the ball has been Kicked after Kickoff
  * 
  * V1.1 Card migrated (Nicholas)
+ * V1.2 Wait (do nothing): for 10 sec after STATE_PLAYING was seen first
+        or opponent has moved the ball for at least .25cm (Adrian)
+        Note: using ExtendedGameInfo to get time since last STATE_PLAYING
  */
 
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
@@ -17,6 +20,7 @@
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h"
 #include "Representations/Infrastructure/FrameInfo.h"
+#include "Representations/Infrastructure/ExtendedGameInfo.h"
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/TeamInfo.h"
@@ -28,30 +32,34 @@
 
 
 CARD(OppKickoffCard,
-{,
-  CALLS(Stand),
-  CALLS(Activity),
-  CALLS(LookForward),
-  CALLS(GoToBallAndKick),
+  { ,
+    CALLS(Stand),
+    CALLS(Activity),
+    CALLS(LookForward),
+    CALLS(GoToBallAndKick),
 
-  REQUIRES(FieldBall),
-  REQUIRES(FieldDimensions),
-  REQUIRES(FrameInfo),
-  REQUIRES(GameInfo),
-  REQUIRES(RobotInfo),
-  REQUIRES(RobotPose),
-  REQUIRES(OwnTeamInfo),
-  REQUIRES(TeamBehaviorStatus),
-  REQUIRES(TeammateRoles),
+    REQUIRES(FieldBall),
+    REQUIRES(FieldDimensions),
+    REQUIRES(FrameInfo),
+    REQUIRES(GameInfo),
+    REQUIRES(ExtendedGameInfo),
+    REQUIRES(RobotInfo),
+    REQUIRES(RobotPose),
+    REQUIRES(OwnTeamInfo),
+    REQUIRES(TeamBehaviorStatus),
+    REQUIRES(TeammateRoles),
 
-  DEFINES_PARAMETERS(
-  {,
-    (float)(200.0f) ballKickedThreshold,
-  }),
-});
+    DEFINES_PARAMETERS(
+    {,
+      (float)(200.0f) ballKickedThreshold,
+    }),
+  });
+
+// 
 
 class OppKickoffCard : public OppKickoffCardBase
 {
+
   /**
    * @brief 
    * IF the other Team is kicking 
@@ -60,14 +68,18 @@ class OppKickoffCard : public OppKickoffCardBase
    * AND the ball is still near the cneter point
    * AND the Robot is not the Goalie
    */
+
   bool preconditions() const override
   {
-    return theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
-      && theFrameInfo.getTimeSince(theGameInfo.timeLastStateChange) <= 1000*10
-      && theGameInfo.state == STATE_PLAYING
+
+    return (
+      theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
+      && !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number)
       && theFieldBall.positionOnField.norm() < ballKickedThreshold
-      && !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number);
-  }
+      // && theGameInfo.secondaryTime > 0  // does not work intentionally in GC 
+      && theExtendedGameInfo.timeSincePlayingStarted < 10000
+      );
+  };
 
   /**
    * @brief Not Precondition
@@ -80,7 +92,7 @@ class OppKickoffCard : public OppKickoffCardBase
   option
   {
     theActivitySkill(BehaviorStatus::oppKickoff);
-    
+
     initial_state(init)
     {
       transition

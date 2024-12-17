@@ -56,7 +56,8 @@ void LEDHandler::update(LEDRequest& ledRequest)
 void LEDHandler::setRightEar(LEDRequest& ledRequest)
 {
   //right ear -> battery
-  setBatteryLevelInEar(ledRequest, LEDRequest::earsRight0Deg);
+  //setBatteryLevelInEar(ledRequest, LEDRequest::earsRight0Deg);
+  setTeammatesInEar(ledRequest, LEDRequest::earsRight0Deg);
 }
 
 void LEDHandler::setLeftEar(LEDRequest& ledRequest)
@@ -239,7 +240,7 @@ void LEDHandler::setChestButton(LEDRequest& ledRequest)
 
 void LEDHandler::setLeftFoot(LEDRequest& ledRequest)
 {
-  switch(theOwnTeamInfo.teamColor)
+  switch(theOwnTeamInfo.fieldPlayerColour)
   {
     case TEAM_ORANGE:
       ledRequest.ledStates[LEDRequest::footLeftGreen] = LEDRequest::half;
@@ -296,6 +297,16 @@ void LEDHandler::setBatteryLevelInEar(LEDRequest& ledRequest, LEDRequest::LED ba
 
   for(int i = 0; i <= onLEDs; ++i)
     ledRequest.ledStates[baseLED + i] = LEDRequest::on;
+}
+
+void LEDHandler::setTeammatesInEar(LEDRequest& ledRequest, LEDRequest::LED baseLED)
+{
+  for (auto &teammate : theTeamData.teammates)
+  {
+    ledRequest.ledStates[baseLED + 2 * (teammate.number - 1)] = LEDRequest::on;
+  }
+
+  ledRequest.ledStates[baseLED + 2 * (theRobotInfo.number - 1)] = LEDRequest::on;
 }
 
 MAKE_MODULE(LEDHandler, behaviorControl);

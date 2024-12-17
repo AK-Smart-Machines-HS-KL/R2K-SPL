@@ -1,4 +1,4 @@
-/**
+   /**
  * @file Skills.h
  *
  * This file declares all skills that are used by the current behavior.
@@ -22,6 +22,7 @@
 #include "Representations/MotionControl/HeadMotionRequest.h"
 #include "Representations/MotionControl/KeyframeMotionRequest.h"
 #include "Representations/MotionControl/MotionRequest.h"
+#include "Representations/BehaviorControl/TI/TIData.h"
 #include "Tools/BehaviorControl/Framework/Skill/Skill.h"
 #include "Tools/BehaviorControl/Interception.h"
 #include "Tools/Math/Angle.h"
@@ -289,10 +290,6 @@ namespace Skills
    */
   SKILL_INTERFACE(TeamSpeaker);
 
-  // Helpers for Team Talk Sync
-  SKILL_INTERFACE(TeamPropagator, (const char&)(-1) index, (const unsigned int&)(0) timestamp);
-  SKILL_INTERFACE(TeamCountdown, (const int&)(0) stateTime);
-
   /**
    * ACTION SKILL
    * This skill controls the head for a robot that walks to the ball.
@@ -320,17 +317,6 @@ namespace Skills
   SKILL_INTERFACE(WalkToPoint, (const Pose2f&) target, (float)(1.f) speed,
                   (bool)(false) rough, (bool)(false) disableObstacleAvoidance, (bool)(false) disableAligning,
                   (bool)(false) disableStanding);
-
-  /**
-   * This skill walks to a target that is modified by a potential field.
-   * @param target The target pose in absolute field coordinates
-   * @param playerNumber The number of the player to support or -1
-   * @param straight Walk straight to the target (ballFactor, useRotation and rotation are ignored)
-   * @param ballFactor How much should the robot turn to the ball when moving to its target in [0, 1]
-   * @param useRotation Use \c rotation when close the target instead of the rotation to the ball
-   * @param rotation The rotation relative to the robot if \c useRotation is true
-   */
-  SKILL_INTERFACE(WalkPotentialField, (const Vector2f&) target, (int) playerNumber, (bool)(false) straight, (float)(0.5f) ballFactor, (bool)(false) useRotation, (float)(0.f) rotation);
 
   /**
    * ACTION SKILL
@@ -427,4 +413,16 @@ namespace Skills
    * This skill can be used to request a reload of the jointCalibration.cfg.
    */
   SKILL_INTERFACE(ReloadJointCalibration);
+
+  /**
+   * @brief This Skill executes the subskill as defined by the action given
+   * @param pAction Skill and parameters to be executed
+   */
+	SKILL_INTERFACE(TIExecute, (const PlaybackAction&) pAction);
+
+  /**
+   * @brief 
+   * @param idx
+   */
+	SKILL_INTERFACE(TIPlayback, (int) idx, (bool)(false) reset);
 }

@@ -15,7 +15,8 @@
 #include "Tools/Communication/BHumanTeamMessageParts/BHumanMessageParticle.h"
 #include "Tools/MessageQueue/MessageIDs.h"
 #include "Tools/Settings.h"
-
+#include "Tools/Communication/MessageComponents/BNTPRequest.h"
+#include "Tools/Communication/MessageComponents/BNTPResponse.h"
 /**
  * @struct BNTPRequest
  *
@@ -81,17 +82,25 @@ public:
   }
 };
 
+  using namespace std::placeholders; // for _1 _2 etc.
+
 /**
  * @class BNTP
  *
  * Implementation of the Network Time Protocol.
  */
-class BNTP : public BHumanMessageParticle<MessageID::undefined>
+class BNTP
 {
 public:
-  /** BHumanMessageParticle functions */
-  void operator>>(BHumanMessage& m) const override;
-  void operator<<(const BHumanMessage& m) override;
+
+  void rcvRequest(BNTPRequestComponent *, RobotMessageHeader &);
+  void rcvResponse(BNTPResponseComponent *, RobotMessageHeader &);
+
+  void sndRequest(BNTPRequestComponent *);
+  void sndResponse(BNTPResponseComponent *);
+
+  // Frame Update
+  void update();
 
   const SynchronizationMeasurementsBuffer* operator[](unsigned number) const
   {
@@ -100,6 +109,13 @@ public:
   }
 
 private:
+  // Callback References
+  BNTPRequestComponent::Callback requestCallback = BNTPRequestComponent::onRecieve.add(std::bind(&BNTP::rcvRequest, this, _1, _2));
+  BNTPRequestComponent::Compiler requestCompiler = BNTPRequestComponent::onCompile.add(std::bind(&BNTP::sndRequest, this, _1));
+
+  BNTPResponseComponent::Callback responseCallback = BNTPResponseComponent::onRecieve.add(std::bind(&BNTP::rcvResponse, this, _1, _2));
+  BNTPResponseComponent::Compiler responseCompiler = BNTPResponseComponent::onCompile.add(std::bind(&BNTP::sndResponse, this, _1));
+
   static constexpr int ntpRequestInterval = 10000; /**< Request an NTP message every $ ms. */
 
   unsigned lastNTPRequestSent = 0; /**< The point of time when the last NTP request has been sent to the team. */
@@ -115,5 +131,5 @@ public:
    * @param theFrameInfo Contains the current time.
    * @param theRobotInfo Contains the player number.
    */
-  BNTP(const FrameInfo& theFrameInfo, const RobotInfo& theRobotInfo) : theFrameInfo(theFrameInfo), theRobotInfo(theRobotInfo) {}
+  BNTP(const FrameInfo& theFrameInfo, const RobotInfo& theRobotInfo);
 };

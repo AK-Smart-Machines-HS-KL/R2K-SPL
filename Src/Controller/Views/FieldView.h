@@ -13,10 +13,10 @@
 #include <QPainter>
 
 #include <SimRobot.h>
-#include "Controller/RobotConsole.h"
+#include "Controller/RobotTextConsole.h"
 #include "Representations/Configuration/FieldDimensions.h"
 
-class RobotConsole;
+class RobotTextConsole;
 
 /**
  * @class FieldView
@@ -33,12 +33,12 @@ public:
    * @param console The console object.
    * @param name The name of the view.
    */
-  FieldView(const QString& fullName, RobotConsole& console, const std::string& name);
+  FieldView(const QString& fullName, RobotTextConsole& console, const std::string& name);
 
 private:
   const QString fullName; /**< The path to this view in the scene graph */
   const QIcon icon; /**< The icon used for listing this view in the scene graph */
-  RobotConsole& console; /**< A reference to the console object. */
+  RobotTextConsole& console; /**< A reference to the console object. */
   const std::string name; /**< The name of the view. */
 
   /**

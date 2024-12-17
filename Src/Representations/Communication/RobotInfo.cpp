@@ -31,6 +31,17 @@ void RobotInfo::draw() const
   }
 }
 
+std::string RobotInfo::getModeAsString() const
+{
+  switch(mode)
+  {
+    case active: return "Active";
+    case calibration: return "Calibatrion";
+    case unstiff: return "Unstiff";
+    default: return "Unknown";
+  }
+}
+
 std::string RobotInfo::getPenaltyAsString() const
 {
   switch(penalty)
@@ -46,6 +57,7 @@ std::string RobotInfo::getPenaltyAsString() const
     case PENALTY_SPL_ILLEGAL_POSITION_IN_SET: return "Illegal Position in Set";
     case PENALTY_SUBSTITUTE: return "Substitute";
     case PENALTY_MANUAL: return "Manual";
+    case PENALTY_SPL_ILLEGAL_MOTION_IN_STANDBY: return "Thomas";
     default: return "None";
   }
 }

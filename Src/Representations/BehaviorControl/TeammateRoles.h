@@ -12,21 +12,23 @@
 #pragma once
 
 #include "Tools/Streams/AutoStreamable.h"
+#include "Tools/Settings.h"
 #include <vector>
+#include "Representations/Communication/RobotInfo.h"
 
 STREAMABLE(TeammateRoles,
 {
  ENUM(R2K_TEAM_ROLES,
   {,
-    UNDEFINED,
-    GOALKEEPER_NORMAL,
+    GOALKEEPER_NORMAL,  // 0
     GOALKEEPER_ACTIVE,
-    DEFENSE_LEFT,
+    DEFENSE_LEFT,       // 2
     DEFENSE_MIDDLE,
     DEFENSE_RIGHT,
-    OFFENSE_LEFT,
+    OFFENSE_LEFT,       // 5
     OFFENSE_MIDDLE,
-    OFFENSE_RIGHT,
+    OFFENSE_RIGHT,      // 7
+    UNDEFINED,
   });
 
 
@@ -35,16 +37,21 @@ STREAMABLE(TeammateRoles,
   bool isTacticalOffense(const int robotNumber) const;
   bool isTacticalDefense(const int robotNumber) const;
   bool playsTheBall(const int robotNumber) const;
+  bool playsTheBall(const RobotInfo *info, const bool wifi) const;   // online/offline variant
+
+  // communication offline utils 
+
+  int  defenseRoleIndex(const int robotNumber) const;    // 0 = left most defense by robot number, 1 = one more defense to the right up to n
+  int  defenseRoleIndex(const RobotInfo* info) const;
+  int  offenseRoleIndex(const int robotNumber) const;    // 0 = right most defense, 1 = one more defense to the left
+  int  anyRoleIndex(const int robotNumber) const;    // 0 = right most first any role 
+
+
 
   int operator[](const size_t i) const;
   int& operator[](const size_t i),
 
-    (std::vector<int>) ({ TeammateRoles::GOALKEEPER_NORMAL,
-                          TeammateRoles::DEFENSE_LEFT,
-                          TeammateRoles::DEFENSE_RIGHT,
-                          TeammateRoles::OFFENSE_LEFT,
-                          TeammateRoles::OFFENSE_RIGHT,
-                          TeammateRoles::UNDEFINED })roles, /** The R2K role assignment for all robots in the team */
+    (std::vector<int>) (std::vector<int>(Settings::highestValidPlayerNumber))roles, /** The R2K role assignment for all robots in the team */
     (int)(-1) captain, /**< The number of the robot which calculated this role assignment. */
     (unsigned)(0) timestamp, /**< The timestamp when this role assignment has been calculated. */ 
 });

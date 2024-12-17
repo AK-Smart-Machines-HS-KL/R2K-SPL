@@ -115,7 +115,8 @@ else()
       -Wno-implicit-int-float-conversion
       -Wunreachable-code
       -Xclang
-      -fno-pch-timestamp)
+      -fno-pch-timestamp
+      -w)
   if(BUILD_DESKTOP)
     if(NOT ${CMAKE_SYSTEM_PROCESSOR} STREQUAL arm64) # Option does not work on Apple M1, but "The Internet" says it also causes trouble on multiple other arm platforms.
       add_compile_options(-march=native)
@@ -328,6 +329,10 @@ if(BUILD_DESKTOP AND (${PLATFORM} STREQUAL Linux))
   set_target_properties(flite::flite_cmulex PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/flite/lib/${PLATFORM}/libflite_cmulex.a")
   set_target_properties(flite::flite PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/flite/lib/${PLATFORM}/libflite.a")
 endif()
+
+add_library(bitproto STATIC "${BHUMAN_PREFIX}/Util/bitproto/lib/c/bitproto.c")
+target_include_directories(bitproto PUBLIC "${BHUMAN_PREFIX}/Util/bitproto/lib/c")
+set_target_properties(bitproto PROPERTIES LINKER_LANGUAGE CXX)
 
 if(NOT ${PLATFORM} STREQUAL macOSarm64)
   include("../CMake/asmjit.cmake")

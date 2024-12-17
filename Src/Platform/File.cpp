@@ -12,6 +12,7 @@
 
 #include <cstdarg>
 #include <cstdio>
+#include <dirent.h>
 
 #ifdef WINDOWS
 #define ftell _ftelli64
@@ -157,4 +158,46 @@ std::list<std::string> File::getConfigDirs()
 #endif
   dirs.push_back(configDir);
   return dirs;
+}
+
+std::list<std::string> File::getSubDirs(std::string path)
+{
+  DIR *dir;
+  dirent *ent;
+  std::list<std::string> subDirs;
+
+  if ((dir = opendir(path.c_str())) != nullptr)
+  {
+    while ((ent = readdir(dir)) != nullptr)
+    {
+      std::string dirName = ent->d_name;
+
+      if(ent->d_type == DT_DIR && dirName != "." && dirName != "..")
+        subDirs.push_back(dirName);
+    }
+
+    closedir(dir);
+  } 
+
+  return subDirs;
+}
+
+std::list<std::string> File::getFiles(std::string path)
+{
+  DIR *dir;
+  dirent *ent;
+  std::list<std::string> files;
+
+  if ((dir = opendir(path.c_str())) != nullptr)
+  {
+    while ((ent = readdir(dir)) != nullptr)
+    {
+      if(ent->d_type == DT_REG)
+        files.push_back(ent->d_name);
+    }
+
+    closedir(dir);
+  } 
+
+  return files;
 }

@@ -15,3 +15,6 @@ jc press 3 call Includes/Joystick
 jc press 4 call Includes/Joystick
 
 echo mr JPEGImage off
+
+vfd worldState cognition:RobotPose
+vfd worldState module:ShotPredictor 

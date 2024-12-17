@@ -5,7 +5,7 @@
 
 #include "AnnotationView.h"
 #include "Controller/RoboCupCtrl.h"
-#include "Controller/RobotConsole.h"
+#include "Controller/RobotTextConsole.h"
 #include "Platform/SystemCall.h"
 #include "Platform/Time.h"
 

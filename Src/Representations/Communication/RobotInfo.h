@@ -28,6 +28,8 @@ public:
 
   RobotInfo();
 
+  std::string getModeAsString() const;
+
   std::string getPenaltyAsString() const;
 
   bool isGoalkeeper() const;

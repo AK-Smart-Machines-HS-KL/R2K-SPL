@@ -16,6 +16,7 @@ CARD(GameControlCard,
   LOADS_PARAMETERS(
   {,
     (DeckOfCards<CardRegistry>) deck, /**< The deck from which a card is played. */
+
   }),
 });
 

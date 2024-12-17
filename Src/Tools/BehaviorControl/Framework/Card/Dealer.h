@@ -82,6 +82,7 @@ public:
     lastCard = nextCard;
     return nextCard;
   }
+
   /** Lets the dealer forget the previously dealt card. */
   void reset()
   {

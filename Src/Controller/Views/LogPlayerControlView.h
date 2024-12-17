@@ -9,7 +9,7 @@
 #include <QWidget>
 
 class LogPlayerControlWidget;
-class RobotConsole;
+class RobotTextConsole;
 
 class QLabel;
 class QPushButton;
@@ -20,13 +20,13 @@ class LogPlayerControlView : public SimRobot::Object
 private:
   const QString fullName; /**< The path to this view in the scene graph */
   LogPlayer& logPlayer;
-  RobotConsole& console;
+  RobotTextConsole& console;
   const QIcon icon; /**< The icon used to list this view in the scene graph */
 
   friend class LogPlayerControlWidget;
 
 public:
-  LogPlayerControlView(const QString& fullName, LogPlayer& logPlayer, RobotConsole& console) :
+  LogPlayerControlView(const QString& fullName, LogPlayer& logPlayer, RobotTextConsole& console) :
     fullName(fullName), logPlayer(logPlayer), console(console), icon(":/Icons/tag_green.png")
   {}
 

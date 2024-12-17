@@ -24,14 +24,14 @@
 
 #include "ImageView.h"
 #include "Controller/RoboCupCtrl.h"
-#include "Controller/RobotConsole.h"
+#include "Controller/RobotTextConsole.h"
 #include "Controller/Visualization/PaintMethods.h"
 #include "Tools/ImageProcessing/ColorModelConversions.h"
 #include "Tools/ImageProcessing/PixelTypes.h"
 
 #include "Tools/Math/Eigen.h"
 
-ImageView::ImageView(QString fullName, RobotConsole& console, std::string background, std::string name, std::string threadIdentifier, float gain, float ddScale) :
+ImageView::ImageView(QString fullName, RobotTextConsole& console, std::string background, std::string name, std::string threadIdentifier, float gain, float ddScale) :
   threadIdentifier(std::move(threadIdentifier)), fullName(std::move(fullName)), icon(":/Icons/tag_green.png"), console(console),
   background(std::move(background)), name(std::move(name)),
   gain(gain), ddScale(ddScale)
@@ -85,8 +85,8 @@ void ImageWidget::paint(QPainter& painter)
   SYNC_WITH(imageView.console);
 
   const DebugImage* image = nullptr;
-  RobotConsole::Images& currentImages = imageView.console.threadData[imageView.threadIdentifier].images;
-  RobotConsole::Images::const_iterator i = currentImages.find(imageView.background);
+  RobotTextConsole::Images& currentImages = imageView.console.threadData[imageView.threadIdentifier].images;
+  RobotTextConsole::Images::const_iterator i = currentImages.find(imageView.background);
 
   if(i != currentImages.end())
   {
@@ -198,8 +198,8 @@ bool ImageWidget::needsRepaint() const
 {
   SYNC_WITH(imageView.console);
   DebugImage* image = nullptr;
-  RobotConsole::Images& currentImages = imageView.console.threadData[imageView.threadIdentifier].images;
-  RobotConsole::Images::const_iterator j = currentImages.find(imageView.background);
+  RobotTextConsole::Images& currentImages = imageView.console.threadData[imageView.threadIdentifier].images;
+  RobotTextConsole::Images::const_iterator j = currentImages.find(imageView.background);
   if(j != currentImages.end())
     image = j->second.image;
 
@@ -247,8 +247,8 @@ void ImageWidget::mouseMoveEvent(QMouseEvent* event)
   window2viewport(pos);
 
   DebugImage* image = nullptr;
-  RobotConsole::Images& currentImages = imageView.console.threadData[imageView.threadIdentifier].images;
-  RobotConsole::Images::const_iterator i = currentImages.find(imageView.background);
+  RobotTextConsole::Images& currentImages = imageView.console.threadData[imageView.threadIdentifier].images;
+  RobotTextConsole::Images::const_iterator i = currentImages.find(imageView.background);
   if(i != currentImages.end())
     image = i->second.image;
 
@@ -406,10 +406,10 @@ void ImageWidget::mouseReleaseEvent(QMouseEvent* event)
       {
         switch(token.type)
         {
-          case RobotConsole::ImageViewCommand::Token::literal:
+          case RobotTextConsole::ImageViewCommand::Token::literal:
             ss << token.string;
             break;
-          case RobotConsole::ImageViewCommand::Token::placeholder:
+          case RobotTextConsole::ImageViewCommand::Token::placeholder:
             if(token.id == 1)
               ss << v.x();
             else if(token.id == 2)
@@ -566,8 +566,8 @@ void ImageWidget::saveImg()
   SYNC_WITH(imageView.console);
 
   const DebugImage* image = nullptr;
-  RobotConsole::Images& currentImages = imageView.console.threadData[imageView.threadIdentifier].images;
-  RobotConsole::Images::const_iterator i = currentImages.find(imageView.background);
+  RobotTextConsole::Images& currentImages = imageView.console.threadData[imageView.threadIdentifier].images;
+  RobotTextConsole::Images::const_iterator i = currentImages.find(imageView.background);
 
   if(i != currentImages.end())
   {

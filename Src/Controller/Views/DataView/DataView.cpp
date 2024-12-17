@@ -15,7 +15,7 @@
 #include <QEvent>
 
 DataView::DataView(const QString& fullName, const std::string& repName,
-                   RobotConsole& console, const TypeInfo& typeInfo) :
+                   RobotTextConsole& console, const TypeInfo& typeInfo) :
   theFullName(fullName), theIcon(":/Icons/tag_green.png"),
   theConsole(console), theName(repName), typeInfo(typeInfo)
 {}

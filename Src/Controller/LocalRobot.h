@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "Controller/RobotConsole.h"
+#include "Controller/RobotTextConsole.h"
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Representations/Infrastructure/GroundTruthWorldState.h"
 #include "Representations/Infrastructure/CameraImage.h"
@@ -29,7 +29,7 @@ class SimulatedRobot;
  * A thread that is instantiated to either directly control a physical robot,
  * a simulated one, or to replay a log file.
  */
-class LocalRobot : public RobotConsole
+class LocalRobot : public RobotTextConsole
 {
 private:
   CameraImage cameraImage; /**< The simulated camera image sent to the robot code. */

@@ -9,6 +9,10 @@
  *  added (Adrian): pre-condition: triggers for role.playBall, action: WalkToBallAndKickAtGoal
  * 
  * V1.1 Card migrated (Nicholas)
+ * v1.2.added functionality to OwnCornerKick: OFFENSE goes to ball and kick to goal" (Adrian)
+ * v1.3 Added online and offline role assignment(Asrar)
+ * v1.4 (Asrar) card is  for  ballWasSeenStickyPeriod (5000msec), i.e., bot assumes ball to be at the last-seen position
+ *                 Applied this parameter by changing the postcondition().
  */
 
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
@@ -25,6 +29,7 @@
 #include "Representations/Communication/RobotInfo.h"
 
 #include "Representations/Modeling/RobotPose.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 #include "Tools/Math/Geometry.h"
 
@@ -44,20 +49,31 @@ CARD(OwnCornerKickCard,
   REQUIRES(GameInfo),
   REQUIRES(TeamBehaviorStatus),
   REQUIRES(TeammateRoles),
+  REQUIRES(TeamCommStatus),  // wifi on off?
+
+  DEFINES_PARAMETERS(
+    {,
+      (bool)(false) footIsSelected,  // freeze the first decision
+      (bool)(true) leftFoot,
+      (Vector2f)(Vector2f(1000.0f, -340.0f)) kickTarget, // Based on 20_deg setup angle in ready card; This is a 20 degree shot
+      (int)(5000) ballWasSeenStickyPeriod,  // freeze the first decision
+    }),
 });
 
 class OwnCornerKickCard : public OwnCornerKickCardBase
 {
-  KickInfo::KickType kickType;
+
   /**
    * @brief The condition that needs to be met to execute this card
    */
   bool preconditions() const override
   {
-		return /*deprecated theTeamBehaviorStatus.role.playBall*/
-        theTeammateRoles.playsTheBall(theRobotInfo.number)
-        && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
-        && theGameInfo.setPlay == SET_PLAY_CORNER_KICK;
+   
+    
+    return  theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)  // I am the striker
+      && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
+      && theGameInfo.setPlay == SET_PLAY_CORNER_KICK
+      && theTeammateRoles.isTacticalOffense(theRobotInfo.number); // My recent role
   }
 
   /**
@@ -65,61 +81,26 @@ class OwnCornerKickCard : public OwnCornerKickCardBase
    */
   bool postconditions() const override
   {
-    return !preconditions();
+    return 
+      !theFieldBall.ballWasSeen(ballWasSeenStickyPeriod)
+      ||
+      theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
+      || theGameInfo.setPlay != SET_PLAY_CORNER_KICK;
   }
 
-  option
+  void execute() override
   {
     theActivitySkill(BehaviorStatus::ownFreeKick);
-    
-    initial_state(init)
-    {
-
-      transition
-      {
-        bool leftFoot = theFieldBall.positionRelative.y() < 0;
-        kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
-        goto active;
-      }
-
-      action
-      {
-        
-        
-      }
+    if (!footIsSelected) {  // select only once
+      footIsSelected = true;
+      leftFoot = theFieldBall.positionRelative.y() < 0;
     }
-
-    state(active)
-    {
-      transition
-      {
-
-      }
-
-      action
-      {
-        theLookForwardSkill();
-        theGoToBallAndKickSkill(calcAngleToGoal(), kickType);
-      }
-    }
-
-    state(standby)
-    {
-      transition
-      {
-
-      }
-
-      action
-      {
-        
-      }
-    }
+    KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
+    theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true);
   }
-
   Angle calcAngleToGoal() const
   {
-    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
+    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGoalArea, 0.f)).angle();
   }
 };
 

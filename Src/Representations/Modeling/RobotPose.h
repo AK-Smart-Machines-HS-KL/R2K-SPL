@@ -55,6 +55,11 @@ STREAMABLE_WITH_BASE(RobotPose, Pose2f, COMMA public BHumanMessageParticle<idRob
   /** Converts a point from absolute coordinates to Robot relative coordinates. */
   Vector2f toRelative(const Vector2f& absolutePoint) const;
 
+  /** Converts a pose from Robot relative coordinates to absolute coordinates. */
+  Pose2f toAbsolute(const Pose2f& relativePose) const;
+  /** Converts a pose from absolute coordinates to Robot relative coordinates. */
+  Pose2f toRelative(const Pose2f& absolutePose) const;
+
   /**
    * Computes the standard deviation given the covariance matrix.
    * The unit is the same as for the pose: mm

@@ -8,14 +8,13 @@
 
 #pragma once
 
-#include "Representations/Modeling/BallModel.h"
 #include "Representations/BehaviorControl/BehaviorStatus.h"
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h"
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Representations/Infrastructure/RobotHealth.h"
-#include "Representations/Infrastructure/TeamTalk.h"
 #include "Representations/Modeling/FieldCoverage.h"
 #include "Representations/Modeling/ObstacleModel.h"
+#include "Representations/Modeling/BallModel.h"
 #include "Representations/Modeling/RobotPose.h"
 #include "Representations/Modeling/Whistle.h"
 
@@ -26,8 +25,11 @@
 #include "Tools/Streams/Enum.h"
 
 #include "Tools/Communication/BNTP.h"
+#include "Tools/Communication/MessageComponents/RobotPose.h"
+#include "Tools/Communication/MessageComponents/BallModel.h"
+#include "Tools/Communication/MessageComponents/BehaviorStatus.h"
 
-STREAMABLE(Teammate, COMMA public MessageHandler
+STREAMABLE(Teammate,
 {
   const SynchronizationMeasurementsBuffer* bSMB = nullptr;
 
@@ -41,9 +43,6 @@ STREAMABLE(Teammate, COMMA public MessageHandler
 
   Vector2f getEstimatedPosition(unsigned time) const;
 
-  /** MessageHandler function */
-  bool handleMessage(InMessage& message) override;
-
   ENUM(Status,
   {,
     PENALIZED,                        /** OK   : I receive packets, but robot is penalized */
@@ -51,33 +50,23 @@ STREAMABLE(Teammate, COMMA public MessageHandler
     PLAYING,                          /** BEST : Teammate is standing/walking and has ground contact :-) */
   });
 
-  FieldCoverage theFieldCoverage, /**< Do not log this huge representation! */
-
+  FieldCoverage theFieldCoverage; /**< Do not log this huge representation! */
+  
+  ,
   (int)(-1) number,
-  (bool)(false) isGoalkeeper, /**< This is for a teammate what \c theRobotInfo.isGoalkeeper() is for the player itself. */
-  (bool)(true) isPenalized,
-  (bool)(true) isUpright,
-  (bool)(true) hasGroundContact,
-  (unsigned)(0) timeWhenLastUpright,
-  (unsigned)(0) timeOfLastGroundContact,
+  (bool)(false) isGoalkeeper,             /**< This is for a teammate what \c theRobotInfo.isGoalkeeper() is for the player itself. */
+  (bool)(false) isPenalized,              // Derived in TeamMessageHandler
+  (bool)(true) isUpright,                 // NOT SYNCED 
 
   (unsigned)(0) timeWhenLastPacketSent,
   (unsigned)(0) timeWhenLastPacketReceived,
-  (Status)(PENALIZED) status,
-  (unsigned)(0) timeWhenStatusChanged,
-  (signed char)(0) sequenceNumber,
-  (signed char)(0) returnSequenceNumber,
+  (Status)(PENALIZED) status,             // NOT SYNCED - Partially derived in TeamMessageHandler
+  (unsigned)(0) timeWhenStatusChanged,    // Derived in TeamMessageHandler
 
-  (RobotPose) theRobotPose,
-  (BallModel) theBallModel,
-  (FrameInfo) theFrameInfo,
-  (ObstacleModel) theObstacleModel,
-  (BehaviorStatus) theBehaviorStatus,
-  (Whistle) theWhistle,
-  (TeamBehaviorStatus) theTeamBehaviorStatus,
-
-  (RobotHealth) theRobotHealth,
-  (TeamTalk) theTeamTalk,
+  (RobotPose) theRobotPose,               // SYNCED
+  (BallModel) theBallModel,               // NOT SYNCED
+  (ObstacleModel) theObstacleModel,       // NOT SYNCED
+  (BehaviorStatus) theBehaviorStatus,     // SYNCED
 });
 
 /**
@@ -86,8 +75,24 @@ STREAMABLE(Teammate, COMMA public MessageHandler
  */
 STREAMABLE(TeamData,
 {
+  TeamData();
+
   void draw() const;
-  FUNCTION(void(const SPLStandardMessageBufferEntry* const)) generate,
+
+  Teammate& getBMate(int number);
+
+  void rcvRobotPose(RobotPoseComponent *, RobotMessageHeader &);
+  RobotPoseComponent::Callback robotPoseCallbackRef = RobotPoseComponent::onRecieve.add(std::bind(&TeamData::rcvRobotPose, this, _1, _2));
+
+  void rcvBallModel(BallModelComponent *, RobotMessageHeader&);
+  BallModelComponent::Callback ballModelCallbackRef = BallModelComponent::onRecieve.add(std::bind(&TeamData::rcvBallModel, this, _1, _2));
+
+  void rcvBehaviorStatus(BehaviorStatusComponent *, RobotMessageHeader &);
+  BehaviorStatusComponent::Callback behaviorStatusCallbackRef = BehaviorStatusComponent::onRecieve.add(std::bind(&TeamData::rcvBehaviorStatus, this, _1, _2));
+
+  void rcvMessage(RobotMessageHeader &);
+  CallbackRegistry<std::function<void(RobotMessageHeader&)>>::Callback msgRecieveCallbackRef = RobotMessage::onRecieve.add(std::bind(&TeamData::rcvMessage, this, _1));
+  ,
 
   (std::vector<Teammate>) teammates, /**< An unordered(!) list of all teammates that are currently communicating with me */
   (int)(0) numberOfActiveTeammates,  /**< The number of teammates (in the list) that are at not PENALIZED */

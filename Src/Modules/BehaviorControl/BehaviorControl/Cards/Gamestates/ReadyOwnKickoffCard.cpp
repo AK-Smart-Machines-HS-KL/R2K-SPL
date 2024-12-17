@@ -9,7 +9,8 @@
  * Sets up Robot 5 Behind the Ball so that it may be kicked towards the opponents Field. 
  * 
  * v1.1: Card dynamically select robot instead hardcoding number  (Adrian)
- * v1.2. Card migrated (Adrian)
+ * v1.2. Card migrated (Adrian
+ * v1.3. using offenseIndex for qualifiying (Asrar)
  */
 
 #include "Representations/BehaviorControl/DefaultPose.h"
@@ -20,6 +21,7 @@
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Modeling/RobotPose.h"
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h" 
+#include "Representations/BehaviorControl/TeammateRoles.h"
 
 #include "Tools/Math/Geometry.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
@@ -35,6 +37,8 @@ CARD(ReadyOwnKickoffCard,
     REQUIRES(GameInfo),
     REQUIRES(OwnTeamInfo),
     REQUIRES(RobotPose),
+  REQUIRES(RobotInfo),
+  REQUIRES(TeammateRoles),
   });
 
 class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
@@ -44,7 +48,8 @@ class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
    */
   bool preconditions() const override
   {
-		return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber && theGameInfo.state == STATE_READY;
+    return  theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber 
+      && theGameInfo.state == STATE_READY;
   }
 
   /**
@@ -59,11 +64,24 @@ class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
   {
 
     theActivitySkill(BehaviorStatus::defaultBehavior);
+    Pose2f targetAbsolute = theDefaultPose.ownDefaultPose.translation;
 
-    Vector2f targetRelative = theRobotPose.toRelative(theDefaultPose.ownDefaultPose.translation);
+    switch (theTeammateRoles.offenseRoleIndex(theRobotInfo.number)) {
+    case 0: // right-most offense
+      targetAbsolute = Pose2f(0, -500, 0);  // #5
+      break;
+    case 1: // 
+      targetAbsolute = Pose2f(0, -500, -2500); // #4
+      break;
+    case 2: // OFFENSIVE MODE - we have 3 offense
+      targetAbsolute = Pose2f(0, -1100, 700);
+      break;
+    }
+
+    Pose2f targetRelative = theRobotPose.toRelative(targetAbsolute);
 
     theLookActiveSkill(); // Head Motion Request
-    theWalkToPointSkill(Pose2f(theDefaultPose.ownDefaultPose.rotation - theRobotPose.rotation, targetRelative), 1.0f, true);
+    theWalkToPointSkill(targetRelative, 1.0f, true);
 
   }
   

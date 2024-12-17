@@ -7,7 +7,7 @@
 #pragma once
 
 #include "Tools/Debugging/TcpConnection.h"
-#include "RobotConsole.h"
+#include "RobotTextConsole.h"
 
 class SimulatedRobot;
 
@@ -16,7 +16,7 @@ class SimulatedRobot;
  *
  * A class representing a thread that communicates with a remote robot via TCP.
  */
-class RemoteRobot : public RobotConsole, public TcpConnection
+class RemoteRobot : public RobotTextConsole, public TcpConnection
 {
 private:
   const std::string ip; /**< The ip of the robot. */
@@ -58,7 +58,7 @@ protected:
    */
   void init() override
   {
-    RobotConsole::init();
+    RobotTextConsole::init();
     Thread::nameCurrentThread(robotName + ".RemoteRobot");
   }
 

@@ -1,6 +1,6 @@
 /**
  * @file Tools/Debugging/Modify.h
- * Macros make data visible/editable from the RobotConsole.
+ * Macros make data visible/editable from the RobotTextConsole.
  *
  * @author Michael Spranger
  * @author Tobias Oberlies

@@ -27,27 +27,33 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanCompressedMessageParticle<Behavior
     initial,
     lookAroundAfterPenalty,
     set,
-
+    
+    teachin,
     testingBehavior,
+    goalShot,
     defaultBehavior,
-
     codeReleaseKickAtGoal,
     codeReleasePositionForKickOff,
     
-
     // R2K stuff
-    chaseBallCard,      
-    offenseForwardPassCard, 
+    searchingForBall,
+    blocking,
+    defenseChaseBallCard,      
+    offenseChaseBallCard,      
     clearOwnHalfCard,  
     clearOwnHalfCardGoalie,
     defenseCard,        
     defenseLongShotCard,
-
+    dive,
+    goalShotCard,
     goalieLongShotCard, 
-    offenseFastGoalKick, 
+    offenseFastGoalKick,
+    offenseForwardPassCard,
+    offenseReceivePassCard,
     
     //Game States
     ownFreeKick,
+    ownPenaltyKick,
     oppFreeKick,
 
     ownKickoff,
@@ -58,6 +64,7 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanCompressedMessageParticle<Behavior
     calibrationFinished,
 
     referenceCard,      // R2K
+    searchForBall,  // R2K
   });
 
   /**

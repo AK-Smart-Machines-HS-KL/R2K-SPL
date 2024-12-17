@@ -1,22 +1,23 @@
 # LICENSE
 ------------------------------------------------------------------
-Copyright (c) 2021 B-Human.  All rights reserved.
+Copyright (c) 2024 R-ZWEI KICKERS.  All rights reserved.
 
 
-Preamble: B-Human releases most of the software it uses at RoboCup
-competitions to allow teams participating in the Standard Platform
-League that do not have the resources to develop a complete robot
-soccer system on their own, but still have important contributions
-to make to the goals of RoboCup. We intend to enable such teams to
-benchmark their own scientific approaches in RoboCup competitions.
-We also hope that the scientific community will benefit from their
-work through the publication of their findings.
-A second reason for B-Human releasing its code is that source code
-is the most solid documentation of how problems were actually
-solved.
+Preamble: R-ZWEI Kickers release the software they use at RoboCup
+competitions in compliance with league regulations and to
+provide the tools we develop to other teams in order to further
+scientific development and provide tools and ideas to help newer
+teams set foot in the league, just like they got helped when they
+started out.
+In the spirit of Open Source we want to document the challenges
+we faced as well as the contributions we could make, practical
+and scientific.
 
-
-Parts of this distribution were not developed by B-Human.
+This distribution is derived from B-Humans 2019 codebase, their
+license is provided in a separate adjacent file and applies to
+the software they provided.
+This means that parts of this distribution were not developed
+by R-ZWEI Kickers, but by B-Human and other RoboCup teams.
 This license doesn't apply to these parts, the rights of the
 copyright owners remain.
 
@@ -49,11 +50,11 @@ are met:
    book.
 
 
-THIS SOFTWARE IS PROVIDED BY B-HUMAN ``AS IS'' AND ANY
+THIS SOFTWARE IS PROVIDED BY R-ZWEI KICKERS ``AS IS'' AND ANY
 EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
 THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
-B-HUMAN NOR ITS MEMBERS BE LIABLE FOR ANY DIRECT, INDIRECT,
+R-ZWEI KICKERS NOR ITS MEMBERS BE LIABLE FOR ANY DIRECT, INDIRECT,
 INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
 OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS

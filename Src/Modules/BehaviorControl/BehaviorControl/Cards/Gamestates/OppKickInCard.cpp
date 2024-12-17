@@ -28,6 +28,7 @@
 #include "Representations/Communication/TeamInfo.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/TeamData.h"
+#include "Representations/BehaviorControl/TeammateRoles.h"
 
 #include "Representations/Modeling/RobotPose.h"
 
@@ -44,7 +45,7 @@ CARD(OppKickInCard,
   CALLS(Activity),
   CALLS(LookForward),
   CALLS(GoToBallAndDribble),
-  CALLS(WalkToPose),
+  CALLS(WalkToPoint),
 
   REQUIRES(DefaultPose),
   REQUIRES(FieldBall),
@@ -55,6 +56,9 @@ CARD(OppKickInCard,
   REQUIRES(OwnTeamInfo),
   REQUIRES(RobotPose),
   REQUIRES(TeamData),
+  REQUIRES(RobotInfo),
+  REQUIRES(TeammateRoles),
+
 
   DEFINES_PARAMETERS(
     {,
@@ -75,7 +79,8 @@ class OppKickInCard : public OppKickInCardBase
   bool preconditions() const override
   {
     return theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
-        && theGameInfo.setPlay == SET_PLAY_KICK_IN;
+      && theGameInfo.setPlay == SET_PLAY_KICK_IN
+      && !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number);
   }
 
   /**
@@ -89,24 +94,18 @@ class OppKickInCard : public OppKickInCardBase
   option
   {
     theActivitySkill(BehaviorStatus::oppFreeKick);
-    
+
     initial_state(init)
     {
       isBlocking = true;
       float ownDistToBall = Geometry::distance(theRobotPose.translation, theFieldBall.positionOnField);
 
-      for(auto teammate : theTeamData.teammates)
+      for(auto& teammate : theTeamData.teammates)
       {
         if (ownDistToBall > Geometry::distance(teammate.theRobotPose.translation, theFieldBall.positionOnField)) {
           isBlocking = false;
           break;
         }
-      }
-
-      if (isBlocking) {
-        Vector2f ownGoalPos = Vector2f(theFieldDimensions.xPosOwnGoal, theFieldDimensions.yPosCenterGoal);
-        Vector2f ballToGoal = (ownGoalPos - theFieldBall.positionOnField).normalized(); 
-        blockingPos = theFieldBall.positionOnField + ballToGoal * blockingDistance;
       }
 
       transition
@@ -136,9 +135,12 @@ class OppKickInCard : public OppKickInCardBase
       {
         theLookForwardSkill();
 
-        Pose2f speed = Pose2f(theGlobalOptions.walkSpeed, theGlobalOptions.walkSpeed, theGlobalOptions.walkSpeed);
-        auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(blockingPos, true, false);
-        theWalkToPoseSkill(blockingPos, speed, obstacleAvoidance, true);
+        Vector2f ownGoalPos = Vector2f(theFieldDimensions.xPosOwnGoal, theFieldDimensions.yPosCenterGoal);
+        Vector2f ballToGoal = (ownGoalPos - theFieldBall.positionOnField).normalized();
+        //Translation for walking
+        blockingPos = theRobotPose.toRelative(theFieldBall.positionOnField + ballToGoal * blockingDistance);
+        //Walk closer to blockingPos and face ball
+        theWalkToPointSkill(Pose2f(theFieldBall.positionRelative.angle(), blockingPos));
       }
     }
 
@@ -152,10 +154,8 @@ class OppKickInCard : public OppKickInCardBase
       action
       { 
         theLookForwardSkill();
-
-        Pose2f speed = Pose2f(theGlobalOptions.walkSpeed, theGlobalOptions.walkSpeed, theGlobalOptions.walkSpeed);
-        auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(theDefaultPose.ownDefaultPose, true, false);
-        theWalkToPoseSkill(theDefaultPose.ownDefaultPose, speed, obstacleAvoidance, true);
+        Vector2f targetRelative = theRobotPose.toRelative(theDefaultPose.ownDefaultPose.translation);
+        theWalkToPointSkill(targetRelative);
       }
     }
   }

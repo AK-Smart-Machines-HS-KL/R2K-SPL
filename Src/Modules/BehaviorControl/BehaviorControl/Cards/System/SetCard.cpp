@@ -45,18 +45,9 @@ class SetCard : public SetCardBase
   void execute() override
   {
     theActivitySkill(BehaviorStatus::set);
-    if(theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT)
-      theLookForwardSkill();
-    else if((theGameInfo.setPlay == SET_PLAY_PENALTY_KICK && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber) ? theTeamBehaviorStatus.role.isGoalkeeper() : theTeamBehaviorStatus.role.playsTheBall())
-    {
-      const Vector2f targetOnField = theGameInfo.setPlay == SET_PLAY_PENALTY_KICK ?
-                                     Vector2f(theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber ? theFieldDimensions.xPosOpponentPenaltyMark : theFieldDimensions.xPosOwnPenaltyMark, 0.f) :
-                                     Vector2f::Zero();
-      theLookAtPointSkill((Vector3f() << theRobotPose.inversePose * targetOnField, theBallSpecification.radius).finished());
-    }
-    else
-      theLookActiveSkill(/* withBall: */ false, /* ignoreBall: */ true);
     theStandSkill(/* high: */ true);
+    theLookActiveSkill();
+    
   }
 };
 

@@ -70,6 +70,7 @@ private:
                    LEDRequest::LEDState s);
 
   void setBatteryLevelInEar(LEDRequest& ledRequest, LEDRequest::LED baseLED);
+  void setTeammatesInEar(LEDRequest& ledRequest, LEDRequest::LED baseLED);
 
   void setRightEar(LEDRequest& ledRequest);
   void setLeftEar(LEDRequest& ledRequest);

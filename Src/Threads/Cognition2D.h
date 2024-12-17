@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "Tools/Communication/SPLMessageHandler.h" // include this first to prevent WinSock2.h/Windows.h conflicts
+#include "Tools/Communication/RobotMessageHandler.h" // include this first to prevent WinSock2.h/Windows.h conflicts
 #include "Tools/Framework/FrameExecutionUnit.h"
 
 /**
@@ -20,9 +20,7 @@
 class Cognition2D : public FrameExecutionUnit
 {
 private:
-  SPLMessageHandler::Buffer inTeamMessages;
-  RoboCup::SPLStandardMessage outTeamMessage;
-  SPLMessageHandler theSPLMessageHandler;
+  RobotMessageHandler robotMessageHandler;
 
 public:
 

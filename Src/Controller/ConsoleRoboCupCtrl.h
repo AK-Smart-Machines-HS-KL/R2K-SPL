@@ -14,7 +14,7 @@
 
 #include "BHToolBar.h"
 #include "RoboCupCtrl.h"
-#include "RobotConsole.h"
+#include "RobotTextConsole.h"
 
 class ConsoleView;
 class RemoteRobot;
@@ -35,7 +35,7 @@ private:
   SystemCall::Mode mode; /**< The mode of the robot currently constructed. */
   std::string logFile; /**< States whether the current robot constructed shall play back a log file. */
   ConsoleView* consoleView; /**< The scene graph object that describes the console widget. */
-  std::list<RobotConsole*> selected; /**< The currently selected simulated robot. */
+  std::list<RobotTextConsole*> selected; /**< The currently selected simulated robot. */
   std::list<RemoteRobot*> remoteRobots; /**< The list of all remote robots. */
   std::list<std::string> textMessages; /**< A list of all text messages received in the current frame. */
   bool newLine = true; /**< States whether the last line of text was finished by a new line. */
@@ -44,10 +44,10 @@ private:
   std::set<std::string>::const_iterator currentCompletionIndex; /** Points to the last string that was used for auto completion */
   const DebugRequestTable* debugRequestTable = nullptr; /**< Points to the debug request table used for tab-completion. */
   const ModuleInfo* moduleInfo = nullptr; /**< Points to the solution info used for tab-completion. */
-  const std::unordered_map<std::string, RobotConsole::ThreadData>* threadData = nullptr; /**< Thread data used for tab-completion. */
-  const RobotConsole::Views* imageViews = nullptr; /**< Points to the map of image views used for tab-completion. */
-  const RobotConsole::Views* fieldViews = nullptr; /**< Points to the map of field views used for tab-completion. */
-  const RobotConsole::PlotViews* plotViews = nullptr; /**< Points to the map of plot views used for tab-completion. */
+  const std::unordered_map<std::string, RobotTextConsole::ThreadData>* threadData = nullptr; /**< Thread data used for tab-completion. */
+  const RobotTextConsole::Views* imageViews = nullptr; /**< Points to the map of image views used for tab-completion. */
+  const RobotTextConsole::Views* fieldViews = nullptr; /**< Points to the map of field views used for tab-completion. */
+  const RobotTextConsole::PlotViews* plotViews = nullptr; /**< Points to the map of plot views used for tab-completion. */
   BHToolBar toolBar; /**< The toolbar shown for this controller. */
   static constexpr float ballFriction = -0.35f; /**< The ball friction acceleration (2D only). */
 
@@ -86,10 +86,10 @@ public:
    * @param console Use this console to execute the command.
    * @param scenarioAndLocationOnly Only interpret commands "cs" and "cl".
    */
-  void executeConsoleCommand(std::string command, RobotConsole* console = nullptr, bool scenarioAndLocationOnly = false);
+  void executeConsoleCommand(std::string command, RobotTextConsole* console = nullptr, bool scenarioAndLocationOnly = false);
 
   /**
-   * Execute command using handleCommand() on all currently selected RobotConsole robot
+   * Execute command using handleCommand() on all currently selected RobotTextConsole robot
    * objects
    */
   void executeConsoleCommandOnSelectedRobots(const std::string& command);
@@ -166,25 +166,25 @@ public:
    * The function sets the thread data used by the command completion.
    * @param threadData The new thread data.
    */
-  void setThreadData(const std::unordered_map<std::string, RobotConsole::ThreadData>& threadData) { this->threadData = &threadData; }
+  void setThreadData(const std::unordered_map<std::string, RobotTextConsole::ThreadData>& threadData) { this->threadData = &threadData; }
 
   /**
    * The function sets the map of image views used by the command completion.
    * @param imageViews The map of image views.
    */
-  void setImageViews(const RobotConsole::Views& imageViews) { this->imageViews = &imageViews; }
+  void setImageViews(const RobotTextConsole::Views& imageViews) { this->imageViews = &imageViews; }
 
   /**
    * The function sets the map of field views used by the command completion.
    * @param fieldViews The map of field views.
    */
-  void setFieldViews(const RobotConsole::Views& fieldViews) { this->fieldViews = &fieldViews; }
+  void setFieldViews(const RobotTextConsole::Views& fieldViews) { this->fieldViews = &fieldViews; }
 
   /**
    * The function sets the map of plot views used by the command completion.
    * @param plotViews The map of plot views.
    */
-  void setPlotViews(const RobotConsole::PlotViews& plotViews) { this->plotViews = &plotViews; }
+  void setPlotViews(const RobotTextConsole::PlotViews& plotViews) { this->plotViews = &plotViews; }
 
   /**
    * The function read text from the stream and prints it to the console.
@@ -202,7 +202,7 @@ private:
    * @param scenarioAndLocationOnly Only interpret commands "cs" and "cl".
    */
   void executeFile(const std::string& name1, const std::string& name2,
-                   bool printError, RobotConsole* console, bool scenarioAndLocationOnly);
+                   bool printError, RobotTextConsole* console, bool scenarioAndLocationOnly);
 
   /**
    * The function adds a robot with a certain name to the set of selected robots.

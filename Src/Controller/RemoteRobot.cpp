@@ -10,7 +10,7 @@
 #include "Platform/Time.h"
 
 RemoteRobot::RemoteRobot(const std::string& robotName, const std::string& ip) :
-  RobotConsole(Settings("Nao", "Nao"), robotName, nullptr, nullptr), ip(ip)
+  RobotTextConsole(Settings("Nao", "Nao"), robotName, nullptr, nullptr), ip(ip)
 {
   mode = SystemCall::remoteRobot;
   if(!RoboCupCtrl::controller->is2D)
@@ -92,12 +92,12 @@ void RemoteRobot::announceStop()
 
 void RemoteRobot::update()
 {
-  RobotConsole::update();
+  RobotTextConsole::update();
 
   if(puppet)
   {
-    if(RobotConsole::jointSensorData.timestamp)
-      simulatedRobot->setJointRequest(reinterpret_cast<JointRequest&>(RobotConsole::jointSensorData));
+    if(RobotTextConsole::jointSensorData.timestamp)
+      simulatedRobot->setJointRequest(reinterpret_cast<JointRequest&>(RobotTextConsole::jointSensorData));
     else
       simulatedRobot->setJointRequest(jointRequest);
     if(moveOp != noMove)

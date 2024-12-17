@@ -107,7 +107,7 @@ public:
 protected:
   /**
    * The constructor.
-   * Used by the RobotConsole and by Debug on the robot.
+   * Used by the RobotTextConsole and by Debug on the robot.
    * Note: ThreadFrame cares about the destruction of the pointers.
    * Note: If no messaging is required pass <code>nullptr</code>.
    * @param settings The settings of this thread.
