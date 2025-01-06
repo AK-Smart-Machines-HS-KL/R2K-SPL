@@ -87,7 +87,7 @@ class ChallangeCard : public ChallangeCardBase
       Vector2f inersectionwithOwnXAxis = Vector2f::Zero();
 
       //Calculate Distance to Ball for Kick depedndant on current Position of Ball and ints Speed
-      float minDistance = theBallModel.estimate.velocity.x();
+      float minDistance = calcminDistance();
 
       if (!footIsSelected) {  // select only once
         footIsSelected = true;
@@ -113,6 +113,7 @@ class ChallangeCard : public ChallangeCardBase
       }
       else if (inersectionwithOwnXAxis != Vector2f::Zero()) {
 
+        //Go infronft of Rolling Ball in Preparation to Kick
         theWalkToKickoffPoseSkill(Pose2f(0_deg, inersectionwithOwnXAxis));
 
       }else if(theFieldBall.isRollingTowardsOwnGoal){
@@ -128,6 +129,14 @@ class ChallangeCard : public ChallangeCardBase
     Angle calcAngleToGoal() const
     {
       return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
+    }
+
+    float calcminDistance() const
+    {
+      Vector2f temp1 = theBallModel.estimate.velocity;
+      float temp2 = temp1.x() * temp1.x();
+      float temp3 = temp1.y() * temp1.y();
+      return std::sqrt(temp2 + temp3);
     }
 };
 
