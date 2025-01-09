@@ -24,23 +24,18 @@
 #include "Representations/Modeling/ObstacleModel.h"
 #include "Representations/Communication/TeamData.h"
 #include "Representations/Modeling/BallModel.h"
-
-
+#include "Modules/MotionControl/WalkingEngine/WalkingEngine.h"
 
 //#include <filesystem>
 #include "Tools/Modeling/BallPhysics.h"
 #include "Tools/Math/Eigen.h"
 #include "Tools/BehaviorControl/Interception.h"
-#include "Representations/BehaviorControl/TeamBehaviorStatus.h" 
-#include "Representations/BehaviorControl/TeammateRoles.h"
-#include "Representations/BehaviorControl/PlayerRole.h"
-#include "Representations/Communication/RobotInfo.h"
-#include "Representations/Communication/TeamCommStatus.h"
+
 
 // Modify this card but don't commit changes to keep it clean for other developers
 // Also don't forget to put this card at the top of your Card Stack!
 CARD(ChallangeCard,
-    {
+  {
        ,
        CALLS(Activity),
        CALLS(LookForward),
@@ -50,17 +45,22 @@ CARD(ChallangeCard,
        CALLS(LookAtBall),
        CALLS(WalkToKickoffPose),
        CALLS(GoToBallAndKick),
+       CALLS(GoToBallAndDribble),
+       CALLS(WalkToBallAndKick),
+       CALLS(TurnAngle),
        REQUIRES(FieldBall),
        REQUIRES(RobotPose),
        REQUIRES(RobotInfo),
        REQUIRES(FieldDimensions),
-       REQUIERS(BallModel),
+       REQUIRES(BallModel),
+       REQUIRES(WalkingEngine),
 
 
        DEFINES_PARAMETERS(
       {,
         (bool)(false) footIsSelected,  // freeze the first decision
         (bool)(true) leftFoot,
+         (bool)(false) kicking,
       }),
     });
 
@@ -70,12 +70,12 @@ class ChallangeCard : public ChallangeCardBase
     //always active
     bool preconditions() const override
     {
-        return true;
+        return theFieldBall.timeSinceBallWasSeen < 7000;
     }
 
     bool postconditions() const override
     {
-      return false;
+      return  !(theFieldBall.timeSinceBallWasSeen < 7000) && false;
 
     }
 
@@ -87,7 +87,7 @@ class ChallangeCard : public ChallangeCardBase
       Vector2f inersectionwithOwnXAxis = Vector2f::Zero();
 
       //Calculate Distance to Ball for Kick depedndant on current Position of Ball and ints Speed
-      float minDistance = calcminDistance();
+      float minDistance = 500;
 
       if (!footIsSelected) {  // select only once
         footIsSelected = true;
@@ -96,34 +96,34 @@ class ChallangeCard : public ChallangeCardBase
 
       KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
 
+      if (!kicking) {
+        if (calcDisrtacetoBall() <= minDistance) {
 
-      if(RobotInfo::getTimeToReachBall() <= minDistance){
+          theGoToBallAndKickSkill(calcAngleToGoal(), kickType, false, std::numeric_limits<float>::max(), true, false);
+          //theWalkToBallAndKickSkill(calcAngleToGoal(), kickType, false, 1.f, theWalkingEngine.maxSpeed);
+          //theGoToBallAndDribbleSkill(calcAngleToGoal(), false, 1.f, false, false)
+        }
+        else if (intersectionwithownYAxis != Vector2f::Zero()) {
 
-        theGoToBallAndKickSkill(calcAngleToGoal(), kickType);
-
-      }else if (intersectionwithownYAxis != Vector2f::Zero()) {
-
-        //theWalkToPointSkill(Pose2f(0_deg, ballpos), 0.7f, true, true, false, true);
-
-        //theInterceptBallSkill((unsigned) bit(Interception::walk), false, false);
-
-        theWalkToKickoffPoseSkill(Pose2f(0_deg, intersectionwithownYAxis));
+          theWalkToKickoffPoseSkill(Pose2f(calcAngleToGoal(), intersectionwithownYAxis));
 
 
+        }
+        else if (inersectionwithOwnXAxis != Vector2f::Zero()) {
+
+          //Go infronft of Rolling Ball in Preparation to Kick
+          theWalkToKickoffPoseSkill(Pose2f(calcAngleToGoal(), inersectionwithOwnXAxis));
+
+        }
+        else if (theFieldBall.isRollingTowardsOwnGoal) {
+          theWalkToKickoffPoseSkill(Pose2f(calcAngleToGoal(), theFieldBall.endPositionRelative));
+        }
+        else {
+
+          theLookAtBallSkill();
+          theTurnAngleSkill(calcAngleToGoal());
+        }
       }
-      else if (inersectionwithOwnXAxis != Vector2f::Zero()) {
-
-        //Go infronft of Rolling Ball in Preparation to Kick
-        theWalkToKickoffPoseSkill(Pose2f(0_deg, inersectionwithOwnXAxis));
-
-      }else if(theFieldBall.isRollingTowardsOwnGoal){
-        theWalkToKickoffPoseSkill(Pose2f(0_deg, theFieldBall.endPositionRelative));
-      }else{
-
-        theLookAtBallSkill();
-        theStandSkill();
-      }
-
     }
 
     Angle calcAngleToGoal() const
@@ -131,9 +131,10 @@ class ChallangeCard : public ChallangeCardBase
       return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
     }
 
-    float calcminDistance() const
+    
+    float calcDisrtacetoBall() const
     {
-      Vector2f temp1 = theBallModel.estimate.velocity;
+      Vector2f temp1 = theFieldBall.recentBallPositionRelative();
       float temp2 = temp1.x() * temp1.x();
       float temp3 = temp1.y() * temp1.y();
       return std::sqrt(temp2 + temp3);
