@@ -25,6 +25,8 @@
 #include "Representations/Communication/TeamData.h"
 #include "Representations/Modeling/BallModel.h"
 #include "Modules/MotionControl/WalkingEngine/WalkingEngine.h"
+#include "Representations/BehaviorControl/Libraries/LibWalk.h"
+
 
 //#include <filesystem>
 #include "Tools/Modeling/BallPhysics.h"
@@ -54,6 +56,7 @@ CARD(ChallangeCard,
        REQUIRES(FieldDimensions),
        REQUIRES(BallModel),
        REQUIRES(WalkingEngine),
+       REQUIRES(LibWalk),
 
 
        DEFINES_PARAMETERS(
@@ -99,9 +102,11 @@ class ChallangeCard : public ChallangeCardBase
       if (!kicking) {
         if (calcDisrtacetoBall() <= minDistance) {
 
-          theGoToBallAndKickSkill(calcAngleToGoal(), kickType, false, std::numeric_limits<float>::max(), true, false);
-          //theWalkToBallAndKickSkill(calcAngleToGoal(), kickType, false, 1.f, theWalkingEngine.maxSpeed);
-          //theGoToBallAndDribbleSkill(calcAngleToGoal(), false, 1.f, false, false)
+          // theGoToBallAndKickSkill(calcAngleToGoal(), kickType, false, std::numeric_limits<float>::max(), true, false);
+          // theGoToBallAndDribbleSkill(calcAngleToGoal(), false, 1.f, false, false);
+          // auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(Pose2f(calcAngleToGoal(), theFieldBall.recentBallPositionRelative()), /* rough: */ true, /* disableObstacleAvoidance: */ false);
+          // theWalkToBallAndKickSkill(calcAngleToGoal(), kickType, false, 1.f, Pose2f(1.f, 1.f, 1.f), obstacleAvoidance);
+          // theDribbleSkill(calcAngleToGoal(), Pose2f(1.f, 1.f, 1.f), obstacleAvoidance, false);
         }
         else if (intersectionwithownYAxis != Vector2f::Zero()) {
 
