@@ -60,11 +60,11 @@ void BeepBroadcaster::update(BeepCommData& beepCommData)
         requestMessageBroadcast(1000, 0.5, 1);
 
     // The Recognized Beeps console output for debugging
-    //std::stringstream ss;
-    //copy( theBeep.messages.begin(), theBeep.messages.end(), std::ostream_iterator<int>(ss, " "));
-    //std::string s = ss.str();
-    //s = s.substr(0, s.length()-1);
-    //OUTPUT_TEXT("The Beep[0]: " << s);
+    std::stringstream ss;
+    copy( theBeep.messages.begin(), theBeep.messages.end(), std::ostream_iterator<int>(ss, " "));
+    std::string s = ss.str();
+    s = s.substr(0, s.length()-1);
+    OUTPUT_TEXT("The Beeps: " << s);
 
     // Handle Response to 1
     if (theRobotInfo.number != 1)
