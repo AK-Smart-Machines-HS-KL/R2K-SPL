@@ -63,7 +63,7 @@ CARD(ChallangeCard,
       {,
         (bool)(false) footIsSelected,  // freeze the first decision
         (bool)(true) leftFoot,
-         (bool)(false) kicking,
+        (bool)(false) isKicking,
       }),
     });
 
@@ -99,7 +99,7 @@ class ChallangeCard : public ChallangeCardBase
 
       KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
 
-      if (!kicking) {
+      if (!isKicking) {
         if (calcDisrtacetoBall() <= minDistance) {
 
           // theGoToBallAndKickSkill(calcAngleToGoal(), kickType, false, std::numeric_limits<float>::max(), true, false);
