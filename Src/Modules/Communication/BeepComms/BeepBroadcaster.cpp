@@ -11,6 +11,8 @@
 #include <condition_variable>
 #include <type_traits>
 #include <algorithm>
+#include <sstream>
+#include <iostream>
 
 #define SAMPLE_RATE 44100
 #define BUFFER_SIZE SAMPLE_RATE
@@ -56,6 +58,13 @@ void BeepBroadcaster::update(BeepCommData& beepCommData)
 
     DEBUG_RESPONSE_ONCE("module:BeepComms:broadcast:1") 
         requestMessageBroadcast(1000, 0.5, 1);
+
+    // The Recognized Beeps console output for debugging
+    //std::stringstream ss;
+    //copy( theBeep.messages.begin(), theBeep.messages.end(), std::ostream_iterator<int>(ss, " "));
+    //std::string s = ss.str();
+    //s = s.substr(0, s.length()-1);
+    //OUTPUT_TEXT("The Beep[0]: " << s);
 
     // Handle Response to 1
     if (theRobotInfo.number != 1)
