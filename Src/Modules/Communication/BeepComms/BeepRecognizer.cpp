@@ -160,17 +160,20 @@ std::vector<long> BeepRecognizer::decode(const RingBuffer<AudioData::Sample>& bu
 
   // Compute volume of samples.
   float volume = 0;
-  for(AudioData::Sample sample : buffer)
+  for(AudioData::Sample sample : buffer){
     volume = std::max(volume, std::abs(static_cast<float>(sample)));
+  }
 
   // Abort if not loud enough.
-  if(volume == 0 || volume < (std::is_same<AudioData::Sample, short>::value ? std::numeric_limits<short>::max() : 1) * minVolume)
+  if(volume == 0 || volume < (std::is_same<AudioData::Sample, short>::value ? std::numeric_limits<short>::max() : 1) * minVolume){
     return data;
+  }
 
   // Copy samples to FFTW input and normalize them.
   const double factor = 1.0 / volume;
-  for(size_t i = 0; i < buffer.size(); ++i)
+  for(size_t i = 0; i < buffer.size(); ++i){
     samples[i] = buffer[i];
+  }
 
   // samples -> spectrum
   fftw_execute(fft);
