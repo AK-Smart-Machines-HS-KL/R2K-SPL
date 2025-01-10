@@ -86,7 +86,6 @@ void BeepBroadcaster::update(BeepCommData& beepCommData)
     while (!beepCommData.broadcastQueue.empty())
     {
         int message = beepCommData.broadcastQueue.back();
-        OUTPUT_TEXT("Broadcasting msg: " << message);
         beepCommData.broadcastQueue.pop_back();
         requestMessageBroadcast(1000, 0.5, message);
     }
@@ -110,7 +109,7 @@ void BeepBroadcaster::requestMessageBroadcast(float duration, float volume, int 
     {
         if ((message & (1 << bit)) != 0) {
             frequencies.push_back(ownBaseFrequency + bit * (bandWidth / encodedBits));
-            OUTPUT_TEXT("Broadcasting " << frequencies.back());
+            OUTPUT_TEXT("Robot nr. " << theRobotInfo.number << " broadcasting message " << message << "(" << frequencies.back() << "Hz)");
         }
     }
     requestMultipleFrequencies(1000, 0.5, frequencies);
