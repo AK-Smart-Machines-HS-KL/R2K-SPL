@@ -100,7 +100,10 @@ class ChallangeCard : public ChallangeCardBase
       if (!isKicking) {
         if (calcDisrtacetoBall() <= minDistance) {
 
-          // theGoToBallAndKickSkill(calcAngleToGoal(), kickType, false, std::numeric_limits<float>::max(), true, false);
+           theGoToBallAndKickSkill(calcAngleToGoal(), kickType, false, 0.5f, true, false, Pose2f(0.5f,0.5f,0.5f), Rangea(20_deg,20_deg));
+           isKicking = true;
+          
+          
           // theGoToBallAndDribbleSkill(calcAngleToGoal(), false, 1.f, false, false);
           // auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(Pose2f(calcAngleToGoal(), theFieldBall.recentBallPositionRelative()), /* rough: */ true, /* disableObstacleAvoidance: */ false);
           // theWalkToBallAndKickSkill(calcAngleToGoal(), kickType, false, 1.f, Pose2f(1.f, 1.f, 1.f), obstacleAvoidance);
@@ -108,18 +111,18 @@ class ChallangeCard : public ChallangeCardBase
         }
         else if (intersectionwithownYAxis != Vector2f::Zero()) {
 
-          theWalkToKickoffPoseSkill(Pose2f(calcAngleToGoal(), intersectionwithownYAxis));
+          //theWalkToKickoffPoseSkill(Pose2f(calcAngleToGoal(), intersectionwithownYAxis));
 
 
         }
         else if (inersectionwithOwnXAxis != Vector2f::Zero()) {
 
           //Go infronft of Rolling Ball in Preparation to Kick
-          theWalkToKickoffPoseSkill(Pose2f(calcAngleToGoal(), inersectionwithOwnXAxis));
+          //theWalkToKickoffPoseSkill(Pose2f(calcAngleToGoal(), inersectionwithOwnXAxis));
 
         }
         else if (theFieldBall.isRollingTowardsOwnGoal) {
-          theWalkToKickoffPoseSkill(Pose2f(calcAngleToGoal(), theFieldBall.endPositionRelative));
+          //theWalkToKickoffPoseSkill(Pose2f(calcAngleToGoal(), theFieldBall.endPositionRelative));
         }
         else {
 
