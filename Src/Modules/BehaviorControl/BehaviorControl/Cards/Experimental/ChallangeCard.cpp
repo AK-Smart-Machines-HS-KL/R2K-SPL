@@ -24,7 +24,6 @@
 #include "Representations/Modeling/ObstacleModel.h"
 #include "Representations/Communication/TeamData.h"
 #include "Representations/Modeling/BallModel.h"
-#include "Modules/MotionControl/WalkingEngine/WalkingEngine.h"
 #include "Representations/BehaviorControl/Libraries/LibWalk.h"
 
 
@@ -55,7 +54,6 @@ CARD(ChallangeCard,
        REQUIRES(RobotInfo),
        REQUIRES(FieldDimensions),
        REQUIRES(BallModel),
-       REQUIRES(WalkingEngine),
        REQUIRES(LibWalk),
 
 
