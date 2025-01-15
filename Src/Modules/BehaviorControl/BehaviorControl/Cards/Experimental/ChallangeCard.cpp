@@ -49,6 +49,7 @@ CARD(ChallangeCard,
        CALLS(GoToBallAndDribble),
        CALLS(WalkToBallAndKick),
        CALLS(TurnAngle),
+       CALLS(Dribble),
        REQUIRES(FieldBall),
        REQUIRES(RobotPose),
        REQUIRES(RobotInfo),
@@ -88,27 +89,27 @@ class ChallangeCard : public ChallangeCardBase
       Vector2f inersectionwithOwnXAxis = Vector2f::Zero();
 
       //Calculate Distance to Ball for Kick depedndant on current Position of Ball and ints Speed
-      float minDistance = 500;
+      float minDistance = 1000;
 
       if (!footIsSelected) {  // select only once
         footIsSelected = true;
         leftFoot = theFieldBall.positionRelative.y() < 0;
       }
 
-      KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
+      KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastRight : KickInfo::forwardFastLeft;
 
       if (!isKicking) {
         if (calcDisrtacetoBall() <= minDistance) {
 
-           theGoToBallAndKickSkill(calcAngleToGoal(), kickType, false, 0.5f, true, false, Pose2f(0.5f,0.5f,0.5f), Rangea(20_deg,20_deg));
-           isKicking = true;
+           //theGoToBallAndKickSkill(calcAngleToGoal(), kickType, false, 0.5f, true, false, Pose2f(0.5f,0.5f,0.5f), Rangea(20_deg,20_deg));
+           //isKicking = true;
           
           
           // theGoToBallAndDribbleSkill(calcAngleToGoal(), false, 1.f, false, false);
-          // auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(Pose2f(calcAngleToGoal(), theFieldBall.recentBallPositionRelative()), /* rough: */ true, /* disableObstacleAvoidance: */ false);
-          // theWalkToBallAndKickSkill(calcAngleToGoal(), kickType, false, 1.f, Pose2f(1.f, 1.f, 1.f), obstacleAvoidance);
-          // theDribbleSkill(calcAngleToGoal(), Pose2f(1.f, 1.f, 1.f), obstacleAvoidance, false);
-        }
+           auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(theRobotPose, /* rough: */ true, /* disableObstacleAvoidance: */ true);
+          theWalkToBallAndKickSkill(calcAngleToGoal(), kickType, false, 0.1f, Pose2f(1.f, 1.f, 1.f), obstacleAvoidance, false, false, Rangea(40_deg, 40_deg));
+           //theDribbleSkill(calcAngleToGoal(), Pose2f(1.f, 1.f, 1.f), obstacleAvoidance, false, 0.5f, false, false, Rangea(40_deg, 40_deg));
+        }/*
         else if (intersectionwithownYAxis != Vector2f::Zero()) {
 
           //theWalkToKickoffPoseSkill(Pose2f(calcAngleToGoal(), intersectionwithownYAxis));
@@ -123,13 +124,13 @@ class ChallangeCard : public ChallangeCardBase
         }
         else if (theFieldBall.isRollingTowardsOwnGoal) {
           //theWalkToKickoffPoseSkill(Pose2f(calcAngleToGoal(), theFieldBall.endPositionRelative));
-        }
+        }*/
         else {
 
-          theLookAtBallSkill();
           theTurnAngleSkill(calcAngleToGoal());
         }
       }
+      theLookAtBallSkill();
     }
 
     Angle calcAngleToGoal() const

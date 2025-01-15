@@ -1,25 +1,4 @@
-# R-ZWEI Kickers Codebase 2024
 
-This is where the code of the team **R-ZWEI Kickers** lives. Its documentation can be found in the [Wiki of this repository](https://github.com/AK-Smart-Machines-HS-KL/R2K-SPL/wiki)
-
-### Git
-
-If you need a refreshment on your Git know-how, we recommend freshening it up with a tutorial, e.g. [this one in German](https://lerneprogrammieren.de/git/) or [this English one](https://www.w3schools.com/git/).
-
-### B-Human Code Release
-
-This code is based on the official 2021 B-Human code release. Documentation for it can be found in their [public wiki](https://wiki.b-human.de/coderelease2021/).
-
-Previous code releases are tagged with "coderelease&lt;year&gt;", where &lt;year&gt; is the year in which the code was released (starting with 2013).
-
-Please note that **before** you clone this repository on Windows, execute:
-
-```
-git config --global core.autocrlf input
-git config --global core.eol lf
-```
-
-As this repository uses submodules, it must be cloned using `git clone --recursive`. Downloading the release as `zip` or `tar.gz` does not work.
 
 Worker of current Branch 2025-03-IRB:
 
@@ -45,13 +24,50 @@ Card used is ChallangeCard
 
 Method for Testing GoToBallAndKick
 Robot num 5 used for testing
- 
-using OneTeam.ros2
-First `gc ready` (otherwise cornerKick wont work)
-wait until playing
+
+Entscheidungen, Tests gewonnen
+
+Entscheidungen, Tests gewonnen
+
+1) SetUp um  Challenge nachbauen
+2 vs dummies
+impuls auf ball mvb geht nicht 
+manuell: bloss nicht ;-)
+Lsg: CornerKick Modofizieren
+game stack: fast alle Cards löschen, TeachIn durch löschen
+
+
+Skizze feld 
+
+2) corner kick, 
+ziele für den ball elfmeter punkt ODER
+pass-spiel direkt vor die Füße
+ball löuft vor dem bot schnell vorbei
+
+3) welche skill
+
+gotoBall: viele Paramter schussteuerung
+welche kombination bringen welchen erfolg: -> schuss wirst bei Ball stopp ausgelöst
+
+walktToBall: obstacleAvoidance ausschalten
+obstacle avoidance kann nicht ausgeschaltet werden? -> schuss zu langsam nicht wünchenstwert 
+gleiches Problem wie bei GotoBall versucht dem Ball hinterherzulaufen anstatt einfach zu kicken
+
+Dribble:
+gleiches problem wie bei WalktoBall
+
+
+4) Lösungsversuch
+MAKE_SKILL "waitForBallAndKick"
+parameters targetAngle
+
+
+using OneTeamFast.ros2 whith manually removing the dummy team from the field
+First `gc playing` (otherwise cornerKick wont work)
 then ´mvb -4300 2900 0´
+then move robot 4 near Ball
+then select robot 5 and ´mv -3500 0 300´
 then ´gc cornerKickForFirstTeam´
-then select one free nao of first team and ´mv -3400 0 300´
 the CornerKickCard hs benn modified so that the Ball should be played right infront of the feet of the second robot
 
 Testing results:
