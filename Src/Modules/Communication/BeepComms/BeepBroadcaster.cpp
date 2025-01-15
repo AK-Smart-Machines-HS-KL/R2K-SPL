@@ -50,7 +50,13 @@ void BeepBroadcaster::update(BeepCommData& beepCommData)
         {
             buttonToggle = false; 
             //requestMultipleFrequencies(1000, 0.5, {500, 600});
-            beepCommData.broadcastQueue.push_back(headButtonMessage);
+            //beepCommData.broadcastQueue.push_back(headButtonMessage);
+
+            //for (int i = 0; i <= 15; i++)
+            //{
+              beepCommData.broadcastQueue.push_back(headButtonMessage);
+              OUTPUT_TEXT("Beep: " << headButtonMessage);
+           // }
         } 
     } else {
         buttonToggle = true;
@@ -81,7 +87,50 @@ void BeepBroadcaster::update(BeepCommData& beepCommData)
         }
         
     }
-    
+    //Kurze say ausgabe zum testen
+    if (theBeep.messages[2] > 0) {
+            if (responseToggle) 
+            {
+                responseToggle = false;
+                SystemCall::say("Something Robot 3");
+            }
+            
+        } else {
+            responseToggle = true;
+        }
+
+        if (theBeep.messages[4] > 0) {
+            if (responseToggle) 
+            {
+                responseToggle = false;
+                SystemCall::say("Something Robot 5");
+            }
+            
+        } else {
+            responseToggle = true;
+        }  
+
+    if (theBeep.messages[0] == 15) {
+            if (responseToggle) 
+            {
+                responseToggle = false;
+                SystemCall::say("Message 15 Robot 1");
+            }
+            
+        } else {
+            responseToggle = true;
+        }
+
+    if (theBeep.messages[0] == 10) {
+            if (responseToggle) 
+            {
+                responseToggle = false;
+                SystemCall::say("Message 10 Robot 1");
+            }
+            
+        } else {
+            responseToggle = true;
+        }
 
     while (!beepCommData.broadcastQueue.empty())
     {

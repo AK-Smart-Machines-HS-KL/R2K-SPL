@@ -164,6 +164,7 @@ std::vector<long> BeepRecognizer::decode(const RingBuffer<AudioData::Sample>& bu
     volume = std::max(volume, std::abs(static_cast<float>(sample)));
   }
 
+  // OUTPUT_TEXT("Volume: " << volume);
   // Abort if not loud enough.
   if(volume == 0 || volume < (std::is_same<AudioData::Sample, short>::value ? std::numeric_limits<short>::max() : 1) * minVolume){
     return data;

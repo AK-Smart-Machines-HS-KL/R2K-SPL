@@ -1,0 +1,32 @@
+Hier die Frequenzen die für jede der Aufnahmen auf der Konsole ausgegben wurden.
+1bit
+M1
+Roboter 1
+500Hz
+Roboter 2
+700Hz
+Roboter 3
+900Hz
+Roboter 4
+1100Hz
+Roboter 5
+1300Hz
+
+4bit
+Roboter 1
+M15
+Robot nr. 1 broadcasting message 15(500Hz)
+Robot nr. 1 broadcasting message 15(550Hz)
+Robot nr. 1 broadcasting message 15(600Hz)
+Robot nr. 1 broadcasting message 15(650Hz)
+
+M10
+Robot nr. 1 broadcasting message 10(550Hz)
+Robot nr. 1 broadcasting message 10(650Hz)
+
+M2
+Robot nr. 1 broadcasting message 2(550Hz)
+
+M3
+Robot nr. 1 broadcasting message 3(500Hz)
+Robot nr. 1 broadcasting message 3(550Hz)
