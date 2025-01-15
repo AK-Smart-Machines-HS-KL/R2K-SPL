@@ -1,6 +1,6 @@
 # Audio Beeps Communication
 Anmerkungen für den Test am 15.01  
-in [Beep Test Sounds](Beep Test Sounds) sind mehrere aufgenommene beeps  
+in [Beep Test Sounds](BeepTestSounds) sind mehrere aufgenommene beeps  
 wenn bei encoded bits 1 eingestellt ist wird unabhägig von message die basisfrequenz kodiert(500,700...)  
 ich habe auch testweise die config auf 4 bit gestellt die ergebniise davon sind in [Beep Test Sounds.txt](Beep Test Sounds/Beep Test Sounds .txt)  
 in [BeepBroadcaster.cpp](Src/Modules/Communication/BeepComms/BeepBroadcaster.cpp)sind ab zeile 98 simple SystemCall::say zum testen von R1M15,R1M10,R5M1,R3M1
@@ -76,7 +76,7 @@ Mit Nao Nummer 10 aktuell keine Dekodirung möglich, mit Verdacht auf defektes M
 
 Bei Unterhaltungen die während der Analyse des bestehenden Codes geführt wurden hat der Roboter mehrfach eine Message erkannt. Daraus folgt eine möglicherweise problematische Rate an falsch positiven Erkennungen.   
 
-Bei manchen Frequenzen werden mehr als nur ein Roboter als Sender erkannt. Hierfür nocheinmal Wilhem fragen,da das Problem schon seit damals bekannt ist. Vieleicht hielft hier [SpektrumanalyseR1M1.PNG](Beep Test Sounds/SpektrumanalyseR1M1.PNG)
+Bei manchen Frequenzen werden mehr als nur ein Roboter als Sender erkannt. Hierfür nocheinmal Wilhem fragen,da das Problem schon seit damals bekannt ist. Vieleicht hielft hier [SpektrumanalyseR1M1.PNG](BeepTestSounds/SpektrumanalyseR1M1.PNG)
 Bsp.(Zahlen müssen erst genauer bestimmt werden und dienen hier nur zu einfacheren veranschlichung)
 |1|0|13|0|0|
 
