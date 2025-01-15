@@ -105,9 +105,9 @@ class ChallangeCard : public ChallangeCardBase
            //isKicking = true;
           
           
-          // theGoToBallAndDribbleSkill(calcAngleToGoal(), false, 1.f, false, false);
-           auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(theRobotPose, /* rough: */ true, /* disableObstacleAvoidance: */ true);
-          theWalkToBallAndKickSkill(calcAngleToGoal(), kickType, false, 0.1f, Pose2f(1.f, 1.f, 1.f), obstacleAvoidance, false, false, Rangea(40_deg, 40_deg));
+          theGoToBallAndDribbleSkill(calcAngleToGoal(), false, 1.f, false, false);
+           //auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(theRobotPose, /* rough: */ true, /* disableObstacleAvoidance: */ true);
+          //theWalkToBallAndKickSkill(calcAngleToGoal(), kickType, false, 0.1f, Pose2f(1.f, 1.f, 1.f), obstacleAvoidance, false, false, Rangea(40_deg, 40_deg));
            //theDribbleSkill(calcAngleToGoal(), Pose2f(1.f, 1.f, 1.f), obstacleAvoidance, false, 0.5f, false, false, Rangea(40_deg, 40_deg));
         }/*
         else if (intersectionwithownYAxis != Vector2f::Zero()) {
