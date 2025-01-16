@@ -49,6 +49,9 @@ ball löuft vor dem bot schnell vorbei
 gotoBall: viele Paramter schussteuerung
 welche kombination bringen welchen erfolg: -> schuss wirst bei Ball stopp ausgelöst
 
+Rexamination mit größerer Rangea (20_deg -> 40_deg -> 80_deg -> 140_deg -> 180_deg)
+Result: no visible change to before
+
 walktToBall: obstacleAvoidance ausschalten
 obstacle avoidance kann nicht ausgeschaltet werden? -> schuss zu langsam nicht wünchenstwert 
 gleiches Problem wie bei GotoBall versucht dem Ball hinterherzulaufen anstatt einfach zu kicken
@@ -56,19 +59,33 @@ gleiches Problem wie bei GotoBall versucht dem Ball hinterherzulaufen anstatt ei
 Dribble:
 gleiches problem wie bei WalktoBall
 
+WalkToPoint:
+Anstelle den Ball zu treten in den Ball rein laufen -> schlechter kick
+Ergebnis:
+
 
 4) Lösungsversuch
 MAKE_SKILL "waitForBallAndKick"
 parameters targetAngle
 
 
+-----Testing Setup:------
+
 using OneTeamFast.ros2 whith manually removing the dummy team from the field
 First `gc playing` (otherwise cornerKick wont work)
 then ´mvb -4300 2900 0´
-then move robot 4 near Ball
-then select robot 5 and ´mv -3500 0 300´
+then move robot 4 closer to Ball so it can reach it in time
+then select robot 5 and ´mv -3550 0 300´
 then ´gc cornerKickForFirstTeam´
 the CornerKickCard hs benn modified so that the Ball should be played right infront of the feet of the second robot
+
+copy - paste - List:
+
+gc playing
+mvb -4300 2900 0
+mv -3550 0 300
+gc cornerKickForFirstTeam
+
 
 Testing results:
 GoToBallAndKick is too slow for what we need here and after a discussion with the professor no other skill is viable
