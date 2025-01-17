@@ -53,7 +53,7 @@ private:
       isActive = true;
     }
 
-    return false;
+    return isActive;
   }
 
   bool postconditions() const override
