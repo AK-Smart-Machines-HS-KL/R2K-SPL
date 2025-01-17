@@ -1,0 +1,18 @@
+<Simulation>
+
+  <Compound name="robots">
+    <Body ref="Nao" name="robot1">
+      <Translation x="3.9" y="-3" z="320mm"/>
+      <Rotation z="90degree"/>
+    </Body>
+    <Body ref="Nao" name="robot2">
+      <Translation x="2.25" y="3" z="320mm"/>
+      <Rotation z="-72.43degree"/>
+    </Body>
+  </Compound>
+<Compound name="extras">
+    	<Body ref="NaoDummy" name="robot3">
+      <Translation x="500" y="6000" z="320mm"/>
+    </Body>
+  </Compound>
+</Simulation>
