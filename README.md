@@ -61,7 +61,7 @@ gleiches problem wie bei WalktoBall
 
 WalkToPoint:
 Anstelle den Ball zu treten in den Ball rein laufen -> schlechter kick
-Ergebnis:
+Ergebnis: Vielverschprechendes Ergebnis -> muss noch dynamischer angepasst werden
 
 
 4) Lösungsversuch
@@ -71,6 +71,10 @@ parameters targetAngle
 
 -----Testing Setup:------
 
+Öffne im Simulator die Scene IRBChallange.ros2
+diese führt den nötigen setup automatisch durch
+
+Alternativ:
 using OneTeamFast.ros2 whith manually removing the dummy team from the field
 First `gc playing` (otherwise cornerKick wont work)
 then ´mvb -4300 2900 0´
@@ -85,10 +89,4 @@ gc playing
 mvb -4300 2900 0
 mv -3550 0 300
 gc cornerKickForFirstTeam
-
-
-Testing results:
-GoToBallAndKick is too slow for what we need here and after a discussion with the professor no other skill is viable
--> Programm a new Skill, with a faster Kick which also acts more dynamicly:
- Proposed name: waitForBallAndKick keeping with the previous naming convention 
 
