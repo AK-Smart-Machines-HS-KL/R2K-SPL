@@ -73,7 +73,7 @@ Dynamisches anlaufen:
 
 Beispiel Video:
 
-<video src="2025-01-19 21-03-20.mkv" width="320" height="240"></video>
+<video src="2025-01-19 21-03-20.mkv" width="320" height="240" controls></video>
 
 4) Lösungsversuch
 MAKE_SKILL "waitForBallAndKick"
