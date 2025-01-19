@@ -102,9 +102,9 @@ class ChallangeCard : public ChallangeCardBase
         if (!isKicking && calcDisrtacetoBall() <= minDistance) {
            //theGoToBallAndKickSkill(calcAngleToGoal(), kickType, false, 1000.0f, false, false, Pose2f(1.0f,1.0f,1.0f), Rangea(180_deg,180_deg));
            
-             theWalkToPointSkill(Pose2f(-200.f, 0.f, 0.f), 1.f, true, true, true);
+             theWalkToPointSkill(Pose2f(0_deg, 200.f, 0.f), 1.f, true, true, true);
              theLookAtBallSkill();
-             isKicking = true;
+             //isKicking = true;
 
           //theGoToBallAndDribbleSkill(calcAngleToGoal(), false, 1.f, false, false);
            //auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(theRobotPose, /* rough: */ true, /* disableObstacleAvoidance: */ true);

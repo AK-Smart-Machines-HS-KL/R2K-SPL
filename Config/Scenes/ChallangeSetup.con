@@ -1,0 +1,9 @@
+gc playing
+mvb -4300 2900 0
+robot robot1
+mv -3550 0 300
+robot robot2
+mv  -4000 2800 300
+gc cornerKickForFirstTeam
+
+
