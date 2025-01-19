@@ -62,12 +62,20 @@ gleiches problem wie bei WalktoBall
 WalkToPoint:
 Anstelle den Ball zu treten in den Ball rein laufen -> schlechter kick
 Ergebnis: Vielverschprechendes Ergebnis -> muss noch dynamischer angepasst werden
+Echte Naos: In echt sidn die Naos langsamer -> Reaktion entspechend den Naos anpassen oder die Geschwindigkeit für die wenigen Schritte erhöhen
+
+Dynamisches Anlaufen: Im Simulator viel zuverlässiger -> muss noch an echten naos getestet werden 
 
 
+Dynamisches anlaufen:
+ - der schwelldistance zum Ball wird anhand der Geschwindigkeit des Balls berechnet mite der Function calcMinDistance
+ - der InterceptPoint (Der Punkt der angelaufen wird) wird ebenfalls anhand der geschwindigkeit des Balls berechnet
+
+ 
 4) Lösungsversuch
 MAKE_SKILL "waitForBallAndKick"
 parameters targetAngle
-
+wurde nie ausprobiert
 
 -----Testing Setup:------
 

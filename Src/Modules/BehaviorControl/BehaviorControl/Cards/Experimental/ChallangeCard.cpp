@@ -2,9 +2,11 @@
  * @file ChallangeCard.cpp
  * @author Dennis Fuhrmann
  * @brief Card for R2k Ball Challange 2025
- *        Currently still in its infancy
- * @version 0.2
- * @date 2025-06-01
+ *        In this Card the Ball is not aktually kicked,
+ *        instead a walk into the Ball is performed to "fake" a kick forward.
+ *        TODO Live Test with Real robots
+ * @version 1.0
+ * @date 2025-19-01
  *
  *
  */
@@ -20,11 +22,10 @@
 // Representations
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/BehaviorControl/FieldBall.h"
-#include "Representations/Communication/RobotInfo.h"
 #include "Representations/Modeling/ObstacleModel.h"
 #include "Representations/Communication/TeamData.h"
 #include "Representations/Modeling/BallModel.h"
-#include "Representations/BehaviorControl/Libraries/LibWalk.h"
+#include "Representations/Configuration/BallSpecification.h"
 
 
 //#include <filesystem>
@@ -33,36 +34,26 @@
 #include "Tools/BehaviorControl/Interception.h"
 
 
-// Modify this card but don't commit changes to keep it clean for other developers
-// Also don't forget to put this card at the top of your Card Stack!
+
 CARD(ChallangeCard,
   {
        ,
        CALLS(Activity),
-       CALLS(LookForward),
-       CALLS(Stand),
        CALLS(WalkToPoint),
-       CALLS(InterceptBall),
        CALLS(LookAtBall),
        CALLS(WalkToKickoffPose),
-       CALLS(GoToBallAndKick),
-       CALLS(GoToBallAndDribble),
-       CALLS(WalkToBallAndKick),
        CALLS(TurnAngle),
-       CALLS(Dribble),
        REQUIRES(FieldBall),
        REQUIRES(RobotPose),
-       REQUIRES(RobotInfo),
        REQUIRES(FieldDimensions),
        REQUIRES(BallModel),
-       REQUIRES(LibWalk),
+       REQUIRES(BallSpecification),
 
 
        DEFINES_PARAMETERS(
       {,
-        (bool)(false) footIsSelected,  // freeze the first decision
-        (bool)(true) leftFoot,
-        (bool)(false) isKicking,
+         (Vector2f)(Vector2f(200.f,0.f)) interceptPoint,
+        (bool)(false) pointIsSelected, // InterceptPoint wird nur einmal berechnet
       }),
     });
 
@@ -89,28 +80,20 @@ class ChallangeCard : public ChallangeCardBase
       Vector2f inersectionwithOwnXAxis = Vector2f::Zero();
 
       //Calculate Distance to Ball for Kick depedndant on current Position of Ball and ints Speed
-      float minDistance = 1000;
-
-      if (!footIsSelected) {  // select only once
-        footIsSelected = true;
-        leftFoot = theFieldBall.positionRelative.y() < 0;
-      }
-
-      KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastRight : KickInfo::forwardFastLeft;
-
+      float minDistance = calcMinDistance();
       
-        if (!isKicking && calcDisrtacetoBall() <= minDistance) {
-           //theGoToBallAndKickSkill(calcAngleToGoal(), kickType, false, 1000.0f, false, false, Pose2f(1.0f,1.0f,1.0f), Rangea(180_deg,180_deg));
-           
-             theWalkToPointSkill(Pose2f(0_deg, 200.f, 0.f), 1.f, true, true, true);
-             theLookAtBallSkill();
-             //isKicking = true;
+        if (calcDisrtacetoBall() <= minDistance) {
+             
+            //// InterceptPoint wird nur einmal berechnet
+          if (!pointIsSelected) {
+            interceptPoint = calcInterceptPoint();
+            pointIsSelected = true;
+          }
+              //Die Kick Skills sind nicht schnell genug um einen rollenden Ball zu intercepten stadesssen nutzen wir einen Lauf in den Ball rein um einen Kick zu simulieren
+             theWalkToPointSkill(Pose2f(0_deg, interceptPoint), 1.f, true, true, true);
+             theLookAtBallSkill(); // HeadMotion controll
 
-          //theGoToBallAndDribbleSkill(calcAngleToGoal(), false, 1.f, false, false);
-           //auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(theRobotPose, /* rough: */ true, /* disableObstacleAvoidance: */ true);
-          //theWalkToBallAndKickSkill(calcAngleToGoal(), kickType, false, 0.1f, Pose2f(1.f, 1.f, 1.f), obstacleAvoidance, false, false, Rangea(40_deg, 40_deg));
-           //theDribbleSkill(calcAngleToGoal(), Pose2f(1.f, 1.f, 1.f), obstacleAvoidance, false, 0.5f, false, false, Rangea(40_deg, 40_deg));
-        }else if(!isKicking)
+        }else
         {
           theTurnAngleSkill(calcAngleToGoal() + 30_deg, 2_deg);
           theLookAtBallSkill();
@@ -124,7 +107,7 @@ class ChallangeCard : public ChallangeCardBase
       return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
     }
 
-    
+    //Altenativ TimetoReachBall benutzen (konnte nicht herausfinden wie)  
     float calcDisrtacetoBall() const
     {
       Vector2f temp1 = theFieldBall.recentBallPositionRelative();
@@ -133,7 +116,22 @@ class ChallangeCard : public ChallangeCardBase
       return std::sqrt(temp2 + temp3);
     }
 
-    
+    //relative InterceptPoint 
+    Vector2f calcInterceptPoint() const
+    {
+      return BallPhysics::propagateBallPosition(theFieldBall.recentBallPositionOnField(), theBallModel.estimate.velocity, 0.6f, theBallSpecification.friction);
+    }
+
+
+    //berechnet den Schwellwert für die Distance zum Ball anhand der Geschwnidkeit des Balls
+    float calcMinDistance() const
+    {
+      Vector2f temp1 = theBallModel.estimate.velocity;
+      float temp2 = temp1.x() * temp1.x();
+      float temp3 = temp1.y() * temp1.y();
+      float result = std::sqrt(temp2 + temp3);
+      return result * 0.8;
+    }
 };
 
 MAKE_CARD(ChallangeCard);
