@@ -16,8 +16,9 @@
 // Representations
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/Infrastructure/SensorData/KeyStates.h"
-#include "Representations/Infrastructure/FrameInfo.h"
-
+#include "Representations/MotionControl/ArmMotionRequest.h"
+#include "Representations/BehaviorControl/DefaultPose.h"
+#include "Representations/Modeling/RobotPose.h"
 
 
 #include "Platform/SystemCall.h"
@@ -29,9 +30,16 @@ CARD(PointingCalibrationCard,
      ,
      CALLS(Activity),
      CALLS(LookForward),
+     CALLS(LookActive),
      CALLS(Stand),
+     CALLS(PointAt),
+     CALLS(TurnToPoint),
+     CALLS(WalkToPoint),
+     CALLS(WalkToPose),
+     REQUIRES(DefaultPose),
+     REQUIRES(RobotPose),
+     REQUIRES(FieldBall),
      REQUIRES(EnhancedKeyStates),
-     REQUIRES(FrameInfo),
 
 
      DEFINES_PARAMETERS(
@@ -41,10 +49,9 @@ CARD(PointingCalibrationCard,
        (bool)(false) hasRun1,
        (bool)(false) hasRun2,
        (bool)(false) hasRun3,
-       (bool)(false) hasRun4,
-       (bool)(false) hasRun5,
-       (bool)(false) hasRun6,
-       (bool)(false) hasRun7,
+       (bool)(false) hasReachedDefaultPose,
+       (bool)(false) hasReachedCenterCircle,
+       (bool)(false) hasReachedBall,
 
     }),
 
@@ -54,7 +61,7 @@ CARD(PointingCalibrationCard,
 class PointingCalibrationCard : public PointingCalibrationCardBase
 {
 private:
-  mutable bool isActive = true;  // mutable für Änderungen in const Methoden
+  mutable bool isActive = false;  
 
 
   bool preconditions() const override
@@ -73,23 +80,18 @@ private:
     return true;
   }
 
-  // Zustand und Logik für die Ausführung der PointingCard
+  // Zustand und Logik für die Ausführung der PointingCalibrationCard
   option
   {
     theActivitySkill(BehaviorStatus::testingBehavior);
 
     initial_state(init)
     {
-      startTime = theFrameInfo.time;
       transition
       {
-             if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] == 1) goto state1;
-        else if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] == 2) goto state2;
-        else if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] == 3) goto state3;
-        else if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] == 4) goto state4;
-        else if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] == 5) goto state5;
-        else if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] == 6) goto state6;
-        else if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] == 7) goto state7;
+             if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] == 1) goto state1; // gehe zum Startpunkt dann zeige auf Mittelkreis
+        else if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] == 2) goto state2; // gehe zum Mittelkreis dann zeige auf Ball
+        else if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] == 3) goto state3; // gehe zum Ball dann zeige auf rechten Torpfosten
         else isActive = false;
       }
     }
@@ -98,15 +100,42 @@ private:
     {
       action
       {
-        if (!hasRun1) { 
-          hasRun1 = true; 
-          SystemCall::say("1"); 
-          OUTPUT_TEXT("1"); 
+        if (!hasRun1) {
+          hasRun1 = true;
+          SystemCall::say("I go to the default pose and then I point at the center circle");
+          OUTPUT_TEXT("I go to the default pose and then I point at the center circle");
         }
 
+
+        // Relative Koordinate der Startposition
+        Pose2f DefaultPose_relativeCoordinate = theRobotPose.toRelative(theDefaultPose.ownDefaultPose);
+
+        if (!hasReachedDefaultPose && (std::abs(DefaultPose_relativeCoordinate.translation.x()) > 0.8f ||
+                                       std::abs(DefaultPose_relativeCoordinate.translation.y()) > 0.8f))
+        {
+          // Laufe zur Startposition
+          theWalkToPointSkill(DefaultPose_relativeCoordinate, 0.7f, false, false, false, true);
+        }
+
+        else
+        {
+          hasReachedDefaultPose = true;
+
+          theStandSkill();
+
+          // Relative Koordinate des Mittelkreises
+          Vector2f centerCircle_relativeCoordinate = theRobotPose.toRelative(Vector2f(0.f, 0.f));
+
+          // Die Z-Koordinate auf 0 setzen, um einen Vector3f zu erstellen
+          Vector3f centerCircle_relativeCoordinate3D(centerCircle_relativeCoordinate.x(), centerCircle_relativeCoordinate.y(), 0.f);
+
+          // Zeige auf den Mittelkreise
+          thePointAtSkill(centerCircle_relativeCoordinate3D);
+        }
+         
         // Head Motion Request
-        theLookForwardSkill();
-        theStandSkill();
+        theLookActiveSkill();
+        
       }
         transition
       {
@@ -120,14 +149,41 @@ private:
       action
       {
         if (!hasRun2) {
-          hasRun2 = true;
-          SystemCall::say("2");
-          OUTPUT_TEXT("2");
+        hasRun2 = true;
+        SystemCall::say("I go to the center circle and then I point at the ball");
+        OUTPUT_TEXT("I go to the center circle and then I point at the ball");
+        }
+
+
+        // Relative Koordinate des Mittelkreises
+        Pose2f centerCircle_relativeCoordinate = theRobotPose.toRelative(Pose2f(0_deg, 0.f, 0.f));
+
+        if (!hasReachedCenterCircle && (std::abs(centerCircle_relativeCoordinate.translation.x()) > 0.8f ||
+                                        std::abs(centerCircle_relativeCoordinate.translation.y()) > 0.8f))
+        {
+          // Laufe zum Mittelkreis
+          theWalkToPointSkill(centerCircle_relativeCoordinate, 0.7f, false, false, false, true);
+        }
+
+        else
+        {
+          hasReachedCenterCircle = true;
+
+          theStandSkill();
+
+          // Relative Koordinate des Balls
+          Vector2f ball_relativeCoordinate = theRobotPose.toRelative(theFieldBall.recentBallPositionOnField());
+
+          // Die Z-Koordinate auf 0 setzen, um einen Vector3f zu erstellen
+          Vector3f ball_relativeCoordinate3D(ball_relativeCoordinate.x(), ball_relativeCoordinate.y(), 0.f);
+
+          // Zeige auf den Ball
+          thePointAtSkill(ball_relativeCoordinate3D);
         }
 
         // Head Motion Request
-        theLookForwardSkill();
-        theStandSkill();
+        theLookActiveSkill();
+
       }
         transition
       {
@@ -141,102 +197,47 @@ private:
       action
       {
         if (!hasRun3) {
-          hasRun3 = true;
-          SystemCall::say("3");
-          OUTPUT_TEXT("3");
+        hasRun3 = true;
+        SystemCall::say("I go to the ball and then I point at the right goalpost");
+        OUTPUT_TEXT("I go to the ball and and then I point at the right goalpost.");
+        }
+
+
+        // Relative Koordinate des Balls
+        Pose2f ball_relativeCoordinate = theRobotPose.toRelative(theFieldBall.recentBallEndPositionOnField());
+        //OUTPUT_TEXT(ball_relativeCoordinate.translation.x() << ", " << ball_relativeCoordinate.translation.y() << ", " << ball_relativeCoordinate.rotation.toDegrees());
+
+        // Nao muss Abstand zum Ball halten, da er sonst den Ball schießt und ihm hinterherläuft
+        if (!hasReachedBall && (std::abs(ball_relativeCoordinate.translation.x()) > 250.f || 
+                                std::abs(ball_relativeCoordinate.translation.y()) > 250.f))
+        {
+          // Laufe zum Ball
+          theWalkToPointSkill(ball_relativeCoordinate, 0.7f, false, false, false, true);
+        }
+
+        else
+        {
+          hasReachedBall = true;
+          
+          theStandSkill();
+
+          // Relative Koordinate des rechten Torpfostens
+          Vector2f goalpost_relativeCoordinate = theRobotPose.toRelative(Vector2f(4500.f, -800.f));
+
+          // Die Z-Koordinate auf 0 setzen, um einen Vector3f zu erstellen
+          Vector3f goalpost_relativeCoordinate3D(goalpost_relativeCoordinate.x(), goalpost_relativeCoordinate.y(), 0.f);
+
+          // Zeige auf rechten Torpfosten
+          thePointAtSkill(goalpost_relativeCoordinate3D);
         }
 
         // Head Motion Request
         theLookForwardSkill();
-        theStandSkill();
+
       }
         transition
       {
         if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] > 3)
-          goto state4;
-      }
-    }
-
-    state(state4)
-    {
-      action
-      {
-        if (!hasRun4) {
-          hasRun4 = true;
-          SystemCall::say("4");
-          OUTPUT_TEXT("4");
-        }
-
-        // Head Motion Request
-        theLookForwardSkill();
-        theStandSkill();
-      }
-        transition
-      {
-        if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] > 4)
-          goto state5;
-      }
-    }
-
-    state(state5)
-    {
-      action
-      {
-        if (!hasRun5) {
-          hasRun5 = true;
-          SystemCall::say("5");
-          OUTPUT_TEXT("5");
-        }
-
-        // Head Motion Request
-        theLookForwardSkill();
-        theStandSkill();
-      }
-        transition
-      {
-        if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] > 5)
-          goto state6;
-      }
-    }
-
-    state(state6)
-    {
-      action
-      {
-        if (!hasRun6) {
-          hasRun6 = true;
-          SystemCall::say("6");
-          OUTPUT_TEXT("6");
-        }
-
-        // Head Motion Request
-        theLookForwardSkill();
-        theStandSkill();
-      }
-        transition
-      {
-        if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] > 6)
-          goto state7;
-      }
-    }
-
-    state(state7)
-    {
-      action
-      {
-        if (!hasRun7) {
-          hasRun7 = true;
-          SystemCall::say("7");
-          OUTPUT_TEXT("7");
-        }
-
-        // Head Motion Request
-        theLookForwardSkill();
-        theStandSkill();
-      }
-        transition
-      {
-        if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] > 7)
           isActive = false;
       }
     }
