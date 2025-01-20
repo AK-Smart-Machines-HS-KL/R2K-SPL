@@ -54,6 +54,8 @@ CARD(ChallangeCard,
       {,
          (Vector2f)(Vector2f(200.f,0.f)) interceptPoint,
         (bool)(false) pointIsSelected, // InterceptPoint wird nur einmal berechnet
+         (float)(0.4f) interceptOffset, // veringere diesen Wert um den Ball früher in seinem lauf zu interceptne
+         (float)(0.6f) minDistanceOffset, // eröhe diesen Wert um den distanz zu erhöhen die der Ball unterschreiten muss damit der Roboter reagiert
       }),
     });
 
@@ -76,8 +78,7 @@ class ChallangeCard : public ChallangeCardBase
     {
       theActivitySkill(BehaviorStatus::testingBehavior);
 
-      Vector2f intersectionwithownYAxis = theFieldBall.intersectionPositionWithOwnYAxis;
-      Vector2f inersectionwithOwnXAxis = Vector2f::Zero();
+     
 
       //Calculate Distance to Ball for Kick depedndant on current Position of Ball and ints Speed
       float minDistance = calcMinDistance();
@@ -119,7 +120,9 @@ class ChallangeCard : public ChallangeCardBase
     //relative InterceptPoint 
     Vector2f calcInterceptPoint() const
     {
-      return BallPhysics::propagateBallPosition(theFieldBall.recentBallPositionOnField(), theBallModel.estimate.velocity, 0.6f, theBallSpecification.friction);
+      Vector2f temp = BallPhysics::propagateBallPosition(theFieldBall.recentBallPositionOnField(), theBallModel.estimate.velocity, interceptOffset, theBallSpecification.friction);
+      temp.x() = temp.x() + 200.f;
+      return temp;
     }
 
 
@@ -130,7 +133,7 @@ class ChallangeCard : public ChallangeCardBase
       float temp2 = temp1.x() * temp1.x();
       float temp3 = temp1.y() * temp1.y();
       float result = std::sqrt(temp2 + temp3);
-      return result * 0.8;
+      return result * minDistanceOffset;
     }
 };
 
