@@ -30,5 +30,5 @@ Zukünftige Entwicklungen umfassen die Verwendung von Passfiltern und Hanning-Fe
 ![Draw_io_Whistle_Recognizer_Process png](https://github.com/user-attachments/assets/33bd1934-cc9c-4eb0-b250-a3694255cb9e)
 
 ## aufgetretene Probleme
-[x] ~~Problem mit dr module:WhistleRecognizer:record~~ // Wurde gelöst durch versetzen in penezile -> not penelized -> penelized 
-[ ] Problem mit versetzen in STATE_PLYING um die Auswahl und Erstellung der Pfeife
+- [x] ~~Problem mit dr module:WhistleRecognizer:record~~ // Wurde gelöst durch versetzen in penezile -> not penelized -> penelized
+- [ ] Problem mit versetzen in STATE_PLYING um die Auswahl und Erstellung der Pfeife
