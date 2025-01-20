@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <limits>
 #include <type_traits>
+#include <cstring>
 
 MAKE_MODULE(WhistleRecognizer, modeling);
 
@@ -217,7 +218,7 @@ void WhistleRecognizer::update(Whistle& theWhistle)
       theWhistle.lastTimeWhistleDetected = theFrameInfo.time;
     }
 
-    samplesRequired = static_cast<unsigned>(bufferSize * newSampleRatio);
+    samplesRequired = static_cast<unsigned>(bufferSize);
   }
 
   // Reset best correlation after it was sent in two network packets.
@@ -242,45 +243,43 @@ void WhistleRecognizer::update(Whistle& theWhistle)
     whistleDetectionTimes.push_back(theFrameInfo.time);
   }
 
-  DECLARE_DEBUG_RESPONSE("module:WhistleRecognizer:detectNew");
+  // Check if the game has been running for 15 seconds
+  if (theGameInfo.state == STATE_PLAYING && theFrameInfo.getTimeSince(theGameInfo.kickOffTime) >= 15000)
   {
-    // Check if the game has been running
-    if (theGameInfo.state == STATE_PLAYING)
+    // Find the closest detection time to 15 seconds ago
+    unsigned closestTime = 0;
+    unsigned closestDiff = std::numeric_limits<unsigned>::max();
+    unsigned targetTime = theFrameInfo.time - 15000;
+
+    for (unsigned time : whistleDetectionTimes)
     {
-      // Find the closest detection time to 15 seconds ago
-      unsigned closestTime = 0;
-      unsigned closestDiff = std::numeric_limits<unsigned>::max();
-      unsigned targetTime = theFrameInfo.time - 15000;
-
-      for (unsigned time : whistleDetectionTimes)
+      unsigned diff = std::abs(static_cast<int>(time - targetTime));
+      if (diff < closestDiff)
       {
-        unsigned diff = std::abs(static_cast<int>(time - targetTime));
-        if (diff < closestDiff)
-        {
-          closestDiff = diff;
-          closestTime = time;
-        }
+        closestDiff = diff;
+        closestTime = time;
       }
-      // Save the closest detection time as a new whistle
-      if (closestTime > 0)
-      {
-        std::string newWhistleName = "detectedWhistle_" + std::to_string(closestTime);
-        Signature signature;
-        signature.selfCorrelation = correlate(signature.spectrum, buffers[firstBuffer], true);
-        signature.name = newWhistleName;
-        signatures.emplace_back(signature);
-
-        OutBinaryFile stream("Whistles/" + newWhistleName + ".dat");
-        if (stream.exists())
-        {
-          stream << signature;
-          OUTPUT_TEXT("Saved new whistle " << newWhistleName << " with selfCorrelation = " << signature.selfCorrelation);
-        }
-      }
-
-      // Clear the detection times
-      whistleDetectionTimes.clear();
     }
+
+    // Save the closest detection time as a new whistle
+    if (closestTime > 0)
+    {
+      std::string newWhistleName = "detectedWhistle_" + std::to_string(closestTime);
+      Signature signature;
+      signature.selfCorrelation = correlate(signature.spectrum, buffers[firstBuffer], true);
+      signature.name = newWhistleName;
+      signatures.emplace_back(signature);
+
+      OutBinaryFile stream("Whistles/" + newWhistleName + ".dat");
+      if (stream.exists())
+      {
+        stream << signature;
+        OUTPUT_TEXT("Saved new whistle " << newWhistleName << " with selfCorrelation = " << signature.selfCorrelation);
+      }
+    }
+
+    // Clear the detection times
+    whistleDetectionTimes.clear();
   }
 }
 
@@ -289,17 +288,28 @@ float WhistleRecognizer::correlate(std::vector<Vector2d>& signature, const RingB
 {
   // Compute volume of samples.
   float volume = 0;
+  // Increased correlation threshold
+  const float minCorrelationThreshold = 0.7f;
+
   for (AudioData::Sample sample : buffer)
     volume = std::max(volume, std::abs(static_cast<float>(sample)));
 
   // Abort if not loud enough.
-  if (volume == 0 || (!record && volume < (std::is_same<AudioData::Sample, short>::value ? std::numeric_limits<short>::max() : 1) * minVolume))
+  const float minVolumeThreshold = 0.5f; // Increased volume threshold
+  if (volume == 0 || (!record && volume < (std::is_same<AudioData::Sample, short>::value ? std::numeric_limits<short>::max() : 1) * minVolumeThreshold))
     return 0.f;
 
-  // Copy samples to FFTW input and normalize them.
+  // Apply a simple low-pass filter to reduce high-frequency noise
+  const float alpha = 0.2f; // Smoothing factor (adjustable)
+  std::vector<AudioData::Sample> filteredSamples(buffer.size());
+  filteredSamples[0] = buffer[0];
+  for (size_t i = 1; i < buffer.size(); ++i)
+    filteredSamples[i] = alpha * buffer[i] + (1 - alpha) * filteredSamples[i - 1];
+
+  // Copy filtered samples to FFTW input and normalize them.
   const double factor = 1.0 / volume;
   for (size_t i = 0; i < buffer.size(); ++i)
-    samples[i] = buffer[i] * factor;
+    samples[i] = filteredSamples[i] * factor;
 
   // samples -> spectrum
   fftw_execute(fft);
@@ -368,5 +378,5 @@ float WhistleRecognizer::correlate(std::vector<Vector2d>& signature, const RingB
     if (std::abs(correlation[i]) > bestCorrelation)
       bestCorrelation = std::abs(correlation[i]);
 
-  return static_cast<float>(std::sqrt(bestCorrelation) / bufferSize / 2);
+  return (std::sqrt(bestCorrelation) / bufferSize / 2) > minCorrelationThreshold ? static_cast<float>(std::sqrt(bestCorrelation) / bufferSize / 2) : 0.f;
 }
