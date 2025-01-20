@@ -1,22 +1,34 @@
-# R-ZWEI Kickers Codebase 2024
+# Whistle Identification Optimization
 
-This is where the code of the team **R-ZWEI Kickers** lives. Its documentation can be found in the [Wiki of this repository](https://github.com/AK-Smart-Machines-HS-KL/R2K-SPL/wiki)
+## Beschreibung
+Bei Turnieren im Rahmen der vergangenen RoboCup-Wettbewerbe ist aufgefallen, dass unsere Roboter zwar recht gut darin sind die verwendeten Whistles zu erkennen (wenige bis gar keine False Negatives, Erkennung von 60-70% aller Whistles im Game), aber einige Geräusche zu viel als solche interpretieren (einiges an False Positives).
 
-### Git
+Um False Positives zu vermeiden, soll in diesem Projekt die Signatur verwendeter Whistles (mit FFTs) untersucht werden, um festzustellen, ob und wenn ja welche weiteren Optimierungen nötig/möglich sind, damit Störgeräusche (z.B. Kinderjauchzen) gefiltert werden können.
 
-If you need a refreshment on your Git know-how, we recommend freshening it up with a tutorial, e.g. [this one in German](https://lerneprogrammieren.de/git/) or [this English one](https://www.w3schools.com/git/).
+## Projektziel
+Das Hauptziel dieses Projekts ist die Optimierung der Pfeiffenerkennung. Spezifische Herausforderungen, die gelöst werden sollen, sind zu viele falsch-positive Erkennungen, z.B. Pfeifen von Nachbarfeldern. Als erster Schritt wird das Abfangen von falsch-positiver Erkennungen durch die Dynamik des Gamecontrollers umgesezt.
 
-### B-Human Code Release
+## Funktionalitäten
+Die Hauptfunktionen des Projekts umfassen die Funktionen der FFTW3 Library sowie die bereits vorhandene Update- und Correlete-Funktion aus WhistleRecognizer.cpp und .h . Spezielle Algorithmen, die verwendet werden, sind die Fast Fourier Transformation (FFT) und die Diskrete Fourier Transformation (DFT).
 
-This code is based on the official 2021 B-Human code release. Documentation for it can be found in their [public wiki](https://wiki.b-human.de/coderelease2021/).
+## Technologien und Tools
+Die verwendete Programmiersprache ist C++. Das Framework Qt wird ebenfalls genutzt. Als Codebasis dient das R2 Kickers GitHub Repository. Der grundlegende Code für den Roboter ist für eine Ubuntu Linux Plattform. Der Simulator ist auf mehreren Plattformen nutzbar, z.B. Windows und Linux.
 
-Previous code releases are tagged with "coderelease&lt;year&gt;", where &lt;year&gt; is the year in which the code was released (starting with 2013).
+## Spezielle Voraussetzungen
+Wie bei jeder akademischen Prüfung werden keine Plagiate akzeptiert. Die Bearbeitung des Projekts erfolgt ausschließlich durch den Studenten.
 
-Please note that **before** you clone this repository on Windows, execute:
+## Lizenz
+Dieses Projekt wird unter der GNU-Lizenz veröffentlicht.
 
-```
-git config --global core.autocrlf input
-git config --global core.eol lf
-```
+## Kontaktinformationen
+Der Hauptverantwortliche für das Projekt ist Dimitri Feuerstein. Kontakt: E-Mail: dipa1001@stud.hs-kl.de, Alternative E-Mail: dpaprnc@gmail.com.
 
-As this repository uses submodules, it must be cloned using `git clone --recursive`. Downloading the release as `zip` or `tar.gz` does not work.
+## Zukünftige Entwicklungen
+Zukünftige Entwicklungen umfassen die Verwendung von Passfiltern und Hanning-Fenstern sowie die Implementierung eines neuronalen Netzwerks mit drei Schichten.
+
+## Diagramm zum ersten Teilschritt
+![Draw_io_Whistle_Recognizer_Process png](https://github.com/user-attachments/assets/33bd1934-cc9c-4eb0-b250-a3694255cb9e)
+
+## aufgetretene Probleme
+[x] ~~Problem mit dr module:WhistleRecognizer:record~~ // Wurde gelöst durch versetzen in penezile -> not penelized -> penelized 
+[ ] Problem mit versetzen in STATE_PLYING um die Auswahl und Erstellung der Pfeife
