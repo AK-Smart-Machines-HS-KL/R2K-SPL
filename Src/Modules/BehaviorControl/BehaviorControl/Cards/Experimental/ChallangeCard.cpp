@@ -52,12 +52,12 @@ CARD(ChallangeCard,
 
        DEFINES_PARAMETERS(
       {,
-         (Vector2f)(Vector2f(200.f,0.f)) interceptPoint,
+         (Vector2f)(Vector2f(200.f,0.f)) interceptPoint, // just a few steps forward 
          (bool)(false) pointIsSelected, // InterceptPoint wird nur einmal berechnet
-         (float)(0.4f) interceptOffset, // veringere diesen Wert um den Ball früher in seinem lauf zu interceptne
+         (float)(0.4f) interceptOffset, // veringere diesen Wert um den Ball früher in seiner Lufbahn zu intercepten
          (float)(0.6f) minDistanceOffset, // eröhe diesen Wert um den distanz zu erhöhen die der Ball unterschreiten muss damit der Roboter reagiert
-         (bool)(false) done,
-         (bool)(false) walking,
+         (bool)(false) done,        
+         (bool)(false) walking,     // Kümmert sich um die Beendung der Card
       }),
     });
 
@@ -72,7 +72,7 @@ class ChallangeCard : public ChallangeCardBase
 
     bool postconditions() const override
     {
-      return  !(theFieldBall.timeSinceBallWasSeen < 7000) && false;
+      return  !(theFieldBall.timeSinceBallWasSeen < 7000) || !done;
 
     }
 
@@ -85,7 +85,7 @@ class ChallangeCard : public ChallangeCardBase
       //Calculate Distance to Ball for Kick depedndant on current Position of Ball and ints Speed
       float minDistance = calcMinDistance();
       
-        if (calcDisrtacetoBall() <= minDistance) {
+        if (calcDistanceToBall() <= minDistance) {
              
             //// InterceptPoint wird nur einmal berechnet
           if (!pointIsSelected) {
@@ -95,9 +95,14 @@ class ChallangeCard : public ChallangeCardBase
               //Die Kick Skills sind nicht schnell genug um einen rollenden Ball zu intercepten stadesssen nutzen wir einen Lauf in den Ball rein um einen Kick zu simulieren
              theWalkToPointSkill(Pose2f(0_deg, interceptPoint), 1.f, true, true, true);
              theLookAtBallSkill(); // HeadMotion controll
+             walking = true;
 
         }else
         {
+          if (walking = true)
+          {
+            done = true;
+          }
           theTurnAngleSkill(calcAngleToGoal() + 30_deg, 2_deg);
           theLookAtBallSkill();
         }
@@ -111,7 +116,7 @@ class ChallangeCard : public ChallangeCardBase
     }
 
     //Altenativ TimetoReachBall benutzen (konnte nicht herausfinden wie)  
-    float calcDisrtacetoBall() const
+    float calcDistanceToBall() const
     {
       Vector2f temp1 = theFieldBall.recentBallPositionRelative();
       float temp2 = temp1.x() * temp1.x();

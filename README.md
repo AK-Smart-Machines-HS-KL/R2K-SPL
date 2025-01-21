@@ -25,10 +25,6 @@ Card used is ChallangeCard
 Method for Testing GoToBallAndKick
 Robot num 5 used for testing
 
-Entscheidungen, Tests gewonnen
-
-Entscheidungen, Tests gewonnen
-
 1) SetUp um  Challenge nachbauen
 2 vs dummies
 impuls auf ball mvb geht nicht 
