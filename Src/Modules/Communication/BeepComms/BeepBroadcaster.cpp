@@ -61,18 +61,25 @@ void BeepBroadcaster::update(BeepCommData& beepCommData)
     } else {
         buttonToggle = true;
     }
+    
+    if(sendToggle){
+      beepCommData.broadcastQueue.push_back(sendmessage);  
+      bool sendToggle=false;
+    } 
 
     DEBUG_RESPONSE_ONCE("module:BeepComms:broadcast:1") 
         requestMessageBroadcast(1000, 0.5, 1);
 
     // The Recognized Beeps console output for debugging
-    /** std::stringstream ss;
+   
+    std::stringstream ss;
     copy( theBeep.messages.begin(), theBeep.messages.end(), std::ostream_iterator<int>(ss, " "));
     std::string s = ss.str();
     s = s.substr(0, s.length()-1);
-    OUTPUT_TEXT("The Beeps: " << s); **/
-
+    OUTPUT_TEXT("The Beeps: " << s); 
+ 
     // Handle Response to 1
+/*
     if (theRobotInfo.number != 1)
     {
         if (theBeep.messages[0] > 0) {
@@ -87,6 +94,8 @@ void BeepBroadcaster::update(BeepCommData& beepCommData)
         }
         
     }
+    
+
     //Kurze say ausgabe zum testen
     if (theBeep.messages[2] > 0) {
             if (responseToggle) 
@@ -95,33 +104,20 @@ void BeepBroadcaster::update(BeepCommData& beepCommData)
                 SystemCall::say("Something Robot 3");
             }
             
-        } else {
-            responseToggle = true;
-        }
-
-        if (theBeep.messages[4] > 0) {
+        } else if (theBeep.messages[4] > 0){
             if (responseToggle) 
             {
                 responseToggle = false;
                 SystemCall::say("Something Robot 5");
             }
-            
-        } else {
-            responseToggle = true;
-        }  
-
-    if (theBeep.messages[0] == 15) {
+        } else if (theBeep.messages[0] == 15) {
             if (responseToggle) 
             {
                 responseToggle = false;
                 SystemCall::say("Message 15 Robot 1");
             }
             
-        } else {
-            responseToggle = true;
-        }
-
-    if (theBeep.messages[0] == 10) {
+        } else if (theBeep.messages[0] == 10) {
             if (responseToggle) 
             {
                 responseToggle = false;
@@ -131,7 +127,7 @@ void BeepBroadcaster::update(BeepCommData& beepCommData)
         } else {
             responseToggle = true;
         }
-
+ */
     while (!beepCommData.broadcastQueue.empty())
     {
         int message = beepCommData.broadcastQueue.back();
@@ -139,6 +135,22 @@ void BeepBroadcaster::update(BeepCommData& beepCommData)
         requestMessageBroadcast(1000, 0.5, message);
     }
 }
+
+void BeepBroadcaster::requestBeep(int robot_number, int message)
+{
+//robotnumber = 0 ->broadcast
+//5 message broadcast
+//2 message per robot
+
+if (robot_number==0){
+    sendmessage=message;
+}else
+{
+    sendmessage=(((robot_number-1)*2)+5+message);
+}
+sendToggle=true;
+}
+
 
 //play sine waves simultaneously
 void BeepBroadcaster::requestMultipleFrequencies(float duration, float volume, std::vector<float> frequencies){
@@ -237,5 +249,6 @@ void BeepBroadcaster::handleBeepRequests()
 BeepBroadcaster::BeepBroadcaster() {}
 BeepBroadcaster::~BeepBroadcaster() {}
 void BeepBroadcaster::update(BeepCommData&) {}
+
 
 #endif

@@ -52,6 +52,12 @@ MODULE(BeepRecognizer,
 
 class BeepRecognizer : public BeepRecognizerBase
 {
+  private:
+  bool responseToggle = true;
+
+
+
+
   float signalWidth;
   std::vector<RingBuffer<long>> averagingBuffers;
   std::vector<std::vector<int>> averageActivations; 
@@ -77,6 +83,7 @@ class BeepRecognizer : public BeepRecognizerBase
    * @return The correlation between signature and buffer. 0 if the volume was too low.
    */
   std::vector<long> decode(const RingBuffer<AudioData::Sample>& buffer);
+  //void update(Beep& theBeep);
 
 public:
   BeepRecognizer();

@@ -51,7 +51,6 @@ BeepRecognizer::~BeepRecognizer()
 }
 
 void BeepRecognizer::update(Beep &theBeep){
-
   if (theBeep.messages.size() != numBands) {
     theBeep.messages.resize(numBands);
   }
@@ -151,6 +150,41 @@ void BeepRecognizer::update(Beep &theBeep){
   //   }
   //   SEND_DEBUG_IMAGE("module:BeepRecognizer", image);
   // }
+
+     //Kurze say ausgabe zum testen
+    if (theBeep.messages[2] > 1) {
+            if (responseToggle) 
+            {
+                responseToggle = false;
+                SystemCall::say("Something Robot 3");
+            }
+            
+        } else if (theBeep.messages[4] > 0){
+            if (responseToggle) 
+            {
+                responseToggle = false;
+                SystemCall::say("Something Robot 5");
+            }
+        } else if (theBeep.messages[0] == 15) {
+            if (responseToggle) 
+            {
+                responseToggle = false;
+                SystemCall::say("Message 15 Robot 1");
+            }
+            
+        } else if (theBeep.messages[0] == 10) {
+            if (responseToggle) 
+            {
+                responseToggle = false;
+                SystemCall::say("Message 10 Robot 1");
+            }
+            
+        } else {
+            responseToggle = true;
+        }
+
+
+
 }
 
 std::vector<long> BeepRecognizer::decode(const RingBuffer<AudioData::Sample>& buffer)

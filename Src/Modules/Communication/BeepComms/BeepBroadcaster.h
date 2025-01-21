@@ -46,6 +46,8 @@ class BeepBroadcaster : public BeepBroadcasterBase
 private:
   bool buttonToggle = true;
   bool responseToggle = true;
+  bool sendToggle=false;
+  int sendmessage = 0;
 
 
   // Async
@@ -56,6 +58,7 @@ private:
   bool shutdown = false;
 
   void update(BeepCommData& audioData) override;
+  void requestBeep(int robot_number , int message);
   void requestMultipleFrequencies(float duration, float volume, std::vector<float> frequencies);
   void requestMessageBroadcast(float duration, float volume, int message);
   void stopWorker();
