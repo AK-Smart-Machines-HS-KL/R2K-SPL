@@ -20,7 +20,7 @@ Windows 10
 
 Visual Studio Version 17.2.2
 
-Nao Nummer 10(Bisher nur Audioausgabe aber keine Audioeingabe)
+Nao Nummer 11
 
 Direkte Verbindung über Ethernet
 
@@ -34,7 +34,7 @@ Alternativer DNS 0.0.0.0
 ### Broadcaster
 Bei der Übertragung werden mittels Frequenzen startend von 500 in 200 Schritten die Nummer des Roboters kodiert(1->500,2->700...).  
 In diesen 200Hz Bändern werden aktuell in der Standartconfig nur 1 Bit Kodiert und damit immer die Basisfrequenz(1->500,2->700...) kodiert.
-Falls man nun die config auf 4 bit ändert beginnt er in 50Hz Schritten zu kodieren und mehrere davon anscheinend überlagerte.(siehe Spektogramme in [BeepTestSounds](BeepTestSounds)). Bisher ist unbekannt ob diese auch erkannt werden.
+Falls man nun die config auf 4 bit ändert beginnt er in 50Hz Schritten zu kodieren und mehrere davon anscheinend überlagerte.(siehe Spektogramme in [BeepTestSounds](BeepTestSounds)). 
 
 Die Ein sowie Ausgabe basiert hier auf einem int 0-15, diese nennen wir message.
 
@@ -60,9 +60,16 @@ Merke nach jedem Deploy muss der Simulator neugestartet werden
 ### Verbindung
 Es wurden mehrere Wege zu Verbindung getesten vovon letztenendes nur der oben genante Weg über eine Direkte Verbindung per Ethernet erfolgreich war. Im folgenden kurz eine Übersicht was probiert wurde und woran es vermutlich gescheitert ist.
 
-Handy als Hotspot - Roboter wollte sich nicht verbinden bzw. ist nicht in der Geräteliste aufgetaucht
+-Handy als Hotspot - Roboter wollte sich nicht verbinden bzw. ist nicht in der Geräteliste aufgetaucht
 
-Fritz Box - egal ob über Wlan oder Ethernet keine IPv4 Adresse vergebbar 
+-Fritz Box - egal ob über Wlan oder Ethernet keine IPv4 Adresse vergebbar 
+
+
+
+Mit Nao Nummer 10 aktuell keine Dekodirung möglich, mit Verdacht auf ein defektes Mikro.Folgend kurzer Test hierfür: Bei Ausgabe der Volume Variable in der [BeepRecognizer](Src/Modules/Communication/BeepComms/BeepRecognizer.cpp) Klasse ist ein Großteil der ausgegeben Werte 0.000518799 unabhängig davon ob ein externes Audiosignal anliegt oder nicht. In [Volume_FehlerDaten](Volume_FehlerDaten.txt) ist ein lägerer Auschnitt der Ausgabe hinterlegt.
+
+Es ist immernoch keine Lösung bekannt, daher wurde Nao 10 gegen Nao 11 ausgetauscht bei dem diese Probleme nicht aufteten.
+
 
 ### Compile und Deploy
 Hier gab es auch öfter Probleme mit Fehlermeldungen wie "Fehler    MSB8066    Der benutzerdefinierte Build für "C:\Users\Sandro\Desktop\FH\Robotik\R2K\R2K-SPL\Build\Windows\CMake\CMakeFiles\725006d56f053ab6e6f68c9c497d7a26\Nao.rule" wurde mit dem Code 1 beendet.    Nao    C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets    245" die mit einer Kombination aus Build Ordner löschen, ./generate ausführen sowie Systemneustarts irgendwann gelöst waren.
@@ -72,8 +79,6 @@ Weiterhin gab es ein Problem bei dem ./generate nichtmehr ausgeführt werden kon
 
 
 ## Aktuelle Problme
-Mit Nao Nummer 10 aktuell keine Dekodirung möglich, mit Verdacht auf ein defektes Mikro.Folgend kurzer Test hierfür: Bei Ausgabe der Volume Variable in der [BeepRecognizer](Src/Modules/Communication/BeepComms/BeepRecognizer.cpp) Klasse ist ein Großteil der ausgegeben Werte 0.000518799 unabhängig davon ob ein externes Audiosignal anliegt oder nicht. In [Volume_FehlerDaten](Volume_FehlerDaten.txt) ist ein lägerer Auschnitt der Ausgabe hinterlegt.
-
 Bei Unterhaltungen die während der Analyse des bestehenden Codes geführt wurden hat der Roboter mehrfach eine Message erkannt. Daraus folgt eine möglicherweise problematische Rate an falsch positiven Erkennungen.   
 
 Bei manchen Frequenzen werden mehr als nur ein Roboter als Sender erkannt. Hierfür nocheinmal Wilhem fragen,da das Problem schon seit damals bekannt ist. Vieleicht hielft hier [SpektrumanalyseR1M1.PNG](BeepTestSounds/SpektrumanalyseR1M1.PNG)
