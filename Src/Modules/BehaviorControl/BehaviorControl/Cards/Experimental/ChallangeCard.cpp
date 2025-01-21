@@ -53,9 +53,11 @@ CARD(ChallangeCard,
        DEFINES_PARAMETERS(
       {,
          (Vector2f)(Vector2f(200.f,0.f)) interceptPoint,
-        (bool)(false) pointIsSelected, // InterceptPoint wird nur einmal berechnet
+         (bool)(false) pointIsSelected, // InterceptPoint wird nur einmal berechnet
          (float)(0.4f) interceptOffset, // veringere diesen Wert um den Ball früher in seinem lauf zu interceptne
          (float)(0.6f) minDistanceOffset, // eröhe diesen Wert um den distanz zu erhöhen die der Ball unterschreiten muss damit der Roboter reagiert
+         (bool)(false) done,
+         (bool)(false) walking,
       }),
     });
 

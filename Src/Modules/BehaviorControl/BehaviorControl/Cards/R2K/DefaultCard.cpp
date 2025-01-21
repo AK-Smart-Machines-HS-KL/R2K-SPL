@@ -30,6 +30,7 @@ CARD(DefaultCard,
         CALLS(Activity),
         CALLS(LookActive),
         CALLS(WalkToPoint),
+        CALLS(Stand),
 
         REQUIRES(DefaultPose),
         REQUIRES(RobotPose),
@@ -69,11 +70,11 @@ class DefaultCard : public DefaultCardBase
 
     theActivitySkill(BehaviorStatus::defaultBehavior);
     
-    Pose2f targetRelative = theRobotPose.toRelative(theDefaultPose.ownDefaultPose);
+    //Pose2f targetRelative = theRobotPose.toRelative(theDefaultPose.ownDefaultPose);
 
     theLookActiveSkill(); // Head Motion Request
-    theWalkToPointSkill(targetRelative, 1.0f, true);     
-
+    //theWalkToPointSkill(targetRelative, 1.0f, true);     
+    theStandSkill();
   }
 };
 

@@ -71,6 +71,9 @@ Dynamisches anlaufen:
  - der schwelldistance zum Ball wird anhand der Geschwindigkeit des Balls berechnet mite der Function calcMinDistance
  - der InterceptPoint (Der Punkt der angelaufen wird) wird ebenfalls anhand der geschwindigkeit des Balls berechnet
 
+die oben berechneten Werte werden nochmal um jeweils einen eigenen Faktor multipliziert:
+Diese können in dem Code je nach Test erfolgen angepassst werden -> in eine Config umlegen für schnelleres anpassen
+
 Beispiel Video:
 
 <video src="2025-01-20 21-41-55.mp4" width="320" height="240" controls></video>
