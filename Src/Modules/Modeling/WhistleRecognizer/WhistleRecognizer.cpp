@@ -254,9 +254,9 @@ void WhistleRecognizer::update(Whistle& theWhistle)
     for (const auto& bestSig : bestSignatures)
     {
       unsigned timeDifference = std::abs(static_cast<int>(theWhistle.lastTimeWhistleDetected - bestSig.timestamp));
-      if (timeDifference < bestTimeDifference || (timeDifference == bestTimeDifference && bestSig.correlation > bestSigCorrelation))
+      if (timeDifference < bestTimeDifference || (timeDifference == bestTimeDifference && bestSig.selfCorrelation > bestSigCorrelation))
       {
-        bestSigCorrelation = bestSig.correlation;
+        bestSigCorrelation = bestSig.selfCorrelation;
         bestSigTime = &bestSig;
       }
     }
