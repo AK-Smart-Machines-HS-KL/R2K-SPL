@@ -45,10 +45,6 @@ CARD(PointingCalibrationCard,
      DEFINES_PARAMETERS(
           {,
        //Define Params here
-       (unsigned)(0) startTime,
-       (bool)(false) hasRun1,
-       (bool)(false) hasRun2,
-       (bool)(false) hasRun3,
        (bool)(false) hasReachedDefaultPose,
        (bool)(false) hasReachedCenterCircle,
        (bool)(false) hasReachedBall,
@@ -89,9 +85,22 @@ private:
     {
       transition
       {
-             if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] == 1) goto state1; // gehe zum Startpunkt dann zeige auf Mittelkreis
-        else if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] == 2) goto state2; // gehe zum Mittelkreis dann zeige auf Ball
-        else if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] == 3) goto state3; // gehe zum Ball dann zeige auf rechten Torpfosten
+             // Mehrmals Tippen, um direkt in einen höheren state zu kommen
+             if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] == 1){
+               SystemCall::say("I go to the default pose and then I point at the center circle");
+               OUTPUT_TEXT("I go to the default pose and then I point at the center circle");
+               goto state1; // gehe direkt zum Startpunkt dann zeige auf Mittelkreis
+             }
+        else if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] == 2){
+               SystemCall::say("I go to the center circle and then I point at the ball");
+               OUTPUT_TEXT("I go to the center circle and then I point at the ball");
+               goto state2; // gehe direkt zum Mittelkreis dann zeige auf Ball
+             }
+        else if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] == 3) {
+               SystemCall::say("I go to the ball and then I point at the right goalpost");
+               OUTPUT_TEXT("I go to the ball and and then I point at the right goalpost.");
+               goto state3; // gehe direkt zum Ball dann zeige auf rechten Torpfosten
+             }
         else isActive = false;
       }
     }
@@ -100,12 +109,6 @@ private:
     {
       action
       {
-        if (!hasRun1) {
-          hasRun1 = true;
-          SystemCall::say("I go to the default pose and then I point at the center circle");
-          OUTPUT_TEXT("I go to the default pose and then I point at the center circle");
-        }
-
 
         // Relative Koordinate der Startposition
         Pose2f DefaultPose_relativeCoordinate = theRobotPose.toRelative(theDefaultPose.ownDefaultPose);
@@ -139,8 +142,11 @@ private:
       }
         transition
       {
-        if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] > 1)
+        if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] > 0){
+          SystemCall::say("I go to the center circle and then I point at the ball");
+          OUTPUT_TEXT("I go to the center circle and then I point at the ball");
           goto state2;
+        }
       }
     }
 
@@ -148,12 +154,6 @@ private:
     {
       action
       {
-        if (!hasRun2) {
-        hasRun2 = true;
-        SystemCall::say("I go to the center circle and then I point at the ball");
-        OUTPUT_TEXT("I go to the center circle and then I point at the ball");
-        }
-
 
         // Relative Koordinate des Mittelkreises
         Pose2f centerCircle_relativeCoordinate = theRobotPose.toRelative(Pose2f(0_deg, 0.f, 0.f));
@@ -187,8 +187,11 @@ private:
       }
         transition
       {
-        if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] > 2)
-          goto state3;
+        if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] > 0) {
+          SystemCall::say("I go to the ball and then I point at the right goalpost");
+          OUTPUT_TEXT("I go to the ball and and then I point at the right goalpost.");
+          goto state2;
+        }
       }
     }
 
@@ -196,12 +199,6 @@ private:
     {
       action
       {
-        if (!hasRun3) {
-        hasRun3 = true;
-        SystemCall::say("I go to the ball and then I point at the right goalpost");
-        OUTPUT_TEXT("I go to the ball and and then I point at the right goalpost.");
-        }
-
 
         // Relative Koordinate des Balls
         Pose2f ball_relativeCoordinate = theRobotPose.toRelative(theFieldBall.recentBallEndPositionOnField());
@@ -237,8 +234,11 @@ private:
       }
         transition
       {
-        if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] > 3)
+        if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] > 0) {
+          SystemCall::say("Calibration card completed");
+          OUTPUT_TEXT("Calibration card completed");
           isActive = false;
+        }
       }
     }
 
