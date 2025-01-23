@@ -21,7 +21,7 @@ Studierende, die mit an der Challenge arbeiten, erhalten einen Einblick in die a
 
 Die ersten Test von B-Huamn die uns als Inpiration dienten:
 
-![Inspirations Video von B-Human](https://www.youtube.com/watch?v=ufiUQ-02DWk)
+[![Inspiration von B-human](https://img.youtube.com/vi/ufiUQ-02DWk/0.jpg)](https://www.youtube.com/watch?v=ufiUQ-02DWk)
 
 
 Hier findet man auch das Rule Book für die Technichal Challange 2025 wo auch der tatsächliche Setup genauer erklärt wird:
