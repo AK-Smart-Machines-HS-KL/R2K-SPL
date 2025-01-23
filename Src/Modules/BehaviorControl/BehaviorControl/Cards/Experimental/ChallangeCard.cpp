@@ -5,7 +5,9 @@
  *        In this Card the Ball is not aktually kicked,
  *        instead a walk into the Ball is performed to "fake" a kick forward.
  *        TODO Live Test with Real robots
- * @version 1.0
+ * 
+ *        version 1.1 The Interceptpoint can no longer be behind the Robot
+ * @version 1.1
  * @date 2025-19-01
  *
  *
@@ -48,18 +50,31 @@ CARD(ChallangeCard,
        REQUIRES(FieldDimensions),
        REQUIRES(BallModel),
        REQUIRES(BallSpecification),
+       /*
+        LOADS_PARAMETERS(
+             {,
+              (Vector2f) interceptPoint,
+              (bool) pointIsSelected,
+              (bool) done,                    // Kümmert sich um die Beendung der Card
+              (bool) walking,
+              (float) interceptFactor, // veringere diesen Wert um den Ball früher in seiner Lufbahn zu intercepten
+              (float) minDistanceFactor, // eröhe diesen Wert um den distanz zu erhöhen die der Ball unterschreiten muss damit der Roboter reagiert
+          }),
+         */ 
 
-
+       
        DEFINES_PARAMETERS(
       {,
          (Vector2f)(Vector2f(200.f,0.f)) interceptPoint, // just a few steps forward 
          (bool)(false) pointIsSelected, // InterceptPoint wird nur einmal berechnet
-         (float)(0.4f) interceptOffset, // veringere diesen Wert um den Ball früher in seiner Lufbahn zu intercepten
-         (float)(0.6f) minDistanceOffset, // eröhe diesen Wert um den distanz zu erhöhen die der Ball unterschreiten muss damit der Roboter reagiert
+         (float)(0.6f) interceptFactor, // veringere diesen Wert um den Ball früher in seiner Lufbahn zu intercepten
+         (float)(0.8f) minDistanceFactor, // eröhe diesen Wert um den distanz zu erhöhen die der Ball unterschreiten muss damit der Roboter reagiert
          (bool)(false) done,        
          (bool)(false) walking,     // Kümmert sich um die Beendung der Card
       }),
+      
     });
+    
 
 class ChallangeCard : public ChallangeCardBase
 {
@@ -127,8 +142,14 @@ class ChallangeCard : public ChallangeCardBase
     //relative InterceptPoint 
     Vector2f calcInterceptPoint() const
     {
-      Vector2f temp = BallPhysics::propagateBallPosition(theFieldBall.recentBallPositionOnField(), theBallModel.estimate.velocity, interceptOffset, theBallSpecification.friction);
-      temp.x() = temp.x() + 200.f;
+      Vector2f temp = BallPhysics::propagateBallPosition(theFieldBall.recentBallPositionOnField(), theBallModel.estimate.velocity, interceptFactor, theBallSpecification.friction);
+      if (temp.x() > 0)
+      {
+        temp.x() = temp.x() + 200.f;
+      }
+      else {
+        temp.x() = temp.x() - 200.f;
+      }
       return temp;
     }
 
@@ -140,7 +161,7 @@ class ChallangeCard : public ChallangeCardBase
       float temp2 = temp1.x() * temp1.x();
       float temp3 = temp1.y() * temp1.y();
       float result = std::sqrt(temp2 + temp3);
-      return result * minDistanceOffset;
+      return result * minDistanceFactor;
     }
 };
 
