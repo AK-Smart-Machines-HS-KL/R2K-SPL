@@ -29,76 +29,77 @@ Hier findet man auch das Rule Book für die Technichal Challange 2025 wo auch de
 [Downlaod Seite für das Regelwerk](https://spl.robocup.org/downloads/)
  
 
-Die genutzte Card ist ChallangeCard
-game stack: fast alle Cards löschen, TeachIn auch gelöscht
+Die genutzte Card ist ChallangeCard </br>
+game stack: fast alle Cards löschen, TeachIn auch gelöscht </br>
 
-1) SetUp um  Challenge nachbauen
-IRBChallange.ros2 (Für ein Fast Game auf schwachen Maschinen)
-ODER
-IRBCHallangeOraclePerceptor.ros2 (Für ein besser simulierten Roboter) -> noch Probleme mit der Ödometrie (der Roboter weis nicht wo er ist)
-Hier wird der Ball direkt vor die Füße von Roboter 1 gespielt dieser sollte dann auch
-in den rollenden Ball reinlaufen 
+## 1) SetUp um  Challenge nachbauen
+IRBChallange.ros2 (Für ein Fast Game auf schwachen Maschinen) </br>
+ODER </br>
+IRBCHallangeOraclePerceptor.ros2 (Für ein besser simulierten Roboter) -> noch Probleme mit der Ödometrie (der Roboter weis nicht wo er ist) </br>
+Hier wird der Ball direkt vor die Füße von Roboter 1 gespielt dieser sollte dann auch </br>
+in den rollenden Ball reinlaufen </br>
 
-2) corner kick, 
-ziele für den ball elfmeter punkt ODER
-pass-spiel direkt vor die Füße
-ball läuft vor dem bot schnell vorbei
+## 2) corner kick, 
+ziele für den ball elfmeter punkt ODER </br>
+pass-spiel direkt vor die Füße </br>
+ball läuft vor dem bot schnell vorbei </br>
 
 
------Testing Setup:------
+### -----Testing Setup:------
 
-Öffne im Simulator die Scene IRBChallange.ros2
-diese führt den nötigen setup automatisch durch
+Öffne im Simulator die Scene IRBChallange.ros2 </br>
+diese führt den nötigen setup automatisch durch </br>
 
 Alternativ:
-using OneTeamFast.ros2 ignoriere einfach ddie Dummies
-First `gc playing` (ansonsten wird der CornerKick nicht ausgefürht)
-then ´mvb -4300 2900 0´
-then bewege robot 4 näher an den Ball damit er Diesen rechtzeigit erreicht
-then wähle robot 5 und benutze den Befehl ´mv -3550 0 300´
-then ´gc cornerKickForFirstTeam´
-die CornerKickCard wurde so modifizeirt das der Ball for die Füße des Roboters form Tor gespielt werden sollte
+using OneTeamFast.ros2 ignoriere einfach ddie Dummies </br>
+First `gc playing` (ansonsten wird der CornerKick nicht ausgefürht) </br>
+then ´mvb -4300 2900 0´ </br>
+then bewege robot 4 näher an den Ball damit er Diesen rechtzeigit erreicht </br>
+then wähle robot 5 und benutze den Befehl ´mv -3550 0 300´ </br>
+then ´gc cornerKickForFirstTeam´ </br>
+die CornerKickCard wurde so modifizeirt das der Ball for die Füße des Roboters form Tor gespielt werden sollte</br>
 
 copy - paste - List:
 
-gc playing
-mvb -4300 2900 0
-mv -3550 0 300
-gc cornerKickForFirstTeam
+gc playing </br>
+mvb -4300 2900 0 </br>
+mv -3550 0 300 </br>
+gc cornerKickForFirstTeam </br>
 
+# 3) welche skill
 
-3) welche skill
-
-gotoBall: viele Paramter schussteuerung
+### gotoBall: viele Paramter schussteuerung
 welche kombination bringen welchen erfolg: -> schuss wirst bei Ball stopp ausgelöst bei alln Kombinationen
 
-Rexamination mit größerer Rangea (20_deg -> 40_deg -> 80_deg -> 140_deg -> 180_deg)
+Rexamination mit größerer Rangea (20_deg -> 40_deg -> 80_deg -> 140_deg -> 180_deg) </br>
 Result: Keine Änderung zu vorher
 
-walktToBall: obstacleAvoidance ausschalten
-obstacle avoidance kann nicht ausgeschaltet werden? -> schuss zu langsam nicht wünchenstwert 
-gleiches Problem wie bei GotoBall versucht dem Ball hinterherzulaufen anstatt einfach zu kicken
+### walktToBall: obstacleAvoidance ausschalten
+obstacle avoidance kann nicht ausgeschaltet werden? -> schuss zu langsam nicht wünchenstwert </br> 
+gleiches Problem wie bei GotoBall versucht dem Ball hinterherzulaufen anstatt einfach zu kicken </br>
 
-Dribble:
-gleiches problem wie bei WalktoBall
+### Dribble:
+gleiches problem wie bei WalktoBall </br>
 
-WalkToPoint:
-Anstelle den Ball zu treten in den Ball rein laufen -> schlechter kick
-Ergebnis: Vielverschprechendes Ergebnis -> muss noch dynamischer angepasst werden
-Echte Naos: In echt sidn die Naos langsamer -> Reaktion entspechend den Naos anpassen oder die Geschwindigkeit für die wenigen Schritte erhöhen
+### WalkToPoint:
+Anstelle den Ball zu treten in den Ball rein laufen -> schlechter kick </br>
+Ergebnis: Vielverschprechendes Ergebnis -> muss noch dynamischer angepasst werden </br>
+Echte Naos: In echt sidn die Naos langsamer -> Reaktion entspechend den Naos anpassen oder die Geschwindigkeit für die wenigen Schritte erhöhen </br>
 
-Dynamisches Anlaufen: Im Simulator viel zuverlässiger -> muss noch an echten naos getestet werden 
-Erstes Testergebnis: Vorzeichen Fehler beim InterceptPoint -> der Roboter ist nahc hinten gelaufen
--> ein einfaches IF statement um dies zu vermeiden
+Dynamisches Anlaufen: Im Simulator viel zuverlässiger -> muss noch an echten naos getestet werden </br>
+Erstes Testergebnis: Vorzeichen Fehler beim InterceptPoint -> der Roboter ist nahc hinten gelaufen </br>
+-> ein einfaches IF statement um dies zu vermeiden </br>
 
 Dynamisches anlaufen:
- - der Abstand zum Ball der unterschritten werden muss damit der Roboter reagiert, wird anhand der Geschwindigkeit des Balls berechnet mite der Funktion calcMinDistance
- - der InterceptPoint (Der Punkt der angelaufen wird) wird ebenfalls anhand der geschwindigkeit des Balls berechnet mit der Funktion calcInterceptPoint
+ - der Abstand zum Ball der unterschritten werden muss damit der Roboter reagiert, </br>
+ wird anhand der Geschwindigkeit des Balls berechnet mite der Funktion calcMinDistance
+ - der InterceptPoint (Der Punkt der angelaufen wird), </br>
+ wird ebenfalls anhand der geschwindigkeit des Balls berechnet mit der Funktion calcInterceptPoint
 
-die oben berechneten Werte werden nochmal um jeweils einen eigenen Faktor multipliziert:
+die oben berechneten Werte werden nochmal um jeweils einen eigenen Faktor multipliziert: </br>
 Diese können in dem Code je nach Test erfolgen angepassst werden -> in eine Config umlegen für schnelleres anpassen
 
-Beispiel Video:
+### Beispiel Video:
 
 Findet man Hier im Ordner mit dem Namen: 2025-01-20 21-41-55.mp4
 
