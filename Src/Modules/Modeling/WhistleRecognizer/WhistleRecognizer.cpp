@@ -221,23 +221,24 @@ void WhistleRecognizer::update(Whistle& theWhistle)
       whistleTimes.emplace_back(bestSignature->name, theFrameInfo.time);
       OUTPUT_TEXT("Best Signature found: " << bestSignature->name << " at " << theFrameInfo.time);
       ANNOTATION("BestSignature", bestSignature->name << " at " << theFrameInfo.time);
-      if(theGameInfo.state == STATE_PLAYING)
+      
+    }
+    if (theGameInfo.state == STATE_PLAYING)
+    {
+      // Find the whistle closest to the STATE_PLAYING time
+      int playingTime = theFrameInfo.time;
+      int minDiff = std::numeric_limits<int>::max();
+      for (const auto& whistleTime : whistleTimes)
       {
-        // Find the whistle closest to the STATE_PLAYING time
-        int playingTime = theFrameInfo.time;
-        int minDiff = std::numeric_limits<int>::max();
-        for(const auto& whistleTime : whistleTimes)
+        int diff = std::abs(whistleTime.second - playingTime);
+        if (diff < minDiff)
         {
-          int diff = std::abs(whistleTime.second - playingTime);
-          if(diff < minDiff)
-          {
-            minDiff = diff;
-            closestWhistle = whistleTime.first;
-          }
+          minDiff = diff;
+          closestWhistle = whistleTime.first;
         }
-        OUTPUT_TEXT("Whistle: " << closestWhistle << " found as closest Whistle");
-        ANNOTATION("WhistleRecognizer", closestWhistle << " with difference off " << minDiff);
       }
+      OUTPUT_TEXT("Whistle: " << closestWhistle << " found as closest Whistle");
+      ANNOTATION("WhistleRecognizer", closestWhistle << " with difference off " << minDiff);
     }
 
     samplesRequired = static_cast<unsigned>(bufferSize * newSampleRatio);
