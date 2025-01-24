@@ -1,5 +1,3 @@
-call Includes/PerceptOracle
-dr debugDrawing3d:representation:RobotInfo 
-dr debugDrawing3d:representation:TeamBallModel
+call Includes/Normal
 call ChallangeSetup
 
