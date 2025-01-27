@@ -28,6 +28,7 @@
 #include "Representations/Communication/TeamData.h"
 #include "Representations/Modeling/BallModel.h"
 #include "Representations/Configuration/BallSpecification.h"
+#include "Representations/BehaviorControl/Shots.h"
 
 
 //#include <filesystem>
@@ -45,6 +46,8 @@ CARD(ChallangeCard,
        CALLS(LookAtBall),
        CALLS(WalkToKickoffPose),
        CALLS(TurnAngle),
+       CALLS(GoToBallAndKick),
+       REQUIRES(Shots),
        REQUIRES(FieldBall),
        REQUIRES(RobotPose),
        REQUIRES(FieldDimensions),
@@ -67,8 +70,8 @@ CARD(ChallangeCard,
       {,
          (Vector2f)(Vector2f(200.f,0.f)) interceptPoint, // just a few steps forward 
          (bool)(false) pointIsSelected, // InterceptPoint wird nur einmal berechnet
-         (float)(0.6f) interceptFactor, // veringere diesen Wert um den Ball früher in seiner Lufbahn zu intercepten
-         (float)(0.8f) minDistanceFactor, // eröhe diesen Wert um den distanz zu erhöhen die der Ball unterschreiten muss damit der Roboter reagiert
+         (float)(2.0f) interceptFactor, // veringere diesen Wert um den Ball früher in seiner Lufbahn zu intercepten
+         (float)(1.2f) minDistanceFactor, // eröhe diesen Wert um den distanz zu erhöhen die der Ball unterschreiten muss damit der Roboter reagiert
          (bool)(false) done,        
          (bool)(false) walking,     // Kümmert sich um die Beendung der Card
       }),
@@ -101,6 +104,7 @@ class ChallangeCard : public ChallangeCardBase
       float minDistance = calcMinDistance();
       
         if (calcDistanceToBall() <= minDistance) {
+          
              
             //// InterceptPoint wird nur einmal berechnet
           if (!pointIsSelected) {
@@ -108,9 +112,11 @@ class ChallangeCard : public ChallangeCardBase
             pointIsSelected = true;
           }
               //Die Kick Skills sind nicht schnell genug um einen rollenden Ball zu intercepten stadesssen nutzen wir einen Lauf in den Ball rein um einen Kick zu simulieren
-             theWalkToPointSkill(Pose2f(0_deg, interceptPoint), 1.f, true, true, true);
+             theWalkToPointSkill(Pose2f(0_deg, interceptPoint), 1.f, true, true, true, true);
              theLookAtBallSkill(); // HeadMotion controll
              walking = true;
+          
+
 
         }else
         {
@@ -118,7 +124,7 @@ class ChallangeCard : public ChallangeCardBase
           {
             done = true;
           }
-          theTurnAngleSkill(calcAngleToGoal() + 30_deg, 2_deg);
+          theTurnAngleSkill(calcAngleToGoal() + 30_deg, 0_deg);
           theLookAtBallSkill();
         }
       

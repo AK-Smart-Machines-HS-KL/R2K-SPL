@@ -2,24 +2,24 @@
 
 Momentaner Arbeiter des Branches 2025-03-IRB:
 
-Name: 		Dennis Fuhrmann
-E-mail:		defu1001@stud.hs-kl.de
-Discord name:	PinkPummeler
+Name: 		Dennis Fuhrmann </br>
+E-mail:		defu1001@stud.hs-kl.de </br>
+Discord name:	PinkPummeler </br>
 
 Dieser Branch befasst mit der Intercept Rolling Ball Challenge 2025, hier noch eine genauere erklärung vom Teamleiter Wilhelm:
 
-3. IRB - Intercept Rolling Ball (Technical Challenge 2025)
+3. IRB - Intercept Rolling Ball (Technical Challenge 2025) </br></br>
 
-Eine technische Challenge beim RoboCup2025 wird sein einen von einer Rampe rollenden Ball abzufangen und direkt zu spielen. 
-Bestenfalls wird dabei erwartet, dass der Ball angefangen und dann zu einem Mitspieler gepasst wird, sodass wir direkt die Indirect-Kick-Rule beachten und das Verhalten somit auch ins Turnierspiel integrieren können.
+Eine technische Challenge beim RoboCup2025 wird sein einen von einer Rampe rollenden Ball abzufangen und direkt zu spielen.</br> 
+Bestenfalls wird dabei erwartet, dass der Ball angefangen und dann zu einem Mitspieler gepasst wird, sodass wir direkt die Indirect-Kick-Rule beachten und das Verhalten somit auch ins Turnierspiel integrieren können.</br></br>
 
-Die Idee hierbei ist die Ballannahme beim Pass, sowie das Abfangen schneller Bälle vom Gegner zu optimieren.
+Die Idee hierbei ist die Ballannahme beim Pass, sowie das Abfangen schneller Bälle vom Gegner zu optimieren.</br></br>
 
-Studierende, die mit an der Challenge arbeiten, erhalten einen Einblick in die aktuellen Challenges im RoboCup und somit in die Hürden,
- die der Robotik softwareseitig noch auferlegt sind. Es gilt sich in die Verhaltens-, aber auch einen Schritt tiefer, in die Körpersteuerung einzuarbeiten,
- um aus dem Roboter eine erhöhte Reaktionszeit und ein angemessenes Abfangverhalten herauszuholen.
+Studierende, die mit an der Challenge arbeiten, erhalten einen Einblick in die aktuellen Challenges im RoboCup und somit in die Hürden,</br>
+ die der Robotik softwareseitig noch auferlegt sind. Es gilt sich in die Verhaltens-, aber auch einen Schritt tiefer, in die Körpersteuerung einzuarbeiten,</br>
+ um aus dem Roboter eine erhöhte Reaktionszeit und ein angemessenes Abfangverhalten herauszuholen.</br></br>
 
-Die ersten Test von B-Huamn die uns als Inpiration dienten:
+Die ersten Test von B-Huamn die uns als Inpiration dienten:</br>
 
 [![Inspiration von B-human](https://img.youtube.com/vi/ufiUQ-02DWk/0.jpg)](https://www.youtube.com/watch?v=ufiUQ-02DWk)
 
