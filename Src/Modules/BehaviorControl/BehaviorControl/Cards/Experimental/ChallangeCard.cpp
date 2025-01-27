@@ -34,6 +34,7 @@
 //#include <filesystem>
 #include "Tools/Modeling/BallPhysics.h"
 #include "Tools/Math/Eigen.h"
+#include "Tools/Math/Geometry.h"
 #include "Tools/BehaviorControl/Interception.h"
 
 
@@ -53,25 +54,14 @@ CARD(ChallangeCard,
        REQUIRES(FieldDimensions),
        REQUIRES(BallModel),
        REQUIRES(BallSpecification),
-       /*
-        LOADS_PARAMETERS(
-             {,
-              (Vector2f) interceptPoint,
-              (bool) pointIsSelected,
-              (bool) done,                    // Kümmert sich um die Beendung der Card
-              (bool) walking,
-              (float) interceptFactor, // veringere diesen Wert um den Ball früher in seiner Lufbahn zu intercepten
-              (float) minDistanceFactor, // eröhe diesen Wert um den distanz zu erhöhen die der Ball unterschreiten muss damit der Roboter reagiert
-          }),
-         */ 
-
+       
        
        DEFINES_PARAMETERS(
       {,
          (Vector2f)(Vector2f(200.f,0.f)) interceptPoint, // just a few steps forward 
          (bool)(false) pointIsSelected, // InterceptPoint wird nur einmal berechnet
-         (float)(2.0f) interceptFactor, // veringere diesen Wert um den Ball früher in seiner Lufbahn zu intercepten
-         (float)(1.2f) minDistanceFactor, // eröhe diesen Wert um den distanz zu erhöhen die der Ball unterschreiten muss damit der Roboter reagiert
+         (float)(3.0f) interceptFactor, // veringere diesen Wert um den Ball früher in seiner Lufbahn zu intercepten
+         (float)(1.4f) minDistanceFactor, // eröhe diesen Wert um den distanz zu erhöhen die der Ball unterschreiten muss damit der Roboter reagiert
          (bool)(false) done,        
          (bool)(false) walking,     // Kümmert sich um die Beendung der Card
       }),
@@ -149,14 +139,15 @@ class ChallangeCard : public ChallangeCardBase
     Vector2f calcInterceptPoint() const
     {
       Vector2f temp = BallPhysics::propagateBallPosition(theFieldBall.recentBallPositionOnField(), theBallModel.estimate.velocity, interceptFactor, theBallSpecification.friction);
+      Vector2f result = Vector2f::Zero();
       if (temp.x() > 0)
       {
-        temp.x() = temp.x() + 200.f;
+        result = Vector2f(temp.x() + 100.f, temp.y() + 100.f);
       }
       else {
-        temp.x() = temp.x() - 200.f;
+        result = Vector2f(temp.x() - 100.f, temp.y() - 50.f);
       }
-      return temp;
+      return result;
     }
 
 
@@ -167,7 +158,10 @@ class ChallangeCard : public ChallangeCardBase
       float temp2 = temp1.x() * temp1.x();
       float temp3 = temp1.y() * temp1.y();
       float result = std::sqrt(temp2 + temp3);
-      float distance = Geamoetrie.getDistanceToLine(theFieldBall.recentBallPositionRelative(), temp1, Vector2f::Zero());
+      float distance = 0.f;
+        if (result >= 1) {
+          distance = Geometry::getDistanceToLine(Geometry::Line(theFieldBall.recentBallPositionRelative(), temp1), Vector2f::Zero());
+        }
       return (result + distance) * minDistanceFactor;
     }
 };
