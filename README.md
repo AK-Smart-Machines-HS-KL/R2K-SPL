@@ -102,6 +102,7 @@ Diese können in dem Code je nach Test erfolgen angepassst werden -> in eine Con
 
 ### Beispiel Video:
 
-Findet man Hier im Ordner mit dem Namen: 2025-01-20 21-41-55.mp4
-
+Findet man Hier im Ordner mit dem Namen 
+- für Fast: 2025-01-20 21-41-55.mp4
+- für Normal: 2025-01-27 20-32-18.mp4
 
