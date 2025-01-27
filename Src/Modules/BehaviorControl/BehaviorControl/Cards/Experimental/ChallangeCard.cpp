@@ -161,7 +161,8 @@ class ChallangeCard : public ChallangeCardBase
       float temp2 = temp1.x() * temp1.x();
       float temp3 = temp1.y() * temp1.y();
       float result = std::sqrt(temp2 + temp3);
-      return result * minDistanceFactor;
+      float distance = Geamoetrie.getDistanceToLine(theFieldBall.recentBallPositionRelative(), temp1, Vector2f::Zero());
+      return (result + distance) * minDistanceFactor;
     }
 };
 
