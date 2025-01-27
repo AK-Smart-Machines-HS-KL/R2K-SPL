@@ -102,7 +102,17 @@ Diese können in dem Code je nach Test erfolgen angepassst werden -> in eine Con
 
 ### Beispiel Video:
 
-Findet man Hier im Ordner mit dem Namen 
-- für Fast: 2025-01-20 21-41-55.mp4
-- für Normal: 2025-01-27 20-32-18.mp4
+- für Fast: </br>
+
+
+https://github.com/user-attachments/assets/f2cd8e37-bab2-4473-a884-26c7c3786432
+
+- für Normal: </br>
+
+
+https://github.com/user-attachments/assets/d67f9cb2-a863-4b5b-a6e3-0eb94ae47f5f
+
+
+
+
 
