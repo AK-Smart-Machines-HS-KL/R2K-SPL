@@ -90,6 +90,7 @@ Dynamisches Anlaufen: Im Simulator viel zuverlässiger -> muss noch an echten na
 Erstes Testergebnis: Vorzeichen Fehler beim InterceptPoint -> der Roboter ist nach hinten gelaufen </br>
 -> ein einfaches IF statement um dies zu vermeiden </br>
 -> Stand 24.01 das Problem bleibt beim echten Roboter bestehen </br>
+-> Stand 27.01 das Problem konnte reproduzeirt werden wenn der Ball sich nicht bewegt aber unter dem Schwellwert liegt </br>
 
 Dynamisches anlaufen:
  - der Abstand zum Ball der unterschritten werden muss damit der Roboter reagiert, </br>
