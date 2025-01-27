@@ -87,8 +87,9 @@ Ergebnis: Vielverschprechendes Ergebnis -> muss noch dynamischer angepasst werde
 Echte Naos: In echt sidn die Naos langsamer -> Reaktion entspechend den Naos anpassen oder die Geschwindigkeit für die wenigen Schritte erhöhen </br>
 
 Dynamisches Anlaufen: Im Simulator viel zuverlässiger -> muss noch an echten naos getestet werden </br>
-Erstes Testergebnis: Vorzeichen Fehler beim InterceptPoint -> der Roboter ist nahc hinten gelaufen </br>
+Erstes Testergebnis: Vorzeichen Fehler beim InterceptPoint -> der Roboter ist nach hinten gelaufen </br>
 -> ein einfaches IF statement um dies zu vermeiden </br>
+-> Stand 24.01 das Problem bleibt beim echten Roboter bestehen </br>
 
 Dynamisches anlaufen:
  - der Abstand zum Ball der unterschritten werden muss damit der Roboter reagiert, </br>
