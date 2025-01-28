@@ -150,7 +150,7 @@ void BeepRecognizer::update(Beep &theBeep){
   //   }
   //   SEND_DEBUG_IMAGE("module:BeepRecognizer", image);
   // }
-
+/*
      //Kurze say ausgabe zum testen
     if (theBeep.messages[2] > 1) {
             if (responseToggle) 
@@ -182,8 +182,106 @@ void BeepRecognizer::update(Beep &theBeep){
         } else {
             responseToggle = true;
         }
+*/
+
+//4bit version
+for (int i=0;i<=4;i++){
+   if (theRobotInfo.number==i){
+    //i++;
+   }
+   if(theBeep.messages[i] >= 1){
+    if(theBeep.messages[i] < 5){
+      
+      //Robot specific
+       for (int j=1;j<=5;j++){
+        if (theRobotInfo.number==j){
+        if (theBeep.messages[i]==(j-1)*2+6){
+        SystemCall::say("msg"+(j-1)*2+6);
+        SystemCall::say("robot"+i+1);   
+        }
+        if (theBeep.messages[i]==(j-1)*2+7){
+        SystemCall::say("msg"+((j-1)*2+7));
+        SystemCall::say("robot"+i+1);
+        }
+      }
+    }  
+/*
+      if (theRobotInfo.number==1){
+        if (theBeep.messages[i]==6){
+
+        }
+        if (theBeep.messages[i]==7){
+
+        }
+      }
+      if (theRobotInfo.number==2){
+        if (theBeep.messages[i]==8){
+
+        }
+        if (theBeep.messages[i]==9){
+
+        }
+      }
+      if (theRobotInfo.number==3){
+        if (theBeep.messages[i]==10){
+
+        }
+        if (theBeep.messages[i]==11){
+
+        }
+      }
+      if (theRobotInfo.number==4){
+        if (theBeep.messages[i]==12){
+
+        }
+        if (theBeep.messages[i]==13){
+
+        }
+      }
+      if (theRobotInfo.number==5){
+        if (theBeep.messages[i]==14){
+
+        }
+        if (theBeep.messages[i]==15){
+
+        }
+      }
+
+    
+    }
+*/
+
+}
+//broadcast
+switch(theBeep.messages[i]) {
+  case 1:
+  SystemCall::say("msg 1 robot"+i+1);
+  OUTPUT_TEXT("test1"); 
+    break;
+  case 2:
+  SystemCall::say("msg 2 robot"+i+1);
+  OUTPUT_TEXT("test2"); 
+    break;
+  case 3:
+  SystemCall::say("msg 3 robot"+i+1);
+  OUTPUT_TEXT("test3"); 
+    break;
+  case 4:
+  SystemCall::say("msg 4 robot"+i+1);
+  OUTPUT_TEXT("test4"); 
+    break;
+  case 5:
+  SystemCall::say("msg 5 robot"+i+1);
+  OUTPUT_TEXT("test5"); 
+    break;
+  default:
+  SystemCall::say("something went wrong");  
+}
+   
+}
 
 
+}
 
 }
 

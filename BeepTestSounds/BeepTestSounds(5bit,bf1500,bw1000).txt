@@ -1,0 +1,46 @@
+Robot nr. 2 broadcasting message 31(2500Hz)
+Robot nr. 2 broadcasting message 31(2700Hz)
+Robot nr. 2 broadcasting message 31(2900Hz)
+Robot nr. 2 broadcasting message 31(3100Hz)
+Robot nr. 2 broadcasting message 31(3300Hz)
+
+The Beeps: 28 8 0 0 0
+The Beeps: 30 8 0 0 0
+
+
+Robot nr. 2 broadcasting message 30(2700Hz)
+Robot nr. 2 broadcasting message 30(2900Hz)
+Robot nr. 2 broadcasting message 30(3100Hz)
+Robot nr. 2 broadcasting message 30(3300Hz)
+The Beeps: 0 30 0 0 0
+
+Robot nr. 2 broadcasting message 23(2500Hz)
+Robot nr. 2 broadcasting message 23(2700Hz)
+Robot nr. 2 broadcasting message 23(2900Hz)
+Robot nr. 2 broadcasting message 23(3300Hz)
+
+0 23 0 0 0
+
+
+Robot nr. 5 broadcasting message 23(5500Hz)
+Robot nr. 5 broadcasting message 23(5700Hz)
+Robot nr. 5 broadcasting message 23(5900Hz)
+Robot nr. 5 broadcasting message 23(6300Hz)
+The Beeps: 0 0 0 0 23
+
+
+Robot nr. 5 broadcasting message 1(5500Hz)
+
+The Beeps: 0 0 0 0 1
+
+
+Robot nr. 5 broadcasting message 11(5500Hz)
+Robot nr. 5 broadcasting message 11(5700Hz)
+Robot nr. 5 broadcasting message 11(6100Hz)
+
+The Beeps: 0 0 0 0 11
+
+Robot nr. 5 broadcasting message 16(6300Hz)
+
+
+The Beeps: 0 0 0 0 16

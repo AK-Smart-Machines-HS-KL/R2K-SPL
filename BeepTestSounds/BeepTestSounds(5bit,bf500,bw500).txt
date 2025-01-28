@@ -1,0 +1,19 @@
+Robot nr. 2 broadcasting message 20(1200Hz)
+Robot nr. 2 broadcasting message 20(1400Hz)
+
+The Beeps: 0 28 0 0 0
+The Beeps: 0 20 0 0 0
+
+higher treshold 
+The Beeps: 0 20 0 0 0
+
+
+Robot nr. 2 broadcasting message 31(1000Hz)
+Robot nr. 2 broadcasting message 31(1100Hz)
+Robot nr. 2 broadcasting message 31(1200Hz)
+Robot nr. 2 broadcasting message 31(1300Hz)
+Robot nr. 2 broadcasting message 31(1400Hz)
+
+The Beeps: 23 1 1 0 0
+The Beeps: 23 1 17 0 4
+The Beeps: 31 25 17 1 4
