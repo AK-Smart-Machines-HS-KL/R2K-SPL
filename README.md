@@ -98,5 +98,5 @@ Menge der kodierten Bits erhöhen(aktuell 4) sowie Bandbreite erhöhen(aktuell 2
 [BeepRecognizer.cpp](Src/Modules/Communication/BeepComms/BeepRecognizer.cpp)  
 [Beep.h](Src/Representations/Communication/Beep.h)  
 [BeepCommData.h](Src/Representations/Infrastructure/BeepCommData.h)  
-[BeepBroadcaster.cfg](Config/Scenarios/Default/BeepBroadcaster.cfg)  
-[BeepRecognizer.cfg](Config/Scenarios/Default/BeepRecognizer.cfg)  
+[beepBroadcaster.cfg](Config/Scenarios/Default/beepBroadcaster.cfg)  
+[beepRecognizer.cfg](Config/Scenarios/Default/beepRecognizer.cfg)  
