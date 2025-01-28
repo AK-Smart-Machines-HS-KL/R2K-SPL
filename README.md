@@ -1,12 +1,4 @@
 # Audio Beeps Communication
-Anmerkungen für den Test am 15.01  
-in [BeepTestSounds](BeepTestSounds) sind mehrere aufgenommene beeps  
-wenn bei encoded bits 1 eingestellt ist wird unabhägig von message die Basisfrequenz kodiert(500,700...)  
-ich habe auch testweise die config auf 4 bit gestellt die Ergebnisse davon sind in [Beep Test Sounds.txt](Beep Test Sounds/Beep Test Sounds .txt)  
-in [BeepBroadcaster.cpp](Src/Modules/Communication/BeepComms/BeepBroadcaster.cpp)sind ab Zeile 98 simple SystemCall::say zum testen von R1M15,R1M10,R5M1,R3M1
-für den rest ist in Zeile 68 auskommentiert eine OUTPUT_TEXT Ausgabe hier kann man auch sehen ob mehrere Dinge erkannt werden(zugriff hierfür über den Simulator genauere Beschreibung weiter unten)  
-
-Namensschema R1M1 - Roboter 1 Message 1
 
 ## Kurzzusammenfassung
 Aufbauend auf den (Teil-) Projekten der Studien-Kollegen Fortune, Hobelsberger und Simus, soll die Audio-Kommunikation erweitert werden. Bisher ist es dem Team gelungen erfolgreich Sender und Empfänger für ein Audio-Kommunikationsprotokoll in einer "Proof of Concept"-Variante umzusetzen. Der nächste Schritt ist, dem Ganzen ein Protokoll zuzuweisen, über welches die Bots ihren Nachrichten Sinn verleihen und welches im Spiel eingesetzt werden kann. Gleichzeitig dient dies als Robustness-Test für den bisherigen Code, da die Roboter darin bisher immer nur das gleiche Signal erkannt haben.
@@ -34,7 +26,7 @@ Alternativer DNS 0.0.0.0
 ### Broadcaster
 Bei der Übertragung werden mittels Frequenzen startend von 500 in 200 Schritten die Nummer des Roboters kodiert(1->500,2->700...).  
 In diesen 200Hz Bändern werden aktuell in der Standartconfig nur 1 Bit Kodiert und damit immer die Basisfrequenz(1->500,2->700...) kodiert.
-Falls man nun die config auf 4 bit ändert beginnt er in 50Hz Schritten zu kodieren und mehrere davon anscheinend überlagerte.(siehe Spektogramme in [BeepTestSounds](BeepTestSounds)). 
+Falls man nun die config auf 4 bit ändert beginnt er in 50Hz(Spanne skaliert mit Anzahl kodierter Bits und bandWidth) Schritten zu kodieren und mehrere davon anscheinend überlagerte.(siehe Spektogramme in [BeepTestSounds](BeepTestSounds)). 
 
 Die Ein sowie Ausgabe basiert hier auf einem int 0-15, diese nennen wir message.
 
@@ -45,7 +37,7 @@ Hier wird mittels fftw(Fourier-Transformation) dekodiert und in Form eines std::
 |0|0|0|0|0| - keine message  |1|0|0|0|0| - message 1 bei Roboter 1(R1M1) |0|0|0|0|15| - message 15 bei Roboter 5(R5M15)
 
 
-In bisherigen Tests wurde nur |1|0|0|0|0| dedektiert und als Antwort eines Roboters der nicht die Nummer 1 trägt eine message 1 gesendet.
+Bisher falls |1|0|0|0|0| dedektiert wurde, wurde falls der Roboters nicht die Nummer 1 trägt eine message 1 als Antwort gesendet gesendet.
 
 ## Zugriff auf OUTPUT_TEXT mit Simulator
 Solange ein Nao in der bush verbunden ist, kann der Simulator genutzt werden um Daten des Roboter im laufenden Betrieb auszulesen. Hierzu zählen OUTPUT_TEXT() Statements die zum Debuggen bzw. einfachen Verifizieren des Codes verwendet werden kann. Hierzu muss bei verbundenem Roboter einfach nur in der bush, in der unteren Leiste der "Simulator" gestartet werden. Hier wird dann im "Console" Fenster der Output angezeigt.
@@ -54,6 +46,21 @@ Mit: << können Variabeln ausgegeben werden. Bsp.
 OUTPUT_TEXT("Irgendwas: " << x);
 
 Merke nach jedem Deploy muss der Simulator neugestartet werden
+
+## Änderungen am Code
+### Config
+averagingBufferSize = 15; averagingThreshold = 11; baseFrequency = 1500; bandWidth = 1000; encodedBits = 5;
+
+Durch obrige Änderungen zumindest in simplen Tests ohne zusätzliche Hintergrundgeräusche eine genaue erkennung möglich. Mit Ausnahme von message 31 welche nicht eindeutig oder sogar falsch erkannt wird. Lösungsvorschlag hier die 31 einfach zu ignorieren.
+
+### Broadcaster
+Neue Methode "BeepBroadcaster::requestBeep(int robot_number, int message)" die als Schnittstelle dient um im Code Beeps zu senden. Bisher noch Probleme bei der Nutzung
+
+### Regognizer
+Code zum aufrufen gewünschter Aktionen auf Basis der empfangenen messages. Aktuell noch Probleme mit merfach aufrufen.
+
+## Beep Test Sounds(Ordner)
+in [BeepTestSounds](BeepTestSounds) sind mehrere aufgenommene beeps sowie Testergebnisse. 
 
 
 ## Alte Problme
@@ -79,14 +86,19 @@ Weiterhin gab es ein Problem bei dem ./generate nichtmehr ausgeführt werden kon
 
 
 ## Aktuelle Problme
-Bei Unterhaltungen die während der Analyse des bestehenden Codes geführt wurden hat der Roboter mehrfach eine Message erkannt. Daraus folgt eine möglicherweise problematische Rate an falsch positiven Erkennungen.   
+Bei Unterhaltungen die während der Analyse des bestehenden Codes geführt wurden hat der Roboter mehrfach eine Message erkannt. Daraus folgt eine möglicherweise problematische Rate an falsch positiven Erkennungen. Durch Configänderungen abgeschwächt.   
 
 Bei manchen Frequenzen werden mehr als nur ein Roboter als Sender erkannt. Hierfür nocheinmal Wilhem fragen,da das Problem schon seit damals bekannt ist. Vieleicht hielft hier [SpektrumanalyseR1M1.PNG](BeepTestSounds/SpektrumanalyseR1M1.PNG)
 Bsp.(Zahlen müssen erst genauer bestimmt werden und dienen hier nur zu einfacheren veranschlichung)
 |1|0|13|0|0|
+Nach Configänderungen bisher nicht beobachtet allerdings immernoch möglich. 
 
 ## Zukünftige Arbeiten
-Menge der kodierten Bits erhöhen(aktuell 4) sowie Bandbreite erhöhen(aktuell 200 HZ) bzw. herausfinden ob und viel möglich ist.
+Merfach ausgabe im Regognizer fixen
+
+"BeepBroadcaster::requestBeep(int robot_number, int message)" Probleme fixen
+
+Demovideo drehen
 
 
 

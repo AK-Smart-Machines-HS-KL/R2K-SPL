@@ -184,6 +184,7 @@ void BeepRecognizer::update(Beep &theBeep){
         }
 */
 
+/*
 //4bit version
 for (int i=0;i<=4;i++){
    if (theRobotInfo.number==i){
@@ -250,7 +251,7 @@ for (int i=0;i<=4;i++){
     
     }
 */
-
+/*
 }
 //broadcast
 switch(theBeep.messages[i]) {
@@ -279,7 +280,67 @@ switch(theBeep.messages[i]) {
 }
    
 }
+*/
 
+
+//5bit version
+for (int i=0;i<=4;i++){
+   if (theRobotInfo.number==i){
+    //i++;
+   }
+   if(theBeep.messages[i] >= 1){
+    if(theBeep.messages[i] < 5){
+      
+      //Robot specific
+       for (int j=1;j<=5;j++){
+        if (theRobotInfo.number==j){
+        if (theBeep.messages[i]==(j-1)*4+9){
+        SystemCall::say("msg"+(j-1)*4+9);
+        SystemCall::say("robot"+i+1);   
+        }
+        if (theBeep.messages[i]==(j-1)*4+10){
+        SystemCall::say("msg"+((j-1)*4+10));
+        SystemCall::say("robot"+i+1);
+        }
+      }
+    }  
+
+
+}
+//broadcast
+switch(theBeep.messages[i]) {
+  case 1:
+  SystemCall::say("msg 1 robot"+i+1); 
+    break;
+  case 2:
+  SystemCall::say("msg 2 robot"+i+1);
+    break;
+  case 3:
+  SystemCall::say("msg 3 robot"+i+1);
+    break;
+  case 4:
+  SystemCall::say("msg 4 robot"+i+1);
+    break;
+  case 5:
+  SystemCall::say("msg 5 robot"+i+1);
+    break;
+  case 6:
+  SystemCall::say("msg 6 robot"+i+1); 
+    break;
+  case 7:
+  SystemCall::say("msg 7 robot"+i+1);
+    break;
+  case 8:
+  SystemCall::say("msg 8 robot"+i+1);
+    break;
+  case 9:
+  SystemCall::say("msg 9 robot"+i+1);
+    break;
+  default:
+  SystemCall::say("something went wrong");  
+}
+   
+}
 
 }
 

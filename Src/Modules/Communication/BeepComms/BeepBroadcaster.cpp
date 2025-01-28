@@ -142,6 +142,24 @@ void BeepBroadcaster::update(BeepCommData& beepCommData)
 }
 
 void BeepBroadcaster::requestBeep(int robot_number, int message)
+
+//5bit
+{
+//robotnumber = 0 ->broadcast
+//10 message broadcast
+//4 message per robot
+
+if (robot_number==0){
+    sendmessage=message;
+}else
+{
+    sendmessage=(((robot_number-1)*4)+10+message);
+}
+sendToggle=true;
+}
+
+/*
+//4bit
 {
 //robotnumber = 0 ->broadcast
 //5 message broadcast
@@ -156,6 +174,7 @@ if (robot_number==0){
 sendToggle=true;
 }
 
+*/
 
 //play sine waves simultaneously
 void BeepBroadcaster::requestMultipleFrequencies(float duration, float volume, std::vector<float> frequencies){
