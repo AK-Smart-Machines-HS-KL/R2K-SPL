@@ -32,7 +32,8 @@ Hier findet man auch das Rule Book für die Technichal Challange 2025 wo auch de
 Die genutzte Card ist [ChallangeCard.cpp](Src/Modules/BehaviorControl/BehaviorControl/Cards/Experimental/ChallangeCard.cpp) </br>
 game stack: fast alle Cards löschen, TeachIn auch gelöscht </br>
 
-## 
+## Zusamenfassung
+Die bisherigen Kick Skills sind  
 
 ## 1) SetUp um  Challenge nachbauen
 IRBChallange.ros2 (Für ein Fast Game auf schwachen Maschinen) </br>
@@ -104,11 +105,41 @@ Erstes Testergebnis: Vorzeichen Fehler beim InterceptPoint -> der Roboter ist na
 
 Dynamisches anlaufen:
 Die Funktionen finden sich alle in [ChallangeCard.cpp](Src/Modules/BehaviorControl/BehaviorControl/Cards/Experimental/ChallangeCard.cpp) </br>
- - der Abstand zum Ball der unterschritten werden muss damit der Roboter reagiert, </br>
+ der Abstand zum Ball der unterschritten werden muss damit der Roboter reagiert, </br>
  wird anhand der Geschwindigkeit des Balls berechnet mite der Funktion calcMinDistance </br>
+   
+    float calcMinDistance() const
+    {
+     Vector2f temp1 = theBallModel.estimate.velocity;
+     float temp2 = temp1.x() * temp1.x();
+     float temp3 = temp1.y() * temp1.y();
+     float result = std::sqrt(temp2 + temp3);
+     float distance = 0.f;
+       if (result >= 1) {
+         distance = Geometry::getDistanceToLine(Geometry::Line(theFieldBall.recentBallPositionRelative(), temp1), Vector2f::Zero());
+       }
+     return (result + distance) * minDistanceFactor;
+     }
 
- - der InterceptPoint (Der Punkt der angelaufen wird), </br>
+
+ der InterceptPoint (Der Punkt der angelaufen wird), </br>
  wird ebenfalls anhand der geschwindigkeit des Balls berechnet mit der Funktion calcInterceptPoint
+
+     //relative InterceptPoint wird berechnet durch propagateBallPosition und einem Festen Offset für einen besseren Schritt in den Ball
+    Vector2f calcInterceptPoint() const
+    {
+      Vector2f temp = BallPhysics::propagateBallPosition(theFieldBall.recentBallPositionOnField(), theBallModel.estimate.velocity, interceptFactor, theBallSpecification.friction);
+      Vector2f result = Vector2f::Zero();
+      if (temp.x() > 0)
+      {
+        result = Vector2f(temp.x() + 100.f, temp.y() + 100.f);
+      }
+      else {
+        result = Vector2f(temp.x() - 100.f, temp.y() - 50.f);
+      }
+      return result;
+    }
+
 
 die oben berechneten Werte werden nochmal um jeweils einen eigenen Faktor multipliziert: </br>
 Diese können in dem Code je nach Test erfolgen angepassst werden -> in eine Config umlegen für schnelleres anpassen
@@ -130,8 +161,8 @@ https://github.com/user-attachments/assets/d67f9cb2-a863-4b5b-a6e3-0eb94ae47f5f
 ## Zukünftige Entwicklung
 
 Momentan funktioniert der Test mit echten Robotern nicht. </br>
-- Sie gehen nicht auf den Ball zu sondern machen nur ein Paar Schritte Rückwärtz (Stand 27.01). </br>
-  Es muss noch überprüft werden wie sehr das momentan Programmierte tatsächlich mit dem Regelwerk der Challenge übereinstimmt. </br>
+- ~~Sie gehen nicht auf den Ball zu sondern machen nur ein Paar Schritte Rückwärtz (Stand 27.01). </br>~~ -> Stand 29.01 x und y-Werte mussten invertiert werden beim echten Roboter
+- Es muss noch überprüft werden wie sehr das momentan Programmierte tatsächlich mit dem Regelwerk der Challenge übereinstimmt. </br>
 - Eine Card für die suche nach dem Ball. Aus dem Regelwerk liest es sich heraus das die Rampe einen Tag immer an der gleichen Stelle steht </br>
   -> Der Suchwinkel kann stark reduziert werden. </br>
 - Bei dem Real-Live Test wird der Roboter von Penelized zu unPenlized gewechselt, dies updatet seine Position an den Rand des Spielfeldes. Dies stört sehr bei vorführungen bei denen der Roboter an bestimmten stellen Plaziert wird. </br>
