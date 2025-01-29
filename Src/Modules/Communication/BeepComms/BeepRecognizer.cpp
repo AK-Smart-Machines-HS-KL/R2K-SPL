@@ -282,14 +282,15 @@ switch(theBeep.messages[i]) {
 }
 */
 
-/*
+
 //5bit version
+if (responseToggle) {
+  responseToggle = false;
 for (int i=0;i<=4;i++){
    if (theRobotInfo.number==i){
     //i++;
    }
-   if(theBeep.messages[i] >= 1){
-    if(theBeep.messages[i] < 10){
+    if(theBeep.messages[i] > 10){
       
       //Robot specific
        for (int j=1;j<=5;j++){
@@ -304,9 +305,7 @@ for (int i=0;i<=4;i++){
         }
       }
     }  
-
-
-}
+  }else if(theBeep.messages[i] >= 1){
 //broadcast
 switch(theBeep.messages[i]) {
   case 1:
@@ -339,11 +338,13 @@ switch(theBeep.messages[i]) {
   default:
   SystemCall::say("something went wrong");  
 }
-   
+}
+}
+}
+else {
+responseToggle = true;
 }
 
-}
-*/
 }
 
 std::vector<long> BeepRecognizer::decode(const RingBuffer<AudioData::Sample>& buffer)
