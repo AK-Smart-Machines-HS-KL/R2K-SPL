@@ -39,9 +39,9 @@ Die Reaktionszeitpunkt wird durch `float calcMinDistance()` berechnet. Kann durc
 Bei einem echten Roboter mussten die Werte ebenfalls invertiert werden -_(._.)_-.
 
 ## 1) SetUp um  Challenge nachbauen
-IRBChallange.ros2 (Für ein Fast Game auf schwachen Maschinen) </br>
+`IRBChallangeFast.ros2` (Für ein Fast Game auf schwachen Maschinen) </br>
 ODER </br>
-IRBCHallangeOraclePerceptor.ros2 (Für ein besser simulierten Roboter) -> noch Probleme mit der Ödometrie (der Roboter weis nicht wo er ist) </br>
+`IRBCHallangeNormal.ros2` (Für ein besser simulierten Roboter) -> noch Probleme mit der Ödometrie (der Roboter weis nicht wo er ist) </br>
 Hier wird der Ball direkt vor die Füße von Roboter 1 gespielt dieser sollte dann auch </br>
 in den rollenden Ball reinlaufen </br>
 
@@ -54,7 +54,7 @@ Pass-spiel direkt vor die Füße </br>
 ### -----Testing Setup:------
 
 ### Simulator:
-Öffne im Simulator die Scene IRBChallange.ros2 </br>
+Öffne im Simulator die Scene `IRBChallangeFast.ros2`  oder `IRBCHallangeNormal.ros2` </br>
 diese führt den nötigen setup automatisch durch </br>
 
 Alternativ:
