@@ -6,7 +6,7 @@ Name: 		Dennis Fuhrmann </br>
 E-mail:		defu1001@stud.hs-kl.de </br>
 Discord name:	PinkPummeler </br>
 
-Dieser Branch befasst mit der Intercept Rolling Ball Challenge 2025, hier noch eine genauere erklärung vom Teamleiter Wilhelm:
+Dieser Branch befasst mit der Intercept Rolling Ball Challenge 2025, hier noch eine genauere Erklärung vom Teamleiter Wilhelm:
 
 3. IRB - Intercept Rolling Ball (Technical Challenge 2025) </br></br>
 
@@ -42,9 +42,9 @@ Hier wird der Ball direkt vor die Füße von Roboter 1 gespielt dieser sollte da
 in den rollenden Ball reinlaufen </br>
 
 ## 2) corner kick, 
-ziele für den ball elfmeter punkt ODER </br>
-pass-spiel direkt vor die Füße </br>
-ball läuft vor dem bot schnell vorbei </br>
+Ziele den Ball auf den Elfmeterpunkt ODER </br>
+Pass-spiel direkt vor die Füße </br>
+-> Ball läuft vor dem bot schnell vorbei </br>
 
 
 ### -----Testing Setup:------
@@ -65,9 +65,9 @@ die CornerKickCard wurde so modifizeirt das der Ball for die Füße des Roboters
 ### Real-Live Test
 Deploy den Roboter auf der Nummer 3 in Realese (für schnellere Reaktionen) und Platziere ihn vor dem Mittelkreis (damit er besser seine Ödometrie anpassen kann) </br>
 Warte bis der Roboter sicher steht und Plaziere den Ball sichtbar für ihn Rechts oder Links schräg (er schaut sich nach ihm langsam um). </br>
-Nachdem er ihn gefunden hat rolle den Ball dem Roboter vor die Füße. </br>
+Nachdem er ihn gefunden hat, rolle den Ball dem Roboter vor die Füße. </br>
 -> eine Markierung machen wo der Ball hingerollt werden soll und am besten auch wo der Roboter optimalerweise auch den Intercept macht. </br>
-Jetzt sollte er den Ball abfangen. </br>
+Jetzt sollte der Roboter den Ball abfangen. </br>
 
 copy - paste - List:
 
@@ -79,31 +79,31 @@ gc cornerKickForFirstTeam </br>
 ## 3) Welcher Skill
 
 ### gotoBall: viele Paramter schussteuerung
-welche kombination bringen welchen erfolg: -> schuss wirst bei Ball stopp ausgelöst bei alln Kombinationen
+Welche kombination bringen welchen erfolg: -> Schuss wirst bei Ball stopp ausgelöst bei allen getesteten Kombinationen
 
 Rexamination mit größerer Rangea (20_deg -> 40_deg -> 80_deg -> 140_deg -> 180_deg) </br>
 Result: Keine Änderung zu vorher
 
 ### walktToBall: obstacleAvoidance ausschalten
-obstacle avoidance kann nicht ausgeschaltet werden? -> schuss zu langsam nicht wünchenstwert </br> 
-gleiches Problem wie bei GotoBall versucht dem Ball hinterherzulaufen anstatt einfach zu kicken </br>
+Obstacle avoidance kann ausgeschaltet werden -> Schuss immmer noch zu langsam nicht Wünchenstwert. </br> 
+Gleiches Problem wie bei GotoBall versucht dem Ball hinterherzulaufen anstatt einfach direkt zu kicken </br>
 
 ### Dribble:
-gleiches problem wie bei WalktoBall </br>
+Gleiches problem wie bei WalktoBall </br>
 
 ### WalkToPoint:
 Anstelle den Ball zu treten in den Ball rein laufen -> schlechter kick </br>
 Ergebnis: Vielverschprechendes Ergebnis -> muss noch dynamischer angepasst werden </br>
-Echte Naos: In echt sidn die Naos langsamer -> Reaktion entspechend den Naos anpassen oder die Geschwindigkeit für die wenigen Schritte erhöhen </br>
+Echte Naos: In echt sind die Naos langsamer -> Reaktion entspechend den Naos anpassen oder die Geschwindigkeit für die wenigen Schritte erhöhen </br>
 
 Dynamisches Anlaufen: Im Simulator viel zuverlässiger -> muss noch an echten naos getestet werden </br>
 Erstes Testergebnis: Vorzeichen Fehler beim InterceptPoint -> der Roboter ist nach hinten gelaufen </br>
--> ein einfaches IF statement um dies zu vermeiden </br>
+-> Ein einfaches IF statement um dies zu vermeiden (Fehlschlag) </br> 
 -> Stand 24.01 das Problem bleibt beim echten Roboter bestehen </br>
 -> Stand 27.01 das Problem konnte im Simulator reproduzeirt werden wenn der Ball sich nicht bewegt aber unter dem Schwellwert liegt </br>
 
 Dynamisches anlaufen:
-Die Funkrionen finden sich alle in [ChallangeCard.cpp](Src/Modules/BehaviorControl/BehaviorControl/Cards/Experimental/ChallangeCard.cpp) </br>
+Die Funktionen finden sich alle in [ChallangeCard.cpp](Src/Modules/BehaviorControl/BehaviorControl/Cards/Experimental/ChallangeCard.cpp) </br>
  - der Abstand zum Ball der unterschritten werden muss damit der Roboter reagiert, </br>
  wird anhand der Geschwindigkeit des Balls berechnet mite der Funktion calcMinDistance </br>
 
@@ -136,6 +136,8 @@ Momentan funktioniert der Test mit echten Robotern nicht. </br>
   -> Der Suchwinkel kann stark reduziert werden. </br>
 - Bei dem Real-Live Test wird der Roboter von Penelized zu unPenlized gewechselt, dies updatet seine Position an den Rand des Spielfeldes. Dies stört sehr bei vorführungen bei denen der Roboter an bestimmten stellen Plaziert wird. </br>
   -> Schalte dies durch z.Bsp duch eine Testing Flag aus. </br>
+- Real-Live laufen die Roboter nicht auf maximaler Geschwindigkeit um die gelenke zu schonen, dies ist allerdings für die wenigen Schrtitte die wir hier machen nicht Relevant.
+  -> Default Geschwindigkeit anpassen auf wenn möglich 100%.
 
 
 ## Relevante Klassen
