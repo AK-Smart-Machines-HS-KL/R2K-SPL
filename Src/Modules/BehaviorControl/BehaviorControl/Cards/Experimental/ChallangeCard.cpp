@@ -48,6 +48,7 @@ CARD(ChallangeCard,
        CALLS(WalkToKickoffPose),
        CALLS(TurnAngle),
        CALLS(GoToBallAndKick),
+       CALLS(Say),
        REQUIRES(Shots),
        REQUIRES(FieldBall),
        REQUIRES(RobotPose),
@@ -60,8 +61,8 @@ CARD(ChallangeCard,
       {,
          (Vector2f)(Vector2f(200.f,0.f)) interceptPoint, // just a few steps forward 
          (bool)(false) pointIsSelected, // InterceptPoint wird nur einmal berechnet
-         (float)(3.0f) interceptFactor, // veringere diesen Wert um den Ball früher in seiner Lufbahn zu intercepten
-         (float)(1.4f) minDistanceFactor, // eröhe diesen Wert um den distanz zu erhöhen die der Ball unterschreiten muss damit der Roboter reagiert
+         (float)(1.2f) interceptFactor, // veringere diesen Wert um den Ball früher in seiner Lufbahn zu intercepten
+         (float)(1.0f) minDistanceFactor, // eröhe diesen Wert um den distanz zu erhöhen die der Ball unterschreiten muss damit der Roboter reagiert
          (bool)(false) done,        
          (bool)(false) walking,     // Kümmert sich um die Beendung der Card
       }),
@@ -86,7 +87,7 @@ class ChallangeCard : public ChallangeCardBase
 
     void execute() override
     {
-      theActivitySkill(BehaviorStatus::testingBehavior);
+     // theActivitySkill(BehaviorStatus::testingBehavior);
 
      
 
@@ -98,8 +99,10 @@ class ChallangeCard : public ChallangeCardBase
              
             // InterceptPoint wird nur einmal berechnet
           if (!pointIsSelected) {
+            theActivitySkill(BehaviorStatus::teachin);
             interceptPoint = calcInterceptPoint();
             pointIsSelected = true;
+            OUTPUT_TEXT("x = " << std::to_string(interceptPoint.x()) << ", y = " << std::to_string(interceptPoint.y()));
           }
               //Die Kick Skills sind nicht schnell genug um einen rollenden Ball zu intercepten stadesssen nutzen wir einen Lauf in den Ball rein um einen Kick zu simulieren
              theWalkToPointSkill(Pose2f(0_deg, interceptPoint), 1.f, true, true, true, true);
@@ -110,11 +113,12 @@ class ChallangeCard : public ChallangeCardBase
 
         }else
         {
+          theActivitySkill(BehaviorStatus::goalShot);
           if (walking = true)
           {
             done = true;
           }
-          theTurnAngleSkill(calcAngleToGoal() + 30_deg, 0_deg);
+          theTurnAngleSkill(calcAngleToGoal() + 30_deg, 2_deg);
           theLookAtBallSkill();
         }
       
@@ -140,13 +144,10 @@ class ChallangeCard : public ChallangeCardBase
     {
       Vector2f temp = BallPhysics::propagateBallPosition(theFieldBall.recentBallPositionOnField(), theBallModel.estimate.velocity, interceptFactor, theBallSpecification.friction);
       Vector2f result = Vector2f::Zero();
-      if (temp.x() > 0)
-      {
-        result = Vector2f(temp.x() + 100.f, temp.y() + 100.f);
-      }
-      else {
-        result = Vector2f(temp.x() - 100.f, temp.y() - 50.f);
-      }
+      
+      
+        result = Vector2f(-(temp.x() + 100.f), -(temp.y() + 100.f));
+
       return result;
     }
 
