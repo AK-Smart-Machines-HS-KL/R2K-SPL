@@ -66,7 +66,7 @@ mvb -4300 2900 0 </br>
 mv -3550 0 300 </br>
 gc cornerKickForFirstTeam </br>
 
-# 3) welche skill
+## 3) Welcher Skill
 
 ### gotoBall: viele Paramter schussteuerung
 welche kombination bringen welchen erfolg: -> schuss wirst bei Ball stopp ausgelöst bei alln Kombinationen
@@ -90,6 +90,7 @@ Dynamisches Anlaufen: Im Simulator viel zuverlässiger -> muss noch an echten na
 Erstes Testergebnis: Vorzeichen Fehler beim InterceptPoint -> der Roboter ist nach hinten gelaufen </br>
 -> ein einfaches IF statement um dies zu vermeiden </br>
 -> Stand 24.01 das Problem bleibt beim echten Roboter bestehen </br>
+-> Stand 27.01 das Problem konnte reproduzeirt werden wenn der Ball sich nicht bewegt aber unter dem Schwellwert liegt </br>
 
 Dynamisches anlaufen:
  - der Abstand zum Ball der unterschritten werden muss damit der Roboter reagiert, </br>
@@ -102,6 +103,17 @@ Diese können in dem Code je nach Test erfolgen angepassst werden -> in eine Con
 
 ### Beispiel Video:
 
-Findet man Hier im Ordner mit dem Namen: 2025-01-20 21-41-55.mp4
+- für Fast: </br>
+
+
+https://github.com/user-attachments/assets/f2cd8e37-bab2-4473-a884-26c7c3786432
+
+- für Normal: </br>
+
+
+https://github.com/user-attachments/assets/d67f9cb2-a863-4b5b-a6e3-0eb94ae47f5f
+
+
+
 
 
