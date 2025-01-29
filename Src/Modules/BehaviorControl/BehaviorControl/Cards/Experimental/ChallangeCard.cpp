@@ -139,7 +139,7 @@ class ChallangeCard : public ChallangeCardBase
       return std::sqrt(temp2 + temp3);
     }
 
-    //relative InterceptPoint wird berechnet durch propagateBallPosition und einem Festen Offset für einen besseren Schritt in den Ball
+    //relative InterceptPoint wird berechnet durch propagateBallPosition und einem Festen Offset für einen besseren Schritt in den Ball, ifdef weil es unterschiedliche ergebnisse beim Simulator und im echten Roboter gibt
     Vector2f calcInterceptPoint() const
     {
       Vector2f temp = BallPhysics::propagateBallPosition(theFieldBall.recentBallPositionOnField(), theBallModel.estimate.velocity, interceptFactor, theBallSpecification.friction);
