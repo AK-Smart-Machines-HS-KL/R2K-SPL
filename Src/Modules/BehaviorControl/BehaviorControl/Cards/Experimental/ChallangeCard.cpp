@@ -7,8 +7,8 @@
  *        TODO Live Test with Real robots
  * 
  *        version 1.1 The Interceptpoint can no longer be behind the Robot
- * @version 1.1
- * @date 2025-19-01
+ * @version 1.2
+ * @date 2025-29-01
  *
  *
  */
@@ -90,13 +90,13 @@ class ChallangeCard : public ChallangeCardBase
 
      
 
-      //Calculate Distance to Ball for Kick depedndant on current Position of Ball and ints Speed
+      //Berechnet die Distanz vom Roboter zum Balls 
       float minDistance = calcMinDistance();
       
         if (calcDistanceToBall() <= minDistance) {
           
              
-            //// InterceptPoint wird nur einmal berechnet
+            // InterceptPoint wird nur einmal berechnet
           if (!pointIsSelected) {
             interceptPoint = calcInterceptPoint();
             pointIsSelected = true;
@@ -135,7 +135,7 @@ class ChallangeCard : public ChallangeCardBase
       return std::sqrt(temp2 + temp3);
     }
 
-    //relative InterceptPoint 
+    //relative InterceptPoint wird berechnet durch propagateBallPosition und einem Festen Offset für einen besseren Schritt in den Ball
     Vector2f calcInterceptPoint() const
     {
       Vector2f temp = BallPhysics::propagateBallPosition(theFieldBall.recentBallPositionOnField(), theBallModel.estimate.velocity, interceptFactor, theBallSpecification.friction);
