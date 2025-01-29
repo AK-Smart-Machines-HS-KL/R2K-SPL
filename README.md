@@ -67,7 +67,7 @@ then ´gc cornerKickForFirstTeam´ </br>
 die CornerKickCard wurde so modifizeirt das der Ball for die Füße des Roboters form Tor gespielt werden sollte</br>
 
 ### Real-Live Test
-Deploy den Roboter auf der Nummer 3 in Realese (für schnellere Reaktionen) und Platziere ihn vor dem Mittelkreis (damit er besser seine Ödometrie anpassen kann) </br>
+Deploy den Roboter auf der Nummer 3 in Release Mode (für schnellere Reaktionen) und Platziere ihn vor dem Mittelkreis (damit er besser seine Ödometrie anpassen kann) </br>
 Warte bis der Roboter sicher steht und Plaziere den Ball sichtbar für ihn Rechts oder Links schräg (er schaut sich nach ihm langsam um). </br>
 Nachdem er ihn gefunden hat, rolle den Ball dem Roboter vor die Füße. </br>
 -> eine Markierung machen wo der Ball hingerollt werden soll und am besten auch wo der Roboter optimalerweise auch den Intercept macht. </br>
@@ -127,23 +127,21 @@ Die Funktionen finden sich alle in [ChallangeCard.cpp](Src/Modules/BehaviorContr
 
  der InterceptPoint (Der Punkt der angelaufen wird), </br>
  wird ebenfalls anhand der geschwindigkeit des Balls berechnet mit der Funktion calcInterceptPoint
-
-     //relative InterceptPoint wird berechnet durch propagateBallPosition und einem Festen Offset für einen besseren Schritt in den Ball
-    Vector2f calcInterceptPoint() const
-    {
-      Vector2f temp = BallPhysics::propagateBallPosition(theFieldBall.recentBallPositionOnField(), theBallModel.estimate.velocity, interceptFactor, theBallSpecification.friction);
-      Vector2f result = Vector2f::Zero();
-      if (temp.x() > 0)
-      {
-        result = Vector2f(temp.x() + 100.f, temp.y() + 100.f);
-      }
-      else {
-        result = Vector2f(temp.x() - 100.f, temp.y() - 50.f);
-      }
-      return result;
-    }
-
-
+    
+        //relative InterceptPoint wird berechnet durch propagateBallPosition und einem Festen Offset für einen besseren Schritt in den Ball, ifdef weil es unterschiedliche ergebnisse beim Simulator und im echten Roboter gibt
+        Vector2f calcInterceptPoint() const
+        {
+          Vector2f temp = BallPhysics::propagateBallPosition(theFieldBall.recentBallPositionOnField(), theBallModel.estimate.velocity, interceptFactor, theBallSpecification.friction);
+          Vector2f result = Vector2f::Zero();
+          //Für den Fehler beim echten Roboter (die Werte sind invertiert)
+    #ifdef NAO
+          result = Vector2f(-(temp.x() + 100.f), -(temp.y() + 100.f));
+    #else
+          result = Vector2f((temp.x() + 100.f), (temp.y() + 100.f));
+    #endif //Simulator
+          return result;
+        }
+        
 die oben berechneten Werte werden nochmal um jeweils einen eigenen Faktor multipliziert: </br>
 Diese können in dem Code je nach Test erfolgen angepassst werden -> in eine Config umlegen für schnelleres anpassen
 
@@ -159,7 +157,17 @@ https://github.com/user-attachments/assets/f2cd8e37-bab2-4473-a884-26c7c3786432
 
 https://github.com/user-attachments/assets/d67f9cb2-a863-4b5b-a6e3-0eb94ae47f5f
 
+- Feld Test:
 
+  
+
+https://github.com/user-attachments/assets/c21c4225-807b-42c4-83b5-e52f1ef872ec
+
+
+https://github.com/user-attachments/assets/e8de8c33-9848-424c-bbe2-e5bb06a3cf0d
+
+
+https://github.com/user-attachments/assets/8e3c0286-4033-4ac3-b017-8374896d450c
 
 ## Zukünftige Entwicklung
 
