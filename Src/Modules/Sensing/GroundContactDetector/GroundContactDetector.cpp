@@ -17,7 +17,7 @@ void GroundContactDetector::update(GroundContactState& groundContactState)
       lastTimeWithPressure = theFrameInfo.time;
     groundContactState.contact = theFrameInfo.getTimeSince(lastTimeWithPressure) < maxTimeWithoutPressure;
     if(!groundContactState.contact && SystemCall::getMode() == SystemCall::physicalRobot)
-      //BeepBroadcaster::requestBeep(0, 1)
+      BeepBroadcaster::requestBeep(0, 1)
       SystemCall::say("High");
   }
   else
