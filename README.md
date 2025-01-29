@@ -36,7 +36,7 @@ game stack: fast alle Cards löschen, TeachIn auch gelöscht </br>
 Die bisherigen Kick Skills sind für die Challange ungeignet. Stadessen nutzen wir WalkToPoint um in den Ball reinzulaufen und somit einen Kick "Simulieren".
 Dabei wird der angelaufene Punkt durch die Funktion `Vector2f calcInterceptPoint()` berechnet. Kann durch veränderung von `interceptFactor` angepasst werden
 Die Reaktionszeitpunkt wird durch `float calcMinDistance()` berechnet. Kann durch veränderung von `minDistanceFactor` angepasst werden
-Bei einem echten Roboter mussten die Werte ebenfalls invertiert werden -_(´. .`)_-.
+Bei einem echten Roboter mussten die Werte ebenfalls invertiert werden -\_(´. .`)\_-.
 
 ## 1) SetUp um  Challenge nachbauen
 `IRBChallangeFast.ros2` (Für ein Fast Game auf schwachen Maschinen) </br>
