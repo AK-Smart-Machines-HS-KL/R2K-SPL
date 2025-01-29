@@ -11,6 +11,7 @@
 #include "Representations/Infrastructure/SensorData/InertialSensorData.h"
 #include "Representations/Sensing/GroundContactState.h"
 #include "Tools/Module/Module.h"
+#include "Modules/Communication/BeepComms/BeepBroadcaster.h"
 
 MODULE(GroundContactDetector,
 {,

@@ -1,0 +1,5 @@
+beep 20
+Robot nr. 2 broadcasting message 20(1900Hz)
+Robot nr. 2 broadcasting message 20(2300Hz)
+The Beeps: 0 0 16 8 0
+The Beeps: 0 0 16 0 0
