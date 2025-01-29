@@ -1,0 +1,218 @@
+Robot nr. 1 broadcasting message 1(1500Hz)
+The Beeps: 1 0 0 0 0
+
+Robot nr. 2 broadcasting message 1(2500Hz)
+The Beeps: 0 1 0 0 0
+
+Robot nr. 3 broadcasting message 1(3500Hz)
+The Beeps: 0 0 1 0 0
+
+Robot nr. 4 broadcasting message 1(4500Hz)
+The Beeps: 0 0 0 1 0
+
+Robot nr. 5 broadcasting message 1(5500Hz)
+The Beeps: 0 0 0 0 1
+
+Robot nr. 1 broadcasting message 6(1700Hz)
+Robot nr. 1 broadcasting message 6(1900Hz)
+The Beeps: 6 0 0 0 0
+
+Robot nr. 1 broadcasting message 7(1500Hz)
+Robot nr. 1 broadcasting message 7(1700Hz)
+Robot nr. 1 broadcasting message 7(1900Hz)
+The Beeps: 7 0 0 0 0
+
+Robot nr. 1 broadcasting message 8(2100Hz)
+The Beeps: 8 0 0 0 0
+
+Robot nr. 1 broadcasting message 9(1500Hz)
+Robot nr. 1 broadcasting message 9(2100Hz)
+The Beeps: 9 0 0 0 0
+The Beeps: 8 0 0 0 0
+
+Robot nr. 1 broadcasting message 10(1700Hz)
+Robot nr. 1 broadcasting message 10(2100Hz)
+The Beeps: 10 0 0 0 0
+The Beeps: 8 0 0 0 0
+
+Robot nr. 2 broadcasting message 10(2700Hz)
+Robot nr. 2 broadcasting message 10(3100Hz)
+The Beeps: 0 10 0 0 0
+
+Robot nr. 3 broadcasting message 10(3700Hz)
+Robot nr. 3 broadcasting message 10(4100Hz)
+The Beeps: 0 0 10 0 0
+
+Robot nr. 4 broadcasting message 10(4700Hz)
+Robot nr. 4 broadcasting message 10(5100Hz)
+The Beeps: 0 0 0 10 0
+
+Robot nr. 5 broadcasting message 10(5700Hz)
+Robot nr. 5 broadcasting message 10(6100Hz)
+The Beeps: 0 0 0 0 10
+
+Robot nr. 1 broadcasting message 15(1500Hz)
+Robot nr. 1 broadcasting message 15(1700Hz)
+Robot nr. 1 broadcasting message 15(1900Hz)
+Robot nr. 1 broadcasting message 15(2100Hz)
+The Beeps: 15 0 0 0 0
+The Beeps: 1 0 0 0 0
+
+Robot nr. 1 broadcasting message 16(2300Hz)
+The Beeps: 16 0 0 0 0
+
+Robot nr. 1 broadcasting message 17(1500Hz)
+Robot nr. 1 broadcasting message 17(2300Hz)
+The Beeps: 17 0 0 0 0
+
+Robot nr. 1 broadcasting message 18(1700Hz)
+Robot nr. 1 broadcasting message 18(2300Hz)
+The Beeps: 18 0 0 0 0
+
+Robot nr. 1 broadcasting message 19(1500Hz)
+Robot nr. 1 broadcasting message 19(1700Hz)
+Robot nr. 1 broadcasting message 19(2300Hz)
+The Beeps: 19 0 0 0 0
+The Beeps: 1 0 0 0 0
+
+Robot nr. 1 broadcasting message 25(1500Hz)
+Robot nr. 1 broadcasting message 25(2100Hz)
+Robot nr. 1 broadcasting message 25(2300Hz)
+The Beeps: 25 0 0 0 0
+
+signal Baseline 2
+Robot nr. 1 broadcasting message 30(1700Hz)
+Robot nr. 1 broadcasting message 30(1900Hz)
+Robot nr. 1 broadcasting message 30(2100Hz)
+Robot nr. 1 broadcasting message 30(2300Hz)
+The Beeps: 30 0 0 0 0
+The Beeps: 30 1 0 0 0
+The Beeps: 14 0 0 0 0
+The Beeps: 4 0 0 0 0
+
+signal Baseline 3
+Robot nr. 1 broadcasting message 30(1700Hz)
+Robot nr. 1 broadcasting message 30(1900Hz)
+Robot nr. 1 broadcasting message 30(2100Hz)
+Robot nr. 1 broadcasting message 30(2300Hz)
+The Beeps: 30 0 0 0 0
+
+Robot nr. 2 broadcasting message 30(2700Hz)
+Robot nr. 2 broadcasting message 30(2900Hz)
+Robot nr. 2 broadcasting message 30(3100Hz)
+Robot nr. 2 broadcasting message 30(3300Hz)
+The Beeps: 0 30 0 0 0
+
+Robot nr. 3 broadcasting message 30(3700Hz)
+Robot nr. 3 broadcasting message 30(3900Hz)
+Robot nr. 3 broadcasting message 30(4100Hz)
+Robot nr. 3 broadcasting message 30(4300Hz)
+The Beeps: 0 0 30 0 0
+
+Robot nr. 4 broadcasting message 30(4700Hz)
+Robot nr. 4 broadcasting message 30(4900Hz)
+Robot nr. 4 broadcasting message 30(5100Hz)
+Robot nr. 4 broadcasting message 30(5300Hz)
+The Beeps: 0 0 0 30 0
+
+Robot nr. 5 broadcasting message 30(5700Hz)
+Robot nr. 5 broadcasting message 30(5900Hz)
+Robot nr. 5 broadcasting message 30(6100Hz)
+Robot nr. 5 broadcasting message 30(6300Hz)
+The Beeps: 0 0 0 0 30
+The Beeps: 0 0 0 0 2
+
+signal Baseline 2
+Robot nr. 1 broadcasting message 31(1500Hz)
+Robot nr. 1 broadcasting message 31(1700Hz)
+Robot nr. 1 broadcasting message 31(1900Hz)
+Robot nr. 1 broadcasting message 31(2100Hz)
+Robot nr. 1 broadcasting message 31(2300Hz)
+The Beeps: 31 31 17 31 31
+The Beeps: 7 0 0 0 0
+The Beeps: 3 0 0 0 0
+
+signal Baseline 3
+Robot nr. 1 broadcasting message 31(1500Hz)
+Robot nr. 1 broadcasting message 31(1700Hz)
+Robot nr. 1 broadcasting message 31(1900Hz)
+Robot nr. 1 broadcasting message 31(2100Hz)
+Robot nr. 1 broadcasting message 31(2300Hz)
+The Beeps: 31 31 16 31 31
+The Beeps: 3 0 0 0 0
+The Beeps: 1 0 0 0 0
+
+Robot nr. 2 broadcasting message 31(2500Hz)
+Robot nr. 2 broadcasting message 31(2700Hz)
+Robot nr. 2 broadcasting message 31(2900Hz)
+Robot nr. 2 broadcasting message 31(3100Hz)
+Robot nr. 2 broadcasting message 31(3300Hz)
+The Beeps: 31 31 31 12 19
+The Beeps: 11 2 0 0 0
+
+Robot nr. 3 broadcasting message 31(3500Hz)
+Robot nr. 3 broadcasting message 31(3700Hz)
+Robot nr. 3 broadcasting message 31(3900Hz)
+Robot nr. 3 broadcasting message 31(4100Hz)
+Robot nr. 3 broadcasting message 31(4300Hz)
+The Beeps: 12 31 31 15 0
+The Beeps: 1 0 0 0 0
+
+Robot nr. 4 broadcasting message 31(4500Hz)
+Robot nr. 4 broadcasting message 31(4700Hz)
+Robot nr. 4 broadcasting message 31(4900Hz)
+Robot nr. 4 broadcasting message 31(5100Hz)
+Robot nr. 4 broadcasting message 31(5300Hz)
+The Beeps:  0  0 26 31 31
+The Beeps: 28 19 31 31 31
+The Beeps: 30 19 31 31 31
+The Beeps: 31 19 31 31 31
+The Beeps: 1 0 0 0 0
+
+Robot nr. 5 broadcasting message 31(5500Hz)
+Robot nr. 5 broadcasting message 31(5700Hz)
+Robot nr. 5 broadcasting message 31(5900Hz)
+Robot nr. 5 broadcasting message 31(6100Hz)
+Robot nr. 5 broadcasting message 31(6300Hz)
+The Beeps: 0 0 16 31 31
+The Beeps: 0 0 0 24 27
+
+Beispiel für eine volle Detektion
+Robot nr. 1 broadcasting message 15(1500Hz)
+Robot nr. 1 broadcasting message 15(1700Hz)
+Robot nr. 1 broadcasting message 15(1900Hz)
+Robot nr. 1 broadcasting message 15(2100Hz)
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 15 0 0 0 0
+The Beeps: 1 0 0 0 0 //es wird am Ende mit der Nachricht überlappend eine Systemnachricht abgespielt
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0

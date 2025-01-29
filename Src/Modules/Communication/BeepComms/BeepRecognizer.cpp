@@ -282,14 +282,14 @@ switch(theBeep.messages[i]) {
 }
 */
 
-
+/*
 //5bit version
 for (int i=0;i<=4;i++){
    if (theRobotInfo.number==i){
     //i++;
    }
    if(theBeep.messages[i] >= 1){
-    if(theBeep.messages[i] < 5){
+    if(theBeep.messages[i] < 10){
       
       //Robot specific
        for (int j=1;j<=5;j++){
@@ -343,7 +343,7 @@ switch(theBeep.messages[i]) {
 }
 
 }
-
+*/
 }
 
 std::vector<long> BeepRecognizer::decode(const RingBuffer<AudioData::Sample>& buffer)

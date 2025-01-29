@@ -1,0 +1,216 @@
+https://www.youtube.com/watch?v=h2zkV-l_TbY als Hintergrund
+
+Robot nr. 2 broadcasting message 30(2700Hz)
+Robot nr. 2 broadcasting message 30(2900Hz)
+Robot nr. 2 broadcasting message 30(3100Hz)
+Robot nr. 2 broadcasting message 30(3300Hz)
+The Beeps: 0 26 0 0 0
+The Beeps: 0 26 0 0 0
+The Beeps: 0 26 0 0 0
+The Beeps: 0 26 0 0 0
+The Beeps: 0 26 0 0 0
+The Beeps: 0 26 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+
+Robot nr. 2 broadcasting message 30(2700Hz)
+Robot nr. 2 broadcasting message 30(2900Hz)
+Robot nr. 2 broadcasting message 30(3100Hz)
+Robot nr. 2 broadcasting message 30(3300Hz)
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 30 0 0 0
+The Beeps: 0 2 0 0 0
+
+Robot nr. 1 broadcasting message 30(1700Hz)
+Robot nr. 1 broadcasting message 30(1900Hz)
+Robot nr. 1 broadcasting message 30(2100Hz)
+Robot nr. 1 broadcasting message 30(2300Hz)
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 4 0 0 0 0
+The Beeps: 4 0 0 0 0
+The Beeps: 4 0 0 0 0
+The Beeps: 4 0 0 0 0
+The Beeps: 4 0 0 0 0
+
+Robot nr. 1 broadcasting message 30(1700Hz)
+Robot nr. 1 broadcasting message 30(1900Hz)
+Robot nr. 1 broadcasting message 30(2100Hz)
+Robot nr. 1 broadcasting message 30(2300Hz)
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 30 0 0 0 0
+The Beeps: 24 0 0 0 0
+The Beeps: 24 0 0 0 0
+The Beeps: 24 0 0 0 0
+The Beeps: 24 0 0 0 0
+The Beeps: 24 0 0 0 0
+The Beeps: 24 0 0 0 0
+
+Robot nr. 1 broadcasting message 1(1500Hz)
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0
+The Beeps: 1 0 0 0 0

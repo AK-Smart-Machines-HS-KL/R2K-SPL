@@ -71,18 +71,17 @@ void BeepBroadcaster::update(BeepCommData& beepCommData)
         requestMessageBroadcast(1000, 0.5, 1);
 
     // The Recognized Beeps console output for debugging
-  /*
+  
+    for(int e:theBeep.messages){   
+    if(e>0){    
     std::stringstream ss;
     copy( theBeep.messages.begin(), theBeep.messages.end(), std::ostream_iterator<int>(ss, " "));
     std::string s = ss.str();
     s = s.substr(0, s.length()-1);
-       // if (!(s.compare(" 0 0 0 0 0")))
-        //{
               OUTPUT_TEXT("The Beeps: " << s); 
-        //}
 
-*/
- 
+    }
+    }
     // Handle Response to 1
 /*
     if (theRobotInfo.number != 1)
@@ -99,40 +98,7 @@ void BeepBroadcaster::update(BeepCommData& beepCommData)
         }
         
     }
-    
-
-    //Kurze say ausgabe zum testen
-    if (theBeep.messages[2] > 0) {
-            if (responseToggle) 
-            {
-                responseToggle = false;
-                SystemCall::say("Something Robot 3");
-            }
-            
-        } else if (theBeep.messages[4] > 0){
-            if (responseToggle) 
-            {
-                responseToggle = false;
-                SystemCall::say("Something Robot 5");
-            }
-        } else if (theBeep.messages[0] == 15) {
-            if (responseToggle) 
-            {
-                responseToggle = false;
-                SystemCall::say("Message 15 Robot 1");
-            }
-            
-        } else if (theBeep.messages[0] == 10) {
-            if (responseToggle) 
-            {
-                responseToggle = false;
-                SystemCall::say("Message 10 Robot 1");
-            }
-            
-        } else {
-            responseToggle = true;
-        }
- */
+*/
     while (!beepCommData.broadcastQueue.empty())
     {
         int message = beepCommData.broadcastQueue.back();
