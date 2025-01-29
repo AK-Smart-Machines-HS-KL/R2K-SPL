@@ -29,7 +29,7 @@ Hier findet man auch das Rule Book für die Technichal Challange 2025 wo auch de
 [Downlaod Seite für das Regelwerk](https://spl.robocup.org/downloads/)
  
 
-Die genutzte Card ist ChallangeCard </br>
+Die genutzte Card ist [ChallangeCard.cpp](Src/Modules/BehaviorControl/BehaviorControl/Cards/Experimental/ChallangeCard.cpp) </br>
 game stack: fast alle Cards löschen, TeachIn auch gelöscht </br>
 
 ## 1) SetUp um  Challenge nachbauen
@@ -47,6 +47,7 @@ ball läuft vor dem bot schnell vorbei </br>
 
 ### -----Testing Setup:------
 
+### Simulator:
 Öffne im Simulator die Scene IRBChallange.ros2 </br>
 diese führt den nötigen setup automatisch durch </br>
 
@@ -58,6 +59,12 @@ then bewege robot 4 näher an den Ball damit er Diesen rechtzeigit erreicht </br
 then wähle robot 5 und benutze den Befehl ´mv -3550 0 300´ </br>
 then ´gc cornerKickForFirstTeam´ </br>
 die CornerKickCard wurde so modifizeirt das der Ball for die Füße des Roboters form Tor gespielt werden sollte</br>
+
+### Real-Live Test
+Deploy den Roboter auf die Nummer 3 und Platziere ihn vor dem Mittelkreis (damit er besser seine Ödometrie anpassen kann) </br>
+Warte bis der Roboter sicher steht und Plaziere den Ball sichtbar für ihn Rechts oder Links schräg (er schaut sich nach ihm langsam um). </br>
+Nachdem er ihn gefunden hat rolle den Ball dem Roboter vor die Füße. </br>
+Jetzt sollte er den Ball abfangen. </br>
 
 copy - paste - List:
 
@@ -114,6 +121,14 @@ https://github.com/user-attachments/assets/f2cd8e37-bab2-4473-a884-26c7c3786432
 https://github.com/user-attachments/assets/d67f9cb2-a863-4b5b-a6e3-0eb94ae47f5f
 
 
+
+## Zukünftige Entwicklung
+
+Momentan funktioniert der Test mit echten Robotern nicht. </br>
+Sie gehen nicht auf den Ball zu sondern machen nur ein Paar Schritte Rückwärtz (Stand 27.01). </br>
+Es muss noch überprüft werden wie sehr das momentan Programmierte tatsächlich mit dem Regelwerk der Challenge übereinstimmt. </br>
+Eine Card für die suche nach dem Ball. Aus dem Regelwerk liest es sich heraus das die Rampe einen Tag immer an der gleichen Stelle steht </br>
+-> Der Suchwinkel kann stark reduziert werden. </br>
 
 
 
