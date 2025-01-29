@@ -33,7 +33,10 @@ Die genutzte Card ist [ChallangeCard.cpp](Src/Modules/BehaviorControl/BehaviorCo
 game stack: fast alle Cards löschen, TeachIn auch gelöscht </br>
 
 ## Zusamenfassung
-Die bisherigen Kick Skills sind  
+Die bisherigen Kick Skills sind für die Challange ungeignet. Stadessen nutzen wir WalkToPoint um in den Ball reinzulaufen und somit einen Kick "Simulieren".
+Dabei wird der angelaufene Punkt durch die Funktion `Vector2f calcInterceptPoint()` berechnet. Kann durch veränderung von `interceptFactor` angepasst werden
+Die Reaktionszeitpunkt wird durch `float calcMinDistance()` berechnet. Kann durch veränderung von `minDistanceFactor` angepasst werden
+Bei einem echten Roboter mussten die Werte ebenfalls invertiert werden -_(._.)_-.
 
 ## 1) SetUp um  Challenge nachbauen
 IRBChallange.ros2 (Für ein Fast Game auf schwachen Maschinen) </br>
