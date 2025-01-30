@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <limits>
 #include <type_traits>
+#include <string>
 
 MAKE_MODULE(BeepRecognizer, communication);
 
@@ -296,12 +297,12 @@ for (int i=0;i<=4;i++){
        for (int j=1;j<=5;j++){
         if (theRobotInfo.number==j){
         if (theBeep.messages[i]==(j-1)*4+9){
-        SystemCall::say("msg"+(j-1)*4+9);
-        SystemCall::say("robot"+i+1);   
+        SystemCall::say((std::string("message ") + std::to_string((j-1)*4+9)).c_str());
+        SystemCall::say((std::string("robot ") + std::to_string(i+1)).c_str());   
         }
         if (theBeep.messages[i]==(j-1)*4+10){
-        SystemCall::say("msg"+((j-1)*4+10));
-        SystemCall::say("robot"+i+1);
+        SystemCall::say((std::string("message ") + std::to_string((j-1)*4+10)).c_str());
+        SystemCall::say((std::string("robot ") + std::to_string(i+1)).c_str());
         }
       }
     }  
@@ -309,31 +310,31 @@ for (int i=0;i<=4;i++){
 //broadcast
 switch(theBeep.messages[i]) {
   case 1:
-  SystemCall::say("msg 1 robot"+i+1); 
+  SystemCall::say((std::string("message 3 robot ") + std::to_string(i+1)).c_str()); 
     break;
   case 2:
-  SystemCall::say("msg 2 robot"+i+1);
+  SystemCall::say((std::string("message 3 robot ") + std::to_string(i+1)).c_str());
     break;
   case 3:
-  SystemCall::say("msg 3 robot"+i+1);
+  SystemCall::say((std::string("message 3 robot ") + std::to_string(i+1)).c_str());
     break;
   case 4:
-  SystemCall::say("msg 4 robot"+i+1);
+  SystemCall::say((std::string("message 3 robot ") + std::to_string(i+1)).c_str());
     break;
   case 5:
-  SystemCall::say("msg 5 robot"+i+1);
+  SystemCall::say((std::string("message 3 robot ") + std::to_string(i+1)).c_str());
     break;
   case 6:
-  SystemCall::say("msg 6 robot"+i+1); 
+  SystemCall::say((std::string("message 3 robot ") + std::to_string(i+1)).c_str()); 
     break;
   case 7:
-  SystemCall::say("msg 7 robot"+i+1);
+  SystemCall::say((std::string("message 3 robot ") + std::to_string(i+1)).c_str());
     break;
   case 8:
-  SystemCall::say("msg 8 robot"+i+1);
+  SystemCall::say((std::string("message 3 robot ") + std::to_string(i+1)).c_str());
     break;
   case 9:
-  SystemCall::say("msg 9 robot"+i+1);
+  SystemCall::say((std::string("message 3 robot ") + std::to_string(i+1)).c_str());
     break;
   default:
   SystemCall::say("something went wrong");  

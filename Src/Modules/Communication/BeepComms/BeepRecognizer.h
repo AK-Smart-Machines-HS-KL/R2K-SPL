@@ -54,7 +54,7 @@ class BeepRecognizer : public BeepRecognizerBase
 {
   private:
   bool responseToggle = true;
-
+  int lastTimeWithBeep = 0;
 
 
 
