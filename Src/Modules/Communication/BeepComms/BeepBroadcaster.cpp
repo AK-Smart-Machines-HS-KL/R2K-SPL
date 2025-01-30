@@ -1,7 +1,7 @@
 /**
  * @file BeepBroadcaster.cpp
  * This file implements a module that provides the sending part of the audio communication system.
- * @author Nicolas Fortune, Andy Hobelsberger
+ * @author Nicolas Fortune, Andy Hobelsberger (Winter 2022/23), Sandro Kloos (Winter 2024/25)
  */
 
 #include "BeepBroadcaster.h"
@@ -45,13 +45,17 @@ BeepBroadcaster::~BeepBroadcaster()
 void BeepBroadcaster::update(BeepCommData& beepCommData)
 {
     //Handle Ground Sensor
-    if (theGroundContactState.contact){
-        groundBeep(beepCommData, 1);
-        OUTPUT_TEXT("Ground-Beep");
+    if(!theGroundContactState.contact)
+    {
+        if (sensorToggle){
+            sensorToggle = false;
+            groundBeep(beepCommData, 1);
+            OUTPUT_TEXT("High Beep!");
+        }
     } else {
-        groundBeep(beepCommData, 2);
-        OUTPUT_TEXT("High-Beep");
+        sensorToggle = true;
     }
+
     // Handle Head Button
     if (theEnhancedKeyStates.isPressedFor(KeyStates::headFront, 100u))
     {

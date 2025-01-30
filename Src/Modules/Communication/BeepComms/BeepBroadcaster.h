@@ -47,6 +47,7 @@ class BeepBroadcaster : public BeepBroadcasterBase
 {
 private:
   bool buttonToggle = true;
+  bool sensorToggle = true;
   bool responseToggle = true;
   bool sendToggle=false;
   int sendmessage = 0;

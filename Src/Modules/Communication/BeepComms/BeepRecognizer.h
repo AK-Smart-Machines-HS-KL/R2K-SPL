@@ -4,7 +4,7 @@
  * This file declares a module that identifies the sound of a beep by
  * correlating with a number of frequencies.
  *
- * @author Wilhelm Simus
+ * @author Wilhelm Simus (Winter 2022/23), Sandro Kloos (Winter 2024/25)
  */
 
 #pragma once
@@ -83,7 +83,6 @@ class BeepRecognizer : public BeepRecognizerBase
    * @return The correlation between signature and buffer. 0 if the volume was too low.
    */
   std::vector<long> decode(const RingBuffer<AudioData::Sample>& buffer);
-  //void update(Beep& theBeep);
 
 public:
   BeepRecognizer();
