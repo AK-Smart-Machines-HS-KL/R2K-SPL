@@ -14,6 +14,7 @@
 #include <sstream>
 #include <iostream>
 
+
 #define SAMPLE_RATE 44100
 #define BUFFER_SIZE SAMPLE_RATE
 #define VOLUME_MULTIPLIER 16000
@@ -43,6 +44,14 @@ BeepBroadcaster::~BeepBroadcaster()
 
 void BeepBroadcaster::update(BeepCommData& beepCommData)
 {
+    //Handle Ground Sensor
+    if (theGroundContactState.contact){
+        groundBeep(beepCommData, 1);
+        OUTPUT_TEXT("Ground-Beep");
+    } else {
+        groundBeep(beepCommData, 2);
+        OUTPUT_TEXT("High-Beep");
+    }
     // Handle Head Button
     if (theEnhancedKeyStates.isPressedFor(KeyStates::headFront, 100u))
     {
@@ -107,8 +116,10 @@ void BeepBroadcaster::update(BeepCommData& beepCommData)
     }
 }
 
-void BeepBroadcaster::requestBeep(int robot_number, int message)
+//void BeepBroadcaster::requestBeep(int message){
+//    beepCommData.broadcastQueue.push_back(message);
 
+/*
 //5bit
 {
 //robotnumber = 0 ->broadcast
@@ -116,13 +127,15 @@ void BeepBroadcaster::requestBeep(int robot_number, int message)
 //4 message per robot
 
 if (robot_number==0){
-    sendmessage=message;
+    int msg = message;
+    requestMessageBroadcast(1, 1.0f, msg);
 }else
 {
-    sendmessage=(((robot_number-1)*4)+10+message);
+    int msg =(((robot_number-1)*4)+10+message);
+    requestMessageBroadcast(1, 1.0f, msg);
 }
-sendToggle=true;
-}
+sendToggle=true;*/
+//}
 
 /*
 //4bit
@@ -232,6 +245,10 @@ void BeepBroadcaster::handleBeepRequests()
             }
         } while (signalSize > 0 && !shutdown); // exit when signal is done OR shutdown is requested
     }
+}
+
+void BeepBroadcaster::groundBeep(BeepCommData& beepCommData, int message){
+    beepCommData.broadcastQueue.push_back(message);
 }
 
 #else // !defined TARGET_ROBOT

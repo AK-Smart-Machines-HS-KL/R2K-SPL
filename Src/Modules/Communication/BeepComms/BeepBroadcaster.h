@@ -14,6 +14,7 @@
 #include "Platform/Thread.h"
 #include "Representations/Infrastructure/BeepCommData.h"
 #include "Representations/Infrastructure/SensorData/KeyStates.h"
+#include "Representations/Sensing/GroundContactState.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/Beep.h"
 #include <string>
@@ -24,6 +25,7 @@ MODULE(BeepBroadcaster,
   PROVIDES(BeepCommData),
   REQUIRES(EnhancedKeyStates),
   REQUIRES(RobotInfo),
+  REQUIRES(GroundContactState),
   REQUIRES(Beep),
   LOADS_PARAMETERS(
   {,
@@ -58,13 +60,13 @@ private:
   bool shutdown = false;
 
   void update(BeepCommData& audioData) override;
-  void requestBeep(int robot_number , int message);
   void requestMultipleFrequencies(float duration, float volume, std::vector<float> frequencies);
   void requestMessageBroadcast(float duration, float volume, int message);
   void stopWorker();
   void startWorker();
   void init_pcm();
   void handleBeepRequests();
+  void groundBeep(BeepCommData& beepCommData, int message);
 
 
 public:
@@ -72,7 +74,6 @@ public:
    * Default constructor
    */
   BeepBroadcaster();
-
   /**
    * Destructor.
    */
