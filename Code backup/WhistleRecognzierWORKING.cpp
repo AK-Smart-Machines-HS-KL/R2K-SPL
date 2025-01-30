@@ -28,7 +28,7 @@ WhistleRecognizer::WhistleRecognizer()
   canvas.setResolution(bufferSize + 1, bufferSize * 2 / 3);
 
   // Load whistle signatures
-  for (const std::string& fileName : whistles)
+  for(const std::string& fileName : whistles)
   {
     InBinaryFile stream("Whistles/" + fileName + ".dat");
     ASSERT(stream.exists());
@@ -76,24 +76,24 @@ void WhistleRecognizer::update(Whistle& theWhistle)
 
   // Empty buffers when entering a state where it should be recorded.
   const bool shouldRecord = (theGameInfo.state == STATE_SET
-    || theGameInfo.state == STATE_PLAYING)
-    && !soundWasPlaying;
-  if (!hasRecorded && shouldRecord)
+                             || theGameInfo.state == STATE_PLAYING)
+                            && !soundWasPlaying;
+  if(!hasRecorded && shouldRecord)
     buffers.clear();
   hasRecorded = shouldRecord;
 
   // Adapt number of channels to audio data.
   buffers.resize(theAudioData.channels);
-  for (auto& buffer : buffers)
+  for(auto& buffer : buffers)
     buffer.reserve(bufferSize);
 
   // Append current samples to buffers and sample down if necessary
   ASSERT(theAudioData.sampleRate % sampleRate == 0);
   const size_t stepSize = theAudioData.sampleRate / sampleRate * theAudioData.channels;
-  for (; sampleIndex < theAudioData.samples.size(); sampleIndex += stepSize)
+  for(; sampleIndex < theAudioData.samples.size(); sampleIndex += stepSize)
   {
     --samplesRequired;
-    for (size_t channel = 0; channel < theAudioData.channels; ++channel)
+    for(size_t channel = 0; channel < theAudioData.channels; ++channel)
       buffers[channel].push_front(theAudioData.samples[sampleIndex + channel]);
   }
   sampleIndex -= theAudioData.samples.size();
@@ -102,38 +102,38 @@ void WhistleRecognizer::update(Whistle& theWhistle)
   const int firstBuffer = theDamageConfigurationHead.audioChannelsDefect[0] ? 1 : 0;
 
   // No whistles can be detected while sound is playing.
-  if (soundWasPlaying)
+  if(soundWasPlaying)
     theWhistle.channelsUsedForWhistleDetection = 0;
 
   // Count number of channels if they were set to zero and no sound is playing.
-  if (!theWhistle.channelsUsedForWhistleDetection && !soundWasPlaying)
-    for (size_t i = 0; i < buffers.size(); ++i)
-      if (!theDamageConfigurationHead.audioChannelsDefect[i])
+  if(!theWhistle.channelsUsedForWhistleDetection && !soundWasPlaying)
+    for(size_t i = 0; i < buffers.size(); ++i)
+      if(!theDamageConfigurationHead.audioChannelsDefect[i])
         ++theWhistle.channelsUsedForWhistleDetection;
 
   std::string selectedName = "newWhistle";
   MODIFY("module:WhistleRecognizer:select", selectedName);
   auto selectedIter = std::find_if(signatures.begin(), signatures.end(),
-    [&selectedName](const Signature& signature) {return signature.name == selectedName; });
+    [&selectedName](const Signature& signature) {return signature.name == selectedName;});
 
   // Record a whistle.
   DEBUG_RESPONSE_ONCE("module:WhistleRecognizer:record")
   {
-    if (buffers[firstBuffer].full())
+    if(buffers[firstBuffer].full())
     {
       Signature signature;
       signature.selfCorrelation = correlate(signature.spectrum, buffers[firstBuffer], true);
-      if (signature.selfCorrelation > 0)
+      if(signature.selfCorrelation > 0)
       {
         signature.name = selectedName;
-        if (selectedIter == signatures.end())
+        if(selectedIter == signatures.end())
         {
           signatures.emplace_back();
           selectedIter = signatures.end() - 1;
         }
         *selectedIter = signature;
         OutBinaryFile stream("Whistles/" + selectedName + ".dat");
-        if (stream.exists())
+        if(stream.exists())
         {
           stream << *selectedIter;
           OUTPUT_TEXT("Recorded whistle " << selectedName << " with selfCorrelation = " << signature.selfCorrelation);
@@ -142,54 +142,48 @@ void WhistleRecognizer::update(Whistle& theWhistle)
     }
   }
 
-  for (size_t i = 0; i < buffers.size(); ++i)
-    if (!buffers[i].empty())
-      switch (i)
+  for(size_t i = 0; i < buffers.size(); ++i)
+    if(!buffers[i].empty())
+      switch(i)
       {
-      case 0: PLOT("module:WhistleRecognizer:samples0", buffers[i].back()); break;
-      case 1: PLOT("module:WhistleRecognizer:samples1", buffers[i].back()); break;
-      case 2: PLOT("module:WhistleRecognizer:samples2", buffers[i].back()); break;
-      case 3: PLOT("module:WhistleRecognizer:samples3", buffers[i].back()); break;
+        case 0: PLOT("module:WhistleRecognizer:samples0", buffers[i].back()); break;
+        case 1: PLOT("module:WhistleRecognizer:samples1", buffers[i].back()); break;
+        case 2: PLOT("module:WhistleRecognizer:samples2", buffers[i].back()); break;
+        case 3: PLOT("module:WhistleRecognizer:samples3", buffers[i].back()); break;
       }
 
   // Correlate all channels with all signatures or only one if selectedName matches a whistle.
-  if (shouldRecord && buffers[firstBuffer].full() && samplesRequired <= 0)
+  if(shouldRecord && buffers[firstBuffer].full() && samplesRequired <= 0)
   {
     COMPLEX_IMAGE("module:WhistleRecognizer:spectra")
     {
       std::memset(canvas[0], 128, sizeof(PixelTypes::Edge2Pixel) * canvas.width * canvas.height);
-      if (selectedIter != signatures.end())
-        for (unsigned x = 0; x < selectedIter->spectrum.size(); ++x)
+      if(selectedIter != signatures.end())
+      for(unsigned x = 0; x < selectedIter->spectrum.size(); ++x)
+      {
+        const Vector2d& complex = selectedIter->spectrum[x];
+        const unsigned amplitude = std::min(static_cast<unsigned>(complex.norm()), canvas.height);
+        if(amplitude > 0)
         {
-          const Vector2d& complex = selectedIter->spectrum[x];
-          const unsigned amplitude = std::min(static_cast<unsigned>(complex.norm()), canvas.height);
-          if (amplitude > 0)
-          {
-            const PixelTypes::Edge2Pixel pixel(static_cast<char>(128 + 127 * complex.x() / amplitude),
-              static_cast<char>(128 + 127 * complex.y() / amplitude));
-            for (size_t y = 0; y < amplitude; ++y)
-              canvas[y][x] = pixel;
-          }
+          const PixelTypes::Edge2Pixel pixel(static_cast<char>(128 + 127 * complex.x() / amplitude),
+                                             static_cast<char>(128 + 127 * complex.y() / amplitude));
+          for(size_t y = 0; y < amplitude; ++y)
+            canvas[y][x] = pixel;
         }
+      }
     }
 
     const Signature* bestSignature = nullptr;
 
-    for (auto& signature : signatures)
-    {// Only correlate with the closestWhistle if it has been found
-      if (!closestWhistle.empty() && signature.name != closestWhistle)
-      {
-        continue;
-      }
-
-      if (selectedIter == signatures.end() || &signature == &*selectedIter)
+    for(auto& signature : signatures)
+      if(selectedIter == signatures.end() || &signature == &*selectedIter)
       {
         size_t defects = 0;
         float correlation = 0.f;
         float bestChannelCorrelation = 0.f;
 
-        for (size_t i = 0; i < buffers.size(); ++i)
-          if (theDamageConfigurationHead.audioChannelsDefect[i] || !buffers[i].full())
+        for(size_t i = 0; i < buffers.size(); ++i)
+          if(theDamageConfigurationHead.audioChannelsDefect[i] || !buffers[i].full())
             ++defects;
           else
           {
@@ -198,10 +192,10 @@ void WhistleRecognizer::update(Whistle& theWhistle)
             correlation += channelCorrelation;
           }
 
-        if (defects < buffers.size())
+        if(defects < buffers.size())
         {
           correlation /= static_cast<float>(buffers.size() - defects) * signature.selfCorrelation * minCorrelation;
-          if (correlation >= bestCorrelation)
+          if(correlation >= bestCorrelation)
           {
             theWhistle.confidenceOfLastWhistleDetection = correlation;
             theWhistle.channelsUsedForWhistleDetection = static_cast<unsigned char>(buffers.size() - defects);
@@ -209,25 +203,24 @@ void WhistleRecognizer::update(Whistle& theWhistle)
             bestSignature = &signature;
           }
 
-          switch (&signature - signatures.data())
+          switch(&signature - signatures.data())
           {
-          case 0: PLOT("module:WhistleRecognizer:correlation0", correlation); break;
-          case 1: PLOT("module:WhistleRecognizer:correlation1", correlation); break;
-          case 2: PLOT("module:WhistleRecognizer:correlation2", correlation); break;
-          case 3: PLOT("module:WhistleRecognizer:correlation3", correlation); break;
-          case 4: PLOT("module:WhistleRecognizer:correlation4", correlation); break;
-          default: PLOT("module:WhistleRecognizer:correlation5", correlation); break;
+            case 0: PLOT("module:WhistleRecognizer:correlation0", correlation); break;
+            case 1: PLOT("module:WhistleRecognizer:correlation1", correlation); break;
+            case 2: PLOT("module:WhistleRecognizer:correlation2", correlation); break;
+            case 3: PLOT("module:WhistleRecognizer:correlation3", correlation); break;
+            case 4: PLOT("module:WhistleRecognizer:correlation4", correlation); break;
+            default: PLOT("module:WhistleRecognizer:correlation5", correlation); break;
           }
         }
       }
-    }
 
-    if (bestSignature)
+    if(bestSignature)
     {
 
       whistleTimes.emplace_back(bestSignature->name, theFrameInfo.time);
       OUTPUT_TEXT("Best Signature found: " << bestSignature->name << " at " << theFrameInfo.time);
-
+      
     }
     if (theGameInfo.state == STATE_PLAYING && closestWhistle.empty())
     {
@@ -237,7 +230,7 @@ void WhistleRecognizer::update(Whistle& theWhistle)
       int minDiff = std::numeric_limits<int>::max();
       for (const auto& whistleTime : whistleTimes)
       {
-        int diff = std::abs(whistleTime.second - playingTime);
+        int diff = std::abs(whistleTime.second - playingTime); 
         if (diff < minDiff)
         {
           minDiff = diff;
@@ -269,20 +262,20 @@ void WhistleRecognizer::update(Whistle& theWhistle)
 }
 
 float WhistleRecognizer::correlate(std::vector<Vector2d>& signature, const RingBuffer<AudioData::Sample>& buffer,
-  bool record)
+                                      bool record)
 {
   // Compute volume of samples.
   float volume = 0;
-  for (AudioData::Sample sample : buffer)
+  for(AudioData::Sample sample : buffer)
     volume = std::max(volume, std::abs(static_cast<float>(sample)));
 
   // Abort if not loud enough.
-  if (volume == 0 || (!record && volume < (std::is_same<AudioData::Sample, short>::value ? std::numeric_limits<short>::max() : 1) * minVolume))
+  if(volume == 0 || (!record && volume < (std::is_same<AudioData::Sample, short>::value ? std::numeric_limits<short>::max() : 1) * minVolume))
     return 0.f;
 
   // Copy samples to FFTW input and normalize them.
   const double factor = 1.0 / volume;
-  for (size_t i = 0; i < buffer.size(); ++i)
+  for(size_t i = 0; i < buffer.size(); ++i)
     samples[i] = buffer[i] * factor;
 
   // samples -> spectrum
@@ -290,25 +283,25 @@ float WhistleRecognizer::correlate(std::vector<Vector2d>& signature, const RingB
 
   COMPLEX_IMAGE("module:WhistleRecognizer:spectra")
   {
-    for (unsigned x = 0; x < signature.size(); ++x)
+    for(unsigned x = 0; x < signature.size(); ++x)
     {
       const Vector2d complex(spectrum[x][0], spectrum[x][1]);
       const unsigned amplitude = std::min(static_cast<unsigned>(complex.norm()), canvas.height);
-      if (amplitude > 0)
+      if(amplitude > 0)
       {
         const PixelTypes::Edge2Pixel pixel(static_cast<char>(128 + 127 * complex.x() / amplitude),
-          static_cast<char>(128 + 127 * complex.y() / amplitude));
-        for (size_t y = 0; y < amplitude; ++y)
+                                           static_cast<char>(128 + 127 * complex.y() / amplitude));
+        for(size_t y = 0; y < amplitude; ++y)
           canvas[canvas.height - 1 - y][x] = pixel;
       }
     }
   }
 
-  if (record)
+  if(record)
   {
     // Store conjugate spectrum as signature and self-correlate input.
     signature.resize(bufferSize + 1);
-    for (size_t i = 0; i < signature.size(); ++i)
+    for(size_t i = 0; i < signature.size(); ++i)
     {
       signature[i] = Vector2d(spectrum[i][0], -spectrum[i][1]);
       spectrum[i][0] = sqr(spectrum[i][0]) + sqr(spectrum[i][1]);
@@ -319,7 +312,7 @@ float WhistleRecognizer::correlate(std::vector<Vector2d>& signature, const RingB
   {
     // Multiply input spectrum with signature spectrum.
     ASSERT(signature.size() == bufferSize + 1);
-    for (size_t i = 0; i < signature.size(); ++i)
+    for(size_t i = 0; i < signature.size(); ++i)
     {
       const double spectrumi0 = spectrum[i][0];
       spectrum[i][0] = spectrumi0 * signature[i][0] - spectrum[i][1] * signature[i][1];
@@ -329,15 +322,15 @@ float WhistleRecognizer::correlate(std::vector<Vector2d>& signature, const RingB
 
   COMPLEX_IMAGE("module:WhistleRecognizer:spectra")
   {
-    for (unsigned x = 0; x < signature.size(); ++x)
+    for(unsigned x = 0; x < signature.size(); ++x)
     {
       const Vector2d complex(spectrum[x][0], spectrum[x][1]);
       const unsigned amplitude = std::min(static_cast<unsigned>(std::sqrt(complex.norm())), canvas.height);
-      if (amplitude > 0)
+      if(amplitude > 0)
       {
         const PixelTypes::Edge2Pixel pixel(static_cast<char>(128 + 127 * complex.x() / amplitude),
-          static_cast<char>(128 + 127 * complex.y() / amplitude));
-        for (size_t y = 0; y < amplitude; ++y)
+                                           static_cast<char>(128 + 127 * complex.y() / amplitude));
+        for(size_t y = 0; y < amplitude; ++y)
           canvas[(canvas.height - amplitude) / 2 + y][x] = pixel;
       }
     }
@@ -348,8 +341,8 @@ float WhistleRecognizer::correlate(std::vector<Vector2d>& signature, const RingB
 
   // Find best correlation.
   double bestCorrelation = 0;
-  for (size_t i = 0; i < bufferSize * 2; ++i)
-    if (std::abs(correlation[i]) > bestCorrelation)
+  for(size_t i = 0; i < bufferSize * 2; ++i)
+    if(std::abs(correlation[i]) > bestCorrelation)
       bestCorrelation = std::abs(correlation[i]);
 
   return static_cast<float>(std::sqrt(bestCorrelation) / bufferSize / 2);
