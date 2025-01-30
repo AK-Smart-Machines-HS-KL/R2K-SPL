@@ -54,6 +54,7 @@ class BeepRecognizer : public BeepRecognizerBase
 {
   private:
   bool responseToggle = true;
+  int maxTimeOutBetweenBeeps = 500;
   int lastTimeWithBeep = 0;
 
 

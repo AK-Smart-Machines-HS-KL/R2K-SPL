@@ -285,67 +285,69 @@ switch(theBeep.messages[i]) {
 
 
 //5bit version
-if (responseToggle) {
-  responseToggle = false;
-for (int i=0;i<=4;i++){
-   if (theRobotInfo.number==i){
-    //i++;
-   }
-    if(theBeep.messages[i] > 10){
-      
-      //Robot specific
-       for (int j=1;j<=5;j++){
-        if (theRobotInfo.number==j){
-        if (theBeep.messages[i]==(j-1)*4+9){
-        SystemCall::say((std::string("message ") + std::to_string((j-1)*4+9)).c_str());
-        SystemCall::say((std::string("robot ") + std::to_string(i+1)).c_str());   
-        }
-        if (theBeep.messages[i]==(j-1)*4+10){
-        SystemCall::say((std::string("message ") + std::to_string((j-1)*4+10)).c_str());
-        SystemCall::say((std::string("robot ") + std::to_string(i+1)).c_str());
-        }
+if (theFrameInfo.getTimeSince(lastTimeWithBeep) >= maxTimeOutBetweenBeeps){
+  lastTimeWithBeep = theFrameInfo.time;
+  if (responseToggle) {
+    responseToggle = false;
+    for (int i=0;i<=4;i++){
+      if (theRobotInfo.number==i){
+        //i++;
       }
-    }  
-  }else if(theBeep.messages[i] >= 1){
-//broadcast
-switch(theBeep.messages[i]) {
-  case 1:
-  SystemCall::say((std::string("message 3 robot ") + std::to_string(i+1)).c_str()); 
-    break;
-  case 2:
-  SystemCall::say((std::string("message 3 robot ") + std::to_string(i+1)).c_str());
-    break;
-  case 3:
-  SystemCall::say((std::string("message 3 robot ") + std::to_string(i+1)).c_str());
-    break;
-  case 4:
-  SystemCall::say((std::string("message 3 robot ") + std::to_string(i+1)).c_str());
-    break;
-  case 5:
-  SystemCall::say((std::string("message 3 robot ") + std::to_string(i+1)).c_str());
-    break;
-  case 6:
-  SystemCall::say((std::string("message 3 robot ") + std::to_string(i+1)).c_str()); 
-    break;
-  case 7:
-  SystemCall::say((std::string("message 3 robot ") + std::to_string(i+1)).c_str());
-    break;
-  case 8:
-  SystemCall::say((std::string("message 3 robot ") + std::to_string(i+1)).c_str());
-    break;
-  case 9:
-  SystemCall::say((std::string("message 3 robot ") + std::to_string(i+1)).c_str());
-    break;
-  default:
-  SystemCall::say("something went wrong");  
-}
-}
-}
+      if(theBeep.messages[i] > 10){
+        
+        //Robot specific
+        for (int j=1;j<=5;j++){
+          if (theRobotInfo.number==j){
+          if (theBeep.messages[i]==(j-1)*4+9){
+            SystemCall::say((std::string("message ") + std::to_string((j-1)*4+9)).c_str());
+            SystemCall::say((std::string("robot ") + std::to_string(i+1)).c_str());   
+          }
+          if (theBeep.messages[i]==(j-1)*4+10){
+            SystemCall::say((std::string("message ") + std::to_string((j-1)*4+10)).c_str());
+            SystemCall::say((std::string("robot ") + std::to_string(i+1)).c_str());
+          }
+        }
+      }  
+    }else if(theBeep.messages[i] >= 1){
+  //broadcast
+      switch(theBeep.messages[i]) {
+        case 1:
+          SystemCall::say((std::string("message 1 robot ") + std::to_string(i+1)).c_str()); 
+          break;
+        case 2:
+          SystemCall::say((std::string("message 2 robot ") + std::to_string(i+1)).c_str());
+          break;
+        case 3:
+          SystemCall::say((std::string("message 3 robot ") + std::to_string(i+1)).c_str());
+          break;
+        case 4:
+          SystemCall::say((std::string("message 4 robot ") + std::to_string(i+1)).c_str());
+          break;
+        case 5:
+          SystemCall::say((std::string("message 5 robot ") + std::to_string(i+1)).c_str());
+          break;
+        case 6:
+          SystemCall::say((std::string("message 6 robot ") + std::to_string(i+1)).c_str()); 
+          break;
+        case 7:
+          SystemCall::say((std::string("message 7 robot ") + std::to_string(i+1)).c_str());
+          break;
+        case 8:
+          SystemCall::say((std::string("message 8 robot ") + std::to_string(i+1)).c_str());
+          break;
+        case 9:
+          SystemCall::say((std::string("message 9 robot ") + std::to_string(i+1)).c_str());
+          break;
+        default:
+          SystemCall::say("something went wrong");  
+      }
+    }
+  }
 }
 else {
-responseToggle = true;
+  responseToggle = true;
 }
-
+}
 }
 
 std::vector<long> BeepRecognizer::decode(const RingBuffer<AudioData::Sample>& buffer)
