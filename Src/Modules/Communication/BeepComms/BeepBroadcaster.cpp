@@ -62,14 +62,8 @@ void BeepBroadcaster::update(BeepCommData& beepCommData)
         if (buttonToggle)   
         {
             buttonToggle = false; 
-            //requestMultipleFrequencies(1000, 0.5, {500, 600});
-            //beepCommData.broadcastQueue.push_back(headButtonMessage);
-
-            //for (int i = 0; i <= 15; i++)
-            //{
-              beepCommData.broadcastQueue.push_back(headButtonMessage);
-              OUTPUT_TEXT("Beep: " << headButtonMessage);
-           // }
+            beepCommData.broadcastQueue.push_back(headButtonMessage);
+            OUTPUT_TEXT("Beep: " << headButtonMessage);
         } 
     } else {
         buttonToggle = true;
