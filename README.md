@@ -24,20 +24,43 @@ Alternativer DNS 0.0.0.0
 
 ## Beschreibung bisheriger Code
 ### Broadcaster
-Bei der Übertragung werden mittels Frequenzen startend von 500 in 200 Schritten die Nummer des Roboters kodiert(1->500,2->700...).  
-In diesen 200Hz Bändern werden aktuell in der Standartconfig nur 1 Bit Kodiert und damit immer die Basisfrequenz(1->500,2->700...) kodiert.
-Falls man nun die config auf 4 bit ändert beginnt er in 50Hz(Spanne skaliert mit Anzahl kodierter Bits und bandWidth) Schritten zu kodieren und mehrere davon anscheinend überlagerte.(siehe Spektogramme in [BeepTestSounds](BeepTestSounds)). 
+Jeder Roboter besitz eine eigene Basisfrequenz. Diese berechnet sich aus den in der [Config](Config\Scenarios\Default/BeepBroadcaster.cfg) konfigurierbaren "baseFrequency" und  "bandWidth" mit folgender Formel:
 
-Die Ein sowie Ausgabe basiert hier auf einem int 0-15, diese nennen wir message.
+baseFrequency x bandWidth x Roboternummer
 
-Ein Beep kann ausgelöst werden mit Betätigen des vorderen Kopfschalters. Die message kann in der [BeepBroadcaster.cfg](Config\Scenarios\Default/BeepBroadcaster.cfg) als "headButtonMessage" geändert werden. Hier können ebenso die Anzal der Bänder(Zahl der Roboter), sowie die Basisfrequenz und Bandbreite geändert werden.
+Bsp.  
+baseFrequency = 1500  
+bandWidth = 1000  
+Roboter 1 -> 1500  
+Roboter 2 -> 2500
+
+In der konfigurierbaren "encodedBits" wird bestimmt wie viele Bit übertragen werden. Hierfür wird das Frequenzband durch die Anzahl der Bits geteilt und die Kombinationen dieser gleichzeitig gesendeten Frequenzen stellen dann unsere Übertragung da. Diese  werden durch den Integer "message" identifiziert.
+
+Bsp.  
+Robot nr. 1 broadcasting message 1(1500Hz)  
+
+Robot nr. 1 broadcasting message 7(1500Hz)  
+Robot nr. 1 broadcasting message 7(1700Hz)  
+Robot nr. 1 broadcasting message 7(1900Hz)  
+
+Robot nr. 1 broadcasting message 31(1500Hz)  
+Robot nr. 1 broadcasting message 31(1700Hz)  
+Robot nr. 1 broadcasting message 31(1900Hz)  
+Robot nr. 1 broadcasting message 31(2100Hz)  
+Robot nr. 1 broadcasting message 31(2300Hz) 
+
+Dies wird auch als Debug Code bei jedem Senden auf der Console ausgegeben.
+
+Ein Beep kann ausgelöst werden mit Betätigen des vorderen Kopfschalters. Die gesendete message kann in der [BeepBroadcaster.cfg](Config\Scenarios\Default/BeepBroadcaster.cfg) als "headButtonMessage" geändert werden.
 
 ### Regognizer
 Hier wird mittels fftw(Fourier-Transformation) dekodiert und in Form eines std::vector messages(siehe [Beep.h](Src\Representations\Communication\Beep.h)) abgespeichert. Hier sind mit dem Index der Roboter und dem Inhalt die messages beschrieben Bsp. bei 5 Robotern und 4 bit   
-|0|0|0|0|0| - keine message  |1|0|0|0|0| - message 1 bei Roboter 1(R1M1) |0|0|0|0|15| - message 15 bei Roboter 5(R5M15)
 
+|0|0|0|0|0| - keine message   
+|1|0|0|0|0| - message 1 bei Roboter 1(R1M1)  
+|0|0|0|0|15| - message 15 bei Roboter 5(R5M15)  
 
-Bisher falls |1|0|0|0|0| dedektiert wurde, wurde falls der Roboters nicht die Nummer 1 trägt eine message 1 als Antwort gesendet gesendet.
+Bisher falls |1|0|0|0|0| von einem Roboter dedektiert wurde, welchernicht Nummer 1 trägt eine message 1 als Antwort gesendet gesendet.
 
 ## Zugriff auf OUTPUT_TEXT mit Simulator
 Solange ein Nao in der bush verbunden ist, kann der Simulator genutzt werden um Daten des Roboter im laufenden Betrieb auszulesen. Hierzu zählen OUTPUT_TEXT() Statements die zum Debuggen bzw. einfachen Verifizieren des Codes verwendet werden kann. Hierzu muss bei verbundenem Roboter einfach nur in der bush, in der unteren Leiste der "Simulator" gestartet werden. Hier wird dann im "Console" Fenster der Output angezeigt.
@@ -49,15 +72,35 @@ Merke nach jedem Deploy muss der Simulator neugestartet werden
 
 ## Änderungen am Code
 ### Config
-averagingBufferSize = 15; averagingThreshold = 11; baseFrequency = 1500; bandWidth = 1000; encodedBits = 5;
+averagingBufferSize = 15
+averagingThreshold = 11 
+baseFrequency = 1500
+bandWidth = 1000
+encodedBits = 5
+signalBaseline = 3
 
-Durch obrige Änderungen zumindest in simplen Tests ohne zusätzliche Hintergrundgeräusche eine genaue erkennung möglich. Mit Ausnahme von message 31 welche nicht eindeutig oder sogar falsch erkannt wird. Lösungsvorschlag hier die 31 einfach zu ignorieren.
+Mit dieser Config ist zumindest in Tests ohne zusätzliche Hintergrundgeräusche eine genaue erkennung möglich und in ersten Tests mit Hintergrundgeräusche auch. Die einzige Ausnahmme hier ist die message 31 welche nicht eindeutig oder sogar falsch erkannt wird. Lösungsvorschlag hier die 31 einfach zu ignorieren. Testausgaben hierfür finden sich [BeepTestSounds](BeepTestSounds). 
 
 ### Broadcaster
-Neue Methode "BeepBroadcaster::requestBeep(int robot_number, int message)" die als Schnittstelle dient um im Code Beeps zu senden. Bisher noch Probleme bei der Nutzung
 
 ### Regognizer
-Code zum aufrufen gewünschter Aktionen auf Basis der empfangenen messages. Aktuell noch Probleme mit merfach aufrufen.
+Mittels SystemCall::say wird für jeden Roboter und jede mögliche message im Muster: "message"+ nummer der message + "robot" + nummer des sendenden roboters ausgegeben.
+Aktuell werden hier die messages 1-10 von jedem Roboter erkannt, die messages 11-30 nur von Spezifischen(siehe Muster unten).
+
+Roboter 1
+11-14
+
+Roboter 2
+15-18
+
+Roboter 3
+19-22
+
+Roboter 4
+23-26
+
+Roboter 5
+27-30
 
 ## Beep Test Sounds(Ordner)
 in [BeepTestSounds](BeepTestSounds) sind mehrere aufgenommene beeps sowie Testergebnisse. 
@@ -94,13 +137,10 @@ Bsp.(Zahlen müssen erst genauer bestimmt werden und dienen hier nur zu einfache
 Nach Configänderungen bisher nicht beobachtet allerdings immernoch möglich. 
 
 ## Zukünftige Arbeiten
-Merfach ausgabe im Regognizer fixen
-
-"BeepBroadcaster::requestBeep(int robot_number, int message)" Probleme fixen
-
-Demovideo drehen
-
-
+Bisherige Ideen für eine Zukünftige praktische Anwendung:
+-einem Roboter mitteilen das der Ball sich hinter ihm befindet während er selber ihn nicht sieht  
+-dem Torwart mitteilen das er falsch steht
+-einem Roboter mitteilen das er die Schusslinie blockiert
 
 
 ## Verlinkung relevanter Klassen  
