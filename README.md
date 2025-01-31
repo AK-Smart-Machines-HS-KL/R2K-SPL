@@ -17,52 +17,82 @@ Wie erkennen wir "unsere" Pfeife:
 3. Ab dem Zeitpunkt, an dem der GameController offiziell den Spielstatus PLAYING ausruft, wird im Code zurückgerechnet, welche der detektierten Pfeifen die beste absolute Zeitdifferenz aufweist. Die Pfeife mit der geringsten Zeitdifferenz wird als String in `closestWhistle` gespeichert (siehe Diagramm unten).
 
 ## Diagramm zum Ansatz
-Das Diagramm beschreibt zum größten teil den derzeitigen Programfluss der Whistle Detection. Die zu implementierenden Teile sind sind bei "Find best Signature" und die Abzweigung "Game Start" zu sehen.
+Das Diagramm beschreibt zum größten teil den derzeitigen Programfluss der Whistle Detection. Die zu implementierenden Teile sind sind bei "Find Best Correlation" und die Abzweigung "Annotate Closest Whistle" zu sehen.
 
-![Draw_io_Whistle_Recognizer_Process png](https://github.com/user-attachments/assets/33bd1934-cc9c-4eb0-b250-a3694255cb9e)
+![DrawIO_WhistleDiagrammV2](https://github.com/user-attachments/assets/dd4a359d-b475-45d5-956b-9dc6c2ccc2d3)
 
 ## Funktionalitäten
 Die Hauptfunktionen des Projekts umfassen die Funktionen der FFTW3 Library sowie die bereits vorhandene Update- und Correlate-Funktion aus `WhistleRecognizer.cpp` und `.h`. Spezielle Algorithmen, die verwendet werden, sind die Fast Fourier Transformation (FFT) und die Diskrete Fourier Transformation (DFT).
 
-## Technologien und Tools
-Die verwendete Programmiersprache ist C++. Das Framework Qt wird ebenfalls genutzt. Als Codebasis dient das R2 Kickers GitHub Repository. Der grundlegende Code für den Roboter ist für eine Ubuntu Linux Plattform. Der Simulator ist auf mehreren Plattformen nutzbar, z.B. Windows und Linux.
-
-## Spezielle Voraussetzungen
-Wie bei jeder akademischen Prüfung werden keine Plagiate akzeptiert. Die Bearbeitung des Projekts erfolgt ausschließlich durch den Studenten.
-
-## Lizenz
-Dieses Projekt wird unter der GNU-Lizenz veröffentlicht.
-
 ## Kontaktinformationen
 Der Hauptverantwortliche für das Projekt ist Dimitri Feuerstein. Kontakt: E-Mail: dipa1001@stud.hs-kl.de.
 
-## Zukünftige Entwicklungen
-Zukünftige Entwicklungen umfassen die Verwendung von Passfiltern und Hanning-Fenstern sowie die Implementierung eines neuronalen Netzwerks mit drei Schichten.
+## Mögliche zukünftige Entwicklungen 
+
+### Hanning-Fensterfunktionen
+Hanning-Fensterfunktionen sind eine wichtige Technik in der Signalverarbeitung, die dazu beitragen kann, die Anzahl falsch positiver Erkennungen bei der Identifikation spezifischer Geräusche zu reduzieren.
+
+Ein Hanning-Fenster ist eine spezielle Fensterfunktion, die verwendet wird, um die spektrale Leckage (spectral leakage) zu minimieren. Spektrale Leckage tritt auf, wenn die Frequenzkomponenten eines Signals aufgrund der endlichen Länge des Fensters in benachbarte Frequenzbänder "auslaufen". Dies kann zu falsch positiven Erkennungen führen, da Frequenzen, die nicht im ursprünglichen Signal vorhanden sind, fälschlicherweise als vorhanden erkannt werden.[Link](https://en.wikipedia.org/wiki/Window_function#Hann_and_Hamming_windows)
+
+### Passfilter
+
+Passfilter sind eine grundlegende Technik in der Signalverarbeitung, die dazu dient, bestimmte Frequenzbereiche eines Signals zu isolieren oder zu unterdrücken. In der Whistle Detection können Passfilter verwendet werden, um die relevanten Frequenzbereiche des Pfeifsignals zu isolieren und störende Frequenzen zu unterdrücken. Dies hilft, das Signal-Rausch-Verhältnis (SNR) zu verbessern und die Erkennung des Pfeifsignals zu erleichtern.
+
+Passfilter arbeiten, indem sie das Eingangssignal durch eine mathematische Funktion leiten, die bestimmte Frequenzen durchlässt und andere unterdrückt. Ein Bandpassfilter ist nützlich für die Whistle Detection, da es nur die Frequenzen durchlässt, die typischerweise von einem Pfeifsignal erzeugt werden, und alle anderen Frequenzen unterdrückt. [Link](https://en.wikipedia.org/wiki/Band-pass_filter)
+
+### Neuronale Netzwerke
+
+Neuronale Netzwerke sind eine leistungsstarke Technik zur Mustererkennung, die in der Lage ist, komplexe Muster in Daten zu erkennen und zu klassifizieren. In der Whistle Detection können neuronale Netzwerke verwendet werden, um die Merkmale des Pfeifsignals zu lernen und zu erkennen, selbst in Anwesenheit von Störgeräuschen und Überlagerungen. Dies kann die Genauigkeit der Erkennung erheblich verbessern und die Anzahl der false positives reduzieren. Die Schwierigkeit liegt hier jedoch in der Erzeugung eines guten Trainings Datensatzes. [Link](https://www.tensorflow.org/tutorials/quickstart/beginner)
 
 ## Dokumentierter Fortschritt
 
-### Generierte Aufnahmen im Ready State 20-01-2025:
+### Testaufbau
+Getestet wurde mit zwei unterschiedlichen Pfeifen durch zwei unterschiedliche Videos auf YouTube. Einmal Fox40 Classic und einmal Fox Black.
 
-![Screenshot 2025-01-20 182436](https://github.com/user-attachments/assets/35cb7be9-e47e-43b1-91f2-6189be4fe2f5)
+#### Szenarien
+1. **Abspielen der Pfeifen sounds bevor "Playing" im Gamecontroller gestartet wird:**
+   - Die minimale Zeit im Vergleich zu Szenario 3 ist groß.
+   - Die Pfeife befindet sich je nach Abstand zwischen abgespieltem Pfeifen-Sound und dem Starten des Spiels "Playing" im oberen Teil der erkannten Pfeifen oder in der Mitte.
 
-### Generierte Aufnahmen im Set und Ready State 25-01-2025:
+2. **Abspielen der Pfeifen sounds nachdem "Playing" im Gamecontroller gestartet wird:**
+   - Die ausgegebene Zeit ist größer als im Fall 3.
+   - Die gefundene Pfeife befindet sich immer an erster Stelle.
 
-![Screenshot 2025-01-24 210717](https://github.com/user-attachments/assets/48b15614-cc81-466c-a625-e5363f1a3868)
+3. **Abspielen der Pfeifen sounds fast zeitgleich:**
+   - Die minimale Zeit ist sehr klein.
+   - Die gewählte Pfeife befindet sich immer in den anfänglich erkannten Pfeifen.
+   - Die `closestWhistle` befindet sich in den ersten erkannten Pfeifen.
 
-### Code Snippets
+#### Ergebnisse
+Die beiden Tests zeigen, dass die Pfeifen erkannt werden und die Pfeife mit der minimalsten Zeit zwischen Spielfreigabe des Gamecontrollers -15 Sekunden gewählt wird. Hier wurde beim Testen mit dem zweiten Video festgestellt, das bei der Fox Black auch andere Pfeifen die Fox Blue oder Fox Silver erkannt werden, was auf sehr ähnliches Spektrum oder einen schlechtes Sample hinweisen könnte.
+
+### Teilschritt 2
+Das Ziel in diesem Teilschritt ist, dass nur noch die Pfeifen mit demselben Namen wie die in Teilschritt 1 gefundene `closestWhistle` vom NAO erkannt werden. Alle anderen sollen für die gesamte Zeit, in der der NAO nicht rebootet wird, erhalten bleiben.
+
+#### Ergebnisse
+Ein großer Zeitsprung zwischen den beiden erkannten Pfeifen oberhalb und unterhalb der roten Linie ist zu erkennen. Hier wurde versucht, mit Video 2 (Fox Black) eine Pfeifenerkennung zu generieren. Erst als wieder auf Fox 40 Classic Sounds abgespielt wurde, wurden neue Pfeifen erkannt.
+
+### Code Snippets Teilschritt 1
 
 ```cpp
-//Codesnippet die in WhistleRecognizer.h hinzugefügt wurden um die detektierten Pfeifen zu Speichern und die Globale Variable für "unsere" Pfreife
+//Codesnippet die in WhistleRecognizer.h hinzugefügt wurden um die detektierten Pfeifen zu Speichern und 
+//die Globale Variable für "unsere" Pfreife
+//Weil wir nicht wissen welche Pfeife "unsere ist müssen wir vor dem Spielbeginn alle Pfeifen aufnehmen. 
+//Von jeder bestSignature Pfeife wird der Name als string und die Zeit als int gespeicher in einem vector gespeichert.
 
 std::vector<std::pair<std::string, int>> whistleTimes; /**< Stores whistle names and their detection times. */
 std::string closestWhistle; /**< Stores the whistle closest to STATE_PLAYING time. */
 
-//If-Statement für die Berechnung der "closestWhistle"
-if (theGameInfo.state == STATE_PLAYING)
+//If-Statement für die Berechnung der "closestWhistle" (string)
+//Suche closestWhistle wenn im State Playing und closestWhistle seid dem Start noch nicht gefunden wurde
+if (theGameInfo.state == STATE_PLAYING && closestWhistle.empty())
 {
-  // Find the whistle closest to the STATE_PLAYING time
-  int playingTime = theFrameInfo.time;
+  // Finde die Pfeife die am die kleine Zeit zwischen der zeit von STATE_PLAYING -15 Sekunden und 
+  //den gespeicherten Pfeifen aufzeigt
+  int playingTime = theFrameInfo.time - 15000; // time were game state playing - 15000 milliseconds = 15 seconds
   int minDiff = std::numeric_limits<int>::max();
+  // Für jede vorher gespeicherte bestSignature wird nun geprüft welcher absolute 
+  //Zeitunterschied der kleinste ist, diese wird als closestWhistle gespeichert
   for (const auto& whistleTime : whistleTimes)
   {
     int diff = std::abs(whistleTime.second - playingTime);
@@ -76,7 +106,34 @@ if (theGameInfo.state == STATE_PLAYING)
   ANNOTATION("WhistleRecognizer", closestWhistle << " with difference off " << minDiff);
 }
 ```
-## Testen
+### Code Snippets Teilschritt 2
+
+```cpp
+for (auto& signature : signatures)
+{// Nutze die funktion Correlate nur wenn der Name von closestWhistle gleich dem namen der aktuellen Pfeife und closestWhistle nich leer ist
+    if (!closestWhistle.empty() && signature.name != closestWhistle)
+    {
+      continue;
+    }
+    //Wenn der Name mit closestWhistle übereinstimmt suche das beste Sample
+    if (selectedIter == signatures.end() || &signature == &*selectedIter)
+    {
+```
+### Bilder
+#### Bilder Teilschrit 1
+![Screenshot 2025-01-30 181849](https://github.com/user-attachments/assets/bd508a5d-d4fa-44ad-93b0-3a65dcfa25a9)
+![Screenshot 2025-01-30 180049](https://github.com/user-attachments/assets/6ccd8169-1526-4cff-95a7-de82cd6f5441)
+#### Bild Teilschrit 2
+![Screenshot 2025-01-30 185307](https://github.com/user-attachments/assets/2fe2734c-7ab7-42af-9728-a75dc7d0818b)
+
+### Youtube Links für Pfeifen Tests:
+[Video 1](https://www.youtube.com/watch?v=Q3EYBVUgcXo&ab_channel=fox40world)
+[Video 2](https://www.youtube.com/watch?v=99E9mi87XgM&ab_channel=WhistlePerformerMr.Kojyoro)
+
+#### Schlussfolgerung
+Der `WhistleRecognizer`-Modul wurde erfolgreich erweitert, um nur die Pfeifen mit demselben Namen wie die gefundene `closestWhistle` zu erkennen. Die Tests zeigen, dass das Modul korrekt funktioniert und die gewünschten Pfeifen erkennt.
+
+## Testenaufbau
 
 Das Testen des Codes ist am einfachsten mit einem funktionierenden [Game Controller](https://github.com/AK-Smart-Machines-HS-KL/R2K-SPL/wiki/Real-RoboCup-Matches#gamecontroller). Beim Starten ist zu beachten, dass auf einer Seite das R2K-Team gewählt wird und als Verbindungsmodus WLAN ausgewählt wird. Die Verbindung kann vorher im Bus mit der Einstellung "Wifi" getestet werden - Einstellungen findet ihr [hier](https://github.com/AK-Smart-Machines-HS-KL/R2K-SPL/wiki/Real-RoboCup-Matches#roboter-deployenverbinden). Es wird empfohlen, den Bot im Bus auf den mittleren Platz #3 zu setzen.
 
