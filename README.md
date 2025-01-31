@@ -48,20 +48,17 @@ Neuronale Netzwerke sind eine leistungsstarke Technik zur Mustererkennung, die i
 
 ### Testaufbau
 Getestet wurde mit zwei unterschiedlichen Pfeifen durch zwei unterschiedliche Videos auf YouTube. Einmal Fox40 Classic und einmal Fox Black.
+Bedingt durch den Testablauf und der Zeit die der NAO an ist ergeben sich unterschiedliche Werte für 'mindiff'.
 
-#### Szenarien
-1. **Abspielen der Pfeifen sounds bevor "Playing" im Gamecontroller gestartet wird:**
-   - Die minimale Zeit im Vergleich zu Szenario 3 ist groß.
-   - Die Pfeife befindet sich je nach Abstand zwischen abgespieltem Pfeifen-Sound und dem Starten des Spiels "Playing" im oberen Teil der erkannten Pfeifen oder in der Mitte.
+#### Szenarien bedingt durch Testablauf
+1. **Abspielen der Pfeife bevor "Playing" im Gamecontroller gestartet wird:**
+   - Die ausgegebene 'mindiff' Zeit ist größer als im Fall 3.
 
-2. **Abspielen der Pfeifen sounds nachdem "Playing" im Gamecontroller gestartet wird:**
-   - Die ausgegebene Zeit ist größer als im Fall 3.
-   - Die gefundene Pfeife befindet sich immer an erster Stelle.
+2. **Abspielen der Pfeife nachdem "Playing" im Gamecontroller gestartet wird:**
+   - Die ausgegebene 'mindiff' Zeit ist größer als im Fall 3.
 
-3. **Abspielen der Pfeifen sounds fast zeitgleich:**
-   - Die minimale Zeit ist sehr klein.
-   - Die gewählte Pfeife befindet sich immer in den anfänglich erkannten Pfeifen.
-   - Die `closestWhistle` befindet sich in den ersten erkannten Pfeifen.
+3. **Abspielen der Pfeife zeitgleich mit dem Gamecontroller:**
+   - Die minimale 'mindiff' Zeit ist sehr klein.
 
 #### Ergebnisse
 Die beiden Tests zeigen, dass die Pfeifen erkannt werden und die Pfeife mit der minimalsten Zeit zwischen Spielfreigabe des Gamecontrollers -15 Sekunden gewählt wird. Hier wurde beim Testen mit dem zweiten Video festgestellt, das bei der Fox Black auch andere Pfeifen die Fox Blue oder Fox Silver erkannt werden, was auf sehr ähnliches Spektrum oder einen schlechtes Sample hinweisen könnte.
@@ -121,8 +118,9 @@ for (auto& signature : signatures)
 ```
 ### Bilder
 #### Bilder Teilschrit 1
-![Screenshot 2025-01-30 181849](https://github.com/user-attachments/assets/bd508a5d-d4fa-44ad-93b0-3a65dcfa25a9)
-![Screenshot 2025-01-30 180049](https://github.com/user-attachments/assets/6ccd8169-1526-4cff-95a7-de82cd6f5441)
+![Screenshot 2025-01-30 181849](https://github.com/user-attachments/assets/61e4742f-5400-459d-96b2-245e2ee5f063)
+![Screenshot 2025-01-30 180049](https://github.com/user-attachments/assets/5f48a547-0961-413e-92d7-935066cad062)
+
 #### Bild Teilschrit 2
 ![Screenshot 2025-01-30 185307](https://github.com/user-attachments/assets/2fe2734c-7ab7-42af-9728-a75dc7d0818b)
 
