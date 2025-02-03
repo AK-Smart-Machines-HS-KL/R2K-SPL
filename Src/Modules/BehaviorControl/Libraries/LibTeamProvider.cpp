@@ -46,7 +46,7 @@ Pose2f LibTeamProvider::getKeeperPose() const
     return theRobotPose;
   for(auto const& teammate : theTeamData.teammates)
   {
-    if(teammate.status != Teammate::PENALIZED && teammate.theTeamBehaviorStatus.role.isGoalkeeper())
+    if(teammate.status != Teammate::PENALIZED)
     {
       return teammate.theRobotPose;
     }
@@ -60,7 +60,7 @@ Pose2f LibTeamProvider::getStrikerPose() const
     return theRobotPose;
   for(auto const& teammate : theTeamData.teammates)
   {
-    if(teammate.status != Teammate::PENALIZED && teammate.theTeamBehaviorStatus.role.playsTheBall())
+    if(teammate.status != Teammate::PENALIZED)
     {
       return teammate.theRobotPose;
     }
@@ -91,7 +91,7 @@ int LibTeamProvider::getKeeperPlayerNumber() const
     return theRobotInfo.number;
   for(auto const& teammate : theTeamData.teammates)
   {
-    if(teammate.status != Teammate::PENALIZED && teammate.theTeamBehaviorStatus.role.isGoalkeeper())
+    if(teammate.status != Teammate::PENALIZED)
     {
       return teammate.number;
     }
@@ -105,7 +105,7 @@ int LibTeamProvider::getStrikerPlayerNumber() const
     return theRobotInfo.number;
   for(auto const& teammate : theTeamData.teammates)
   {
-    if(teammate.status != Teammate::PENALIZED && teammate.theTeamBehaviorStatus.role.playsTheBall())
+    if(teammate.status != Teammate::PENALIZED)
     {
       return teammate.number;
     }
@@ -162,11 +162,7 @@ const TimeToReachBall* LibTeamProvider::getTimeToReachBall(int player) const
 {
   if(player == theRobotInfo.number)
     return &(theTeamBehaviorStatus.timeToReachBall);
-  for(auto const& teammate : theTeamData.teammates)
-  {
-    if(teammate.number == player)
-      return &(teammate.theTeamBehaviorStatus.timeToReachBall);
-  }
+
   return nullptr;
 }
 
@@ -175,7 +171,6 @@ int LibTeamProvider::numberOfNonKeeperTeammateInOwnGoalArea(const float distance
   for(auto const& teammate : theTeamData.teammates)
   {
     if(teammate.status != Teammate::PENALIZED
-       && !teammate.theTeamBehaviorStatus.role.isGoalkeeper()
        && theLibPosition.isNearOwnGoalArea(teammate.theRobotPose.translation, distanceThreshold, distanceThreshold))
     {
       return teammate.number;

@@ -20,7 +20,7 @@ struct JointAngles;
 struct JointLimits;
 struct MotionRequest;
 struct RobotDimensions;
-class RobotConsole;
+class RobotTextConsole;
 class KickViewWidget;
 
 class KickView : public SimRobot::Object
@@ -28,7 +28,7 @@ class KickView : public SimRobot::Object
 public:
   QString fullName;
   QIcon icon;
-  RobotConsole& console;
+  RobotTextConsole& console;
   const FrameInfo& frameInfo;
   const JointAngles& jointAngles;
   const JointLimits& jointLimits;
@@ -37,7 +37,7 @@ public:
   const std::string& motionRequestCommand;
   SimRobotCore2::Body* robot;
 
-  KickView(const QString& fullName, RobotConsole& console, const MotionRequest& motionRequest, const JointAngles& jointAngles, const FrameInfo& frameInfo,
+  KickView(const QString& fullName, RobotTextConsole& console, const MotionRequest& motionRequest, const JointAngles& jointAngles, const FrameInfo& frameInfo,
            const JointLimits& jointLimits, const RobotDimensions& robotDimensions, const std::string& mr, SimRobotCore2::Body* robot);
 
 private:

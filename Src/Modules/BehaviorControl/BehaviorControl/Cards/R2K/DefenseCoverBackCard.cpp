@@ -1,5 +1,5 @@
 /**
- * @file ChaseBallCard.cpp
+ * @file DefenseCoverBackCard.cpp
  * @author Niklas Schmidts, Adrian Müller   
  * @brief Allows Offenseplayer to chase the Ball and kick to goal
  * @version 1.2
@@ -17,7 +17,7 @@
  * * 
  * 
  * v1.1. avoid that our  offense bots struggle for ball. loop over buddies -> 
- *      if BehaviorStatus::chaseBallCard or clearOwnHalfCard or clearOwnHalfCardGoalie exit this card
+ *      if BehaviorStatus::DefenseCoverBackCard or clearOwnHalfCard or clearOwnHalfCardGoalie exit this card
  * 
  * v.1.2 card now checks wether there is an passing event active (OffenseForwardPassCard, OffenseReceivePassCard)
  * v 1.3: (Asrar) "theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)"
@@ -47,13 +47,16 @@
 
 
 
-CARD(ChaseBallCard,
+CARD(DefenseCoverBackCard,
      {
         ,
         CALLS(Activity),
         CALLS(LookForward),
         CALLS(GoToBallAndDribble),
+        CALLS(WalkToPoint),
         CALLS(WalkAtRelativeSpeed),
+        CALLS(LookAtBall),
+        CALLS(Stand),
         USES(GameInfo),
         REQUIRES(ObstacleModel),
         REQUIRES(TeamBehaviorStatus),
@@ -69,13 +72,13 @@ CARD(ChaseBallCard,
              {,
                 //Define Params here
                 (float)(0.8f) walkSpeed,
-                (int)(7000) ballNotSeenTimeout,
+                (int)(5000) ballNotSeenTimeout,
                 (int)(1000) threshold,
              }),
 
      });
 
-class ChaseBallCard : public ChaseBallCardBase
+class DefenseCoverBackCard : public DefenseCoverBackCardBase
 {
 
   bool preconditions() const override
@@ -84,22 +87,16 @@ class ChaseBallCard : public ChaseBallCardBase
    
     //Vergleich ob die Spielerposition in der Opponentside liegt
     //mit einem threshold damit Stürmer noch teils ins eigene Feld darf
-  
-    return true;
-      //(
-      //  !aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
-      //  theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
-      //  theFieldBall.positionOnField.x() > (0 - threshold)
-      //  // theFieldBall.positionOnField.x() >= theRobotPose.translation.x() - threshold;
-      //  )
-      //||
-      //(theGameInfo.setPlay == SET_PLAY_NONE &&
-      //  !aBuddyIsChasingOrClearing() &&
-      //  theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
-      //  theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
-      //  theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
-      //  theFieldBall.endPositionOnField.x() < -500 &&
-      //  !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME));
+    Vector2f ownGoal = Vector2f(theFieldDimensions.xPosOwnGroundLine, 0);
+    float distToGoal = (ownGoal - theFieldBall.positionOnField).norm();
+
+    return
+      theFieldBall.ballWasSeen()&&
+      distToGoal > 1000 &&
+      theGameInfo.setPlay == SET_PLAY_NONE &&
+      !aBuddyIsChasingOrClearing() &&
+      theTeammateRoles.isTacticalDefense(theRobotInfo.number); // my recent role
+      
   }
 
   bool postconditions() const override
@@ -107,41 +104,26 @@ class ChaseBallCard : public ChaseBallCardBase
     return !preconditions();
   }
 
-  option
-  {
-    theActivitySkill(BehaviorStatus::chaseBallCard);
+  void execute() override {
+    Vector2f ownGoal = theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOwnGroundLine, 0));
 
-   initial_state(goToBallAndDribble)
-    {
-      transition
-      {
-        if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
-          goto searchForBall;
-      }
+    Vector2f ballToGoal = ownGoal - theFieldBall.positionRelative;
+    Vector2f ballToGoalDirection = ballToGoal.normalized();
 
-        action
-      {
-        // theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::walkForwardsLeft);
-        // SKILL_INTERFACE(GoToBallAndDribble, (Angle) targetDirection, (bool)(false) alignPrecisely, (float)(1.f) kickPower, (bool)(true) preStepAllowed, (bool)(true) turnKickAllowed, (const Rangea&)(Rangea(0_deg, 0_deg)) directionPrecision);
+    Pose2f target = Pose2f(theFieldBall.positionRelative.angle(), theFieldBall.positionRelative + ballToGoalDirection * 600);
 
-        theGoToBallAndDribbleSkill(calcAngleToGoal(),true);
-      }
+    theActivitySkill(BehaviorStatus::blocking);
+    theLookAtBallSkill();
+    
+    if (target.translation.norm() > 600) {  // I am far
+      theWalkToPointSkill(target); 
+    } else if(target.translation.norm() > 100 || target.rotation > 10_deg) {    // I am close
+      Pose2f normedTargetDirection = Pose2f(std::clamp((float) target.rotation, -1.0f, 1.0f) , target.translation.normalized());
+      theWalkAtRelativeSpeedSkill(normedTargetDirection);
+    } else { // I have arrived
+      theStandSkill();
     }
 
-    state(searchForBall)
-    {
-      transition
-      {
-        if(theFieldBall.ballWasSeen())
-          goto goToBallAndDribble;
-      }
-
-      action
-      {
-        theLookForwardSkill();
-        theWalkAtRelativeSpeedSkill(Pose2f(walkSpeed, 0.f, 0.f));
-      }
-    }
   }
 
     Angle calcAngleToGoal() const
@@ -158,18 +140,17 @@ class ChaseBallCard : public ChaseBallCardBase
     {
       for (const auto& buddy : theTeamData.teammates) 
       {
-        if (buddy.theBehaviorStatus.activity == BehaviorStatus::chaseBallCard ||
+        if (buddy.theBehaviorStatus.activity == BehaviorStatus::defenseChaseBallCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::blocking ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::goalShot ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
+          buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard 
+          )
           return true;
       }
       return false;
     }
 };
 
-MAKE_CARD(ChaseBallCard);
+MAKE_CARD(DefenseCoverBackCard);

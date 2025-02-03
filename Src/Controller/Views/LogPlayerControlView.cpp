@@ -1,5 +1,5 @@
 #include "LogPlayerControlView.h"
-#include "Controller/RobotConsole.h"
+#include "Controller/RobotTextConsole.h"
 
 #include <QBoxLayout>
 #include <QEvent>

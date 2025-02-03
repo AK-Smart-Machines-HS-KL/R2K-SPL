@@ -18,7 +18,7 @@
 #include "Platform/Thread.h" // for SYNC
 #include "PropertyManager.h"
 
-class RobotConsole;
+class RobotTextConsole;
 class InMessage;
 class DataWidget;
 class QtProperty;
@@ -43,7 +43,7 @@ public:
    * @param repName Name of the streamable data. This is used to generate get requests.
    * @param typeInfo Is used to get the type information while parsing.
    */
-  DataView(const QString& fullName, const std::string& repName, RobotConsole& console, const TypeInfo& typeInfo);
+  DataView(const QString& fullName, const std::string& repName, RobotTextConsole& console, const TypeInfo& typeInfo);
 
   SimRobot::Widget* createWidget() override;
   const QString& getFullName() const override { return theFullName; }
@@ -66,7 +66,7 @@ public:
   bool handleMessage(InMessage& msg, const std::string& type, const std::string& repName);
 
   /**
-   * If set to true, the view will ignore further updates from the RobotConsole.
+   * If set to true, the view will ignore further updates from the RobotTextConsole.
    */
   void setIgnoreUpdates(bool value);
 
@@ -96,7 +96,7 @@ private:
   DECLARE_SYNC;
   const QString theFullName; /**< The path to this view in the scene graph */
   const QIcon theIcon; /**< The icon used for listing this view in the scene graph */
-  RobotConsole& theConsole; /**< A reference to the console object. */
+  RobotTextConsole& theConsole; /**< A reference to the console object. */
   const std::string theName; /**< The name of the view and the data displayed. */
   std::string type; /**< The type of the data shown. */
   DataWidget* pTheWidget = nullptr; /**< The widget which displays the properties */

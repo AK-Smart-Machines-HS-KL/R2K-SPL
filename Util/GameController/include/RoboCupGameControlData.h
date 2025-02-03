@@ -7,7 +7,7 @@
 #define GAMECONTROLLER_RETURN_PORT 3939
 
 #define GAMECONTROLLER_STRUCT_HEADER  "RGme"
-#define GAMECONTROLLER_STRUCT_VERSION 15
+#define GAMECONTROLLER_STRUCT_VERSION 18
 
 #define MAX_NUM_PLAYERS 20
 
@@ -26,8 +26,8 @@
 #define COMPETITION_PHASE_ROUNDROBIN 0
 #define COMPETITION_PHASE_PLAYOFF    1
 
-#define COMPETITION_TYPE_NORMAL                0
-#define COMPETITION_TYPE_DYNAMIC_BALL_HANDLING 1
+#define COMPETITION_TYPE_NORMAL          0
+#define COMPETITION_TYPE_SHARED_AUTONOMY 1
 
 #define GAME_PHASE_NORMAL       0
 #define GAME_PHASE_PENALTYSHOOT 1
@@ -39,6 +39,7 @@
 #define STATE_SET      2
 #define STATE_PLAYING  3
 #define STATE_FINISHED 4
+#define STATE_STANDBY  5
 
 #define SET_PLAY_NONE              0
 #define SET_PLAY_GOAL_KICK         1
@@ -59,45 +60,46 @@
 #define PENALTY_SPL_LOCAL_GAME_STUCK          8
 #define PENALTY_SPL_ILLEGAL_POSITION_IN_SET   9
 #define PENALTY_SPL_PLAYER_STANCE             10
+#define PENALTY_SPL_ILLEGAL_MOTION_IN_STANDBY 11
 
 #define PENALTY_SUBSTITUTE                    14
 #define PENALTY_MANUAL                        15
 
 struct RobotInfo
 {
-  uint8_t penalty;             // penalty state of the player
-  uint8_t secsTillUnpenalised; // estimate of time till unpenalised
+    uint8_t penalty;             // penalty state of the player
+    uint8_t secsTillUnpenalised; // estimate of time till unpenalised
 };
 
 struct TeamInfo
 {
-  uint8_t teamNumber;                        // unique team number
-  uint8_t fieldPlayerColour;                 // colour of the field players
-  uint8_t goalkeeperColour;                  // colour of the goalkeeper
-  uint8_t goalkeeper;                        // player number of the goalkeeper (0-MAX_NUM_PLAYERS)
-  uint8_t score;                             // team's score
-  uint8_t penaltyShot;                       // penalty shot counter
-  uint16_t singleShots;                      // bits represent penalty shot success
-  uint16_t messageBudget;                    // number of team messages the team is allowed to send for the remainder of the game
-  struct RobotInfo players[MAX_NUM_PLAYERS]; // the team's players
+    uint8_t teamNumber;                        // unique team number
+    uint8_t fieldPlayerColour;                 // colour of the field players
+    uint8_t goalkeeperColour;                  // colour of the goalkeeper
+    uint8_t goalkeeper;                        // player number of the goalkeeper (1-MAX_NUM_PLAYERS)
+    uint8_t score;                             // team's score
+    uint8_t penaltyShot;                       // penalty shot counter
+    uint16_t singleShots;                      // bits represent penalty shot success
+    uint16_t messageBudget;                    // number of team messages the team is allowed to send for the remainder of the game
+    struct RobotInfo players[MAX_NUM_PLAYERS]; // the team's players
 };
 
 struct RoboCupGameControlData
 {
-  char header[4];           // header to identify the structure
-  uint8_t version;          // version of the data structure
-  uint8_t packetNumber;     // number incremented with each packet sent (with wraparound)
-  uint8_t playersPerTeam;   // the number of players on a team
-  uint8_t competitionPhase; // phase of the competition (COMPETITION_PHASE_ROUNDROBIN, COMPETITION_PHASE_PLAYOFF)
-  uint8_t competitionType;  // type of the competition (COMPETITION_TYPE_NORMAL, COMPETITION_TYPE_DYNAMIC_BALL_HANDLING)
-  uint8_t gamePhase;        // phase of the game (GAME_PHASE_NORMAL, GAME_PHASE_PENALTYSHOOT, etc)
-  uint8_t state;            // state of the game (STATE_READY, STATE_PLAYING, etc)
-  uint8_t setPlay;          // active set play (SET_PLAY_NONE, SET_PLAY_GOAL_KICK, etc)
-  uint8_t firstHalf;        // 1 = game in first half, 0 otherwise
-  uint8_t kickingTeam;      // the team number of the next team to kick off, free kick etc
-  int16_t secsRemaining;    // estimate of number of seconds remaining in the half
-  int16_t secondaryTime;    // number of seconds shown as secondary time (remaining ready, until free ball, etc)
-  struct TeamInfo teams[2];
+    char header[4];           // header to identify the structure
+    uint8_t version;          // version of the data structure
+    uint8_t packetNumber;     // number incremented with each packet sent (with wraparound)
+    uint8_t playersPerTeam;   // the number of players on a team
+    uint8_t competitionPhase; // phase of the competition (COMPETITION_PHASE_ROUNDROBIN, COMPETITION_PHASE_PLAYOFF)
+    uint8_t competitionType;  // type of the competition (COMPETITION_TYPE_NORMAL, COMPETITION_TYPE_SHARED_AUTONOMY)
+    uint8_t gamePhase;        // phase of the game (GAME_PHASE_NORMAL, GAME_PHASE_PENALTYSHOOT, etc)
+    uint8_t state;            // state of the game (STATE_READY, STATE_PLAYING, etc)
+    uint8_t setPlay;          // active set play (SET_PLAY_NONE, SET_PLAY_GOAL_KICK, etc)
+    uint8_t firstHalf;        // 1 = game in first half, 0 otherwise
+    uint8_t kickingTeam;      // the team number of the next team to kick off, free kick etc
+    int16_t secsRemaining;    // estimate of number of seconds remaining in the half
+    int16_t secondaryTime;    // number of seconds shown as secondary time (remaining ready, until free ball, etc)
+    struct TeamInfo teams[2];
 };
 
 // data structure header
@@ -106,48 +108,48 @@ struct RoboCupGameControlData
 
 struct RoboCupGameControlReturnData
 {
-  char header[4];     // "RGrt"
-  uint8_t version;    // has to be set to GAMECONTROLLER_RETURN_STRUCT_VERSION
-  uint8_t playerNum;  // player number starts with 1
-  uint8_t teamNum;    // team number
-  uint8_t fallen;     // 1 means that the robot is fallen, 0 means that the robot can play
+    char header[4];     // "RGrt"
+    uint8_t version;    // has to be set to GAMECONTROLLER_RETURN_STRUCT_VERSION
+    uint8_t playerNum;  // player number starts with 1
+    uint8_t teamNum;    // team number
+    uint8_t fallen;     // 1 means that the robot is fallen, 0 means that the robot can play
 
-  // position and orientation of robot
-  // coordinates in millimeters
-  // 0,0 is in center of field
-  // +ve x-axis points towards the goal we are attempting to score on
-  // +ve y-axis is 90 degrees counter clockwise from the +ve x-axis
-  // angle in radians, 0 along the +x axis, increasing counter clockwise
-  float pose[3];         // x,y,theta
+    // position and orientation of robot
+    // coordinates in millimeters
+    // 0,0 is in center of field
+    // +ve x-axis points towards the goal we are attempting to score on
+    // +ve y-axis is 90 degrees counter clockwise from the +ve x-axis
+    // angle in radians, 0 along the +x axis, increasing counter clockwise
+    float pose[3];         // x,y,theta
 
-  // ball information
-  float ballAge;         // seconds since this robot last saw the ball. -1.f if we haven't seen it
+    // ball information
+    float ballAge;         // seconds since this robot last saw the ball. -1.f if we haven't seen it
 
-  // position of ball relative to the robot
-  // coordinates in millimeters
-  // 0,0 is in center of the robot
-  // +ve x-axis points forward from the robot
-  // +ve y-axis is 90 degrees counter clockwise from the +ve x-axis
-  float ball[2];
+    // position of ball relative to the robot
+    // coordinates in millimeters
+    // 0,0 is in center of the robot
+    // +ve x-axis points forward from the robot
+    // +ve y-axis is 90 degrees counter clockwise from the +ve x-axis
+    float ball[2];
 
 #ifdef __cplusplus
-  // constructor
-  RoboCupGameControlReturnData() :
-    version(GAMECONTROLLER_RETURN_STRUCT_VERSION),
-    playerNum(0),
-    teamNum(0),
-    fallen(255),
-    ballAge(-1.f)
-  {
-    const char* init = GAMECONTROLLER_RETURN_STRUCT_HEADER;
-    for(unsigned int i = 0; i < sizeof(header); ++i)
-      header[i] = init[i];
-    pose[0] = 0.f;
-    pose[1] = 0.f;
-    pose[2] = 0.f;
-    ball[0] = 0.f;
-    ball[1] = 0.f;
-  }
+    // constructor
+    RoboCupGameControlReturnData() :
+        version(GAMECONTROLLER_RETURN_STRUCT_VERSION),
+        playerNum(0),
+        teamNum(0),
+        fallen(255),
+        ballAge(-1.f)
+    {
+        const char* init = GAMECONTROLLER_RETURN_STRUCT_HEADER;
+        for (unsigned int i = 0; i < sizeof(header); ++i)
+            header[i] = init[i];
+        pose[0] = 0.f;
+        pose[1] = 0.f;
+        pose[2] = 0.f;
+        ball[0] = 0.f;
+        ball[1] = 0.f;
+    }
 #endif
 };
 

@@ -1,7 +1,7 @@
 /*
- * @file Controller/RobotConsole.h
+ * @file Controller RobotTextConsole.h
  *
- * Declaration of RobotConsole.
+ * Declaration of RobotTextConsole.
  *
  * @author Thomas Röfer
  */
@@ -53,11 +53,11 @@ class ConsoleRoboCupCtrl;
 class ImageView;
 
 /**
- * @class RobotConsole
+ * @class RobotTextConsole
  *
  * A threads that manages the text console for a single robot.
  */
-class RobotConsole : public ThreadFrame
+class RobotTextConsole : public ThreadFrame
 {
 public:
   ENUM(Color, /**< Colors for plot drawings. Same sequence as constants in ColorRGBA (without white)! */
@@ -188,7 +188,7 @@ private:
   class DataViewWriter : public MessageHandler
   {
   private:
-    std::unordered_map<std::string, DataView*>* pDataViews; /**< Pointer to dataViews of RobotConsole */
+    std::unordered_map<std::string, DataView*>* pDataViews; /**< Pointer to dataViews of RobotTextConsole */
 
   public:
     DataViewWriter(std::unordered_map<std::string, DataView*>* pViews) : pDataViews(pViews) {}
@@ -319,10 +319,10 @@ public:
    * @param debugReceiver The receiver of this thread.
    * @param debugSender The sender of this thread.
    */
-  RobotConsole(const Settings& settings, const std::string& robotName, DebugReceiver<MessageQueue>* receiver, DebugSender<MessageQueue>* sender);
+ RobotTextConsole(const Settings& settings, const std::string& robotName, DebugReceiver<MessageQueue>* receiver, DebugSender<MessageQueue>* sender);
 
   /** Destructor. */
-  ~RobotConsole();
+  ~RobotTextConsole();
 
   /**
    * The function adds per-robot views.
@@ -487,7 +487,7 @@ private:
   bool viewField(In& stream);
   bool viewData(In& stream); /**< Creates a new representation view. Stream should contain the name of the debug data to display. */
   bool kickView();
-  bool viewDrawing(In& stream, RobotConsole::Views& views, const char* type);
+  bool viewDrawing(In& stream, RobotTextConsole::Views& views, const char* type);
   bool viewImage(In& stream);
   bool viewImageCommand(In& stream);
   bool viewPlot(In& stream);

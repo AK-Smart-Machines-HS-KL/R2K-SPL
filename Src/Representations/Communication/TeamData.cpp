@@ -6,19 +6,9 @@
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Tools/Module/Blackboard.h"
 #include "Tools/Debugging/DebugDrawings3D.h"
+#include "Platform/Time.h"
 #include <algorithm>
 
-#define HANDLE_PARTICLE(particle) case id##particle: return the##particle.handleArbitraryMessage(message, [this](unsigned u){return this->toLocalTimestamp(u);})
-bool Teammate::handleMessage(InMessage& message)
-{
-  switch(message.getMessageID())
-  {
-      HANDLE_PARTICLE(FieldCoverage);
-      HANDLE_PARTICLE(RobotHealth);
-    default:
-      return false;
-  }
-}
 
 Vector2f Teammate::getEstimatedPosition(unsigned time) const
 {
@@ -65,21 +55,6 @@ void TeamData::draw() const
     // Player number
     DRAW_TEXT("representation:TeamData", rPos.x() + 100, rPos.y(), 100, ColorRGBA::black, teammate.number);
 
-    // Role
-    DRAW_TEXT("representation:TeamData", rPos.x() + 100, rPos.y() - 150, 100,
-             ColorRGBA::black, TypeRegistry::getEnumName(teammate.theTeamBehaviorStatus.role.role));
-
-    // Time to reach ball
-    int ttrb = teammate.theTeamBehaviorStatus.role.playsTheBall()
-               ? static_cast<int>(teammate.theTeamBehaviorStatus.timeToReachBall.timeWhenReachBallStriker)
-               : static_cast<int>(teammate.theTeamBehaviorStatus.timeToReachBall.timeWhenReachBall);
-    if(Blackboard::getInstance().exists("FrameInfo"))
-    {
-      const FrameInfo& theFrameInfo = static_cast<const FrameInfo&>(Blackboard::getInstance()["FrameInfo"]);
-      ttrb = theFrameInfo.getTimeSince(ttrb);
-    }
-    DRAW_TEXT("representation:TeamData", rPos.x() + 100, rPos.y() - 300, 100, ColorRGBA::black, "TTRB: " << ttrb);
-
     // Line from Robot to WalkTarget
     const Vector2f target = teammate.theRobotPose * teammate.theBehaviorStatus.walkingTo;
     LINE("representation:TeamData", rPos.x(), rPos.y(), target.x(), target.y(),
@@ -90,3 +65,44 @@ void TeamData::draw() const
     CIRCLE("representation:TeamData", ballPos.x(), ballPos.y(), 50, 20, Drawings::solidPen, ColorRGBA::yellow, Drawings::solidBrush, ColorRGBA::yellow);
   }
 }
+
+TeamData::TeamData() {
+  RobotPoseComponent::priority = 1;
+  BehaviorStatusComponent::priority = 1;
+  BallModelComponent::priority = 1;
+}
+
+Teammate& TeamData::getBMate(int number)
+{
+  for(auto& teammate : teammates) {
+    if(teammate.number == number) {
+      return teammate;
+    }
+  }
+  teammates.emplace_back();
+  teammates.back().number = number;
+  return teammates.back();
+}
+
+void TeamData::rcvMessage(RobotMessageHeader & header) {
+  auto& bmate = getBMate(header.senderID);
+
+  bmate.timeWhenLastPacketReceived = Time::getCurrentSystemTime();
+}
+
+void TeamData::rcvRobotPose(RobotPoseComponent * comp, RobotMessageHeader & header) {
+  auto& bmate = getBMate(header.senderID);
+  bmate.theRobotPose = comp->pose;
+}
+
+void TeamData::rcvBehaviorStatus(BehaviorStatusComponent * comp, RobotMessageHeader & header) {
+  auto& bmate = getBMate(header.senderID);
+  bmate.theBehaviorStatus.activity = static_cast<BehaviorStatus::Activity>(comp->activity);
+}
+
+
+void TeamData::rcvBallModel(BallModelComponent* comp, RobotMessageHeader& header) {
+  auto& bmate = getBMate(header.senderID);
+  bmate.theBallModel = comp->model;
+}
+

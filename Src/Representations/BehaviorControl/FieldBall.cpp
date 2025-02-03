@@ -121,9 +121,17 @@ void FieldBall::draw() const
   }
   if(timeUntilIntersectsOwnYAxis != std::numeric_limits<float>::max() && intersectionPositionWithOwnYAxis != Vector2f::Zero())
   {
-    CROSS("representation:FieldBall:relative", intersectionPositionWithOwnYAxis.x(), intersectionPositionWithOwnYAxis.y(), 150, 20, Drawings::solidPen, ColorRGBA::blue);
+    CROSS("representation:FieldBall:relative", intersectionPositionWithOwnYAxis.x(), intersectionPositionWithOwnYAxis.y(), 150, 20, Drawings::solidPen, ColorRGBA::cyan);
     LINE("representation:FieldBall:relative", 0.f, 0.f, intersectionPositionWithOwnYAxis.x() * 1.5f, intersectionPositionWithOwnYAxis.y() * 1.5f,
          10, Drawings::dashedPen, ColorRGBA::red);
     DRAW_TEXT("representation:FieldBall:relative", intersectionPositionWithOwnYAxis.x() * 1.5f, intersectionPositionWithOwnYAxis.y() * 1.5f, 250, ColorRGBA::blue, timeUntilIntersectsOwnYAxis);
   }
+
+
+  // added AM
+  if(ballWasSeen())
+   FILLED_RECTANGLE("representation:FieldBall:global", teamPositionOnField.x(), teamPositionOnField.y(), teamPositionOnField.x() + 1000, teamPositionOnField.y() + 1000, 1, Drawings::solidPen, ColorRGBA(100, 255, 100), Drawings::solidBrush, ColorRGBA(100, 155, 100));
+    // FILLED_RECTANGLE("representation:FieldBall:global", recentBallPositionOnField().x(), recentBallPositionOnField().y(), recentBallPositionOnField().x()+200, recentBallPositionOnField().y()+200, 1, Drawings::solidPen, ColorRGBA(100, 255, 100), Drawings::solidBrush, ColorRGBA(100, 255, 100));
+  else //use different color fpr team estimate
+    FILLED_RECTANGLE("representation:FieldBall:global", recentBallPositionOnField().x(), recentBallPositionOnField().y(), recentBallPositionOnField().x() + 200, recentBallPositionOnField().y() + 200, 1, Drawings::solidPen, ColorRGBA(200, 150, 50), Drawings::solidBrush, ColorRGBA(200, 155, 50));
 }

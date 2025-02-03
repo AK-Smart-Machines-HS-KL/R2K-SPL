@@ -15,7 +15,7 @@
 
 class AnnotationInfo;
 class AnnotationWidget;
-class RobotConsole;
+class RobotTextConsole;
 class LogPlayer;
 
 class QTableWidget;

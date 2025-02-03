@@ -18,7 +18,7 @@
 #include <QString>
 
 class NumberTableWidgetItem;
-class RobotConsole;
+class RobotTextConsole;
 struct Row;
 class TimeInfo;
 class TimeWidget;
@@ -41,12 +41,12 @@ public:
    * @param console The console object.
    * @param info The timing info object to be visualized.
    */
-  TimeView(const QString& fullName, RobotConsole& console, const TimeInfo& info);
+  TimeView(const QString& fullName, RobotTextConsole& console, const TimeInfo& info);
 
 private:
   const QString fullName; /**< The path to this view in the scene graph */
   const QIcon icon; /**< The icon used for listing this view in the scene graph */
-  RobotConsole& console; /**< A reference to the console object. */
+  RobotTextConsole& console; /**< A reference to the console object. */
   const TimeInfo& info; /**< The Time info structure. */
 
   /**

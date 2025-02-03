@@ -1,0 +1,17 @@
+proto FieldBall
+
+import vector "Vector.bitproto"
+import time "Time.bitproto"
+
+message BallState {
+    vector.Vector2 position = 1
+    vector.Vector2 velocity = 2
+}
+
+message BallModel {
+    vector.Vector2 last_perception = 1
+    BallState estimate = 2
+    time.Timestamp time_when_last_seen = 3
+    time.Timestamp time_when_disappeared = 4
+    uint7 seen_percentage = 5
+}

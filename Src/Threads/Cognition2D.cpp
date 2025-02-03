@@ -15,20 +15,20 @@
 REGISTER_EXECUTION_UNIT(Cognition2D)
 
 Cognition2D::Cognition2D()
-: theSPLMessageHandler(inTeamMessages, outTeamMessage)
+: robotMessageHandler()
 {
 #ifndef TARGET_ROBOT
-  theSPLMessageHandler.startLocal(Global::getSettings().teamPort, static_cast<unsigned>(Global::getSettings().playerNumber));
+  robotMessageHandler.startLocal(Global::getSettings().teamPort, static_cast<unsigned>(Global::getSettings().playerNumber));
 #else
   std::string bcastAddr = UdpComm::getWifiBroadcastAddress();
-  theSPLMessageHandler.start(Global::getSettings().teamPort, bcastAddr.c_str());
+  robotMessageHandler.start(Global::getSettings().teamPort, bcastAddr.c_str());
 #endif
 }
 
 bool Cognition2D::beforeFrame()
 {
   // read from team comm udp socket
-  theSPLMessageHandler.receive();
+  robotMessageHandler.receive();
 
   return LogDataProvider::isFrameDataComplete();
 }
@@ -36,26 +36,14 @@ bool Cognition2D::beforeFrame()
 void Cognition2D::beforeModules()
 {
   BH_TRACE_MSG("before TeamData");
-  // push teammate data in our system
-  if(Blackboard::getInstance().exists("TeamData") &&
-     static_cast<const TeamData&>(Blackboard::getInstance()["TeamData"]).generate)
-  {
-    while(!inTeamMessages.empty())
-      static_cast<const TeamData&>(Blackboard::getInstance()["TeamData"]).generate(inTeamMessages.takeBack());
-  }
-
-  DECLARE_PLOT("module:SPLMessageHandler:standardMessageDataBufferUsageInPercent");
 }
 
 void Cognition2D::afterModules()
 {
   if(Blackboard::getInstance().exists("BHumanMessageOutputGenerator")
-     && static_cast<const BHumanMessageOutputGenerator&>(Blackboard::getInstance()["BHumanMessageOutputGenerator"]).generate
      && static_cast<const BHumanMessageOutputGenerator&>(Blackboard::getInstance()["BHumanMessageOutputGenerator"]).sendThisFrame)
   {
-    static_cast<const BHumanMessageOutputGenerator&>(Blackboard::getInstance()["BHumanMessageOutputGenerator"]).generate(&outTeamMessage);
-
     BH_TRACE_MSG("before theSPLMessageHandler.send()");
-    theSPLMessageHandler.send();
+    robotMessageHandler.send();
   }
 }

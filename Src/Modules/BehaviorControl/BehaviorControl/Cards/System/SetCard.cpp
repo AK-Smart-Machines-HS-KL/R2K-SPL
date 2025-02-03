@@ -46,7 +46,7 @@ class SetCard : public SetCardBase
   {
     theActivitySkill(BehaviorStatus::set);
     theStandSkill(/* high: */ true);
-    theLookForwardSkill();
+    theLookActiveSkill();
     
   }
 };

@@ -26,6 +26,7 @@ void TeamBallLocator::update(TeamBallModel& teamBallModel)
   ballsAvailableForTeamBall.clear();
   teamBallModel.isValid = false;
   // Try to compute a team ball
+  // OUTPUT_TEXT("Try to compute a team ball");
   findAvailableBalls();
   clusterBalls();
   computeModel(teamBallModel);
@@ -123,6 +124,7 @@ void TeamBallLocator::computeModel(TeamBallModel& teamBallModel)
   {
     teamBallModel.isValid = true;
     teamBallModel.position = avgPos / weightSum;
+    // OUTPUT_TEXT(theRobotInfo.number << " " << avgPos.x() << " " << avgPos.y());
     teamBallModel.velocity = avgVel / weightSum;
   }
 }
@@ -148,6 +150,9 @@ void TeamBallLocator::updateInternalBallBuffers()
   // Observations by teammates:
   for(auto const& teammate : theTeamData.teammates)
   {
+    // called in non-fast games, but timeWhenLastSeen == 0 alwasy.
+    // OUTPUT_TEXT(teammate.number << " " << teammate.theBallModel.timeWhenLastSeen);
+
     // teammate is participating in the game and has made a new ball observation
     unsigned n = teammate.number;
     if(teammate.status == Teammate::PLAYING &&
@@ -164,8 +169,9 @@ void TeamBallLocator::updateInternalBallBuffers()
       newBall.vel                    = teammate.theBallModel.estimate.velocity;
       newBall.time                   = teammate.theBallModel.timeWhenLastSeen;
       newBall.valid = true;
-      if(newBall.poseQualityModifier > 0.f) // If the value is zero, the final weighting would be 0, too.
+      if (newBall.poseQualityModifier > 0.f) {// If the value is zero, the final weighting would be 0, too.
         balls[teammate.number].push_front(newBall);
+      }
     }
   }
   // If any teammate is not PLAYING anymore, invalidate the observations that happened during the time

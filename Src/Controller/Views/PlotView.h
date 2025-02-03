@@ -15,7 +15,7 @@
 #include <string>
 #include <SimRobot.h>
 
-class RobotConsole;
+class RobotTextConsole;
 class QPointF;
 class QPainter;
 class PlotWidget;
@@ -38,7 +38,7 @@ public:
    * @param xUnit The name of the x-axis.
    * @param xScale A scale factor for the x-axis.
    */
-  PlotView(const QString& fullName, RobotConsole& console, const std::string& name,
+  PlotView(const QString& fullName, RobotTextConsole& console, const std::string& name,
            unsigned int plotSize, float minValue, float maxValue,
            const std::string& yUnit = "", const std::string& xUnit = "", float xScale = 1);
 
@@ -59,7 +59,7 @@ public:
 private:
   const QString fullName; /**< The path to this view in the scene graph */
   const QIcon icon; /**< The icon used for listing this view in the scene graph */
-  RobotConsole& console; /**< A reference to the console object. */
+  RobotTextConsole& console; /**< A reference to the console object. */
   PlotWidget* plotWidget = nullptr;
   const std::string name; /**< The name of the view. */
   unsigned int plotSize; /**< The number of entries in a plot. */

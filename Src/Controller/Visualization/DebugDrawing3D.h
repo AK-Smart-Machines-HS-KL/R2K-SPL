@@ -16,7 +16,7 @@
 #include <SimRobotCore2.h>
 
 struct CameraImage;
-class RobotConsole;
+class RobotTextConsole;
 
 class DebugDrawing3D : public SimRobotCore2::Controller3DDrawing
 {
@@ -93,7 +93,7 @@ public:
 
   bool drawn = false; /**< is this drawing already registered? */
   bool flip = false; /**< rotate drawings 180 degrees around the z-axis */
-  RobotConsole* robotConsole = nullptr;
+  RobotTextConsole* robotTextConsole = nullptr;
   unsigned timestamp; /**< The time when this drawing was created. */
 
   DebugDrawing3D();

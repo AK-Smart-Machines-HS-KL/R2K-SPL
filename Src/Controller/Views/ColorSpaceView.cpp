@@ -7,11 +7,11 @@
  */
 
 #include "ColorSpaceView.h"
-#include "Controller/RobotConsole.h"
+#include "Controller/RobotTextConsole.h"
 #include "Controller/Visualization/OpenGLMethods.h"
 #include <Platform/OpenGL.h>
 
-ColorSpaceView::ColorSpaceView(const QString& fullName, RobotConsole& c, const std::string& n, ColorModel cm, int ch, const Vector3f& b, const std::string& threadIdentifier) :
+ColorSpaceView::ColorSpaceView(const QString& fullName, RobotTextConsole& c, const std::string& n, ColorModel cm, int ch, const Vector3f& b, const std::string& threadIdentifier) :
   View3D(fullName, b), console(c), name(n), colorModel(cm), channel(ch), threadIdentifier(threadIdentifier)
 {}
 
@@ -21,8 +21,8 @@ void ColorSpaceView::updateDisplayLists()
   DebugImage* image = nullptr;
   DebugImage* raw = nullptr;
 
-  RobotConsole::Images& currentImages = console.threadData[threadIdentifier].images;
-  RobotConsole::Images::const_iterator i = currentImages.find(name);
+  RobotTextConsole::Images& currentImages = console.threadData[threadIdentifier].images;
+  RobotTextConsole::Images::const_iterator i = currentImages.find(name);
 
   if(i != currentImages.end())
     image = i->second.image;
@@ -65,8 +65,8 @@ bool ColorSpaceView::needsUpdate() const
 {
   SYNC_WITH(console);
   DebugImage* image = nullptr;
-  RobotConsole::Images& currentImages = console.threadData[threadIdentifier].images;
-  RobotConsole::Images::const_iterator i = currentImages.find(name);
+  RobotTextConsole::Images& currentImages = console.threadData[threadIdentifier].images;
+  RobotTextConsole::Images::const_iterator i = currentImages.find(name);
   if(i != currentImages.end())
     image = i->second.image;
   return ((image && image->timestamp != lastTimestamp) ||

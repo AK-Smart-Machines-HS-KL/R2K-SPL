@@ -401,7 +401,7 @@ bool GameController::handleRobotCommand(int robot, const std::string& command)
   return false;
 }
 
-bool GameController::handleRobotConsole(int robot, In& stream)
+bool GameController::handleRobotTextConsole(int robot, In& stream)
 {
   SYNC;
   std::string command;

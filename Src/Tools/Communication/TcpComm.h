@@ -101,4 +101,5 @@ public:
    * @return Was the connection established?
    */
   bool connected() const { return transferSocket > 0; }
+
 };

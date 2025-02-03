@@ -9,7 +9,7 @@
  */
 
 #include "SensorView.h"
-#include "Controller/RobotConsole.h"
+#include "Controller/RobotTextConsole.h"
 #include "Controller/RoboCupCtrl.h"
 #include "Controller/Visualization/HeaderedWidget.h"
 #include "Platform/BHAssert.h"
@@ -33,7 +33,7 @@ private:
   void update() override{ sensorWidget->update(); }
 };
 
-SensorView::SensorView(const QString& fullName, RobotConsole& console, const FsrSensorData& fsrSensorData,
+SensorView::SensorView(const QString& fullName, RobotTextConsole& console, const FsrSensorData& fsrSensorData,
                        const InertialSensorData& inertialSensorData, const KeyStates& keyStates,
                        const SystemSensorData& systemSensorData, const unsigned& timestamp) :
   fullName(fullName), icon(":/Icons/tag_green.png"), console(console), fsrSensorData(fsrSensorData),

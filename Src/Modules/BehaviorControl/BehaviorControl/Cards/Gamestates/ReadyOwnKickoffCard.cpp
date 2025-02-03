@@ -64,26 +64,24 @@ class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
   {
 
     theActivitySkill(BehaviorStatus::defaultBehavior);
-    Vector2f targetAbsolute = theDefaultPose.ownDefaultPose.translation + Vector2f(+450.f, 0);
-
-    int nOffenseFound = 0;
+    Pose2f targetAbsolute = theDefaultPose.ownDefaultPose.translation;
 
     switch (theTeammateRoles.offenseRoleIndex(theRobotInfo.number)) {
     case 0: // right-most offense
-      targetAbsolute = Vector2f(-500, 0);
+      targetAbsolute = Pose2f(0, -500, 0);  // #5
       break;
     case 1: // 
-      targetAbsolute = Vector2f(-700, -2000);
+      targetAbsolute = Pose2f(0, -500, -2500); // #4
       break;
     case 2: // OFFENSIVE MODE - we have 3 offense
-      targetAbsolute = Vector2f(-700, 2000);
+      targetAbsolute = Pose2f(0, -1100, 700);
       break;
     }
 
-    Vector2f targetRelative = theRobotPose.toRelative(targetAbsolute);
+    Pose2f targetRelative = theRobotPose.toRelative(targetAbsolute);
 
     theLookActiveSkill(); // Head Motion Request
-    theWalkToPointSkill(Pose2f(theDefaultPose.ownDefaultPose.rotation - theRobotPose.rotation, targetRelative), 1.0f, true);
+    theWalkToPointSkill(targetRelative, 1.0f, true);
 
   }
   

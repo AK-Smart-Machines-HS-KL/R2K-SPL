@@ -8,6 +8,7 @@
 
 #include "GameDataProvider.h"
 #include "Tools/Settings.h"
+#include "Platform/SystemCall.h"
 #ifdef TARGET_ROBOT
 #include <arpa/inet.h>
 #include <netinet/in.h>
@@ -156,6 +157,18 @@ void GameDataProvider::handleButtons()
 {
   RoboCup::TeamInfo& team = gameCtrlData.teams[gameCtrlData.teams[0].teamNumber == Global::getSettings().teamNumber ? 0 : 1];
   RoboCup::RobotInfo& player = team.players[Global::getSettings().playerNumber - 1];
+  
+  if(theEnhancedKeyStates.hitStreak[KeyStates::headRear])
+  {
+    std::string output = "You are the best operator!";
+    SystemCall::say(output.c_str());
+  }
+
+  if(theEnhancedKeyStates.hitStreak[KeyStates::headFront])
+  {
+    std::string output = "I am in mode " + theRobotInfo.getModeAsString();
+    SystemCall::say(output.c_str());
+  }
 
   if(mode == RobotInfo::active && !ignoreChestButton && theEnhancedKeyStates.hitStreak[KeyStates::chest] == 1)
   {

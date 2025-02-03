@@ -15,7 +15,7 @@
 
 #include "CABSLBehaviorView.h"
 #include "Controller/RoboCupCtrl.h"
-#include "Controller/RobotConsole.h"
+#include "Controller/RobotTextConsole.h"
 
 class CABSLBehaviorWidget : public QWidget
 {
@@ -192,7 +192,7 @@ private:
   void update() override { cabslBehaviorWidget->update(); }
 };
 
-CABSLBehaviorView::CABSLBehaviorView(const QString& fullName, RobotConsole& console, const ActivationGraph& activationGraph, const unsigned& timestamp) :
+CABSLBehaviorView::CABSLBehaviorView(const QString& fullName, RobotTextConsole& console, const ActivationGraph& activationGraph, const unsigned& timestamp) :
   fullName(fullName), icon(":/Icons/tag_green.png"), console(console), activationGraph(activationGraph), timestamp(timestamp)
 {}
 
