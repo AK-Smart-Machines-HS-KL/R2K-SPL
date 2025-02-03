@@ -2,15 +2,15 @@
 
   <Compound name="robots">
     <Body ref="Nao" name="robot3">
-      <Translation x="0.9" z="320mm"/>
+      <Translation x="-2.7" z="320mm"/>
 	  <Set name="NaoColor" value="red"/>
       <Rotation z="180degree"/>
     </Body>
   
 	<Body ref="Nao" name="robot9">
-      <Translation x="-2.25" y="3" z="320mm"/>
-      <Rotation z="-107.57degree"/>
-      <Set name="NaoColor" value="dblue"/>
+      <Translation x="-4.5" z="320mm"/>
+      <Rotation z="0degree"/>
+      <Set name="NaoColor" value="green"/>
     </Body>
   </Compound>
 

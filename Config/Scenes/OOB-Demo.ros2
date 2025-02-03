@@ -9,15 +9,18 @@
     <Light z="9m" ambientColor="rgb(50%, 50%, 50%)"/>
 
     <Compound name="teamColors">
-      <Appearance name="red"/>
+      <Appearance name="black"/>
       <Appearance name="blue"/>
     </Compound>
 
     <Compound ref="robots"/>
 	
+	<Compound name="extras">
+    </Compound>
+	
     <Compound name="balls">
       <Body ref="ball">
-        <Translation z="1m"/>
+        <Translation x="-3.2" z="1m"/>
       </Body>
     </Compound>
 
