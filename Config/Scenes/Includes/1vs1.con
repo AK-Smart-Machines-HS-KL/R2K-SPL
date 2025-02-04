@@ -1,6 +1,6 @@
 # Additional setup for 1 vs 1
 
-robot robot3
+robot robot1
 jc press 11 call Includes/PenaltyKickFirst # Shift+Ctrl+K (penalty kicK)
 jc press 12 call Includes/PushingFreeKickFirst # Shift+Ctrl+L (fouL)
 
