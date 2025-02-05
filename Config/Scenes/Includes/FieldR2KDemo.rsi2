@@ -35,25 +35,25 @@
       <Set name="color" value="goalWhite"/>
     </Compound>
 	
-	<BoxAppearance depth="3.2m" width="0.01m" height="0.3m" name="bande">
+	<BoxAppearance depth="3.2m" width="0.01m" height="0.2m" name="bande">
       <Surface ref="goalWhite"/>
       <Translation x="1.15m" y="1.10m" z="0.1m"/>
     </BoxAppearance>
-	<BoxAppearance depth="3.2m" width="0.01m" height="0.3m" name="bande2">
+	<BoxAppearance depth="3.2m" width="0.01m" height="0.2m" name="bande2">
       <Surface ref="goalWhite"/>
       <Translation x="1.15m" y="-1.10m" z="0.1m"/>
     </BoxAppearance>
-	<BoxAppearance depth="0.01m" width="2.2" height="0.3m" name="bande3">
+	<BoxAppearance depth="0.01m" width="2.2" height="0.2m" name="bande3">
       <Surface ref="goalWhite"/>
       <Translation x="2.75m" z="0.1m"/>
     </BoxAppearance>
-	<BoxAppearance depth="0.01m" width="2.2" height="0.3m" name="bande4">
+	<BoxAppearance depth="0.01m" width="2.2" height="0.2m" name="bande4">
       <Surface ref="goalWhite"/>
       <Translation x="-0.45m" z="0.1m"/>
     </BoxAppearance>
 	<BoxAppearance width="4m" height="0.01m" depth="5.5m" name="boden">
 	  <Surface ref="goalWhite"/>
-      <Translation z="-0.1m"/>
+      <Translation z="-0.01m"/>
     </BoxAppearance>
 
   </Compound>
