@@ -51,11 +51,8 @@ void BeepBroadcaster::update(BeepCommData& beepCommData)
     responseToggle = false;
     for (int i=1;i<=numBands;i++){
       //skips the robots own message 
-      if (theRobotInfo.number==i){       
-        //commented out for test purposes
-        //i++;
-      }
-      if(theBeep.messages[i] >= 10){
+      if (theRobotInfo.number-1!=i){       
+         if(theBeep.messages[i] >= 10){
         
         //Robot specific
         //11-14 offset for 10 broadcast messages at 4 messages per robot
@@ -77,6 +74,7 @@ void BeepBroadcaster::update(BeepCommData& beepCommData)
         }
       }
       }  
+    }
     }
     }
     }
