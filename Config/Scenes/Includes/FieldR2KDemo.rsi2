@@ -5,17 +5,17 @@
       <Translation z="-0.1m"/>
       <Material name="fieldCarpet"/>
     </BoxGeometry>
-    <BoxGeometry width="0.1m" height="0.3m" depth="11m" color="rgb(80, 80, 80)">
-      <Translation y="-4.00m" z="0.15m"/>
+    <BoxGeometry width="0.1m" height="0.3m" depth="3.2m" color="rgb(80, 80, 80)">
+      <Translation y="-1.10m" z="0.15m"/>
     </BoxGeometry>
-    <BoxGeometry width="0.1m" height="0.3m" depth="11m" color="rgb(80, 80, 80)">
-      <Translation y="4.00m" z="0.15m"/>
+    <BoxGeometry width="0.1m" height="0.3m" depth="3.2m" color="rgb(80, 80, 80)">
+      <Translation y="1.10m" z="0.15m"/>
     </BoxGeometry>
-    <BoxGeometry width="8m" height="0.3m" depth="0.1m" color="rgb(80, 80, 80)">
-      <Translation x="-5.5m" z="0.15m"/>
+    <BoxGeometry width="2.2m" height="0.3m" depth="0.1m" color="rgb(80, 80, 80)">
+      <Translation x="-1.6m" z="0.15m"/>
     </BoxGeometry>
-    <BoxGeometry width="8m" height="0.3m" depth="0.1m" color="rgb(80, 80, 80)">
-      <Translation x="5.5m" z="0.15m"/>
+    <BoxGeometry width="2.2m" height="0.3m" depth="0.1m" color="rgb(80, 80, 80)">
+      <Translation x="1.6m" z="0.15m"/>
     </BoxGeometry>
 
     <ComplexAppearance ref="fieldLines" name="fieldLines1"/>

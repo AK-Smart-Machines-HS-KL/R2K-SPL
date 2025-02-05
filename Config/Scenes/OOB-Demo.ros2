@@ -20,7 +20,7 @@
 	
     <Compound name="balls">
       <Body ref="ball">
-        <Translation x="1.6" z="0.5m"/>
+        <Translation x="0.75" z="0.5m"/>
       </Body>
     </Compound>
 
