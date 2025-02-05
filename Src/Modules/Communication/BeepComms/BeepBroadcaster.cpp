@@ -44,6 +44,43 @@ BeepBroadcaster::~BeepBroadcaster()
 
 void BeepBroadcaster::update(BeepCommData& beepCommData)
 {
+    //demo
+    if (theFrameInfo.getTimeSince(lastTimeWithBeep) >= maxTimeOutBetweenBeeps){
+      lastTimeWithBeep = theFrameInfo.time;
+      if (responseToggle) {
+    responseToggle = false;
+    for (int i=1;i<=numBands;i++){
+      //skips the robots own message 
+      if (theRobotInfo.number==i){       
+        //commented out for test purposes
+        //i++;
+      }
+      if(theBeep.messages[i] >= 10){
+        
+        //Robot specific
+        //11-14 offset for 10 broadcast messages at 4 messages per robot
+        for (int j=1;j<=numBands;j++){
+          if (theRobotInfo.number==j){
+          if (theBeep.messages[i]==(j-1)*4+11){
+            if(theRobotInfo.number==numBands){ 
+              beepCommData.broadcastQueue.push_back((1-1)*4+11);
+            }else{
+              beepCommData.broadcastQueue.push_back((theRobotInfo.number-1)*4+11);  
+            }
+          }
+          if (theBeep.messages[i]==(j-1)*4+12){
+          }
+          if (theBeep.messages[i]==(j-1)*4+13){
+          }
+          if (theBeep.messages[i]==(j-1)*4+14){
+          }
+        }
+      }
+      }  
+    }
+    }
+    }
+
     //Handle Ground Sensor
     if(!theGroundContactState.contact)
     {

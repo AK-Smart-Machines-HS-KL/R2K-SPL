@@ -19,6 +19,8 @@
 #include "Representations/Communication/Beep.h"
 #include <string>
 #include <condition_variable>
+#include "Representations/Infrastructure/FrameInfo.h"
+#include "Representations/Infrastructure/AudioData.h"
 
 MODULE(BeepBroadcaster,
 {,
@@ -27,6 +29,7 @@ MODULE(BeepBroadcaster,
   REQUIRES(RobotInfo),
   REQUIRES(GroundContactState),
   REQUIRES(Beep),
+  REQUIRES(FrameInfo),
   LOADS_PARAMETERS(
   {,
     (int) numBands,
@@ -51,6 +54,8 @@ private:
   bool responseToggle = true;
   bool sendToggle=false;
   int sendmessage = 0;
+  int maxTimeOutBetweenBeeps = 500;
+  int lastTimeWithBeep = 0;
 
 
   // Async

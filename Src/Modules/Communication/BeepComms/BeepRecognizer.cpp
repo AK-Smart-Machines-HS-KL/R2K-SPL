@@ -157,7 +157,7 @@ if (theFrameInfo.getTimeSince(lastTimeWithBeep) >= maxTimeOutBetweenBeeps){
   lastTimeWithBeep = theFrameInfo.time;
   if (responseToggle) {
     responseToggle = false;
-    for (int i=0;i<=4;i++){
+    for (int i=1;i<=numBands;i++){
       //skips the robots own message 
       if (theRobotInfo.number==i){       
         //commented out for test purposes
@@ -166,11 +166,13 @@ if (theFrameInfo.getTimeSince(lastTimeWithBeep) >= maxTimeOutBetweenBeeps){
       if(theBeep.messages[i] >= 10){
         
         //Robot specific
-        for (int j=1;j<=5;j++){
+        //11-14 offset for 10 broadcast messages at 4 messages per robot
+        for (int j=1;j<=numBands;j++){
           if (theRobotInfo.number==j){
           if (theBeep.messages[i]==(j-1)*4+11){
-            SystemCall::say((std::string("message ") + std::to_string((j-1)*4+11)).c_str());
-            SystemCall::say((std::string("robot ") + std::to_string(i+1)).c_str());   
+           //commented out for demo
+           //SystemCall::say((std::string("message ") + std::to_string((j-1)*4+11)).c_str());
+           //SystemCall::say((std::string("robot ") + std::to_string(i+1)).c_str());   
           }
           if (theBeep.messages[i]==(j-1)*4+12){
             SystemCall::say((std::string("message ") + std::to_string((j-1)*4+12)).c_str());
@@ -190,7 +192,10 @@ if (theFrameInfo.getTimeSince(lastTimeWithBeep) >= maxTimeOutBetweenBeeps){
   //broadcast
       switch(theBeep.messages[i]) {
         case 1:
-          SystemCall::say((std::string("message 1 robot ") + std::to_string(i+1)).c_str()); 
+          //commented out for demo
+          //SystemCall::say((std::string("message 1 robot ") + std::to_string(i+1)).c_str());
+          SystemCall::say((std::string("robot ") + std::to_string(i+1)).c_str()); 
+          SystemCall::say("getting kidnapped");
           break;
         case 2:
           SystemCall::say((std::string("message 2 robot ") + std::to_string(i+1)).c_str());
