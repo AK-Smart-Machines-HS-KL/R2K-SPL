@@ -1,7 +1,7 @@
 <Simulation>
 
   <Compound name="field">
-    <BoxGeometry width="4m" height="0.2m" depth="5.5m" color="rgb(50,50, 50)">
+    <BoxGeometry width="8m" height="0.2m" depth="11m" color="rgb(50,50, 50)">
       <Translation z="-0.1m"/>
       <Material name="fieldCarpet"/>
     </BoxGeometry>
@@ -26,32 +26,32 @@
     <ComplexAppearance ref="fieldGreen"/>
 
     <Compound ref="fieldGoal" name="Goal1">
-      <Translation x="-2275mm"/>
+      <Translation x="-4525mm"/>
       <Set name="color" value="goalWhite"/>
     </Compound>
     <Compound ref="fieldGoal" name="Goal2">
-      <Translation x="2275mm"/>
+      <Translation x="4525mm"/>
       <Rotation z="180degree"/>
       <Set name="color" value="goalWhite"/>
     </Compound>
 	
-	<BoxAppearance depth="3.2m" width="0.01m" height="0.3m" name="bande">
+	<BoxAppearance depth="11m" width="0.1m" height="0.3m" name="bande">
       <Surface ref="goalWhite"/>
-      <Translation x="1.15m" y="1.10m" z="0.1m"/>
+      <Translation y="4.00m" z="0.1m"/>
     </BoxAppearance>
-	<BoxAppearance depth="3.2m" width="0.01m" height="0.3m" name="bande2">
+	<BoxAppearance depth="11m" width="0.1m" height="0.3m" name="bande2">
       <Surface ref="goalWhite"/>
-      <Translation x="1.15m" y="-1.10m" z="0.1m"/>
+      <Translation y="-4.00m" z="0.1m"/>
     </BoxAppearance>
-	<BoxAppearance depth="0.01m" width="2.2" height="0.3m" name="bande3">
+	<BoxAppearance depth="0.1m" width="8.1m" height="0.3m" name="bande3">
       <Surface ref="goalWhite"/>
-      <Translation x="2.75m" z="0.1m"/>
+      <Translation x="-5.50m" z="0.1m"/>
     </BoxAppearance>
-	<BoxAppearance depth="0.01m" width="2.2" height="0.3m" name="bande4">
+	<BoxAppearance depth="0.1m" width="8.1m" height="0.3m" name="bande4">
       <Surface ref="goalWhite"/>
-      <Translation x="-0.45m" z="0.1m"/>
+      <Translation x="5.50m" z="0.1m"/>
     </BoxAppearance>
-	<BoxAppearance width="4m" height="0.01m" depth="5.5m" name="boden">
+	<BoxAppearance width="8m" height="0.1m" depth="11m" name="teppich">
 	  <Surface ref="goalWhite"/>
       <Translation z="-0.1m"/>
     </BoxAppearance>
@@ -133,58 +133,58 @@
 
   <Vertices name="fieldLines">
 # middle line (nur halb wegen Punktspiegelung für andere Hälfte)
--0.025 1.5 0
+-0.025 3 0
 -0.025 0 0
 0.025 0 0
-0.025 1.5 0
+0.025 3 0
 
 # goal line
-2.225 1.525 0
-2.225 -1.525 0
-2.275 -1.525 0
-2.275 1.525 0
+4.475 3.025 0
+4.475 -3.025 0
+4.525 -3.025 0
+4.525 3.025 0
 
 # outer line left
--2.225 1.525 0
--2.225 1.475 0
-2.225 1.475 0
-2.225 1.525 0
+-4.475 3.025 0
+-4.475 2.975 0
+4.475 2.975 0
+4.475 3.025 0
 
 # penalty area line left
-1.425 1.025 0
-1.425 0.975 0
-2.225 0.975 0
-2.225 1.025 0
+2.875 2.025 0
+2.875 1.975 0
+4.475 1.975 0
+4.475 2.025 0
 
 # penalty area line right
-2.225 -1.025 0
-2.225 -0.975 0
-1.425 -0.975 0
-1.425 -1.025 0
+4.475 -2.025 0
+4.475 -1.975 0
+2.875 -1.975 0
+2.875 -2.025 0
 
 # penalty area line front
-1.4 1.025 0
-1.4 -1.025 0
-1.45 -1.025 0
-1.45 1.025 0
+2.825 2.025 0
+2.825 -2.025 0
+2.875 -2.025 0
+2.875 2.025 0
 
 # goal area line left
-1.975 0.575 0
-1.975 0.525 0
-2.225 0.525 0
-2.225 0.575 0
+3.925 1.125 0
+3.925 1.075 0
+4.475 1.075 0
+4.475 1.125 0
 
 # goal area line right
-2.225 -0.575 0
-2.225 -0.525 0
-1.975 -0.525 0
-1.975 -0.575 0
+4.475 -1.125 0
+4.475 -1.075 0
+3.925 -1.075 0
+3.925 -1.125 0
 
 # goal area line front
-1.925 0.575 0
-1.925 -0.575 0
-1.975 -0.575 0
-1.975 0.575 0
+3.875 1.125 0
+3.875 -1.125 0
+3.925 -1.125 0
+3.925 1.125 0
   </Vertices>
 
   <Vertices name="fieldCross">
@@ -360,10 +360,10 @@
   </Vertices>
 
   <Vertices name="fieldGreen">
--2.75 -2 -0.001
-2.75 -2 -0.001
-2.75 2 -0.001
--2.75 2 -0.001
+-5.2 -3.7 -0.001
+5.2 -3.7 -0.001
+5.2 3.7 -0.001
+-5.2 3.7 -0.001
   </Vertices>
   <TexCoords name="fieldGreen">
 0 0
@@ -420,7 +420,7 @@
 32 33 34 35
     </Quads>
     <ComplexAppearance ref="fieldCross">
-      <Translation x="1.6" y="0" z="0"/>
+      <Translation x="3.2" y="0" z="0"/>
     </ComplexAppearance>
     <ComplexAppearance ref="fieldCenterCircle"/>
   </ComplexAppearance>
