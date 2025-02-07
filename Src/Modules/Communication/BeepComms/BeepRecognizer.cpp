@@ -160,7 +160,8 @@ if (theFrameInfo.getTimeSince(lastTimeWithBeep) >= maxTimeOutBetweenBeeps){
     for (int i=0;i<=numBands;i++){
       //skips the robots own message 
       if (theRobotInfo.number-1!=i) {   
-      if(theBeep.messages[i] >= 10){        
+      if(theBeep.messages[i] >= 10){  
+        OUTPUT_TEXT("demo0rc");    
         //Robot specific
         //11-14 offset for 10 broadcast messages at 4 messages per robot
         for (int j=1;j<=numBands;j++){
