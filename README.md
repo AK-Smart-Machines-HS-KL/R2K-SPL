@@ -31,6 +31,7 @@ Hier findet man auch das Rule Book für die Technichal Challange 2025 wo auch de
 
 Die genutzte Card ist [ChallangeCard.cpp](Src/Modules/BehaviorControl/BehaviorControl/Cards/Experimental/ChallangeCard.cpp) </br>
 game stack: fast alle Cards löschen, TeachIn auch gelöscht </br>
+DefaultCard wurde bearbeitet -> Walk in Fällt weg der Roboter bleibt auf der Stelle stehen.   
 
 ## Zusamenfassung
 Die bisherigen Kick Skills sind für die Challange ungeignet. Stadessen nutzen wir WalkToPoint um in den Ball reinzulaufen und somit einen Kick "Simulieren".
@@ -108,8 +109,10 @@ Erstes Testergebnis: Vorzeichen Fehler beim InterceptPoint -> der Roboter ist na
 
 Dynamisches anlaufen:
 Die Funktionen finden sich alle in [ChallangeCard.cpp](Src/Modules/BehaviorControl/BehaviorControl/Cards/Experimental/ChallangeCard.cpp) </br>
- der Abstand zum Ball der unterschritten werden muss damit der Roboter reagiert, </br>
- wird anhand der Geschwindigkeit des Balls berechnet mite der Funktion calcMinDistance </br>
+ Der Abstand zum Ball der unterschritten werden muss damit der Roboter reagiert, </br>
+ wird anhand der Geschwindigkeit des Balls berechnet mit der Funktion calcMinDistance </br>
+ Dabei wird die Geschwindigkeit des Balls sowie die Distanz zur Lauf-Linie des Balls berücksichtigt,   
+ so dass bei höherer Geschwindikeit/Distanz der Roboter früher reagiert.
    
     float calcMinDistance() const
     {
