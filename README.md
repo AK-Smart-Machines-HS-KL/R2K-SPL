@@ -46,12 +46,6 @@ ODER </br>
 Hier wird der Ball direkt vor die Füße von Roboter 1 gespielt dieser sollte dann auch </br>
 in den rollenden Ball reinlaufen </br>
 
-## 2) corner kick, 
-Ziele den Ball auf den Elfmeterpunkt ODER </br>
-Pass-spiel direkt vor die Füße </br>
--> Ball läuft vor dem bot schnell vorbei </br>
-
-
 ### -----Testing Setup:------
 
 ### Simulator:
@@ -80,6 +74,16 @@ gc playing </br>
 mvb -4300 2900 0 </br>
 mv -3550 0 300 </br>
 gc cornerKickForFirstTeam </br>
+
+
+
+## 2) corner kick, 
+Ziele den Ball auf den Elfmeterpunkt ODER </br>
+Pass-spiel direkt vor die Füße </br>
+-> Ball läuft vor dem bot schnell vorbei </br>
+
+
+
 
 ## 3) Welcher Skill
 
