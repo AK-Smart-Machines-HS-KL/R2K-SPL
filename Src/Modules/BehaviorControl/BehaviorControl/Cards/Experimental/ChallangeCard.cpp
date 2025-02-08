@@ -145,7 +145,7 @@ class ChallangeCard : public ChallangeCardBase
       Vector2f temp = BallPhysics::propagateBallPosition(theFieldBall.recentBallPositionOnField(), theBallModel.estimate.velocity, interceptFactor, theBallSpecification.friction);
       Vector2f result = Vector2f::Zero();
       //Für den Fehler beim echten Roboter (die Werte sind invertiert)
-#ifdef NAO
+#ifdef TARGET_ROBOT
       result = Vector2f(-(temp.x() + 100.f), -(temp.y() + 100.f));
 #else
       result = Vector2f((temp.x() + 100.f), (temp.y() + 100.f));
