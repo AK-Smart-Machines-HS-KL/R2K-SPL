@@ -22,6 +22,14 @@ Standartgateway: 192.168.50.1
 Bevorzugter DNS 1.1.1.1  
 Alternativer DNS 0.0.0.0  
 
+## Zugriff auf OUTPUT_TEXT mit Simulator
+Solange ein Nao in der bush verbunden ist, kann der Simulator genutzt werden um Daten des Roboter im laufenden Betrieb auszulesen. Hierzu zählen OUTPUT_TEXT() Statements die zum Debuggen bzw. einfachen Verifizieren des Codes verwendet werden kann. Hierzu muss bei verbundenem Roboter einfach nur in der bush, in der unteren Leiste der "Simulator" gestartet werden. Hier wird dann im "Console" Fenster der Output angezeigt.
+
+Mit: << können Variabeln ausgegeben werden. Bsp.  
+OUTPUT_TEXT("Irgendwas: " << x);
+
+Merke nach jedem Deploy muss der Simulator neugestartet werden
+
 ## Beschreibung bisheriger Code
 ### Broadcaster
 Jeder Roboter besitz eine eigene Basisfrequenz. Diese berechnet sich aus den in der [Config](Config\Scenarios\Default/BeepBroadcaster.cfg) konfigurierbaren "baseFrequency" und  "bandWidth" mit folgender Formel:
@@ -62,13 +70,6 @@ Hier wird mittels fftw(Fourier-Transformation) dekodiert und in Form eines std::
 
 Bisher falls |1|0|0|0|0| von einem Roboter dedektiert wurde, welchernicht Nummer 1 trägt eine message 1 als Antwort gesendet gesendet.
 
-## Zugriff auf OUTPUT_TEXT mit Simulator
-Solange ein Nao in der bush verbunden ist, kann der Simulator genutzt werden um Daten des Roboter im laufenden Betrieb auszulesen. Hierzu zählen OUTPUT_TEXT() Statements die zum Debuggen bzw. einfachen Verifizieren des Codes verwendet werden kann. Hierzu muss bei verbundenem Roboter einfach nur in der bush, in der unteren Leiste der "Simulator" gestartet werden. Hier wird dann im "Console" Fenster der Output angezeigt.
-
-Mit: << können Variabeln ausgegeben werden. Bsp.  
-OUTPUT_TEXT("Irgendwas: " << x);
-
-Merke nach jedem Deploy muss der Simulator neugestartet werden
 
 ## Änderungen am Code
 ### Config
@@ -82,25 +83,16 @@ signalBaseline = 3
 Mit dieser Config ist zumindest in Tests ohne zusätzliche Hintergrundgeräusche eine genaue erkennung möglich und in ersten Tests mit Hintergrundgeräusche auch. Die einzige Ausnahmme hier ist die message 31 welche nicht eindeutig oder sogar falsch erkannt wird. Lösungsvorschlag hier die 31 einfach zu ignorieren. Testausgaben hierfür finden sich [BeepTestSounds](BeepTestSounds). 
 
 ### Broadcaster
+Hier wurde hinzugefügt, dass der theGroundContactState(das gleiche was für "High" und "Ground" zuständig ist) ausgelesen wird und ein Beep erzeugt falls der Roboter hochgehoben bzw. "High" sagen würde.
 
 ### Regognizer
 Mittels SystemCall::say wird für jeden Roboter und jede mögliche message im Muster: "message"+ nummer der message + "robot" + nummer des sendenden roboters ausgegeben.
-Aktuell werden hier die messages 1-10 von jedem Roboter erkannt, die messages 11-30 nur von Spezifischen(siehe Muster unten).
+Aktuell werden hier die messages 1-10 von jedem Roboter erkannt, die messages 11-30 nur von Spezifischen(siehe Muster unten) dies ist unser Übertragunsprotokoll(jeder Roboter erkennt weiterhin jedes Signal reagiert aber nur auf die ihm zugewissenen).
 
-Roboter 1
-11-14
+Aufteilung der Messages/Payload auf die Unterschiedlichen Roboter  
+1-------------------------------------------------------------------------------------------------31  
+1-10 Broadcast - 11-14 Roboter 1 - 15-18 Roboter 2 - 19-22 Roboter 3 - 23-26 Roboter 4 - Roboter 5
 
-Roboter 2
-15-18
-
-Roboter 3
-19-22
-
-Roboter 4
-23-26
-
-Roboter 5
-27-30
 
 ## Beep Test Sounds(Ordner)
 in [BeepTestSounds](BeepTestSounds) sind mehrere aufgenommene beeps sowie Testergebnisse. 
@@ -131,16 +123,13 @@ Weiterhin gab es ein Problem bei dem ./generate nichtmehr ausgeführt werden kon
 ## Aktuelle Problme
 Bei Unterhaltungen die während der Analyse des bestehenden Codes geführt wurden hat der Roboter mehrfach eine Message erkannt. Daraus folgt eine möglicherweise problematische Rate an falsch positiven Erkennungen. Durch Configänderungen abgeschwächt.   
 
-Bei manchen Frequenzen werden mehr als nur ein Roboter als Sender erkannt. Hierfür nocheinmal Wilhem fragen,da das Problem schon seit damals bekannt ist. Vieleicht hielft hier [SpektrumanalyseR1M1.PNG](BeepTestSounds/SpektrumanalyseR1M1.PNG)
-Bsp.(Zahlen müssen erst genauer bestimmt werden und dienen hier nur zu einfacheren veranschlichung)
-|1|0|13|0|0|
-Nach Configänderungen bisher nicht beobachtet allerdings immernoch möglich. 
+Bei manchen Frequenzen werden mehr als nur ein Roboter als Sender erkannt. Nach Configänderungen bisher nicht beobachtet allerdings immernoch möglich. 
 
 ## Zukünftige Arbeiten
-Bisherige Ideen für eine Zukünftige praktische Anwendung:
--einem Roboter mitteilen das der Ball sich hinter ihm befindet während er selber ihn nicht sieht  
--dem Torwart mitteilen das er falsch steht
--einem Roboter mitteilen das er die Schusslinie blockiert
+Bisherige Ideen für eine Zukünftige praktische Anwendung:  
+-einem Roboter mitteilen das der Ball sich hinter ihm befindet während er selber ihn nicht sieht    
+-dem Torwart mitteilen das er falsch steht  
+-einem Roboter mitteilen das er die Schusslinie blockiert  
 
 
 ## Verlinkung relevanter Klassen  

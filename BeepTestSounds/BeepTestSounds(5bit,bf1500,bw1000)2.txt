@@ -1,3 +1,4 @@
+da unser Signal eine halbe Sekunde andauert wir aber öfter Erkennungen durführen haben wir mehr als ein erkanntes Signal falls mehr als ein Wert erkannt wurde werden alle aufgelsitet
 Robot nr. 1 broadcasting message 1(1500Hz)
 The Beeps: 1 0 0 0 0
 
@@ -177,7 +178,7 @@ Robot nr. 5 broadcasting message 31(6300Hz)
 The Beeps: 0 0 16 31 31
 The Beeps: 0 0 0 24 27
 
-Beispiel für eine volle Detektion
+Beispiel für eine volle Detektion 
 Robot nr. 1 broadcasting message 15(1500Hz)
 Robot nr. 1 broadcasting message 15(1700Hz)
 Robot nr. 1 broadcasting message 15(1900Hz)
