@@ -190,7 +190,7 @@ private:
         if (theEnhancedKeyStates.hitStreak[KeyStates::headRear] > 0) {
           SystemCall::say("I go to the ball and then I point at the right goalpost");
           OUTPUT_TEXT("I go to the ball and and then I point at the right goalpost.");
-          goto state2;
+          goto state3;
         }
       }
     }
