@@ -44,7 +44,7 @@ BeepBroadcaster::~BeepBroadcaster()
 
 void BeepBroadcaster::update(BeepCommData& beepCommData)
 {
-    //demo
+  //demo
   if (theFrameInfo.getTimeSince(lastTimeWithBeep) >= maxTimeOutBetweenBeeps){
   lastTimeWithBeep = theFrameInfo.time;
   if (responseToggle) {
@@ -52,19 +52,15 @@ void BeepBroadcaster::update(BeepCommData& beepCommData)
     for (int i=0;i<=numBands;i++){
       //skips the robots own message 
       if (theRobotInfo.number-1!=i) {
-      if(theBeep.messages[i] >= 10){ 
-        OUTPUT_TEXT("demo0");     
+      if(theBeep.messages[i] >= 10){      
         //Robot specific
         //11-14 offset for 10 broadcast messages at 4 messages per robot
         for (int j=1;j<=numBands;j++){
           if (theRobotInfo.number==j){
           if (theBeep.messages[i]==(j-1)*4+11){
-             OUTPUT_TEXT("demo");
             if(theRobotInfo.number==numBands){ 
-              OUTPUT_TEXT("demo1");  
               beepCommData.broadcastQueue.push_back((1-1)*4+11);
             }else{
-                OUTPUT_TEXT("demo2");
               beepCommData.broadcastQueue.push_back((theRobotInfo.number)*4+11);  
             }
           }

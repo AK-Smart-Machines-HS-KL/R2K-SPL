@@ -3,7 +3,7 @@
  *
  * This file implements a module that identifies the sound of a beep
  *
- * @author Wilhelm Simus
+ * @author Wilhelm Simus,Sandro Kloos (Winter 2024/25)
  */
 
 #include "BeepRecognizer.h"
@@ -152,6 +152,7 @@ void BeepRecognizer::update(Beep &theBeep){
   //   SEND_DEBUG_IMAGE("module:BeepRecognizer", image);
   // }
 
+#ifdef 
 //say ausgabe aller messages
 if (theFrameInfo.getTimeSince(lastTimeWithBeep) >= maxTimeOutBetweenBeeps){
   lastTimeWithBeep = theFrameInfo.time;
@@ -161,7 +162,6 @@ if (theFrameInfo.getTimeSince(lastTimeWithBeep) >= maxTimeOutBetweenBeeps){
       //skips the robots own message 
       if (theRobotInfo.number-1!=i) {   
       if(theBeep.messages[i] >= 10){  
-        OUTPUT_TEXT("demo0rc");    
         //Robot specific
         //11-14 offset for 10 broadcast messages at 4 messages per robot
         for (int j=1;j<=numBands;j++){
@@ -232,6 +232,9 @@ else {
   responseToggle = true;
 }
 }
+
+#endif
+
 }
 
 std::vector<long> BeepRecognizer::decode(const RingBuffer<AudioData::Sample>& buffer)
