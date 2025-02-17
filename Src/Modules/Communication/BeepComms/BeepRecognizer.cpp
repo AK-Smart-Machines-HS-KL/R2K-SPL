@@ -152,7 +152,7 @@ void BeepRecognizer::update(Beep &theBeep){
   //   SEND_DEBUG_IMAGE("module:BeepRecognizer", image);
   // }
 
-#ifdef 
+#ifdef NDEBUG
 //say ausgabe aller messages
 if (theFrameInfo.getTimeSince(lastTimeWithBeep) >= maxTimeOutBetweenBeeps){
   lastTimeWithBeep = theFrameInfo.time;

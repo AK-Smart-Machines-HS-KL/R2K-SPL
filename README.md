@@ -105,6 +105,8 @@ Aufteilung der Messages/Payload auf die Unterschiedlichen Roboter
 
 Wie sinnvoll diese aufteilung ist muss noch erprobt werden.
 
+Ausgabe aktuell nur in DEBUG verfügbar.
+
 ## Beep Test Sounds(Ordner)
 in [BeepTestSounds](BeepTestSounds) sind mehrere aufgenommene beeps sowie Testergebnisse. 
 
