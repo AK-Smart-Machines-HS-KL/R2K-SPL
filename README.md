@@ -61,12 +61,6 @@ then wähle robot 5 und benutze den Befehl ´mv -3550 0 300´ </br>
 then ´gc cornerKickForFirstTeam´ </br>
 die CornerKickCard wurde so modifiziert  das der Ball vor die Füße des Roboters vorm Tor gespielt werden sollte</br>
 
-### Real-Live Test
-Deploy den Roboter auf der Nummer 3 in Release Mode (für schnellere Reaktionen) und Platziere ihn vor dem Mittelkreis (damit er besser seine Odometrie  anpassen kann) </br>
-Warte bis der Roboter sicher steht und Platziere den Ball sichtbar für ihn Rechts oder Links schräg (er schaut sich nach ihm langsam um). </br>
-Nachdem er ihn gefunden hat, rolle den Ball dem Roboter vor die Füße. </br>
--> eine Markierung machen wo der Ball hin gerollt werden soll.   </br>
-Jetzt sollte der Roboter den Ball abfangen. </br>
 
 copy - paste - List:
 
@@ -75,12 +69,44 @@ mvb -4300 2900 0 </br>
 mv -3550 0 300 </br>
 gc cornerKickForFirstTeam </br>
 
+### Beispiel Videos für Simulator:
+
+- für Fast: </br>
+
+
+https://github.com/user-attachments/assets/f2cd8e37-bab2-4473-a884-26c7c3786432
+
+- für Normal: </br>
+
+
+https://github.com/user-attachments/assets/d67f9cb2-a863-4b5b-a6e3-0eb94ae47f5f
+
+
+### Real-Live Test
+Deploy den Roboter auf der Nummer 3 in Release Mode (für schnellere Reaktionen) und Platziere ihn vor dem Mittelkreis (damit er besser seine Odometrie  anpassen kann) </br>
+Warte bis der Roboter sicher steht und Platziere den Ball sichtbar für ihn Rechts oder Links schräg (er schaut sich nach ihm langsam um). </br>
+Nachdem er ihn gefunden hat, rolle den Ball dem Roboter vor die Füße. </br>
+-> eine Markierung machen wo der Ball hin gerollt werden soll.   </br>
+Jetzt sollte der Roboter den Ball abfangen. </br>
+
+- Video Beispiel aus dem Feldtest:
+
+  
+
+https://github.com/user-attachments/assets/c21c4225-807b-42c4-83b5-e52f1ef872ec
+
+
+https://github.com/user-attachments/assets/e8de8c33-9848-424c-bbe2-e5bb06a3cf0d
+
+
+https://github.com/user-attachments/assets/8e3c0286-4033-4ac3-b017-8374896d450c
+
 
 
 ## 2) corner kick, 
-Ziele den Ball auf den Elfmeterpunkt ODER </br>
-Pass-spiel direkt vor die Füße </br>
--> Ball läuft vor dem Robot schnell vorbei </br>
+Die [OwnCornerKickCard.cpp](Src\Modules\BehaviorControl\BehaviorControl\Cards\Gamestates\OwnCornerKickCard.cpp) wurde so angepasst, das der Ball nicht mehr an den Pfosten gespielt wird,  
+sondern um einen Festen Winkel fersetzt vor das Tor gespielt wird -> aktuelle Spiellage wird nicht berücksichtigt.
+Der Empfänger steht dabei auf einem festen Punkt, der durch ausprobieren ermittelt wurde, vor dem Tor und dieser soll dann die Challenge asuführen. 
 
 ## 3) Welcher Skill
 
@@ -155,39 +181,21 @@ Diese können in dem Code je nach Test erfolgen angepasst werden -> in eine Conf
 
 ### Beispiel Video:
 
-- für Fast: </br>
-
-
-https://github.com/user-attachments/assets/f2cd8e37-bab2-4473-a884-26c7c3786432
-
-- für Normal: </br>
-
-
-https://github.com/user-attachments/assets/d67f9cb2-a863-4b5b-a6e3-0eb94ae47f5f
-
-- Feld Test:
-
-  
-
-https://github.com/user-attachments/assets/c21c4225-807b-42c4-83b5-e52f1ef872ec
-
-
-https://github.com/user-attachments/assets/e8de8c33-9848-424c-bbe2-e5bb06a3cf0d
-
-
-https://github.com/user-attachments/assets/8e3c0286-4033-4ac3-b017-8374896d450c
 
 ## Zukünftige Entwicklung
 
-Momentan funktioniert der Test mit echten Robotern nicht. </br>
+~~Momentan funktioniert der Test mit echten Robotern nicht.~~ </br>
 - ~~Sie gehen nicht auf den Ball zu, sondern machen nur ein paar Schritte Rückwärts (Stand 27.01). </br>~~ -> Stand 29.01 x und y-Werte mussten invertiert werden beim echten Roboter
 - Es muss noch überprüft werden wie sehr das momentan Programmierte tatsächlich mit dem Regelwerk der Challenge übereinstimmt. </br>
 - Eine Card für die suche nach dem Ball. Aus dem Regelwerk liest es sich heraus, das die Rampe einen Tag immer an der gleichen Stelle steht </br>
   -> Der Suchwinkel kann stark reduziert werden. </br>
 - Bei dem Real-Live Test wird der Roboter von Penelized zu unPenlized gewechselt, dies updatet seine Position an den Rand des Spielfeldes. Dies stört sehr bei vorführungen bei denen der Roboter an bestimmten stellen Plaziert wird. </br>
   -> Schalte dies durch z.Bsp druch eine Testing Flag aus. </br>
--  ~~Real-Live laufen die Roboter nicht auf maximaler Geschwindigkeit um die Gelenke zu schonen, dies ist allerdings für die wenigen Schritte die wir hier machen nicht Relevant.
-  -> Default Geschwindigkeit anpassen auf wen möglich 100%.~~
+-  Real-Live laufen die Roboter nicht auf maximaler Geschwindigkeit um die Gelenke zu schonen, dies ist allerdings für die wenigen Schritte die wir hier machen nicht Relevant.
+  -> Default Geschwindigkeit anpassen auf wen möglich 100%.
+- Anpassung von CornerKick für ein besseren Passspiel, mit berücksichtigung aktueller Spielage.
+- Bestimmung der Empfänger-Pose beim Eckball (Corner Kick).
+  -> Kommunikation zwichen Empfäanger und Passspieler realisieren.
 
 
 ## Relevante Klassen
