@@ -24,18 +24,15 @@
 // Representations
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/BehaviorControl/FieldBall.h"
-#include "Representations/Modeling/ObstacleModel.h"
 #include "Representations/Communication/TeamData.h"
 #include "Representations/Modeling/BallModel.h"
 #include "Representations/Configuration/BallSpecification.h"
-#include "Representations/BehaviorControl/Shots.h"
 
 
 //#include <filesystem>
 #include "Tools/Modeling/BallPhysics.h"
 #include "Tools/Math/Eigen.h"
 #include "Tools/Math/Geometry.h"
-#include "Tools/BehaviorControl/Interception.h"
 
 
 
@@ -45,11 +42,7 @@ CARD(ChallangeCard,
        CALLS(Activity),
        CALLS(WalkToPoint),
        CALLS(LookAtBall),
-       CALLS(WalkToKickoffPose),
        CALLS(TurnAngle),
-       CALLS(GoToBallAndKick),
-       CALLS(Say),
-       REQUIRES(Shots),
        REQUIRES(FieldBall),
        REQUIRES(RobotPose),
        REQUIRES(FieldDimensions),
@@ -113,7 +106,6 @@ class ChallangeCard : public ChallangeCardBase
 
         }else
         {
-          theActivitySkill(BehaviorStatus::goalShot);
           if (walking = true)
           {
             done = true;
