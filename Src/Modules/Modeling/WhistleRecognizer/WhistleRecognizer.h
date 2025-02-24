@@ -7,6 +7,12 @@
  * @author Tim Laue
  * @author Dennis Schuethe
  * @author Thomas Röfer
+ * 
+ * 
+ * // file modifirf by Feuerstein Dimitri on january 2025
+ * 
+ * std::vector<std::pair<std::string, int>> whistleTimes was added to stores all best whistles names and their detection times until STATE_PLAYING. 
+ * std::string closestWhistle was added to store the whistle closest to STATE_PLAYING time.
  */
 
 #pragma once

@@ -31,7 +31,7 @@ Der Hauptverantwortliche für das Projekt ist Dimitri Feuerstein. Kontakt: E-Mai
 
 ## Dokumentierter Fortschritt
 
-### Testaufbau
+### Teilschritt 1
 Getestet wurde mit zwei unterschiedlichen Pfeifen durch zwei unterschiedliche Videos auf YouTube. Einmal Fox40 Classic und einmal Fox Black.
 Bedingt durch den Testablauf und der Zeit die der NAO an ist ergeben sich unterschiedliche Werte für 'mindiff'.
 
@@ -44,19 +44,6 @@ Bedingt durch den Testablauf und der Zeit die der NAO an ist ergeben sich unters
 
 3. **Abspielen der Pfeife zeitgleich mit dem Gamecontroller:**
    - Die minimale 'mindiff' Zeit ist sehr klein.
-
-#### Ergebnisse
-Die beiden Tests zeigen, dass die Pfeifen erkannt werden und die Pfeife mit der minimalsten Zeit zwischen Spielfreigabe des Gamecontrollers -15 Sekunden gewählt wird. Hier wurde beim Testen mit dem zweiten [Video 1](https://www.youtube.com/watch?v=Q3EYBVUgcXo&ab_channel=fox40world) festgestellt, das bei der Fox Black auch andere Pfeifen die Fox Blue oder Fox Silver erkannt werden, was auf sehr ähnliches Spektrum oder einen schlechtes Sample hinweisen könnte.
-
-### Teilschritt 2
-Das Ziel in diesem Teilschritt ist, dass nur noch die Pfeifen mit demselben Namen wie die in Teilschritt 1 gefundene `closestWhistle` vom NAO erkannt werden. Alle anderen sollen für die gesamte Zeit, in der der NAO nicht rebootet wird, erhalten bleiben.
-
-#### Ergebnisse
-Ein großer Zeitsprung zwischen den beiden erkannten Pfeifen oberhalb und unterhalb der roten Linie ist zu erkennen. Hier wurde versucht, mit [Video 2](https://www.youtube.com/watch?v=99E9mi87XgM&ab_channel=WhistlePerformerMr.Kojyoro) (Fox Black) eine Pfeifenerkennung zu generieren. Erst als wieder auf Fox 40 Classic Sounds abgespielt wurde, wurden neue Pfeifen erkannt.
-
-### Youtube Links für Pfeifen Tests:
-[Video 1](https://www.youtube.com/watch?v=Q3EYBVUgcXo&ab_channel=fox40world)
-[Video 2](https://www.youtube.com/watch?v=99E9mi87XgM&ab_channel=WhistlePerformerMr.Kojyoro)
 
 ### Code Snippets Teilschritt 1
 
@@ -93,7 +80,18 @@ if (theGameInfo.state == STATE_PLAYING && closestWhistle.empty())
   ANNOTATION("WhistleRecognizer", closestWhistle << " with difference off " << minDiff);
 }
 ```
-### Code Snippets Teilschritt 2
+
+#### Bilder Teilschritt 1
+![Screenshot 2025-01-30 181849](https://github.com/user-attachments/assets/61e4742f-5400-459d-96b2-245e2ee5f063)
+![Screenshot 2025-01-30 180049](https://github.com/user-attachments/assets/5f48a547-0961-413e-92d7-935066cad062)
+
+#### Ergebnisse
+Die beiden Tests zeigen, dass die Pfeifen erkannt werden und die Pfeife mit der minimalsten Zeit zwischen Spielfreigabe des Gamecontrollers -15 Sekunden gewählt wird. Hier wurde zudem beim Testen mit [Video 1](https://www.youtube.com/watch?v=Q3EYBVUgcXo&ab_channel=fox40world) festgestellt, dass bei der Fox Black auch andere Pfeifen die Fox Blue oder Fox Silver erkannt werden, was auf sehr ähnliches Spektrum oder einen schlechtes Sample hinweisen könnte.
+
+### Teilschritt 2
+Das Ziel in diesem Teilschritt ist, dass nur noch die Pfeifen mit demselben Namen wie die in Teilschritt 1 gefundene `closestWhistle` vom NAO erkannt werden. Alle anderen sollen für die gesamte Zeit, in der der NAO nicht rebootet wird, erhalten bleiben.
+
+#### Code Snippets Teilschritt 2
 
 ```cpp
 for (auto& signature : signatures)
@@ -106,13 +104,13 @@ for (auto& signature : signatures)
     if (selectedIter == signatures.end() || &signature == &*selectedIter)
     {
 ```
-### Bilder
-#### Bilder Teilschrit 1
-![Screenshot 2025-01-30 181849](https://github.com/user-attachments/assets/61e4742f-5400-459d-96b2-245e2ee5f063)
-![Screenshot 2025-01-30 180049](https://github.com/user-attachments/assets/5f48a547-0961-413e-92d7-935066cad062)
 
-#### Bild Teilschrit 2
+#### Bild Teilschritt 2
 ![Screenshot 2025-01-30 185307](https://github.com/user-attachments/assets/2fe2734c-7ab7-42af-9728-a75dc7d0818b)
+
+
+#### Ergebnisse
+Ein großer Zeitsprung zwischen den beiden erkannten Pfeifen oberhalb und unterhalb der roten Linie ist zu erkennen. Hier wurde versucht, mit [Video 2](https://www.youtube.com/watch?v=99E9mi87XgM&ab_channel=WhistlePerformerMr.Kojyoro) (Fox Black) eine Pfeifenerkennung zu generieren. Erst als wieder auf Fox 40 Classic Sounds abgespielt wurde, wurden neue Pfeifen erkannt.
 
 #### Schlussfolgerung
 Der `WhistleRecognizer`-Modul wurde erfolgreich erweitert, um nur die Pfeifen mit demselben Namen wie die gefundene `closestWhistle` zu erkennen. Die Tests zeigen, dass das Modul korrekt funktioniert und die gewünschten Pfeifen erkennt.

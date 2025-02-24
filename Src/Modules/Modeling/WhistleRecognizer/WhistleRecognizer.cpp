@@ -7,6 +7,11 @@
  * @author Tim Laue
  * @author Dennis Schuethe
  * @author Thomas Röfer
+ * 
+ * // file modifirf by Feuerstein Dimitri on january 2025
+ * 
+ * The file was modified in such a way that it now only safes the whistle which is the closest according to theFrameInfo.time - 15 seconds.abort
+ * After the initialization, the only this whistle will be heard by the robot and persists until a reboot of the NAO.
  */
 
 #include "WhistleRecognizer.h"
