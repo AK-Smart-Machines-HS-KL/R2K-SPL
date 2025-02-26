@@ -105,8 +105,6 @@ Aufteilung der Messages/Payload auf die Unterschiedlichen Roboter
 
 Wie sinnvoll diese aufteilung ist muss noch erprobt werden.
 
-Ausgabe aktuell nur in DEBUG verfügbar.
-
 ## Beep Test Sounds(Ordner)
 in [BeepTestSounds](BeepTestSounds) sind mehrere aufgenommene beeps sowie Testergebnisse. 
 
@@ -138,7 +136,9 @@ Bei manchen Frequenzen werden mehr als nur ein Roboter als Sender erkannt. Nach 
 
 Bei manchen messages wird manchmal die message falsch erkannt, besonders bei solchen die aus mehreren Frequenzen zusammengesetzt sind. 
 Bsp. 
-message 12 ist message 4 und message 8 gleichzeitig gesendet hier wird bei niederen Frequenzen eher 4 und bei höheren Frequenzen eher 8 erkannt. Eine pottentiele Lösung hierfür wäre die ungefähr 15 einzelne Erkenungen eines Signals nocheinmal zu Mitteln eine weitere Lösungsidee wäre die Frequenzen an Musiknoten anzupassen.
+message 12 ist message 4 und message 8 gleichzeitig gesendet hier wird bei niederen Frequenzen eher 4 und bei höheren Frequenzen eher 8 erkannt. 
+
+Das Problem liegt vermutlich daran, dass eine der beiden messages(4 bzw. 8) minimal früher nichtmehr gesendet/empfangen wird. Mögliche Lösungsansetze sind es diesen hinteren Teil abzuschneiden oder von den Ungefähr 30 Erkennungen[(Beispiele)](BeepTestSounds\BeepTestSounds(5bit,bf1500,bw1000,signalBaeline3)hintergrundgeräsche.txt) die bei einem Signal vorliegen das auszuwählen das am häufigsten Erkannt wird.    
 
 ## Zukünftige Arbeiten
 Lösung der aktuellen Problemme  

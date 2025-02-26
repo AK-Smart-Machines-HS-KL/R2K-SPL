@@ -3,7 +3,8 @@
  *
  * This file declares a module that identifies the sound of a beep by
  * correlating with a number of frequencies.
- *
+ * WS 24/25 Changes
+ * added Protocol (10 Broadcast, 5 indivdul per Robot) uses SystemCall::say to say msg+sender robot
  * @author Wilhelm Simus (Winter 2022/23), Sandro Kloos (Winter 2024/25)
  */
 

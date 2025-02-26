@@ -2,7 +2,8 @@
  * @file BeepRecognizer.cpp
  *
  * This file implements a module that identifies the sound of a beep
- *
+ * WS 24/25 Changes
+ * added Protocol (10 Broadcast, 4 indivdul per Robot) uses SystemCall::say to say msg+sender robot
  * @author Wilhelm Simus,Sandro Kloos (Winter 2024/25)
  */
 
@@ -152,7 +153,7 @@ void BeepRecognizer::update(Beep &theBeep){
   //   SEND_DEBUG_IMAGE("module:BeepRecognizer", image);
   // }
 
-#ifdef NDEBUG
+#ifdef TARGET_ROBOT
 //say ausgabe aller messages
 if (theFrameInfo.getTimeSince(lastTimeWithBeep) >= maxTimeOutBetweenBeeps){
   lastTimeWithBeep = theFrameInfo.time;

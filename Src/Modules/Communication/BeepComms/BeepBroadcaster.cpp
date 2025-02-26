@@ -1,6 +1,9 @@
 /**
  * @file BeepBroadcaster.cpp
  * This file implements a module that provides the sending part of the audio communication system.
+ * WS 24/25 Changes
+ * added demo: targtet beeps in cycle(Bsp. 1-2-3-1-2-3...implemented in a way that 2-5 Robots should work(tested with 3))
+ * added ground detector beep(beeps when lifted "high" )
  * @author Nicolas Fortune, Andy Hobelsberger (Winter 2022/23), Sandro Kloos (Winter 2024/25)
  */
 
