@@ -1,0 +1,5 @@
+call Includes/Fast
+dr debugDrawing3d:representation:RobotInfo 
+dr debugDrawing3d:representation:TeamBallModel
+call ChallangeSetup
+

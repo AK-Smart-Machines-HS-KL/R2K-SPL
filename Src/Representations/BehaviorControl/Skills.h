@@ -372,6 +372,16 @@ namespace Skills
 
   /**
    * ACTION SKILL
+   * This Skill waits on its current position and Kicks once the Ball comes close
+   * 
+   * @param targetDirection The direction to which the ball should be kicked in robot-relative coordinates
+   * @param kickType The kick type that should be executed there
+   * @param length The desired length of the kick (works only for certain types of kicks)
+   */
+  //SKILL_INTERFACE(WaitforBallAndKick, (Angle) targetDirection, (KickInfo::KickType) kickType, (float)(std::numeric_limits<float>::max()) length);
+
+  /**
+   * ACTION SKILL
    * This skill walks very carefully to a kick pose and executes a kick there.
    * Specifically made for penalty kicks
    * @param kickPose The pose at which the kick should be executed in robot-relative coordinates

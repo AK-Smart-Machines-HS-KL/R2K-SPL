@@ -100,7 +100,7 @@ class DefenseChaseBallCard : public DefenseChaseBallCardBase
 
   option
   {
-    theActivitySkill(BehaviorStatus::defenseChaseBallCard);
+    // theActivitySkill(BehaviorStatus::defenseChaseBallCard);
 
    initial_state(goToBallAndDribble)
     {
