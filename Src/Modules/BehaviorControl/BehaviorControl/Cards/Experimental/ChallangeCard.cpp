@@ -2,15 +2,21 @@
  * @file ChallangeCard.cpp
  * @author Dennis Fuhrmann
  * @brief Card for R2k Ball Challange 2025
- *        In this Card the Ball is not aktually kicked,
- *        instead a walk into the Ball is performed to "fake" a kick forward.
- *        TODO Live Test with Real robots
+ *        Final approach: instead of a regular kick, we use "stumbling", 
+ *        i.e. a walk into the ball is performed to "fake" a kick forward.
+ *        
  * 
- *        version 1.1 The Interceptpoint can no longer be behind the Robot
- * @version 1.2
- * @date 2025-29-01
+ * @version 1.1 calcInterceptpoint() berechnet den relativen Punkt den der Roboter anlaufen muss, um den Ball zu "kicken".
+ *              Dieser Punkt wird  noch um den Wert interceptOffset erhöht damit der Punkt hinter dem Ball liegt und ein Lauf in den Ball
+ *              mehr mach einem Kick aussieht.
+ * @version 1.2 Diskrepanz zwichen Simulator und echten Nao erfordern spiegelung der x,y-Koordinaten des InterceptPoint
+ * @date 2025-04-03
  *
- *
+ * 
+ * Future work (as of 3/3´/25)
+ * - to migrate this card into a two player corner kick we need to add theGameInfo.setPlay != SET_PLAY_CORNER_KICK to pre-cond, and 
+ *   verify, there is enough time for the kick to be excuted
+ * - clean up: theActivitySkill(BehaviorStatus::ownFreeKick);
  */
 
  // Skills - Must be included BEFORE Card Base
@@ -49,15 +55,17 @@ CARD(ChallangeCard,
        REQUIRES(BallModel),
        REQUIRES(BallSpecification),
        
-       
+    
        DEFINES_PARAMETERS(
       {,
+         (int)(7000) timeOut, // controls pre and postcondition, how long ago the Ball had to be visible  
          (Vector2f)(Vector2f(200.f,0.f)) interceptPoint, // just a few steps forward 
          (bool)(false) pointIsSelected, // InterceptPoint wird nur einmal berechnet
          (float)(1.2f) interceptFactor, // veringere diesen Wert um den Ball früher in seiner Lufbahn zu intercepten
          (float)(1.0f) minDistanceFactor, // eröhe diesen Wert um den distanz zu erhöhen die der Ball unterschreiten muss damit der Roboter reagiert
-         (bool)(false) done,        
-         (bool)(false) walking,     // Kümmert sich um die Beendung der Card
+         (float)(100.0f) interceptOffset, // sowohl x und y Werte sind betroffen
+         (Angle)(Angle(30_deg)) goalOffset, // needed so the Nao actually looks at the goal and not the goal post, Offset is relative to goal post
+         (Angle)(Angle(2_deg)) goalPrecision, // (suggested Value) how precice the Nao turn towards the goal 
       }),
       
     });
@@ -69,18 +77,18 @@ class ChallangeCard : public ChallangeCardBase
     //always active
     bool preconditions() const override
     {
-        return theFieldBall.timeSinceBallWasSeen < 7000;
+        return theFieldBall.timeSinceBallWasSeen < timeOut;
     }
 
     bool postconditions() const override
     {
-      return  !(theFieldBall.timeSinceBallWasSeen < 7000) || !done;
+      return  !preconditions();
 
     }
 
     void execute() override
     {
-     // theActivitySkill(BehaviorStatus::testingBehavior);
+      theActivitySkill(BehaviorStatus::ownFreeKick);
 
      
 
@@ -92,37 +100,33 @@ class ChallangeCard : public ChallangeCardBase
              
             // InterceptPoint wird nur einmal berechnet
           if (!pointIsSelected) {
-            theActivitySkill(BehaviorStatus::teachin);
+            
             interceptPoint = calcInterceptPoint();
             pointIsSelected = true;
-            OUTPUT_TEXT("x = " << std::to_string(interceptPoint.x()) << ", y = " << std::to_string(interceptPoint.y()));
           }
               //Die Kick Skills sind nicht schnell genug um einen rollenden Ball zu intercepten stadesssen nutzen wir einen Lauf in den Ball rein um einen Kick zu simulieren
              theWalkToPointSkill(Pose2f(0_deg, interceptPoint), 1.f, true, true, true, true);
              theLookAtBallSkill(); // HeadMotion controll
-             walking = true;
           
 
 
         }else
         {
-          if (walking = true)
-          {
-            done = true;
-          }
-          theTurnAngleSkill(calcAngleToGoal() + 30_deg, 2_deg);
+          
+          theTurnAngleSkill(calcAngleToGoal() + goalOffset, goalPrecision);
           theLookAtBallSkill();
         }
       
       
     }
-
+    // kopiert aus CornerKick
     Angle calcAngleToGoal() const
     {
       return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
     }
 
-    //Altenativ TimetoReachBall benutzen (konnte nicht herausfinden wie)  
+    // Altenativ TimetoReachBall benutzen (konnte nicht herausfinden wie)  
+    // relativer Abstand nach Pytagoras
     float calcDistanceToBall() const
     {
       Vector2f temp1 = theFieldBall.recentBallPositionRelative();
@@ -131,16 +135,16 @@ class ChallangeCard : public ChallangeCardBase
       return std::sqrt(temp2 + temp3);
     }
 
-    //relative InterceptPoint wird berechnet durch propagateBallPosition und einem Festen Offset für einen besseren Schritt in den Ball, ifdef weil es unterschiedliche ergebnisse beim Simulator und im echten Roboter gibt
+   
+    // ifdef weil es unterschiedliche ergebnisse beim Simulator und im echten Roboter gibt
     Vector2f calcInterceptPoint() const
     {
       Vector2f temp = BallPhysics::propagateBallPosition(theFieldBall.recentBallPositionOnField(), theBallModel.estimate.velocity, interceptFactor, theBallSpecification.friction);
-      Vector2f result = Vector2f::Zero();
       //Für den Fehler beim echten Roboter (die Werte sind invertiert)
 #ifdef TARGET_ROBOT
-      result = Vector2f(-(temp.x() + 100.f), -(temp.y() + 100.f));
+      Vector2f result = Vector2f(-(temp.x() + interceptOffset), -(temp.y() + interceptOffset));
 #else
-      result = Vector2f((temp.x() + 100.f), (temp.y() + 100.f));
+      Vector2f result = Vector2f((temp.x() + interceptOffset), (temp.y() + interceptOffset));
 #endif //Simulator
       return result;
     }
@@ -149,11 +153,13 @@ class ChallangeCard : public ChallangeCardBase
     //berechnet den Schwellwert für die Distance zum Ball anhand der Geschwnidkeit des Balls
     float calcMinDistance() const
     {
+      // Geschwindigkeit des Balls durch Pythagoras
       Vector2f temp1 = theBallModel.estimate.velocity;
       float temp2 = temp1.x() * temp1.x();
       float temp3 = temp1.y() * temp1.y();
       float result = std::sqrt(temp2 + temp3);
       float distance = 0.f;
+      // Ball stands still inclusive assumed sensor jitter
         if (result >= 1) {
           distance = Geometry::getDistanceToLine(Geometry::Line(theFieldBall.recentBallPositionRelative(), temp1), Vector2f::Zero());
         }
