@@ -13,6 +13,7 @@
  * v1.3 Added online and offline role assignment(Asrar)
  * v1.4 (Asrar) card is  for  ballWasSeenStickyPeriod (5000msec), i.e., bot assumes ball to be at the last-seen position
  *                 Applied this parameter by changing the postcondition().
+ * v1.5 Target is opponent penaly mark; assuming a body is waiting there (Adrian, 3/25)
  */
 
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
@@ -96,11 +97,11 @@ class OwnCornerKickCard : public OwnCornerKickCardBase
       leftFoot = theFieldBall.positionRelative.y() < 0;
     }
     KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
-    theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true);
+    theGoToBallAndKickSkill(calcAngleToOppPenaltyMark(), kickType, true);
   }
-  Angle calcAngleToGoal() const
+  Angle calcAngleToOppPenaltyMark() const
   {
-    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGoalArea, 0.f)).angle();
+    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentPenaltyMark, 0.f)).angle();
   }
 };
 
