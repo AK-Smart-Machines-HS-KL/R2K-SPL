@@ -1,13 +1,12 @@
 # Whistle Identification Optimization
 
-## Beschreibung
-Bei Turnieren im Rahmen der vergangenen RoboCup-Wettbewerbe ist aufgefallen, dass unsere Roboter zwar recht gut darin sind, die verwendeten Whistles zu erkennen (wenige bis gar keine False Negatives, Erkennung von 60-70% aller Whistles im Spiel), aber einige Geräusche zu viel als solche interpretieren (einiges an False Positives).
+## Beschreibung des Problems
+Bei vergangenen RoboCup-Wettbewerben ist aufgefallen, dass unsere Roboter zwar recht gut darin sind, die verwendeten Whistles zu erkennen (wenige bis gar keine False Negatives, Erkennung von 60-70% aller Whistles im Spiel), aber andere Geräusche zu viel als solche interpretieren (einige False Positives).
 
-Um False Positives zu vermeiden, soll in diesem Projekt die Signatur verwendeter Whistles (mit FFTs) untersucht werden, um festzustellen, ob und wenn ja, welche weiteren Optimierungen nötig/möglich sind, damit Störgeräusche (z.B. Kinderjauchzen) gefiltert werden können.
+Um False Positives zu vermeiden, soll in diesem Projekt die Signatur verwendeter Whistles (mit FFTs) untersucht werden, um festzustellen, welche weiteren Optimierungen nötig/möglich sind, damit Störgeräusche (z.B. Kinderjauchzen) gefiltert werden können.
 
 ## Projektziel
-Das Hauptziel dieses Projekts ist die Verbesserung der Identifikation der Pfeiffenerkennung. Spezifische Herausforderungen, die gelöst werden sollen, sind zu viele falsch-positive Erkennungen, z.B. Pfeifen von Nachbarfeldern. Als erster Schritt wird das Abfangen von falsch-positiven Erkennungen durch die Dynamik des Gamecontrollers umgesetzt.
-
+Das Hauptziel dieses Projekts ist die Verbesserung der Identifikation der Pfeiffenerkennung. Die Herausforderungen, die gelöst werden sollen, sind zu viele falsch-positive Erkennungen, z.B. Pfeifen von Nachbarfeldern. 
 ## Ansatz
 Der bestehende Whistle-Detection-Code (zu finden in den Dateien `WhistleRecognition.cpp` und `.h`) wird verwendet, um versehentliche Pfeifenaufnahmen von benachbarten Feldern von "unserer" Pfeife zu unterscheiden. Dies soll zunächst über die Dynamik des Spielablaufes geschehen.
 
@@ -17,12 +16,12 @@ Wie erkennen wir "unsere" Pfeife:
 3. Ab dem Zeitpunkt, an dem der GameController offiziell den Spielstatus PLAYING ausruft, wird im Code zurückgerechnet, welche der detektierten Pfeifen die beste absolute Zeitdifferenz aufweist. Die Pfeife mit der geringsten Zeitdifferenz wird als String in `closestWhistle` gespeichert (siehe Diagramm unten).
 
 ## Diagramm zum Ansatz
-Das Diagramm beschreibt den derzeitigen Programfluss der Whistle Detection. Für die zwei Teilschritte wurden die "grün" markierten Bereiche des Codes im WhistleRecognizer.cpp verändert. Die WhistleRecognizer.h wurde zum Speichern der Besten "Correlations" und der "ClosestWhistle" um den <string,int>Vectoer "WhistleTimes" und den string "closestWhistle" erweitert.
+Das Diagramm beschreibt und veranschaulicht den derzeitigen Programfluss der Whistle Detection. Für die zwei Teilschritte wurden nur die "grün" markierten Bereiche des Codes im WhistleRecognizer.cpp verändert. Die WhistleRecognizer.h wurde zum Speichern der Besten "Correlations" und der "ClosestWhistle" um den <string,int>Vectoer "WhistleTimes" und den string "closestWhistle" erweitert.
 
 ![diagram12 2 2025-15_03_09](https://github.com/user-attachments/assets/cd4a0b9c-43d8-4cd3-aeae-c215b1807311)
 
-## Funktionalitäten
-Die Hauptfunktionen des Projekts umfassen die Funktionen der FFTW3 Library sowie die bereits vorhandene Update- und Correlate-Funktion aus `WhistleRecognizer.cpp` und `.h`. Spezielle Algorithmen, die verwendet werden, sind die Fast Fourier Transformation (FFT) und die Diskrete Fourier Transformation (DFT).
+## Funktionen
+Die Hauptfunktionen des Projekts sind die Funktionen der FFTW3 Library sowie die bereits vorhandene Update- und Correlate-Funktion aus `WhistleRecognizer.cpp` und `.h`. Spezielle Algorithmen, die verwendet werden, sind die Fast Fourier Transformation (FFT) und die Diskrete Fourier Transformation (DFT).
 
 ## Kontaktinformationen
 Der Hauptverantwortliche für das Projekt ist Dimitri Feuerstein. Kontakt: E-Mail: dipa1001@stud.hs-kl.de.
@@ -32,8 +31,8 @@ Der Hauptverantwortliche für das Projekt ist Dimitri Feuerstein. Kontakt: E-Mai
 ## Dokumentierter Fortschritt
 
 ### Teilschritt 1
-Getestet wurde mit zwei unterschiedlichen Pfeifen durch zwei unterschiedliche Videos auf YouTube. Einmal Fox40 Classic und einmal Fox Black.
-Bedingt durch den Testablauf und der Zeit die der NAO an ist ergeben sich unterschiedliche Werte für 'mindiff'.
+Getestet wurde mit zwei unterschiedlichen Pfeifen aus zwei unterschiedlichen Videos auf YouTube. Einmal Fox40 Classic und einmal Fox Black.
+Bedingt durch den Testablauf und der Zeit die der NAO angeschaltet ist ergeben sich unterschiedliche Werte für 'mindiff'.
 
 #### Szenarien bedingt durch Testablauf
 1. **Abspielen der Pfeife bevor "Playing" im Gamecontroller gestartet wird:**
@@ -86,10 +85,10 @@ if (theGameInfo.state == STATE_PLAYING && closestWhistle.empty())
 ![Screenshot 2025-01-30 180049](https://github.com/user-attachments/assets/5f48a547-0961-413e-92d7-935066cad062)
 
 #### Ergebnisse
-Die beiden Tests zeigen, dass die Pfeifen erkannt werden und die Pfeife mit der minimalsten Zeit zwischen Spielfreigabe des Gamecontrollers -15 Sekunden gewählt wird. Hier wurde zudem beim Testen mit [Video 1](https://www.youtube.com/watch?v=Q3EYBVUgcXo&ab_channel=fox40world) festgestellt, dass bei der Fox Black auch andere Pfeifen die Fox Blue oder Fox Silver erkannt werden, was auf sehr ähnliches Spektrum oder einen schlechtes Sample hinweisen könnte.
+Die beiden Tests zeigen, dass die Pfeifen erkannt werden und die Pfeife mit der minimalsten Zeit zwischen Spielfreigabe des Gamecontrollers -15 Sekunden gewählt wird. Hier wurde zudem beim Testen mit [Video 1](https://www.youtube.com/watch?v=Q3EYBVUgcXo&ab_channel=fox40world) festgestellt, dass bei der Fox Black auch andere Pfeifen wie die Fox Blue oder die Fox Silver erkannt werden, was auf ein sehr ähnliches Spektrum oder eine schlechtes Sample hinweisen könnte.
 
 ### Teilschritt 2
-Das Ziel in diesem Teilschritt ist, dass nur noch die Pfeifen mit demselben Namen wie die in Teilschritt 1 gefundene `closestWhistle` vom NAO erkannt werden. Alle anderen sollen für die gesamte Zeit, in der der NAO nicht rebootet wird, erhalten bleiben.
+Das Ziel in dem zweiten Teilschritt ist es, dass nur noch die Pfeifen mit demselben Namen wie die in Teilschritt 1 gefundene `closestWhistle` vom NAO erkannt werden. Alle anderen sollen für die gesamte Zeit, in der der NAO nicht rebootet wird, erhalten bleiben.
 
 #### Code Snippets Teilschritt 2
 
@@ -115,7 +114,7 @@ Ein großer Zeitsprung zwischen den beiden erkannten Pfeifen oberhalb und unterh
 #### Schlussfolgerung
 Der `WhistleRecognizer`-Modul wurde erfolgreich erweitert, um nur die Pfeifen mit demselben Namen wie die gefundene `closestWhistle` zu erkennen. Die Tests zeigen, dass das Modul korrekt funktioniert und die gewünschten Pfeifen erkennt.
 
-## Testenaufbau
+## Testaufbau
 
 Das Testen des Codes ist am einfachsten mit einem funktionierenden [Game Controller](https://github.com/AK-Smart-Machines-HS-KL/R2K-SPL/wiki/Real-RoboCup-Matches#gamecontroller). Beim Starten ist zu beachten, dass auf einer Seite das R2K-Team gewählt wird und als Verbindungsmodus WLAN ausgewählt wird. Die Verbindung kann vorher im Bus mit der Einstellung "Wifi" getestet werden - Einstellungen findet ihr [hier](https://github.com/AK-Smart-Machines-HS-KL/R2K-SPL/wiki/Real-RoboCup-Matches#roboter-deployenverbinden). Es wird empfohlen, den Bot im Bus auf den mittleren Platz #3 zu setzen.
 
@@ -127,15 +126,6 @@ Wenn der Nao im Entwicklungsmodus bereitgestellt wurde, kann gleichzeitig der Si
 
 Die Whistle Detection läuft auf ihrem eigenen Thread, das heißt, wenn die Eingangsvoraussetzungen – Spielstatus ist SET oder PLAYING – erfüllt sind, sollten, -falls der Code funktioniert- die Pfeifen erkannt werden.
 
-## Derzeitige Blocker / Probleme
-- [x] ~~Ausführung von: dr module:WhistleRecognizer:record~~
-- [x] ~~Code Compelierung~~ // Lösung hier war, die Error Ausgaben von VisualStudioCode zu ignorieren und nur die Errors in der Konsole von oben nach unten zu beseitigen.
-- [x] ~~nutzen des STREAMABLE Makros zum Schreiben des Spectrums von der "TrueWhistle"~~
-- [x] ~~folgt aus dem Punkt darüber. NAO ERROR LOG: '11:50:45 /mnt/c/Development/R2K-SPL/Src/Platform/File.cpp:54: VERIFY(!eof()) failed'~~
-- [x] ~~Verwendung eines Gamecontrollers hat im ersten Anlauf nicht funktioniert~~ // Lösung für das Problem war das eine der Einstellung der Gamecontroller Executable vor dem Start zwingenderweise WLAN sein musste. Diese Information wurde im Wiki nicht gefunden.
-- [x] ~~Keine Ausgaben auf die Konsole nachdem der Gamecontroller gestartet wurde. Vermutung fehlerhafter Code, weil auch keine Annotations in die Logs geschrieben wurden~~ // Ein Logikfehler im Code hatte dazu geführt das die IF-Statements im Code in denen die Konsolenausgaben und Annotations enthalten waren nicht erreicht wurden.
-
-
 ## Mögliche zukünftige Entwicklungen 
 
 ### Hanning-Fensterfunktionen
@@ -146,8 +136,7 @@ Ein Hanning-Fenster ist eine spezielle Fensterfunktion, die verwendet wird, um d
 ### Passfilter
 
 Passfilter sind eine grundlegende Technik in der Signalverarbeitung, die dazu dient, bestimmte Frequenzbereiche eines Signals zu isolieren oder zu unterdrücken. In der Whistle Detection können Passfilter verwendet werden, um die relevanten Frequenzbereiche des Pfeifsignals zu isolieren und störende Frequenzen zu unterdrücken. Dies hilft, das Signal-Rausch-Verhältnis (SNR) zu verbessern und die Erkennung des Pfeifsignals zu erleichtern.
-
-Passfilter arbeiten, indem sie das Eingangssignal durch eine mathematische Funktion leiten, die bestimmte Frequenzen durchlässt und andere unterdrückt. Ein Bandpassfilter ist nützlich für die Whistle Detection, da es nur die Frequenzen durchlässt, die typischerweise von einem Pfeifsignal erzeugt werden, und alle anderen Frequenzen unterdrückt. [Link](https://en.wikipedia.org/wiki/Band-pass_filter)
+Passfilter arbeiten, indem sie das Eingangssignal durch eine mathematische Funktion leiten, die bestimmte Frequenzen durchlässt und andere unterdrückt. [Link](https://en.wikipedia.org/wiki/Band-pass_filter)
 
 ### Neuronale Netzwerke
 
