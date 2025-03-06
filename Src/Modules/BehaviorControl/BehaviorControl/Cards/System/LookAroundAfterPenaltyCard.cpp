@@ -24,7 +24,7 @@ CARD(LookAroundAfterPenaltyCard,
   DEFINES_PARAMETERS(
   {,
     (int)(500) minDuration, /**< This card will be active for at least this duration after a robot has been unpenalized. */
-    (int)(3000) maxDuration, /**< This card will be left if the robot has been unpenalized for more than this duration. */
+    (int)(1500) maxDuration, /**< This card will be left if the robot has been unpenalized for more than this duration. */
   }),
 });
 
