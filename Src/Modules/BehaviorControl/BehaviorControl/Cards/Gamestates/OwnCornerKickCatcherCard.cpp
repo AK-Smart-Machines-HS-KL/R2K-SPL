@@ -3,13 +3,14 @@
  * @author Dennis Fuhrmann
  * @brief Card to recieve the Pass from OwnCornerKickCard.cpp and kick it into the Goal
  *          based on ChallangeCard.cpp from Branch 2025-03-IRB 
- *        
+ *        Second Half of this konzept. 
+ *        Performs the Kick into the Goal
  * 
- * @version 1.0 Copy of ChallangeCard.cpp and walk to OpponentPenaltyMark
- * 
+ * @version 1.0 Copy of ChallangeCard.cpp and walk to OpponentPenaltyMark and we don't assume  we already are at the korrekt position and continue walking to the Point
+ *              
  * @date 2025-06-03
  * 
- * future Work: Split this Card into two  - first one where the Catcher walks to the OpponentPenaltyArea
+ * future Work: Split this Card into two  - first one where the Catcher walks to the OpponentPenaltyArea (OwnCornerKickCatcherWalkInCard.cpp)
  *                                        - second one actually plays the Ball into the goal
  */
 
@@ -79,8 +80,9 @@
  
  class OwnCornerKickCatcherCard : public OwnCornerKickCatcherCardBase
  {
- 
-     
+
+      // Currently can't actually activate (is in gameStack normalPlay but has as condition play == Corner Kick)    
+  
      bool preconditions() const override
      {
          return !theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)  // I am not the striker
