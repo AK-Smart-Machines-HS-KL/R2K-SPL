@@ -8,9 +8,9 @@
  * @version 1.0 Copy of ChallangeCard.cpp and walk to OpponentPenaltyMark
  * 
  * @date 2025-06-03
- *
  * 
- * 
+ * future Work: Split this Card into two  - first one where the Catcher walks to the OpponentPenaltyArea
+ *                                        - second one actually plays the Ball into the goal
  */
 
  // Skills - Must be included BEFORE Card Base
@@ -64,7 +64,7 @@
      
         DEFINES_PARAMETERS(
        {,
-          (int)(15000) timeOut, // how long the Robot stays in the Card after COrnerKick is Done 
+          (int)(1500) timeOut, // how long the Robot stays in the Card after COrnerKick is Done (doesnt work GC takes priority over postconditions of Card)
           (Vector2f)(Vector2f(200.f,0.f)) interceptPoint, // just a few steps forward 
           (bool)(false) pointIsSelected, // InterceptPoint wird nur einmal berechnet
           (float)(1.2f) interceptFactor, // veringere diesen Wert um den Ball früher in seiner Lufbahn zu intercepten
