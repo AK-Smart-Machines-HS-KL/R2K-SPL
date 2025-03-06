@@ -1,0 +1,182 @@
+/**
+ * @file OwnCornerKickCatcherCard.cpp
+ * @author Dennis Fuhrmann
+ * @brief Card to recieve the Pass from OwnCornerKickCard.cpp and kick it into the Goal
+ *          based on ChallangeCard.cpp from Branch 2025-03-IRB 
+ *        
+ * 
+ * @version 1.0 Copy of ChallangeCard.cpp and walk to OpponentPenaltyMark
+ * 
+ * @date 2025-06-03
+ *
+ * 
+ * 
+ */
+
+ // Skills - Must be included BEFORE Card Base
+ #include "Representations/BehaviorControl/Skills.h"
+
+ // Card Base
+ #include "Tools/BehaviorControl/Framework/Card/Card.h"
+ #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
+ 
+ 
+ // Representations
+ #include "Representations/Configuration/FieldDimensions.h"
+ #include "Representations/BehaviorControl/FieldBall.h"
+ #include "Representations/Communication/TeamData.h"
+ #include "Representations/Modeling/BallModel.h"
+ #include "Representations/Configuration/BallSpecification.h"
+
+ #include "Representations/Communication/GameInfo.h"
+ #include "Representations/Communication/TeamInfo.h"
+ #include "Representations/Communication/RobotInfo.h"
+ #include "Representations/Communication/TeamCommStatus.h"
+ #include "Representations/BehaviorControl/PlayerRole.h"
+
+ 
+ //#include <filesystem>
+ #include "Tools/Modeling/BallPhysics.h"
+ #include "Tools/Math/Eigen.h"
+ #include "Tools/Math/Geometry.h"
+ 
+ 
+ 
+ CARD(OwnCornerKickCatcherCard,
+   {
+        ,
+        CALLS(Activity),
+        CALLS(WalkToPoint),
+        CALLS(LookAtBall),
+        CALLS(TurnAngle),
+        REQUIRES(FieldBall),
+        REQUIRES(RobotPose),
+        REQUIRES(FieldDimensions),
+        REQUIRES(GameInfo),
+        REQUIRES(RobotInfo),
+        REQUIRES(PlayerRole),
+        REQUIRES(OwnTeamInfo),
+        REQUIRES(TeammateRoles),
+        REQUIRES(BallModel),
+        REQUIRES(BallSpecification),
+        REQUIRES(TeamCommStatus), 
+        
+     
+        DEFINES_PARAMETERS(
+       {,
+          (int)(15000) timeOut, // how long the Robot stays in the Card after COrnerKick is Done 
+          (Vector2f)(Vector2f(200.f,0.f)) interceptPoint, // just a few steps forward 
+          (bool)(false) pointIsSelected, // InterceptPoint wird nur einmal berechnet
+          (float)(1.2f) interceptFactor, // veringere diesen Wert um den Ball früher in seiner Lufbahn zu intercepten
+          (float)(1.0f) minDistanceFactor, // eröhe diesen Wert um den distanz zu erhöhen die der Ball unterschreiten muss damit der Roboter reagiert
+          (float)(100.0f) interceptOffset, // sowohl x und y Werte sind betroffen
+          (Angle)(Angle(30_deg)) goalOffset, // needed so the Nao actually looks at the goal and not the goal post, Offset is relative to goal post
+          (Angle)(Angle(2_deg)) goalPrecision, // (suggested Value) how precice the Nao turn towards the goal 
+       }),
+       
+     });
+     
+ 
+ class OwnCornerKickCatcherCard : public OwnCornerKickCatcherCardBase
+ {
+ 
+     
+     bool preconditions() const override
+     {
+         return !theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)  // I am not the striker
+            &&  theGameInfo.setPlay == SET_PLAY_CORNER_KICK     
+            &&  theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber // ownCornerKick 
+            &&  theTeammateRoles.isTacticalOffense(theRobotInfo.number);
+     }
+ 
+     bool postconditions() const override
+     {
+       return  !preconditions() && theGameInfo.timeLastStateChange < timeOut;  
+     }
+ 
+     void execute() override
+     {
+       theActivitySkill(BehaviorStatus::ownFreeKick);
+ 
+      
+ 
+       //Berechnet die Distanz vom Roboter zum Balls 
+       float minDistance = calcMinDistance();
+       
+         if (calcDistanceToBall() <= minDistance) {
+           
+              
+             // InterceptPoint wird nur einmal berechnet
+           if (!pointIsSelected) {
+             
+             interceptPoint = calcInterceptPoint();
+             pointIsSelected = true;
+           }
+               //Die Kick Skills sind nicht schnell genug um einen rollenden Ball zu intercepten stadesssen nutzen wir einen Lauf in den Ball rein um einen Kick zu simulieren
+              theWalkToPointSkill(Pose2f(0_deg, interceptPoint), 1.f, true, true, true, true);
+              theLookAtBallSkill(); // HeadMotion controll
+           
+ 
+ 
+         }else if (theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyArea, 0)) != Vector2f::Zero())
+         {
+            theWalkToPointSkill(Pose2f(calcAngleToGoal() + goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyArea, 0))));
+            theLookAtBallSkill(); // head Motion Control
+         }else
+         {
+           
+           theTurnAngleSkill(calcAngleToGoal() + goalOffset, goalPrecision);
+           theLookAtBallSkill(); // head Motion Control
+         }
+       
+       
+     }
+     // kopiert aus CornerKick
+     Angle calcAngleToGoal() const
+     {
+       return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
+     }
+ 
+     // Altenativ TimetoReachBall benutzen (konnte nicht herausfinden wie)  
+     // relativer Abstand nach Pytagoras
+     float calcDistanceToBall() const
+     {
+       Vector2f temp1 = theFieldBall.recentBallPositionRelative();
+       float temp2 = temp1.x() * temp1.x();
+       float temp3 = temp1.y() * temp1.y();
+       return std::sqrt(temp2 + temp3);
+     }
+ 
+    
+     // ifdef weil es unterschiedliche ergebnisse beim Simulator und im echten Roboter gibt
+     Vector2f calcInterceptPoint() const
+     {
+       Vector2f temp = BallPhysics::propagateBallPosition(theFieldBall.recentBallPositionOnField(), theBallModel.estimate.velocity, interceptFactor, theBallSpecification.friction);
+       //Für den Fehler beim echten Roboter (die Werte sind invertiert)
+ #ifdef TARGET_ROBOT
+       Vector2f result = Vector2f(-(temp.x() + interceptOffset), -(temp.y() + interceptOffset));
+ #else
+       Vector2f result = Vector2f((temp.x() + interceptOffset), (temp.y() + interceptOffset));
+ #endif //Simulator
+       return result;
+     }
+ 
+ 
+     //berechnet den Schwellwert für die Distance zum Ball anhand der Geschwnidkeit des Balls
+     float calcMinDistance() const
+     {
+       // Geschwindigkeit des Balls durch Pythagoras
+       Vector2f temp1 = theBallModel.estimate.velocity;
+       float temp2 = temp1.x() * temp1.x();
+       float temp3 = temp1.y() * temp1.y();
+       float result = std::sqrt(temp2 + temp3);
+       float distance = 0.f;
+       // Ball stands still inclusive assumed sensor jitter
+         if (result >= 1) {
+           distance = Geometry::getDistanceToLine(Geometry::Line(theFieldBall.recentBallPositionRelative(), temp1), Vector2f::Zero());
+         }
+       return (result + distance) * minDistanceFactor;
+     }
+ };
+ 
+ MAKE_CARD(OwnCornerKickCatcherCard);
