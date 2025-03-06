@@ -8,7 +8,7 @@
  * @author Dennis Schuethe
  * @author Thomas Röfer
  * 
- * // file modifirf by Feuerstein Dimitri on january 2025
+ * modified by Feuerstein Dimitri on january 2025
  * 
  * The file was modified in such a way that it now only safes the whistle which is the closest according to theFrameInfo.time - 15 seconds.abort
  * After the initialization, the only this whistle will be heard by the robot and persists until a reboot of the NAO.
@@ -254,7 +254,7 @@ void WhistleRecognizer::update(Whistle &theWhistle)
     if (theGameInfo.state == STATE_PLAYING && closestWhistle.empty())
     {
       // Find the whistle closest to the STATE_PLAYING time
-      int playingTime = theFrameInfo.time - 15000; // time were game state playing - 15000 milliseconds = 15 seconds
+      int playingTime = theFrameInfo.time - timeOffset; // time were game state playing - 15000 milliseconds = 15 seconds
       int minDiff = std::numeric_limits<int>::max();
       for (const auto &whistleTime : whistleTimes)
       {

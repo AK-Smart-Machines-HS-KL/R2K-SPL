@@ -9,10 +9,13 @@
  * @author Thomas Röfer
  * 
  * 
- * // file modifirf by Feuerstein Dimitri on january 2025
- * 
- * std::vector<std::pair<std::string, int>> whistleTimes was added to stores all best whistles names and their detection times until STATE_PLAYING. 
- * std::string closestWhistle was added to store the whistle closest to STATE_PLAYING time.
+ * modified by Feuerstein Dimitri on january 2025: 
+ * prevent whistle recognizer from accepting a near-by, second whistle.
+ * 15sec after game state is PLAYING, the game controller confírms the own whistle.
+ * So, this code stores all whistles since, and then traces back the correct one.
+ * Added:
+ * std::vector<std::pair<std::string, int>> whistleTimes was added to note all best whistles names and their detection times until STATE_PLAYING. 
+ * std::string closestWhistle was added to note the whistle closest to STATE_PLAYING time.
  */
 
 #pragma once
@@ -53,6 +56,7 @@ MODULE(WhistleRecognizer,
     (int)accumulationDuration, /**< The duration over which correlations are collected before they are reported. */
     (int) minAnnotationDelay, /**< The minimum time between annotations announcing a detected whistle. */
     (bool)mute, /**< Deactivate sound output in game states in which a whistle could be detected. */
+    (int)timeOffset,
   }),
 });
 
