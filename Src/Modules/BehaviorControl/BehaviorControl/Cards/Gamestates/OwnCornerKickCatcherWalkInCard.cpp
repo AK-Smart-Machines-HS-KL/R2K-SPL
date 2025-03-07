@@ -1,10 +1,11 @@
 /**
  * @file OwnCornerKickCatcherWalkInCard.cpp
  * @author Dennis Fuhrmann
- * @brief Card to recieve the Pass from OwnCornerKickCard.cpp and kick it into the Goal
+ * @brief Card to recieve the Pass from OwnCornerKickCard.cpp and kick it into the goal
  *        based on ChallangeCard.cpp from Branch 2025-03-IRB 
  *        first half of this Konzept. 
- *        Robot Walks to target Location
+ *        Robot Walks to penalty point = target Location
+ *        to be in sync with OwnCornerKickCard.cpp
  *        
  * 
  * @version 1.0 Robot Walks to OpponentPenaltyArea during the Own Corner Kick Phase
@@ -21,7 +22,7 @@
  #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
  
  
- // Representations
+ 
  #include "Representations/Configuration/FieldDimensions.h"
  #include "Representations/Communication/TeamData.h"
 
@@ -31,7 +32,7 @@
  #include "Representations/Communication/TeamCommStatus.h"
 
  
- //#include <filesystem>
+ 
  #include "Tools/Math/Eigen.h"
  #include "Tools/Math/Geometry.h"
  
@@ -55,7 +56,8 @@
         
      
         DEFINES_PARAMETERS(
-       {,
+       {, 
+          (int)(100) targetOffset, // target behind penalty point 
           (Angle)(Angle(25_deg)) goalOffset, // needed so the Nao actually looks at the goal and not the goal post, Offset is relative to goal post
           (Angle)(Angle(2_deg)) goalPrecision, // (suggested Value) how precice the Nao turn towards the goal 
        }),
@@ -84,14 +86,14 @@
      {
        theActivitySkill(BehaviorStatus::ownFreeKick);
  
-         if (theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyArea, 0)) != Vector2f::Zero())
+         if (theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0)) != Vector2f::Zero())
          {
-            theWalkToPointSkill(Pose2f(calcAngleToGoal() + goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyArea, 0))));
+            theWalkToPointSkill(Pose2f(calcAngleToGoal(), theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset,  0))));
             theLookAtBallSkill(); // head Motion Control
          }else
          {
            
-           theTurnAngleSkill(calcAngleToGoal() + goalOffset, goalPrecision);
+           theTurnAngleSkill(calcAngleToGoal(), goalPrecision);
            theLookAtBallSkill(); // head Motion Control
          }
        

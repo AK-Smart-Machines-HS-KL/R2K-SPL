@@ -49,7 +49,7 @@
         CALLS(Activity),
         CALLS(WalkToPoint),
         CALLS(LookAtBall),
-        CALLS(TurnAngle),
+        CALLS(Stand),
         REQUIRES(FieldBall),
         REQUIRES(RobotPose),
         REQUIRES(FieldDimensions),
@@ -65,7 +65,8 @@
      
         DEFINES_PARAMETERS(
        {,
-          (int)(1500) timeOut, // how long the Robot stays in the Card after COrnerKick is Done (doesnt work GC takes priority over postconditions of Card)
+          (int)(100) targetOffset, // target behind penalty point
+          (int)(15) timeOut, // how long the Robot stays in the Card after COrnerKick is Done 
           (Vector2f)(Vector2f(200.f,0.f)) interceptPoint, // just a few steps forward 
           (bool)(false) pointIsSelected, // InterceptPoint wird nur einmal berechnet
           (float)(1.2f) interceptFactor, // veringere diesen Wert um den Ball früher in seiner Lufbahn zu intercepten
@@ -86,14 +87,13 @@
      bool preconditions() const override
      {
          return !theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)  // I am not the striker
-            &&  theGameInfo.setPlay == SET_PLAY_CORNER_KICK     
-            &&  theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber // ownCornerKick 
-            &&  theTeammateRoles.isTacticalOffense(theRobotInfo.number);
+            &&  theTeammateRoles.isTacticalOffense(theRobotInfo.number) // but i am Offence
+            &&  theGameInfo.timeLastStateChange < timeOut; // We came from Corner Kick 
      }
  
      bool postconditions() const override
      {
-       return  !preconditions() && theGameInfo.timeLastStateChange < timeOut;  
+       return  !preconditions();  
      }
  
      void execute() override
@@ -118,16 +118,16 @@
               theWalkToPointSkill(Pose2f(0_deg, interceptPoint), 1.f, true, true, true, true);
               theLookAtBallSkill(); // HeadMotion controll
            
- 
- 
-         }else if (theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyArea, 0)) != Vector2f::Zero())
+            // we don't assume we already are at the correkt position
+              
+         }else if (theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0)) != Vector2f::Zero())
          {
-            theWalkToPointSkill(Pose2f(calcAngleToGoal() + goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyArea, 0))));
+            theWalkToPointSkill(Pose2f(calcAngleToGoal(), theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
             theLookAtBallSkill(); // head Motion Control
          }else
          {
            
-           theTurnAngleSkill(calcAngleToGoal() + goalOffset, goalPrecision);
+           theStandSkill();
            theLookAtBallSkill(); // head Motion Control
          }
        
