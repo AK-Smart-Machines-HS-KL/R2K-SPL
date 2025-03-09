@@ -190,9 +190,9 @@ private:
             // 3 player
                 { {GN,DM,OM,UN,UN}, {GN,DR,DM,UN,UN}, {GA,DM,OM,UN,UN}, {GN,OR,OM,UN,UN} },
                 // 4 player
-                    { {GN,DM,OR,OM,UN}, {GN,DR,DL,OM,UN}, {GA,DM,DL,OM,UN}, {GN,DM,OL,OM,UN} },
+                    { {GN,DM,OR,OM,UN}, {GN,DR,DL,OM,UN}, {GA,DM,OL,OR,UN}, {GN,DM,OL,OM,UN} },
                     // 5 player
-                        { {GN,DR,DL,OR,OL}, {GN,DR,DL,DM,OM}, {GA,DM,DL,OR,OM}, {GN,DM,OL,OR,OM} }
+                        { {GN,DR,DL,OR,OL}, {GN,DR,DL,DM,OM}, {GA,DM,OL,OR,OM}, {GN,DM,OL,OR,OM} }
 
 
     };

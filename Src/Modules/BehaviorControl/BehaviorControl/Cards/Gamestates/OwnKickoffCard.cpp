@@ -65,6 +65,7 @@ class OwnKickoffCard : public OwnKickoffCardBase
   /**
    * @brief all tactical offense try to kick the ball
    * 
+   */
   bool preconditions() const override
   {
     return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
@@ -88,13 +89,15 @@ class OwnKickoffCard : public OwnKickoffCardBase
       footIsSelected = true;
       leftFoot = theFieldBall.positionRelative.y() < 0;
     }
-    KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeftLong : KickInfo::forwardFastRightLong;
-    theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true); 
+    KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
+    theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true, 3000); 
     }
  
   Angle calcAngleToGoal() const
   {
-    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
+    // return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, -3000.f)).angle();
+    return (theRobotPose.inversePose * Vector2f(2000, -2000.f)).angle();
+
   }
 };
 
