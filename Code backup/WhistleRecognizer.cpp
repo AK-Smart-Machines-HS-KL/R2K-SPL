@@ -1,19 +1,3 @@
-/**
- * @file WhistleRecognizer.cpp
- *
- * This file implements a module that identifies the sound of a whistle by
- * correlating with a number of templates.
- *
- * @author Tim Laue
- * @author Dennis Schuethe
- * @author Thomas Röfer
- * 
- * modified by Feuerstein Dimitri on january 2025
- * 
- * The file was modified in such a way that it now only safes the whistle which is the closest according to theFrameInfo.time - 15 seconds.abort
- * After the initialization, the only this whistle will be heard by the robot and persists until a reboot of the NAO.
- */
-
 #include "WhistleRecognizer.h"
 #include "Platform/SystemCall.h"
 #include "Platform/Thread.h"
@@ -23,7 +7,10 @@
 #include <algorithm>
 #include <limits>
 #include <type_traits>
-#include <chrono>
+#include <cstring>
+#include <iostream>
+#include <cstdio>
+#include <cstdlib>
 
 MAKE_MODULE(WhistleRecognizer, modeling);
 
@@ -34,7 +21,7 @@ WhistleRecognizer::WhistleRecognizer()
   canvas.setResolution(bufferSize + 1, bufferSize * 2 / 3);
 
   // Load whistle signatures
-  for (const std::string &fileName : whistles)
+  for (const std::string& fileName : whistles)
   {
     InBinaryFile stream("Whistles/" + fileName + ".dat");
     ASSERT(stream.exists());
@@ -52,6 +39,12 @@ WhistleRecognizer::WhistleRecognizer()
   SYNC;
   fft = fftw_plan_dft_r2c_1d(bufferSize * 2, samples, spectrum, FFTW_MEASURE);
   ifft = fftw_plan_dft_c2r_1d(bufferSize * 2, spectrum, correlation, FFTW_MEASURE);
+
+  // Dimitri: Hier ist es nicht sicher ob die FFTW_Plans erstellt werden deswegen hier eine Abfrage um sicher zu gehen das dies geschieht
+  if (!fft || !ifft)
+  {
+    OUTPUT_TEXT("Failed to create FFTW plans.");
+  }
 }
 
 WhistleRecognizer::~WhistleRecognizer()
@@ -64,7 +57,7 @@ WhistleRecognizer::~WhistleRecognizer()
   fftw_free(samples);
 }
 
-void WhistleRecognizer::update(Whistle &theWhistle)
+void WhistleRecognizer::update(Whistle& theWhistle)
 {
   DECLARE_PLOT("module:WhistleRecognizer:correlation0");
   DECLARE_PLOT("module:WhistleRecognizer:correlation1");
@@ -88,7 +81,7 @@ void WhistleRecognizer::update(Whistle &theWhistle)
 
   // Adapt number of channels to audio data.
   buffers.resize(theAudioData.channels);
-  for (auto &buffer : buffers)
+  for (auto& buffer : buffers)
     buffer.reserve(bufferSize);
 
   // Append current samples to buffers and sample down if necessary
@@ -118,11 +111,10 @@ void WhistleRecognizer::update(Whistle &theWhistle)
   std::string selectedName = "newWhistle";
   MODIFY("module:WhistleRecognizer:select", selectedName);
   auto selectedIter = std::find_if(signatures.begin(), signatures.end(),
-                                   [&selectedName](const Signature &signature)
-                                   { return signature.name == selectedName; });
+    [&selectedName](const Signature& signature) {return signature.name == selectedName; });
 
   // Record a whistle.
-  DEBUG_RESPONSE_ONCE("module:WhistleRecognizer:record")
+  DEBUG_RESPONSE_ONCE("module:WhistleRecognizer:record");
   {
     if (buffers[firstBuffer].full())
     {
@@ -141,6 +133,7 @@ void WhistleRecognizer::update(Whistle &theWhistle)
         if (stream.exists())
         {
           stream << *selectedIter;
+          OUTPUT_TEXT("Recorded whistle " << selectedName << " with selfCorrelation = " << signature.selfCorrelation);
         }
       }
     }
@@ -150,18 +143,10 @@ void WhistleRecognizer::update(Whistle &theWhistle)
     if (!buffers[i].empty())
       switch (i)
       {
-      case 0:
-        PLOT("module:WhistleRecognizer:samples0", buffers[i].back());
-        break;
-      case 1:
-        PLOT("module:WhistleRecognizer:samples1", buffers[i].back());
-        break;
-      case 2:
-        PLOT("module:WhistleRecognizer:samples2", buffers[i].back());
-        break;
-      case 3:
-        PLOT("module:WhistleRecognizer:samples3", buffers[i].back());
-        break;
+      case 0: PLOT("module:WhistleRecognizer:samples0", buffers[i].back()); break;
+      case 1: PLOT("module:WhistleRecognizer:samples1", buffers[i].back()); break;
+      case 2: PLOT("module:WhistleRecognizer:samples2", buffers[i].back()); break;
+      case 3: PLOT("module:WhistleRecognizer:samples3", buffers[i].back()); break;
       }
 
   // Correlate all channels with all signatures or only one if selectedName matches a whistle.
@@ -173,27 +158,21 @@ void WhistleRecognizer::update(Whistle &theWhistle)
       if (selectedIter != signatures.end())
         for (unsigned x = 0; x < selectedIter->spectrum.size(); ++x)
         {
-          const Vector2d &complex = selectedIter->spectrum[x];
+          const Vector2d& complex = selectedIter->spectrum[x];
           const unsigned amplitude = std::min(static_cast<unsigned>(complex.norm()), canvas.height);
           if (amplitude > 0)
           {
             const PixelTypes::Edge2Pixel pixel(static_cast<char>(128 + 127 * complex.x() / amplitude),
-                                               static_cast<char>(128 + 127 * complex.y() / amplitude));
+              static_cast<char>(128 + 127 * complex.y() / amplitude));
             for (size_t y = 0; y < amplitude; ++y)
               canvas[y][x] = pixel;
           }
         }
     }
 
-    const Signature *bestSignature = nullptr;
+    const Signature* bestSignature = nullptr;
 
-    for (auto &signature : signatures)
-    { // Only correlate with the closestWhistle if it has been found
-      if (!closestWhistle.empty() && signature.name != closestWhistle)
-      {
-        continue;
-      }
-
+    for (auto& signature : signatures)
       if (selectedIter == signatures.end() || &signature == &*selectedIter)
       {
         size_t defects = 0;
@@ -218,69 +197,31 @@ void WhistleRecognizer::update(Whistle &theWhistle)
             theWhistle.confidenceOfLastWhistleDetection = correlation;
             theWhistle.channelsUsedForWhistleDetection = static_cast<unsigned char>(buffers.size() - defects);
             bestCorrelation = correlation;
+            signature.timestamp = theFrameInfo.time;
             bestSignature = &signature;
           }
 
           switch (&signature - signatures.data())
           {
-          case 0:
-            PLOT("module:WhistleRecognizer:correlation0", correlation);
-            break;
-          case 1:
-            PLOT("module:WhistleRecognizer:correlation1", correlation);
-            break;
-          case 2:
-            PLOT("module:WhistleRecognizer:correlation2", correlation);
-            break;
-          case 3:
-            PLOT("module:WhistleRecognizer:correlation3", correlation);
-            break;
-          case 4:
-            PLOT("module:WhistleRecognizer:correlation4", correlation);
-            break;
-          default:
-            PLOT("module:WhistleRecognizer:correlation5", correlation);
-            break;
+          case 0: PLOT("module:WhistleRecognizer:correlation0", correlation); break;
+          case 1: PLOT("module:WhistleRecognizer:correlation1", correlation); break;
+          case 2: PLOT("module:WhistleRecognizer:correlation2", correlation); break;
+          case 3: PLOT("module:WhistleRecognizer:correlation3", correlation); break;
+          case 4: PLOT("module:WhistleRecognizer:correlation4", correlation); break;
+          default: PLOT("module:WhistleRecognizer:correlation5", correlation); break;
           }
         }
       }
-    }
 
     if (bestSignature)
     {
-
-      whistleTimes.emplace_back(bestSignature->name, theFrameInfo.time);
-    }
-    if (theGameInfo.state == STATE_PLAYING && closestWhistle.empty())
-    {
-      // Find the whistle closest to the STATE_PLAYING time
-      int playingTime = theFrameInfo.time - timeOffset; // time were game state playing - 15000 milliseconds = 15 seconds
-      int minDiff = std::numeric_limits<int>::max();
-      for (const auto &whistleTime : whistleTimes)
-      {
-        int diff = std::abs(whistleTime.second - playingTime);
-        if (diff < minDiff)
-        {
-          minDiff = diff;
-          closestWhistle = whistleTime.first;
-        }
-      }
-      // Get the current time
-      auto now = std::chrono::steady_clock::now();
-      auto lastAnnotationTime = now;
-
-      // Check if 5 seconds have passed since the last annotation
-      if (std::chrono::duration_cast<std::chrono::seconds>(now - lastAnnotationTime).count() >= 5)
-      {
-        ANNOTATION("WhistleRecognizer", "Whistle: " << closestWhistle << " found as closest Whistle");
-        ANNOTATION("WhistleRecognizer", "mindiff: " << minDiff << " difference in milliseconds");
-
-        // Update the last annotation time
-        lastAnnotationTime = now;
-      }
+      if (theFrameInfo.getTimeSince(theWhistle.lastTimeWhistleDetected) > minAnnotationDelay)
+        ANNOTATION("WhistleRecognizer", bestSignature->name << " with " << static_cast<int>(bestCorrelation * 100.f) << "%");
+      theWhistle.lastTimeWhistleDetected = theFrameInfo.time;
+      bestSignatures.push_back(*bestSignature);
     }
 
-    samplesRequired = static_cast<unsigned>(bufferSize * newSampleRatio);
+    samplesRequired = static_cast<unsigned>(bufferSize);
   }
 
   // Reset best correlation after it was sent in two network packets.
@@ -291,36 +232,89 @@ void WhistleRecognizer::update(Whistle &theWhistle)
     soundWasPlaying = SystemCall::soundIsPlaying();
   }
 
-  DEBUG_RESPONSE_ONCE("module:WhistleRecognizer:detectNow")
+  DEBUG_RESPONSE_ONCE("module:WhistleRecognizer:detectNow");
   {
     theWhistle.lastTimeWhistleDetected = theFrameInfo.time;
     theWhistle.confidenceOfLastWhistleDetection = 2.f;
   }
 
   SEND_DEBUG_IMAGE("module:WhistleRecognizer:spectra", canvas, PixelTypes::Edge2);
+
+  // Analyze whistle events when the state changes to PLAYING
+  if (theGameInfo.state == STATE_PLAYING)
+  {
+    const Signature* bestSigTime = nullptr;
+    float bestSigCorrelation = 0.f;
+    unsigned bestTimeDifference = std::numeric_limits<unsigned>::max(); // Initialize with a large value
+
+    // Check if bestSignatures is not empty
+    if (!bestSignatures.empty())
+    {
+      // Assign the first element of bestSignatures to bestSigTime
+      bestSigTime = &bestSignatures[0];
+    }
+
+    for (const auto& bestSig : bestSignatures)
+    {
+      unsigned timeDifference = std::abs(static_cast<int>(theWhistle.lastTimeWhistleDetected - bestSig.timestamp));
+      if (timeDifference < bestTimeDifference || (timeDifference == bestTimeDifference && bestSig.selfCorrelation > bestSigCorrelation))
+      {
+        bestSigCorrelation = bestSig.selfCorrelation;
+        bestSigTime = &bestSig;
+      }
+    }
+
+    if (bestSigTime)
+    {
+      OutBinaryFile stream1("Whistles/TrueWhistle.dat");
+      ASSERT(stream.exists());
+      //If stream << bestSigTime does not work
+      if (!trueWhistle.empty())
+      {
+        stream << trueWhistle;
+        OUTPUT_TEXT("true Whistle found:" << bestSigTime->name);
+      }
+      /*stream << bestSigTime;*/
+      OUTPUT_TEXT("Failed to find True Whistle.");
+    if (theFrameInfo.getTimeSince(theWhistle.lastTimeWhistleDetected) >= accumulationDuration)
+    {
+      bestSigTime = nullptr;
+      bestSigCorrelation = 0.f;
+    }
+  }
 }
 
-float WhistleRecognizer::correlate(std::vector<Vector2d> &signature, const RingBuffer<AudioData::Sample> &buffer,
-                                   bool record)
+float WhistleRecognizer::correlate(std::vector<Vector2d>& signature, const RingBuffer<AudioData::Sample>& buffer, bool record)
 {
   // Compute volume of samples.
   float volume = 0;
+  // Increased correlation threshold
+  const float minCorrelationThreshold = 0.7f;
+
   for (AudioData::Sample sample : buffer)
     volume = std::max(volume, std::abs(static_cast<float>(sample)));
 
   // Abort if not loud enough.
-  if (volume == 0 || (!record && volume < (std::is_same<AudioData::Sample, short>::value ? std::numeric_limits<short>::max() : 1) * minVolume))
+  const float minVolumeThreshold = 0.5f; // Increased volume threshold
+  if (volume == 0 || (!record && volume < (std::is_same<AudioData::Sample, short>::value ? std::numeric_limits<short>::max() : 1) * minVolumeThreshold))
     return 0.f;
 
-  // Copy samples to FFTW input and normalize them.
+  // Apply a simple low-pass filter to reduce high-frequency noise
+  const float alpha = 0.2f; // Smoothing factor (adjustable)
+  std::vector<AudioData::Sample> filteredSamples(buffer.size());
+  filteredSamples[0] = buffer[0];
+  for (size_t i = 1; i < buffer.size(); ++i)
+    filteredSamples[i] = alpha * buffer[i] + (1 - alpha) * filteredSamples[i - 1];
+
+  // Copy filtered samples to FFTW input and normalize them.
   const double factor = 1.0 / volume;
   for (size_t i = 0; i < buffer.size(); ++i)
-    samples[i] = buffer[i] * factor;
+    samples[i] = filteredSamples[i] * factor;
 
   // samples -> spectrum
   fftw_execute(fft);
 
-  COMPLEX_IMAGE("module:WhistleRecognizer:spectra")
+  COMPLEX_IMAGE("module:WhistleRecognizer:spectra");
   {
     for (unsigned x = 0; x < signature.size(); ++x)
     {
@@ -329,7 +323,7 @@ float WhistleRecognizer::correlate(std::vector<Vector2d> &signature, const RingB
       if (amplitude > 0)
       {
         const PixelTypes::Edge2Pixel pixel(static_cast<char>(128 + 127 * complex.x() / amplitude),
-                                           static_cast<char>(128 + 127 * complex.y() / amplitude));
+          static_cast<char>(128 + 127 * complex.y() / amplitude));
         for (size_t y = 0; y < amplitude; ++y)
           canvas[canvas.height - 1 - y][x] = pixel;
       }
@@ -368,7 +362,7 @@ float WhistleRecognizer::correlate(std::vector<Vector2d> &signature, const RingB
       if (amplitude > 0)
       {
         const PixelTypes::Edge2Pixel pixel(static_cast<char>(128 + 127 * complex.x() / amplitude),
-                                           static_cast<char>(128 + 127 * complex.y() / amplitude));
+          static_cast<char>(128 + 127 * complex.y() / amplitude));
         for (size_t y = 0; y < amplitude; ++y)
           canvas[(canvas.height - amplitude) / 2 + y][x] = pixel;
       }
@@ -384,5 +378,5 @@ float WhistleRecognizer::correlate(std::vector<Vector2d> &signature, const RingB
     if (std::abs(correlation[i]) > bestCorrelation)
       bestCorrelation = std::abs(correlation[i]);
 
-  return static_cast<float>(std::sqrt(bestCorrelation) / bufferSize / 2);
+  return (std::sqrt(bestCorrelation) / bufferSize / 2) > minCorrelationThreshold ? static_cast<float>(std::sqrt(bestCorrelation) / bufferSize / 2) : 0.f;
 }
