@@ -138,7 +138,8 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
     for (const auto& buddy : theTeamData.teammates)
     {
       if (
-        buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard)
+        buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard)
         return true;
     }
     return false;

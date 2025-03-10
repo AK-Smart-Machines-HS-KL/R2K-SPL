@@ -51,7 +51,7 @@ CARD(GoalShotCard,
                 (bool)(false) done,
                 (Shot) currentShot,
                 (unsigned int) (0) timeLastFail,
-                (unsigned int) (6000) cooldown,
+                (int) (6000) cooldown,
              }),
 
      });
@@ -72,7 +72,7 @@ class GoalShotCard : public GoalShotCardBase
       theFieldBall.positionRelative.norm() < 600
       && theFrameInfo.getTimeSince(timeLastFail) > cooldown
       && theShots.goalShot.failureProbability < 0.50
-      && theFieldBall.positionOnField.x() > theRobotPose.translation.x()
+      && theFieldBall.endPositionOnField.x() > theRobotPose.translation.x()
       && !aBuddyIsChasingOrClearing()
     ;
   }

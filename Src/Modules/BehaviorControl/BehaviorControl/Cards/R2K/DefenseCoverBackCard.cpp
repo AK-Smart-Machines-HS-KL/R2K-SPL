@@ -91,7 +91,8 @@ class DefenseCoverBackCard : public DefenseCoverBackCardBase
     float distToGoal = (ownGoal - theFieldBall.positionOnField).norm();
 
     return
-      theFieldBall.ballWasSeen()&&
+      theFieldBall.ballWasSeen() &&
+      !theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // XOR to CleanOwnHalf
       distToGoal > 1000 &&
       theGameInfo.setPlay == SET_PLAY_NONE &&
       !aBuddyIsChasingOrClearing() &&

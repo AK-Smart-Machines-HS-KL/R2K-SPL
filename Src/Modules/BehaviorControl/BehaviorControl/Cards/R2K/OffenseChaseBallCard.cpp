@@ -70,7 +70,7 @@ CARD(OffenseChaseBallCard,
                 //Define Params here
                 (float)(0.8f) walkSpeed,
                 (int)(5000) ballNotSeenTimeout,
-                (int)(1000) threshold,
+                (int)(2000) threshold,
              }),
 
      });
@@ -90,7 +90,7 @@ class OffenseChaseBallCard : public OffenseChaseBallCardBase
       !aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
       theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
       (theFieldBall.endPositionOnField.x() > (0 - threshold)) &&
-      theFieldBall.endPositionOnField.x() >= theRobotPose.translation.x() - threshold;
+       theFieldBall.endPositionOnField.x() >= theRobotPose.translation.x() - threshold;
   }
 
   bool postconditions() const override
