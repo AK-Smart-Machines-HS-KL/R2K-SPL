@@ -30,6 +30,8 @@
  #include "Representations/Communication/TeamInfo.h"
  #include "Representations/Communication/RobotInfo.h"
  #include "Representations/Communication/TeamCommStatus.h"
+#include "Representations\BehaviorControl\Libraries\LibTeam.h"
+
 
  
  
@@ -52,12 +54,14 @@
         REQUIRES(PlayerRole),
         REQUIRES(OwnTeamInfo),
         REQUIRES(TeammateRoles),
-        REQUIRES(TeamCommStatus), 
+        REQUIRES(TeamCommStatus),
+        REQUIRES(LibTeam),
+
         
      
         DEFINES_PARAMETERS(
        {, 
-          (int)(100) targetOffset, // target behind penalty point 
+          (int)(0) targetOffset, // target behind penalty point 
           (Angle)(Angle(25_deg)) goalOffset, // needed so the Nao actually looks at the goal and not the goal post, Offset is relative to goal post
           (Angle)(Angle(2_deg)) goalPrecision, // (suggested Value) how precice the Nao turn towards the goal 
        }),
@@ -74,7 +78,7 @@
          return !theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)  // I am not the striker
             &&  theGameInfo.setPlay == SET_PLAY_CORNER_KICK     
             &&  theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber // ownCornerKick 
-            &&  theTeammateRoles.isTacticalOffense(theRobotInfo.number);
+            &&  theTeammateRoles.isTacticalOffense(theRobotInfo.number); // but i am Offence
      }
  
      bool postconditions() const override
@@ -88,7 +92,13 @@
  
          if (theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0)) != Vector2f::Zero())
          {
-            theWalkToPointSkill(Pose2f(calcAngleToGoal(), theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset,  0))));
+           Pose2f strikerPose = theLibTeam.strikerPose;
+           if (theRobotPose.toRelative(strikerPose).translation.y() >= 0){ // if the striker is above the middle Line turn left
+             theWalkToPointSkill(Pose2f(calcAngleToGoal() + goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
+           }
+           else { // else turn right
+             theWalkToPointSkill(Pose2f(calcAngleToGoal() - goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
+           }
             theLookAtBallSkill(); // head Motion Control
          }else
          {

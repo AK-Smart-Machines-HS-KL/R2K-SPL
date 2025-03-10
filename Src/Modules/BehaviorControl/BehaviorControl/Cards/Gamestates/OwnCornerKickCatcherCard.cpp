@@ -34,6 +34,7 @@
  #include "Representations/Communication/RobotInfo.h"
  #include "Representations/Communication/TeamCommStatus.h"
  #include "Representations/BehaviorControl/PlayerRole.h"
+ #include "Representations\BehaviorControl\Libraries\LibTeam.h"
 
  
  //#include <filesystem>
@@ -60,13 +61,16 @@
         REQUIRES(TeammateRoles),
         REQUIRES(BallModel),
         REQUIRES(BallSpecification),
-        REQUIRES(TeamCommStatus), 
+        REQUIRES(TeamCommStatus),
+        REQUIRES(LibTeam),
         
      
         DEFINES_PARAMETERS(
        {,
-          (int)(100) targetOffset, // target behind penalty point
-          (int)(15) timeOut, // how long the Robot stays in the Card after COrnerKick is Done 
+          (int)(0) targetOffset, // target behind penalty point
+          (int)(150) timeOutIntern, // how long the Robot stays in the Card after COrnerKick is Done 
+          (int)(15) timoOutExtern, // how long after last State Change
+          (int)(0) timer,
           (Vector2f)(Vector2f(200.f,0.f)) interceptPoint, // just a few steps forward 
           (bool)(false) pointIsSelected, // InterceptPoint wird nur einmal berechnet
           (float)(1.2f) interceptFactor, // veringere diesen Wert um den Ball früher in seiner Lufbahn zu intercepten
@@ -86,14 +90,18 @@
   
      bool preconditions() const override
      {
-         return !theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)  // I am not the striker
-            &&  theTeammateRoles.isTacticalOffense(theRobotInfo.number) // but i am Offence
-            &&  theGameInfo.timeLastStateChange < timeOut; // We came from Corner Kick 
+       return !theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)  // I am not the striker
+         &&   theTeammateRoles.isTacticalOffense(theRobotInfo.number) // but i am Offence
+         &&   theGameInfo.timeLastStateChange < timoOutExtern // We came from Corner Kick 
+         &&   (theLibTeam.strikerPose.translation.x() >= theFieldDimensions.xPosOpponentGoalArea && (theLibTeam.strikerPose.translation.y() <= theFieldDimensions.yPosLeftPenaltyArea || theLibTeam.strikerPose.translation.y() >= theFieldDimensions.yPosRightPenaltyArea)); // Striker is in Corner
+          
      }
  
      bool postconditions() const override
      {
-       return  !preconditions();  
+       return !(theTeammateRoles.isTacticalOffense(theRobotInfo.number) // but i am Offence
+         &&   theGameInfo.timeLastStateChange < timoOutExtern) // We came from Corner Kick  // We came from Corner Kick 
+         ||   timeOutIntern < timer;      // time Out
      }
  
      void execute() override
@@ -122,8 +130,14 @@
               
          }else if (theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0)) != Vector2f::Zero())
          {
-            theWalkToPointSkill(Pose2f(calcAngleToGoal(), theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
-            theLookAtBallSkill(); // head Motion Control
+           Pose2f strikerPose = theLibTeam.strikerPose;
+           if (theRobotPose.toRelative(strikerPose).translation.y() >= 0) { // if the striker is above the Robot turn left
+             theWalkToPointSkill(Pose2f(calcAngleToGoal() + goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
+           }
+           else { // else turn left
+             theWalkToPointSkill(Pose2f(calcAngleToGoal() - goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
+           }
+           theLookAtBallSkill(); // head Motion Control            theLookAtBallSkill(); // head Motion Control
          }else
          {
            
@@ -131,7 +145,7 @@
            theLookAtBallSkill(); // head Motion Control
          }
        
-       
+         timer++;
      }
      // kopiert aus CornerKick
      Angle calcAngleToGoal() const
@@ -178,6 +192,15 @@
            distance = Geometry::getDistanceToLine(Geometry::Line(theFieldBall.recentBallPositionRelative(), temp1), Vector2f::Zero());
          }
        return (result + distance) * minDistanceFactor;
+     }
+
+     bool isStrikerInCorner() {
+       Pose2f strikerPose = theLibTeam.strikerPose;
+       if (strikerPose.translation.x() >= theFieldDimensions.xPosOpponentPenaltyArea && (strikerPose.translation.y() <= theFieldDimensions.yPosLeftPenaltyArea || strikerPose.translation.y() >= theFieldDimensions.yPosRightPenaltyArea))
+       {
+         return true;
+       }
+       return false;
      }
  };
  
