@@ -6,7 +6,7 @@
  * @date 2025-03-06
  * 
  * Behavior: 
- * OwnKickOff: During the Own Kickoff, Robot 5 attempts to kick the ball 20_deg to the left 
+ * OwnKickOff: During the Own Kickoff, Robot 5 attempts to kick the ball 20_deg to the right
  * this card: goe into opp field. wait
 
  * Note: all tactical offense try to kick the ball. So default position is crucial
