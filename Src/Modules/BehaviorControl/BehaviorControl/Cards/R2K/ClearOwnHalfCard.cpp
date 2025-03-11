@@ -34,6 +34,7 @@
  * v.1.3 precond: x < 0 - threshold. 
  *      Activated !aBuddyIsClearingOwnHalf
  * v.1.4 Added the online & offline role assignment(Asrar)
+ * v.1.5 fixed massive type in preconditon, , reactivated aBuddyIsClearingOwnHalf
  * ToDo:
  * - we need a better shooting direction!! 
  * - maybe add OFFENSIVE mode as a blocker?
@@ -93,10 +94,11 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
   {
     return
       theGameInfo.setPlay == SET_PLAY_NONE &&  // no penalty active
-      theTeammateRoles.playsTheBall(theRobotInfo.number);
+      theTeammateRoles.playsTheBall(theRobotInfo.number) && 
       // theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
-      theFieldBall.positionOnField.x() < -500 &&
+      theFieldBall.positionOnField.x() < 0 &&
+      !aBuddyIsClearingOwnHalf() && 
       !(theTeamBehaviorStatus.teamActivity == TeamBehaviorStatus::R2K_SPARSE_GAME);
   }
 
@@ -111,26 +113,26 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
    
     theActivitySkill(BehaviorStatus::clearOwnHalfCard);
 
-    if (!footIsSelected) {  // select only once
-      footIsSelected = true;
-      leftFoot = theFieldBall.positionRelative.y() < 0;
-      if (theRobotPose.translation.x() > theFieldBall.positionOnField.x())
-        shootAngleIsZero = false; // take some time not too shoot at own goal or into own side 
-      else
-        shootAngleIsZero = true; // bot is  closer to goal than ball,  quick shot
-    }
-    if(leftFoot) {
-      if (shootAngleIsZero)  
-        theGoToBallAndKickSkill(0, KickInfo::walkForwardsLeft);
-      else
-        theGoToBallAndKickSkill(-theRobotPose.rotation, KickInfo::walkForwardsLeft);
+      if (!footIsSelected) {  // select only once
+        footIsSelected = true;
+        leftFoot = theFieldBall.positionRelative.y() < 0;
+        if (theRobotPose.translation.x() > theFieldBall.positionOnField.x())
+          shootAngleIsZero = false; // take some time not too shoot at own goal or into own side 
+        else
+          shootAngleIsZero = true; // bot is  closer to goal than ball,  quick shot
+      }
+      if(leftFoot) {
+        if (shootAngleIsZero)  
+          theGoToBallAndKickSkill(0, KickInfo::walkForwardsLeft);
+        else
+          theGoToBallAndKickSkill(-theRobotPose.rotation, KickInfo::walkForwardsLeft);
         
-    }
-    else
-      if (shootAngleIsZero)
-        theGoToBallAndKickSkill(0, KickInfo::walkForwardsRight);
+      }
       else
-        theGoToBallAndKickSkill(-theRobotPose.rotation, KickInfo::walkForwardsRight);
+        if (shootAngleIsZero)
+          theGoToBallAndKickSkill(0, KickInfo::walkForwardsRight);
+        else
+          theGoToBallAndKickSkill(-theRobotPose.rotation, KickInfo::walkForwardsRight);
   }
 
   bool aBuddyIsClearingOwnHalf() const
@@ -138,7 +140,8 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
     for (const auto& buddy : theTeamData.teammates)
     {
       if (
-        buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard)
+        buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
+        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard)
         return true;
     }
     return false;

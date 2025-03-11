@@ -11,7 +11,9 @@
  * v1.1: Card dynamically select robot instead hardcoding number  (Adrian)
  * v1.2. Card migrated (Adrian
  * v1.3. using offenseIndex for qualifiying (Asrar)
+ * v.1.4 bot #4 more centric (Adrian)
  */
+
 
 #include "Representations/BehaviorControl/DefaultPose.h"
 #include "Representations/BehaviorControl/Skills.h"
@@ -71,10 +73,10 @@ class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
       targetAbsolute = Pose2f(0, -500, 0);  // #5
       break;
     case 1: // 
-      targetAbsolute = Pose2f(0, -500, -2500); // #4
+      targetAbsolute = Pose2f(0, -1000, -1750); // #4 sty behind #5 to prevent re-ordering at PLAYING
       break;
     case 2: // OFFENSIVE MODE - we have 3 offense
-      targetAbsolute = Pose2f(0, -1100, 700);
+      targetAbsolute = Pose2f(0, -1600, 700);
       break;
     }
 

@@ -13,7 +13,7 @@
  * Only the the second player from the front beginning can activate this card.
  *
  * v.1.1: increased the shoot strength from KickInfo::walkForwardsLeft to   KickInfo::walkForwardsLeftLong);
- *
+ * v 1.2. added check opponent is not close 
  * Note:
  *
  *
@@ -41,6 +41,8 @@
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/TeamCommStatus.h"
 #include "Representations/Infrastructure/ExtendedGameInfo.h"
+#include "Representations/Modeling/ObstacleModel.h"
+
 
 CARD(OffenseForwardPassCard,
      {
@@ -103,10 +105,10 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
           !aBuddyIsClearingOrPassing() &&
           theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
           theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
+          theObstacleModel.opponentIsTooClose(theFieldBall.positionRelative, 500.f) != KickInfo::LongShotType::noKick &&  // float min = 1800.0f, float preciseMin = 2300.0f)
           // either a substantial delta on x - or we are at kick-off
           (thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1 ||
             theExtendedGameInfo.timeSincePlayingStarted < 10000)  // side pass at kickOff
-        // theObstacleModel.opponentIsTooClose(theFieldBall.positionRelative) != KickInfo::LongShotType::noKick &&  
         // theTeamBehaviorStatus.teamActivity != TeamBehaviorStatus::R2K_SPARSE_GAME;
           ) return true;
         return false;
@@ -126,7 +128,7 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
                 if(buddy.theRobotPose.translation.x() > theRobotPose.translation.x()) {
                     if(target.x() < buddy.theRobotPose.translation.x() || target == Vector2f::Zero()) {
                         target = buddy.theRobotPose.translation;
-                        target.x() += 1500;
+                        target.x() += 500;
                     }
                 }
             }
@@ -142,7 +144,7 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
         }
         
         theActivitySkill(BehaviorStatus::offenseForwardPassCard);
-        theGoToBallAndKickSkill(theRobotPose.toRelative(targetAbsolute).angle(), KickInfo::forwardFastLeft);
+        theGoToBallAndKickSkill(theRobotPose.toRelative(targetAbsolute).angle(), KickInfo::walkForwardsRightLong);
     }
 
     void reset() override

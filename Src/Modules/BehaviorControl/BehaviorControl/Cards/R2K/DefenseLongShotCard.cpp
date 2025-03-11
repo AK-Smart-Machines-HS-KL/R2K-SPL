@@ -35,6 +35,7 @@
  *  v.1.3 precond: x < 0 - threshold. 
  *      Activated !aBuddyIsClearingOwnHalf
  *  v.1.4 Added the online & offline role assignment(Asrar)
+ * v1.5 postcond = ! precond
  * ToDo: 
  * check for free shoot vector and opt. change y-coordinate
  * check whether isDone () works correctly 
@@ -89,10 +90,9 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
 {
   bool preconditions() const override
   {
-    
     return
       theTeammateRoles.playsTheBall(&theRobotInfo , theTeamCommStatus.isWifiCommActive) &&  // I am the striker
-      !theObstacleModel.opponentIsClose(1200) && // see below: min distance is minOppDistance
+      !theObstacleModel.opponentIsClose(1500) && // see below: min distance is minOppDistance
       !aBuddyIsClearingOwnHalf() &&
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
 
@@ -104,12 +104,18 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
       );
   }
 
+  /*
   bool postconditions() const override
   {
     return 
     theObstacleModel.opponentIsClose(500) ||
     !theTeammateRoles.isTacticalDefense(theRobotInfo.number) ||
     !(theFieldBall.endPositionOnField.x() < 200);
+  }
+  */
+  bool postconditions() const override
+  {
+    return !preconditions();
   }
 
  
@@ -141,9 +147,10 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
   {
     for (const auto& buddy : theTeamData.teammates)
     {
-      if (buddy.theBehaviorStatus.activity == BehaviorStatus::defenseChaseBallCard ||
-        buddy.theBehaviorStatus.activity == BehaviorStatus::blocking ||
-        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+      if (
+        // buddy.theBehaviorStatus.activity == BehaviorStatus::defenseChaseBallCard ||
+        // buddy.theBehaviorStatus.activity == BehaviorStatus::blocking ||
+        // buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
         buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
         buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
         buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard)

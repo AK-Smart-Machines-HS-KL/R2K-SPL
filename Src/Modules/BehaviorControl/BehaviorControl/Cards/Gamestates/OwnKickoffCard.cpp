@@ -10,6 +10,7 @@
  * V1.1 Card migrated (Nicholas)
  * V 1.2. changed to long kick (Adrian)
  * v 1.3 card disabled
+ * v.14 card active, changed kick type to be faster (Adrian)  3/25
  * 
  * Note: all tactical offense try to kick the ball. So default position is crucial
  */
@@ -65,10 +66,11 @@ class OwnKickoffCard : public OwnKickoffCardBase
   /**
    * @brief all tactical offense try to kick the ball
    * 
+   */
   bool preconditions() const override
   {
     return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
-      && theExtendedGameInfo.timeSincePlayingStarted < 10000 // 10sec
+      && theExtendedGameInfo.timeSincePlayingStarted < 5000 // 5sec
       && theGameInfo.state == STATE_PLAYING
       && theTeammateRoles.isTacticalOffense(theRobotInfo.number); // my recent role;
   }
@@ -88,13 +90,15 @@ class OwnKickoffCard : public OwnKickoffCardBase
       footIsSelected = true;
       leftFoot = theFieldBall.positionRelative.y() < 0;
     }
-    KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeftLong : KickInfo::forwardFastRightLong;
-    theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true); 
+    KickInfo::KickType kickType = leftFoot ? KickInfo::walkForwardsLeftLong : KickInfo::walkForwardsRight;
+    theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true, 3000); 
     }
  
   Angle calcAngleToGoal() const
   {
-    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
+    // return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, -3000.f)).angle();
+    return (theRobotPose.inversePose * Vector2f(2000, -2000.f)).angle();
+
   }
 };
 
