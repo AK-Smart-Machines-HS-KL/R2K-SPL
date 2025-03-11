@@ -191,14 +191,6 @@
        return (result + distance) * minDistanceFactor;
      }
 
-     bool isStrikerInCorner() {
-       Pose2f strikerPose = theLibTeam.strikerPose;
-       if (strikerPose.translation.x() >= theFieldDimensions.xPosOpponentPenaltyArea && (strikerPose.translation.y() <= theFieldDimensions.yPosLeftPenaltyArea || strikerPose.translation.y() >= theFieldDimensions.yPosRightPenaltyArea))
-       {
-         return true;
-       }
-       return false;
-     }
  };
  
  MAKE_CARD(OwnCornerKickCatcherCard);
