@@ -34,7 +34,7 @@
  #include "Representations/Communication/RobotInfo.h"
  #include "Representations/Communication/TeamCommStatus.h"
  #include "Representations/BehaviorControl/PlayerRole.h"
- #include "Representations\BehaviorControl\Libraries\LibTeam.h"
+ #include "Representations/BehaviorControl/Libraries/LibTeam.h"
 
  
  //#include <filesystem>
@@ -68,7 +68,7 @@
         DEFINES_PARAMETERS(
        {,
           (int)(0) targetOffset, // target behind penalty point
-          (int)(150) timeOutIntern, // how long the Robot stays in the Card after COrnerKick is Done 
+          (int)(50000) timeOutIntern, // how long the Robot stays in the Card after COrnerKick is Done 
           (int)(15) timoOutExtern, // how long after last State Change
           (int)(0) timer,
           (Vector2f)(Vector2f(200.f,0.f)) interceptPoint, // just a few steps forward 
@@ -90,18 +90,15 @@
   
      bool preconditions() const override
      {
-       return !theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)  // I am not the striker
-         &&   theTeammateRoles.isTacticalOffense(theRobotInfo.number) // but i am Offence
-         &&   theGameInfo.timeLastStateChange < timoOutExtern // We came from Corner Kick 
-         &&   (theLibTeam.strikerPose.translation.x() >= theFieldDimensions.xPosOpponentGoalArea && (theLibTeam.strikerPose.translation.y() <= theFieldDimensions.yPosLeftPenaltyArea || theLibTeam.strikerPose.translation.y() >= theFieldDimensions.yPosRightPenaltyArea)); // Striker is in Corner
-          
+       return  thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1  // but i am Supporter 
+         &&   (theLibTeam.strikerPose.translation.x() >= theFieldDimensions.xPosOpponentPenaltyMark && (theLibTeam.strikerPose.translation.y() >= theFieldDimensions.yPosLeftPenaltyArea || theLibTeam.strikerPose.translation.y() <= theFieldDimensions.yPosRightPenaltyArea)); // Striker is in Corner  
      }
  
      bool postconditions() const override
      {
-       return !(theTeammateRoles.isTacticalOffense(theRobotInfo.number) // but i am Offence
-         &&   theGameInfo.timeLastStateChange < timoOutExtern) // We came from Corner Kick  // We came from Corner Kick 
-         ||   timeOutIntern < timer;      // time Out
+       return !(thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1) // i am no longer Suppoter
+           
+         ||   timeOutIntern > timer;      // time Out
      }
  
      void execute() override
@@ -131,13 +128,13 @@
          }else if (theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0)) != Vector2f::Zero())
          {
            Pose2f strikerPose = theLibTeam.strikerPose;
-           if (theRobotPose.toRelative(strikerPose).translation.y() >= 0) { // if the striker is above the Robot turn left
+           if (theRobotPose.toRelative(strikerPose).translation.y() >= 0.f) { // if the striker is above the Robot turn left
              theWalkToPointSkill(Pose2f(calcAngleToGoal() + goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
            }
            else { // else turn left
              theWalkToPointSkill(Pose2f(calcAngleToGoal() - goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
            }
-           theLookAtBallSkill(); // head Motion Control            theLookAtBallSkill(); // head Motion Control
+           theLookAtBallSkill(); // head Motion Control         
          }else
          {
            

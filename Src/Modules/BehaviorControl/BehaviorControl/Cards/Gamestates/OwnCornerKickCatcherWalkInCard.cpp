@@ -30,7 +30,7 @@
  #include "Representations/Communication/TeamInfo.h"
  #include "Representations/Communication/RobotInfo.h"
  #include "Representations/Communication/TeamCommStatus.h"
-#include "Representations\BehaviorControl\Libraries\LibTeam.h"
+ #include "Representations/BehaviorControl/Libraries/LibTeam.h"
 
 
  
@@ -78,7 +78,7 @@
          return !theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)  // I am not the striker
             &&  theGameInfo.setPlay == SET_PLAY_CORNER_KICK     
             &&  theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber // ownCornerKick 
-            &&  theTeammateRoles.isTacticalOffense(theRobotInfo.number); // but i am Offence
+            &&  thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1 ; // but i am Supporter
      }
  
      bool postconditions() const override
