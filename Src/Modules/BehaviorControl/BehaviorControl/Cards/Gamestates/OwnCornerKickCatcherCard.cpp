@@ -35,6 +35,8 @@
  #include "Representations/Communication/TeamCommStatus.h"
  #include "Representations/BehaviorControl/PlayerRole.h"
  #include "Representations/BehaviorControl/Libraries/LibTeam.h"
+ #include "Representations/Infrastructure/ExtendedGameInfo.h"
+
 
  
  //#include <filesystem>
@@ -63,13 +65,14 @@
         REQUIRES(BallSpecification),
         REQUIRES(TeamCommStatus),
         REQUIRES(LibTeam),
+        REQUIRES(ExtendedGameInfo),
         
      
         DEFINES_PARAMETERS(
        {,
-          (int)(0) targetOffset, // target behind penalty point
+          (int)(50) targetOffset, // target behind penalty point
           (int)(50000) timeOutIntern, // how long the Robot stays in the Card after COrnerKick is Done 
-          (int)(15) timoOutExtern, // how long after last State Change
+          (float)(1000.f) timeOut, // how long after last State Change
           (int)(0) timer,
           (Vector2f)(Vector2f(200.f,0.f)) interceptPoint, // just a few steps forward 
           (bool)(false) pointIsSelected, // InterceptPoint wird nur einmal berechnet
@@ -91,13 +94,17 @@
      bool preconditions() const override
      {
        return  thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1  //  i am Supporter 
-         &&   (theLibTeam.strikerPose.translation.x() >= theFieldDimensions.xPosOpponentPenaltyMark && (theLibTeam.strikerPose.translation.y() >= theFieldDimensions.yPosLeftPenaltyArea || theLibTeam.strikerPose.translation.y() <= theFieldDimensions.yPosRightPenaltyArea)); // Striker is in Corner  
+         //&&   (theLibTeam.strikerPose.translation.x() >= theFieldDimensions.xPosOpponentPenaltyMark && (theLibTeam.strikerPose.translation.y() >= theFieldDimensions.yPosLeftPenaltyArea || theLibTeam.strikerPose.translation.y() <= theFieldDimensions.yPosRightPenaltyArea)) // Striker is in Corner  
+         //doesnt work how i want it to
+         &&    theGameInfo.setPlay == SET_PLAY_NONE  // No Penalty
+         &&    theExtendedGameInfo.timeSinceLastPenaltyEnded < timeOut; // 10 sec since last penalty
+         
      }
  
      bool postconditions() const override
      {
-       return !preconditions()
-          ||   timeOutIntern > timer;      // time Out
+       return !preconditions();
+          //||   timeOutIntern > timer      // time Out
      }
  
      void execute() override
@@ -128,10 +135,10 @@
          {
            Pose2f strikerPose = theLibTeam.strikerPose;
            if (theRobotPose.toRelative(strikerPose).translation.y() >= 0.f) { // if the striker is above the Robot turn left
-             theWalkToPointSkill(Pose2f(calcAngleToGoal() + goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
+             theWalkToPointSkill(Pose2f(calcAngleToGoal() - goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
            }
            else { // else turn left
-             theWalkToPointSkill(Pose2f(calcAngleToGoal() - goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
+             theWalkToPointSkill(Pose2f(calcAngleToGoal() + goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
            }
            theLookAtBallSkill(); // head Motion Control         
          }else

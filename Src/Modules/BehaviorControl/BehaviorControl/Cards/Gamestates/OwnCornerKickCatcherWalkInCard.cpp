@@ -61,7 +61,7 @@
      
         DEFINES_PARAMETERS(
        {, 
-          (int)(0) targetOffset, // target behind penalty point 
+          (int)(50) targetOffset, // target behind penalty point 
           (Angle)(Angle(25_deg)) goalOffset, // needed so the Nao actually looks at the goal and not the goal post, Offset is relative to goal post
           (Angle)(Angle(2_deg)) goalPrecision, // (suggested Value) how precice the Nao turn towards the goal 
        }),
@@ -94,16 +94,16 @@
          {
            Pose2f strikerPose = theLibTeam.strikerPose;
            if (theRobotPose.toRelative(strikerPose).translation.y() >= 0){ // if the striker is above the middle Line turn left
-             theWalkToPointSkill(Pose2f(calcAngleToGoal() + goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
+             theWalkToPointSkill(Pose2f(calcAngleToGoal() - goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
            }
            else { // else turn right
-             theWalkToPointSkill(Pose2f(calcAngleToGoal() - goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
+             theWalkToPointSkill(Pose2f(calcAngleToGoal() + goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
            }
             theLookAtBallSkill(); // head Motion Control
          }else
          {
            
-           theTurnAngleSkill(calcAngleToGoal(), goalPrecision);
+           theTurnAngleSkill(0_deg, goalPrecision);
            theLookAtBallSkill(); // head Motion Control
          }
        
