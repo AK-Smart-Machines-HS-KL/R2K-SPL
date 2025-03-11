@@ -25,6 +25,7 @@
     
  * - Check: GoalShot has higher priority and takes over close to opp.goal
  * v 1.3 DEFENSE only x < 0 - threshold
+ * v 1.4 heGoToBallAndDribbleSkill(calcAngleToGoal(),false,0.8f,true,true); more effectiv? (Adrian)
  */
 
 // Skills - Must be included BEFORE Card Base
@@ -70,7 +71,7 @@ CARD(OffenseChaseBallCard,
                 //Define Params here
                 (float)(0.8f) walkSpeed,
                 (int)(5000) ballNotSeenTimeout,
-                (int)(2000) threshold,
+                (int)(1500) threshold,
              }),
 
      });
@@ -115,7 +116,7 @@ class OffenseChaseBallCard : public OffenseChaseBallCardBase
         // theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::walkForwardsLeft);
         // SKILL_INTERFACE(GoToBallAndDribble, (Angle) targetDirection, (bool)(false) alignPrecisely, (float)(1.f) kickPower, (bool)(true) preStepAllowed, (bool)(true) turnKickAllowed, (const Rangea&)(Rangea(0_deg, 0_deg)) directionPrecision);
 
-        theGoToBallAndDribbleSkill(calcAngleToGoal(),true);
+        theGoToBallAndDribbleSkill(calcAngleToGoal(),false,0.8f,true,true);
       }
     }
 
@@ -150,10 +151,10 @@ class OffenseChaseBallCard : public OffenseChaseBallCardBase
       for (const auto& buddy : theTeamData.teammates) 
       {
         if (buddy.theBehaviorStatus.activity == BehaviorStatus::offenseChaseBallCard ||
-          //buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
           //buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
           //buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
-          //buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseFastGoalKick ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard 
           //buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard

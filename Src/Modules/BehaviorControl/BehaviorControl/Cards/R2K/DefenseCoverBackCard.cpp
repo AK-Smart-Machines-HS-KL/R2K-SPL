@@ -25,6 +25,7 @@
     
  * - Check: GoalShot has higher priority and takes over close to opp.goal
  * v 1.3 DEFENSE only x < 0 - threshold
+ * v .1.4 DEFENSE ball in range distToGoal > 1000 && distToGoal < 3000 (Adrian)
  */
 
 // Skills - Must be included BEFORE Card Base
@@ -93,7 +94,7 @@ class DefenseCoverBackCard : public DefenseCoverBackCardBase
     return
       theFieldBall.ballWasSeen() &&
       !theTeammateRoles.playsTheBall(theRobotInfo.number) &&  // XOR to CleanOwnHalf
-      distToGoal > 1000 &&
+      distToGoal > 1000 && distToGoal < 3000 && 
       theGameInfo.setPlay == SET_PLAY_NONE &&
       !aBuddyIsChasingOrClearing() &&
       theTeammateRoles.isTacticalDefense(theRobotInfo.number); // my recent role

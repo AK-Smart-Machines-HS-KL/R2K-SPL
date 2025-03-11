@@ -4,6 +4,8 @@
  * This file implements an implementation of the GoToBallAndDribble skill.
  *
  * @author Arne Hasselbring
+ * 
+ * v1.1. switchToPathPlannerDistance increased 1000->1500 (Adrian)
  */
 
 #include "Representations/BehaviorControl/BehaviorStatus.h"
@@ -30,8 +32,8 @@ SKILL_IMPLEMENTATION(GoToBallAndDribbleImpl,
   CALLS(RecordTargetAndSpeed),
   DEFINES_PARAMETERS(
   {,
-    (float)(1000.f) switchToPathPlannerDistance, /**< If the target is further away than this distance, the path planner is used. */
-    (float)(900.f) switchToLibWalkDistance, /**< If the target is closer than this distance, LibWalk is used. */
+    (float)(1500.f) switchToPathPlannerDistance, /**< If the target is further away than this distance, the path planner is used. */
+    (float)(1400.f) switchToLibWalkDistance, /**< If the target is closer than this distance, LibWalk is used. */
   }),
 });
 

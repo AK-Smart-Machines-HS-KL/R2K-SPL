@@ -113,9 +113,9 @@ class GoalShotCard : public GoalShotCardBase
       {
         if(state_time > initalCheckTime) {
           currentShot = theShots.goalShot;
-          OUTPUT_TEXT("Locking Target: (" << currentShot.target.x() << ", " << currentShot.target.y() << ")\n" << currentShot);
+          // OUTPUT_TEXT("Locking Target: (" << currentShot.target.x() << ", " << currentShot.target.y() << ")\n" << currentShot);
           if (currentShot.failureProbability > 0.3) {
-            OUTPUT_TEXT("Aborting! shot too likely to fail");
+            // OUTPUT_TEXT("Aborting! shot too likely to fail");
             timeLastFail = theFrameInfo.time;
             goto done;
           }
@@ -142,7 +142,7 @@ class GoalShotCard : public GoalShotCardBase
 
       action
       {
-        theGoToBallAndKickSkill(theRobotPose.toRelative(currentShot.target).angle(), currentShot.kickType.name);
+          theGoToBallAndKickSkill(theRobotPose.toRelative(currentShot.target).angle(), currentShot.kickType.name);
       }
     }
 
