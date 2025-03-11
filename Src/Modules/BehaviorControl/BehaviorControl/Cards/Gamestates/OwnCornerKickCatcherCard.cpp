@@ -90,15 +90,14 @@
   
      bool preconditions() const override
      {
-       return  thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1  // but i am Supporter 
+       return  thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1  //  i am Supporter 
          &&   (theLibTeam.strikerPose.translation.x() >= theFieldDimensions.xPosOpponentPenaltyMark && (theLibTeam.strikerPose.translation.y() >= theFieldDimensions.yPosLeftPenaltyArea || theLibTeam.strikerPose.translation.y() <= theFieldDimensions.yPosRightPenaltyArea)); // Striker is in Corner  
      }
  
      bool postconditions() const override
      {
-       return !(thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1) // i am no longer Suppoter
-           
-         ||   timeOutIntern > timer;      // time Out
+       return !preconditions()
+          ||   timeOutIntern > timer;      // time Out
      }
  
      void execute() override
