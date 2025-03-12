@@ -68,7 +68,7 @@ class GoalShotCard : public GoalShotCardBase
   {
     return 
       theFieldBall.ballWasSeen() &&
-      theRobotPose.translation.x() > 1500 &&
+      theRobotPose.translation.x() > -500 &&
       theFieldBall.positionRelative.norm() < 600
       && theFrameInfo.getTimeSince(timeLastFail) > cooldown
       && theShots.goalShot.failureProbability < 0.50
@@ -92,7 +92,7 @@ class GoalShotCard : public GoalShotCardBase
       Angle angleToGoal = (Vector2f(4500, 0) - theRobotPose.translation).angle() - theRobotPose.rotation; 
       transition
       {
-        if(abs(angleToGoal.normalize()) < 20_deg || state_time > 2000) {
+        if(abs(angleToGoal.normalize()) < 20_deg || state_time > 1500) {
           goto check;
         }
       }
@@ -171,6 +171,7 @@ class GoalShotCard : public GoalShotCardBase
           buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::ownKickoff ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard )
           // buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
           return true;
