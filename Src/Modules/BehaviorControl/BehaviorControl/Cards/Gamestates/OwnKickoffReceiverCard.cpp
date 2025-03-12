@@ -84,7 +84,7 @@ class OwnKickoffReceiverCard : public OwnKickoffReceiverCardBase
    */
   bool postconditions() const override
   {
-    return !preconditions();
+    return theExtendedGameInfo.timeSincePlayingStarted >= 10000;
   };
 
   void execute() override

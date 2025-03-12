@@ -28,6 +28,7 @@
 #include "Representations/Communication/TeamInfo.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Modeling/RobotPose.h"
+#include "Representations/Communication/TeamCommStatus.h"
 
 #include "Tools/Math/Geometry.h"
 
@@ -50,6 +51,7 @@ CARD(OwnKickoffCard,
   REQUIRES(ExtendedGameInfo),
   REQUIRES(TeamBehaviorStatus),
   REQUIRES(TeammateRoles),
+  REQUIRES(TeamCommStatus),
 
   DEFINES_PARAMETERS(
   {,
@@ -72,6 +74,7 @@ class OwnKickoffCard : public OwnKickoffCardBase
     return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
       && theExtendedGameInfo.timeSincePlayingStarted < 5000 // 5sec
       && theGameInfo.state == STATE_PLAYING
+      && theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)   // I am the striker
       && theTeammateRoles.isTacticalOffense(theRobotInfo.number); // my recent role;
   }
 
