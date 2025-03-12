@@ -72,7 +72,7 @@ class OwnKickoffCard : public OwnKickoffCardBase
   bool preconditions() const override
   {
     return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
-      && theExtendedGameInfo.timeSincePlayingStarted < 5000 // 5sec
+      && theExtendedGameInfo.timeSincePlayingStarted < 12000 // 5sec
       && theGameInfo.state == STATE_PLAYING
       && theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)   // I am the striker
       && theTeammateRoles.isTacticalOffense(theRobotInfo.number); // my recent role;
@@ -83,7 +83,7 @@ class OwnKickoffCard : public OwnKickoffCardBase
    */
   bool postconditions() const override
   {
-    return !preconditions();
+    return !theExtendedGameInfo.timeSincePlayingStarted < 12000;
   };
 
   void execute() override

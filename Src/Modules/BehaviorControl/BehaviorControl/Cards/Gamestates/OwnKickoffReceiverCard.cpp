@@ -71,7 +71,7 @@ class OwnKickoffReceiverCard : public OwnKickoffReceiverCardBase
   bool preconditions() const override
   {
     return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
-      && theExtendedGameInfo.timeSincePlayingStarted < 10000 // 10sec
+      && theExtendedGameInfo.timeSincePlayingStarted < 12000 // 10sec
       && theGameInfo.state == STATE_PLAYING
       // && !(theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive))   // I am not the striker
       && thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1 // second right most bot
@@ -84,7 +84,7 @@ class OwnKickoffReceiverCard : public OwnKickoffReceiverCardBase
    */
   bool postconditions() const override
   {
-    return theExtendedGameInfo.timeSincePlayingStarted >= 10000;
+    return theExtendedGameInfo.timeSincePlayingStarted >= 12000;
   };
 
   void execute() override
