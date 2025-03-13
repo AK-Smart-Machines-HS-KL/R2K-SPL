@@ -50,9 +50,11 @@ class GameplayCard : public GameplayCardBase
 
   void execute() override
   {
+    if (theGameInfo.state == STATE_STANDBY)return;
     theArmContactSkill();
     if(!theTeamBehaviorStatus.role.isGoalkeeper())
       theArmObstacleAvoidanceSkill();
+
     if(theGameInfo.state == STATE_READY)
     {
       if(theGameInfo.setPlay == SET_PLAY_PENALTY_KICK)
