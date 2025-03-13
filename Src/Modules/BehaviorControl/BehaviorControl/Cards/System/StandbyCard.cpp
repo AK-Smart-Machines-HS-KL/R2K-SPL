@@ -47,7 +47,7 @@ class StandbyCard : public StandbyCardBase
     theActivitySkill(BehaviorStatus::set);
     theStandSkill(/* high: */ true);
     theLookActiveSkill();
-    
+
   }
 };
 
