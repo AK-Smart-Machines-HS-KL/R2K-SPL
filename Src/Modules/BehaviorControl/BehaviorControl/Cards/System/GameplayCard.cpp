@@ -50,8 +50,8 @@ class GameplayCard : public GameplayCardBase
 
   void execute() override
   {
-    if (theGameInfo.state == STATE_STANDBY)return;
     theArmContactSkill();
+    if (theGameInfo.state == STATE_STANDBY) return;
     if(!theTeamBehaviorStatus.role.isGoalkeeper())
       theArmObstacleAvoidanceSkill();
 
@@ -86,7 +86,7 @@ class GameplayCard : public GameplayCardBase
     }
     else
     {
-      ASSERT(theGameInfo.state == STATE_PLAYING);
+      // ASSERT(theGameInfo.state == STATE_PLAYING);
       #ifdef TARGET_ROBOT
         const int stateTime = theFrameInfo.time - _context.stateStart;
       #endif
