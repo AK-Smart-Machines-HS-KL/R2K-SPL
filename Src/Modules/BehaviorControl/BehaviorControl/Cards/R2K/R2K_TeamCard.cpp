@@ -479,7 +479,7 @@ private:
         // OUTPUT_TEXT("goalie is out of zone");
         for (int i = 5; i > 0; i--) {  // search for goalie
           if (1 == teamMateRoles.roles[i]) shiftRight = true;  // "i" is the goalies' offset 
-          if (shiftRight) teamMateRoles.roles[i] = teamMateRoles.roles[i-1]; // shift right
+          if (shiftRight) teamMateRoles.roles[i] = teamMateRoles.roles[i - 1]; // shift right
         }
         teamMateRoles.roles[0] = 1;
       } // nothing to do wrt. goalie
@@ -488,8 +488,8 @@ private:
     // eg [0,3,4,5,UN] -to do -> [GN,OL,DR,DL,OR,UN] 
     // 
     // r2k_tactics[5][TeamBehaviorStatus::numOfTeamActivities][5] =
-    
-    
+
+
 
       // d4
       // make a copy of teamMateRoles.roles[], so we can store tactical role in teamMateRoles.roles[]
@@ -498,25 +498,35 @@ private:
         sorted_bots[i] = teamMateRoles.roles[i];
       }
       // now this is identical to    teamMateRoles.roles[] = mate.number or UNDEFINED
-      
+
       for (int bot = 1; bot <= 5; bot++) {  // #bot
-          
+
         // auto itr = std::find(sorted_bots, sorted_bots+n,i);
         int i_pos;  // offset in sorted_bots == rank left2right on real soccer field
 
-        bool found = false;  
+        bool found = false;
         for (i_pos = 0; i_pos <= 4; i_pos++) {
 
           // looking for rank of bot
           if (bot == sorted_bots[i_pos]) {  // bots count from 1..5
-            found = true; 
-            teamMateRoles.roles[bot - 1] = r2k_tactics[activeBuddies-1][teamBehaviorStatus - 1][i_pos];
+            found = true;
+            teamMateRoles.roles[bot - 1] = r2k_tactics[activeBuddies - 1][teamBehaviorStatus - 1][i_pos];
             break;
           }
         }
-        if (!found) teamMateRoles.roles[bot-1] = UN;
-      }  // rof: bot #1..5
-  
+        if (!found) teamMateRoles.roles[bot - 1] = UN;
+
+        // minMessageBudget = 30, see EBC
+#ifdef TARGET_ROBOT
+        if (theOwnTeamInfo.messageBudget <= 30) {
+          teamMateRoles.roles[0] = GN;
+          teamMateRoles.roles[1] = DL;
+          teamMateRoles.roles[2] = DR;
+          teamMateRoles.roles[3] = OL;
+          teamMateRoles.roles[4] = OR;
+        }
+#endif
+      } // rof: bot #1..5
     } // else: dynamic assignment, done
 
      // f) goalie plays the ball?´deprecated code segment deleted

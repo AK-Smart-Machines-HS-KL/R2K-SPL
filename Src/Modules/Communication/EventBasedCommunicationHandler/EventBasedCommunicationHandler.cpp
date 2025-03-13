@@ -219,7 +219,7 @@ bool EventBasedCommunicationHandler::ebcSendThisFrame(const EventBasedCommunicat
   }
 
 
-  if (theGameInfo.state == STATE_INITIAL || theGameInfo.state == STATE_READY || theGameInfo.state == STATE_FINISHED) 
+  if (theGameInfo.state == STATE_INITIAL || theGameInfo.state == STATE_STANDBY || theGameInfo.state == STATE_SET|| theGameInfo.state == STATE_READY || theGameInfo.state == STATE_FINISHED)
     return false;
     // Note: R2K_TeamCard deals with STATE_READY explicitely, to save bandwith here
 
