@@ -73,7 +73,7 @@ class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
       targetAbsolute = Pose2f(0, -400, 0);  // #5
       break;
     case 1: // 
-      targetAbsolute = Pose2f(0, -700, -1750); // #4 sty behind #5 to prevent re-ordering at PLAYING
+      targetAbsolute = Pose2f(0, -900, -1750); // #4 sty behind #5 to prevent re-ordering at PLAYING
       break;
     case 2: // OFFENSIVE MODE - we have 3 offense
       targetAbsolute = Pose2f(0, -1600, 700);

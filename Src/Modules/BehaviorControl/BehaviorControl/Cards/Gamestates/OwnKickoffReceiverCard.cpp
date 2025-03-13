@@ -84,7 +84,7 @@ class OwnKickoffReceiverCard : public OwnKickoffReceiverCardBase
    */
   bool postconditions() const override
   {
-    return theExtendedGameInfo.timeSincePlayingStarted >= 12000;
+    return theExtendedGameInfo.timeSincePlayingStarted >= 15000;
   };
 
   void execute() override
@@ -94,8 +94,10 @@ class OwnKickoffReceiverCard : public OwnKickoffReceiverCardBase
     theLookActiveSkill(); // Head Motion Request
 
     Pose2f targetRelative = theRobotPose.toRelative(Pose2f(theFieldDimensions.xPosOpponentFieldBorder, -2000.f));
-    theWalkToPointSkill(targetRelative, 1.0f, true);
-
+    if(theExtendedGameInfo.timeSincePlayingStarted > 4000)
+     theWalkToPointSkill(targetRelative, 1.0f, true);
+    else
+      theWalkToPointSkill(targetRelative, 0.1f, true);
     }
 };
 

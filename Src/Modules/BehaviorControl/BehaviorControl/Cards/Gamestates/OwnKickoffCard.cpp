@@ -83,7 +83,7 @@ class OwnKickoffCard : public OwnKickoffCardBase
    */
   bool postconditions() const override
   {
-    return !theExtendedGameInfo.timeSincePlayingStarted < 12000;
+    return !theExtendedGameInfo.timeSincePlayingStarted < 13000;
   };
 
   void execute() override
@@ -93,8 +93,8 @@ class OwnKickoffCard : public OwnKickoffCardBase
       footIsSelected = true;
       leftFoot = theFieldBall.positionRelative.y() < 0;
     }
-    KickInfo::KickType kickType = leftFoot ? KickInfo::walkForwardsLeftLong : KickInfo::walkForwardsRight;
-    theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true, 3000); 
+    KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeftLong : KickInfo::forwardFastRight;
+    theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true, 5000); 
     }
  
   Angle calcAngleToGoal() const
