@@ -70,7 +70,7 @@ class ReadyOwnKickoffCard : public ReadyOwnKickoffCardBase
 
     switch (theTeammateRoles.offenseRoleIndex(theRobotInfo.number)) {
     case 0: // right-most offense
-      targetAbsolute = Pose2f(0, -400, 0);  // #5
+      targetAbsolute = Pose2f(-45, -200, 300);  // #5
       break;
     case 1: // 
       targetAbsolute = Pose2f(0, -900, -1750); // #4 sty behind #5 to prevent re-ordering at PLAYING

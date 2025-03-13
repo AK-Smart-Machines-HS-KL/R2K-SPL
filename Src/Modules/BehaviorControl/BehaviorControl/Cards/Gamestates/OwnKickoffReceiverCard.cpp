@@ -94,7 +94,7 @@ class OwnKickoffReceiverCard : public OwnKickoffReceiverCardBase
     theLookActiveSkill(); // Head Motion Request
 
     Pose2f targetRelative = theRobotPose.toRelative(Pose2f(theFieldDimensions.xPosOpponentFieldBorder, -2000.f));
-    if(theExtendedGameInfo.timeSincePlayingStarted > 4000)
+    if(theExtendedGameInfo.timeSincePlayingStarted > 7000)
      theWalkToPointSkill(targetRelative, 1.0f, true);
     else
       theWalkToPointSkill(targetRelative, 0.1f, true);
