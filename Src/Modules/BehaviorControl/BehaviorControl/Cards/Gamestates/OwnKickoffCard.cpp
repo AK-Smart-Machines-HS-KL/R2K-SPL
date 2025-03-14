@@ -29,8 +29,10 @@
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Modeling/RobotPose.h"
 #include "Representations/Communication/TeamCommStatus.h"
-
+#include "Representations/BehaviorControl/TeamBehaviorStatus.h"
 #include "Tools/Math/Geometry.h"
+#include "Representations/Communication/TeamInfo.h"         // access scores, OwnTeamInfo, OppTeamInfo
+#include "Representations/Communication/TeamCommStatus.h"
 
 
 
@@ -40,7 +42,6 @@ CARD(OwnKickoffCard,
   CALLS(Activity),
   CALLS(LookForward),
   CALLS(GoToBallAndKick),
-
   REQUIRES(FieldBall),
   REQUIRES(RobotPose),
   REQUIRES(RobotInfo),
@@ -100,8 +101,12 @@ class OwnKickoffCard : public OwnKickoffCardBase
   Angle calcAngleToGoal() const
   {
     // return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, -3000.f)).angle();
-    return (theRobotPose.inversePose * Vector2f(-1000.f, -1000.f)).angle();
-
+    if (theTeammateRoles.isTacticalOffense(3)) {
+      return (theRobotPose.inversePose * Vector2f(-1000.f, 1000.f)).angle();
+    }
+    else {
+      return (theRobotPose.inversePose * Vector2f(-1000.f, -1000.f)).angle();
+    }
   }
 };
 

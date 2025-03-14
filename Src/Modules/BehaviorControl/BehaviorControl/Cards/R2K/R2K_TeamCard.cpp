@@ -227,25 +227,18 @@ private:
 
     // n vs. 2  || 3 vs 3 or less 
     if (opp_penalties >= 18 || (own_penalties > 18 && opp_penalties > 18)) {  //undeployed robots count as penalized; the array is 20 bots long
-    // HOT FIX
-    // if(true) {
-      
+  
       theTeamActivitySkill(TeamBehaviorStatus::R2K_SPARSE_GAME);
       teamBehaviorStatus = TeamBehaviorStatus::R2K_SPARSE_GAME;
-  
-/*    
-      theTeamActivitySkill(TeamBehaviorStatus::R2K_NORMAL_GAME);
-      teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME;
-  */  
-    }
+     }
     else {
-      if (own_score == opp_score ) {
+      if (own_score == opp_score+1 ) {  // 3:2
         theTeamActivitySkill(TeamBehaviorStatus::R2K_NORMAL_GAME);
         teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME;
       }
 
       // to do: add time limit, so we will not spoil our leadership in the last n minutes
-       else if (own_score < opp_score) {
+       else if (own_score < opp_score+1) {  // 2:2, 1:2, 0:1
         theTeamActivitySkill(TeamBehaviorStatus::R2K_OFFENSIVE_GAME);
         teamBehaviorStatus = TeamBehaviorStatus::R2K_OFFENSIVE_GAME;
       } else {
