@@ -94,7 +94,7 @@ class OwnKickoffCard : public OwnKickoffCardBase
       footIsSelected = true;
       leftFoot = theFieldBall.positionRelative.y() < 0;
     }
-    KickInfo::KickType kickType = leftFoot ? KickInfo::walkForwardsLeftLong : KickInfo::walkForwardsRightLong;
+    KickInfo::KickType kickType = leftFoot ? KickInfo::walkForwardsLeft: KickInfo::walkForwardsRight;
     theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true, 5000); 
     }
  
