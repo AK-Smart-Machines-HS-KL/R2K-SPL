@@ -89,7 +89,7 @@ class GoalShotCard : public GoalShotCardBase
     initial_state(align)
     {
       done = false;
-      Angle angleToGoal = (Vector2f(4500, 0) - theRobotPose.translation).angle() - theRobotPose.rotation; 
+      Angle angleToGoal = (Vector2f(4500, -750) - theRobotPose.translation).angle() - theRobotPose.rotation; 
       transition
       {
         if(abs(angleToGoal.normalize()) < 20_deg || state_time > 1500) {

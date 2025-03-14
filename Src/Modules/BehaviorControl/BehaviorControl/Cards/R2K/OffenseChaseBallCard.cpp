@@ -88,6 +88,7 @@ class OffenseChaseBallCard : public OffenseChaseBallCardBase
   
     return
       theFieldBall.ballWasSeen() && 
+      theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&
       !aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
       theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
       (theFieldBall.endPositionOnField.x() > (0 - threshold)) &&
