@@ -136,9 +136,9 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
     }
     else
       if (shootAngleIsZero)
-        theGoToBallAndKickSkill(0, KickInfo::walkForwardsRight);
+        theGoToBallAndKickSkill(0, KickInfo::walkForwardsRightLong);
       else
-        theGoToBallAndKickSkill(-theRobotPose.rotation, KickInfo::walkForwardsRight);
+        theGoToBallAndKickSkill(-theRobotPose.rotation, KickInfo::walkForwardsRightLong);
   }
   bool aBuddyIsClearingOwnHalf() const
   {
