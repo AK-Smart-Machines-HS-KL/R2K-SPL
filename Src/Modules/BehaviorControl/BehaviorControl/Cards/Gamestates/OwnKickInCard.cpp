@@ -105,7 +105,7 @@ class OwnKickInCard : public OwnKickInCardBase
       footIsSelected = true;
       leftFoot = theFieldBall.positionRelative.y() < 0;
     }
-    KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeft : KickInfo::forwardFastRight;
+    KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeftLong : KickInfo::forwardFastRightLong;
     theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true);
   }
   Angle calcAngleToGoal() const
