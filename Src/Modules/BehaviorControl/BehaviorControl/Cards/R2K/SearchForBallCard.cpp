@@ -99,7 +99,10 @@ class SearchForBallCard : public SearchForBallCardBase
   option
   {
     theActivitySkill(BehaviorStatus::searchForBall);
-
+    if (theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number)) {
+      theLookAtBallSkill();
+      return;
+    }
     initial_state(init)
     {
       startTime = theFrameInfo.time;
