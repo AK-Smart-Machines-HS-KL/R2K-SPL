@@ -155,6 +155,7 @@ class OffenseChaseBallCard : public OffenseChaseBallCardBase
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
           //buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
           //buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::defenseChaseBallCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::offenseFastGoalKick ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard ||
