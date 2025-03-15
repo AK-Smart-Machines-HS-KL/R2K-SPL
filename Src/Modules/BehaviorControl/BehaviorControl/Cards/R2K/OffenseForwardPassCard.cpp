@@ -91,7 +91,7 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
         {
             if (!buddy.isPenalized && buddy.isUpright)
             {
-                if(buddy.theRobotPose.translation.x() > theRobotPose.translation.x()) {
+                if(buddy.theRobotPose.translation.x() > theRobotPose.translation.x()+500) {
                     buddyValid = true;
                     break;
                 }
