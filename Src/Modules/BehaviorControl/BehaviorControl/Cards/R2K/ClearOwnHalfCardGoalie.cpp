@@ -84,7 +84,7 @@ CARD(ClearOwnHalfCardGoalie,
 
     DEFINES_PARAMETERS(
     {,
-      (float)(500) maxDistanceFromGoalArea,  // how far  goalie will leave the goal box
+      (float)(1000) maxDistanceFromGoalArea,  // how far  goalie will leave the goal box
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
       (bool)(true) shootAngleIsZero,
@@ -144,8 +144,7 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
   {
     for (const auto& buddy : theTeamData.teammates)
     {
-      if (buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
-        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie)
+      if (buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard)
         return true;
     }
     return false;
