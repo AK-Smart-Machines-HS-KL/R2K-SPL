@@ -198,6 +198,10 @@ void LEDHandler::setChestButton(LEDRequest& ledRequest)
       else
         switch(theGameInfo.state)
         {
+          case STATE_STANDBY:
+            ledRequest.ledStates[LEDRequest::chestGreen] = LEDRequest::on;
+            ledRequest.ledStates[LEDRequest::chestBlue] = LEDRequest::half;
+            break;
           case STATE_READY:
             ledRequest.ledStates[LEDRequest::chestBlue] = LEDRequest::on;
             break;
