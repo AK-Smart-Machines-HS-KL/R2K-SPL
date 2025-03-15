@@ -232,13 +232,14 @@ private:
       teamBehaviorStatus = TeamBehaviorStatus::R2K_SPARSE_GAME;
      }
     else {
-      if (own_score == opp_score ) {  // 3:3
+      if (own_score == opp_score || (own_score+1) == opp_score || 
+          (own_score+2) == opp_score || (own_score + 3) == opp_score){  // 
         theTeamActivitySkill(TeamBehaviorStatus::R2K_NORMAL_GAME);
         teamBehaviorStatus = TeamBehaviorStatus::R2K_NORMAL_GAME;
       }
 
       // to do: add time limit, so we will not spoil our leadership in the last n minutes
-       else if (own_score < opp_score) {  // 1:2, 1:3, 0:1
+       else if ((own_score + 7) < opp_score) {  // 1:2, 1:3, 0:1
         theTeamActivitySkill(TeamBehaviorStatus::R2K_OFFENSIVE_GAME);
         teamBehaviorStatus = TeamBehaviorStatus::R2K_OFFENSIVE_GAME;
       } else {
