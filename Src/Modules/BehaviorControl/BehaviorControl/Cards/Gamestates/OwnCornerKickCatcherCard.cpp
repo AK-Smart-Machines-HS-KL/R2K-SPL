@@ -7,7 +7,8 @@
  *        Performs the Kick into the Goal
  * 
  * @version 1.0 Copy of ChallangeCard.cpp and walk to OpponentPenaltyMark and we don't assume  we already are at the korrekt position and continue walking to the Point
- *              
+ *          1.1 Preconditions cahnged to actually work in a real game 
+ *              Robot angles himself to the corner where Ball is Located   
  * @date 2025-06-03
  * 
  * future Work: Split this Card into two  - first one where the Catcher walks to the OpponentPenaltyArea (OwnCornerKickCatcherWalkInCard.cpp)
@@ -70,16 +71,14 @@
      
         DEFINES_PARAMETERS(
        {,
-          (int)(50) targetOffset, // target behind penalty point
-          (int)(50000) timeOutIntern, // how long the Robot stays in the Card after COrnerKick is Done 
-          (float)(1000.f) timeOut, // how long after last State Change
-          (int)(0) timer,
+          (int)(100) targetOffset, // target behind penalty point
+          (float)(3000.f) timeOut, // how long after last State Change
           (Vector2f)(Vector2f(200.f,0.f)) interceptPoint, // just a few steps forward 
           (bool)(false) pointIsSelected, // InterceptPoint wird nur einmal berechnet
           (float)(1.2f) interceptFactor, // veringere diesen Wert um den Ball früher in seiner Lufbahn zu intercepten
-          (float)(1.0f) minDistanceFactor, // eröhe diesen Wert um den distanz zu erhöhen die der Ball unterschreiten muss damit der Roboter reagiert
+          (float)(0.9f) minDistanceFactor, // eröhe diesen Wert um den distanz zu erhöhen die der Ball unterschreiten muss damit der Roboter reagiert
           (float)(100.0f) interceptOffset, // sowohl x und y Werte sind betroffen
-          (Angle)(Angle(30_deg)) goalOffset, // needed so the Nao actually looks at the goal and not the goal post, Offset is relative to goal post
+          (Angle)(Angle(25_deg)) goalOffset, // needed so the Nao actually looks at the goal and not the goal post, Offset is relative to goal post
           (Angle)(Angle(2_deg)) goalPrecision, // (suggested Value) how precice the Nao turn towards the goal 
        }),
        
@@ -89,22 +88,21 @@
  class OwnCornerKickCatcherCard : public OwnCornerKickCatcherCardBase
  {
 
-      // Currently can't actually activate (is in gameStack normalPlay but has as condition play == Corner Kick)    
-  
+        // active if last freee Kick was under 5 sec ago  
      bool preconditions() const override
      {
        return  thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1  //  i am Supporter 
          //&&   (theLibTeam.strikerPose.translation.x() >= theFieldDimensions.xPosOpponentPenaltyMark && (theLibTeam.strikerPose.translation.y() >= theFieldDimensions.yPosLeftPenaltyArea || theLibTeam.strikerPose.translation.y() <= theFieldDimensions.yPosRightPenaltyArea)) // Striker is in Corner  
-         //doesnt work how i want it to
+         // doesnt work how i want it to
+         &&    ballIsInCorner()
          &&    theGameInfo.setPlay == SET_PLAY_NONE  // No Penalty
-         &&    theExtendedGameInfo.timeSinceLastPenaltyEnded < timeOut; // 10 sec since last penalty
+         &&    theExtendedGameInfo.timeSinceLastFreeKickEnded < timeOut; // 3 sec since last penalty
          
      }
  
      bool postconditions() const override
      {
        return !preconditions();
-          //||   timeOutIntern > timer      // time Out
      }
  
      void execute() override
@@ -134,7 +132,7 @@
          }else if (theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0)) != Vector2f::Zero())
          {
            Pose2f strikerPose = theLibTeam.strikerPose;
-           if (theRobotPose.toRelative(strikerPose).translation.y() >= 0.f) { // if the striker is above the Robot turn left
+           if (theRobotPose.toRelative(strikerPose).translation.y() <= 0.f) { // if the striker is above the Robot turn left
              theWalkToPointSkill(Pose2f(calcAngleToGoal() - goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
            }
            else { // else turn left
@@ -148,7 +146,6 @@
            theLookAtBallSkill(); // head Motion Control
          }
        
-         timer++;
      }
      // kopiert aus CornerKick
      Angle calcAngleToGoal() const
@@ -196,7 +193,12 @@
          }
        return (result + distance) * minDistanceFactor;
      }
-
+    bool ballIsInCorner() const
+    {
+      return (theFieldBall.positionOnField.x() > theFieldDimensions.xPosOpponentPenaltyArea  // is behind penelty area line
+              && (theFieldBall.positionOnField.y() <= theFieldDimensions.yPosLeftPenaltyArea // is Left of penalty area
+              || theFieldBall.positionOnField.y() >= theFieldDimensions.yPosRightPenaltyArea)); // is Right of penalty area
+    }
  };
  
  MAKE_CARD(OwnCornerKickCatcherCard);
