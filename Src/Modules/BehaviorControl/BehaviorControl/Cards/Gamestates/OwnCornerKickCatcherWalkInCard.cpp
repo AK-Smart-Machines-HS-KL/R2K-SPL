@@ -25,6 +25,8 @@
  
  #include "Representations/Configuration/FieldDimensions.h"
  #include "Representations/Communication/TeamData.h"
+ #include "Representations/BehaviorControl/FieldBall.h"
+
 
  #include "Representations/Communication/GameInfo.h"
  #include "Representations/Communication/TeamInfo.h"
@@ -56,6 +58,7 @@
         REQUIRES(TeammateRoles),
         REQUIRES(TeamCommStatus),
         REQUIRES(LibTeam),
+        REQUIRES(FieldBall),
 
         
      
@@ -92,18 +95,22 @@
  
          if (theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0)) != Vector2f::Zero())
          {
-           Pose2f strikerPose = theLibTeam.strikerPose;
-           if (theRobotPose.toRelative(strikerPose).translation.y() <= 0){ // if the striker is above the middle Line turn left
+           
+           if (theFieldBall.positionOnField.x() >= 0){ // if the Ball is above the middle Line turn slightly left
              theWalkToPointSkill(Pose2f(calcAngleToGoal() - goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
            }
-           else { // else turn right
+           else { // else turn slightly right
              theWalkToPointSkill(Pose2f(calcAngleToGoal() + goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
            }
             theLookAtBallSkill(); // head Motion Control
          }else
          {
-           
-           theTurnAngleSkill(0_deg, goalPrecision);
+          if (theFieldBall.positionOnField.x() <= 0){ // if the Ball is above the middle Line turn slightly left
+            theTurnAngleSkill(calcAngleToGoal() - goalOffset, goalPrecision);
+          }
+          else { // else turn slightly right
+            theTurnAngleSkill(calcAngleToGoal() + goalOffset, goalPrecision);
+          }
            theLookAtBallSkill(); // head Motion Control
          }
        

@@ -131,14 +131,13 @@
               
          }else if (theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0)) != Vector2f::Zero())
          {
-           Pose2f strikerPose = theLibTeam.strikerPose;
-           if (theRobotPose.toRelative(strikerPose).translation.y() <= 0.f) { // if the striker is above the Robot turn left
-             theWalkToPointSkill(Pose2f(calcAngleToGoal() - goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
-           }
-           else { // else turn left
-             theWalkToPointSkill(Pose2f(calcAngleToGoal() + goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
-           }
-           theLookAtBallSkill(); // head Motion Control         
+          if (theFieldBall.positionOnField.x() >= 0){ // if the Ball is above the middle Line turn slightly left
+            theWalkToPointSkill(Pose2f(calcAngleToGoal() - goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
+          }
+          else { // else turn slightly right
+            theWalkToPointSkill(Pose2f(calcAngleToGoal() + goalOffset, theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0))));
+          }
+           theLookAtBallSkill(); // head Motion Control       
          }else
          {
            
