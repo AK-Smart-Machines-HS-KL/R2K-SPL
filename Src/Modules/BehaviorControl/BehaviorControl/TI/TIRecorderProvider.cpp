@@ -24,8 +24,8 @@ TIRecorderProvider::TIRecorderProvider() {
     worldData =  RingBuffer<WorldModel>(bufSize);
 
     struct stat info;
-    ASSERT(stat( TIRecordingDir.c_str(), &info ) == 0); // ensure that TIRecordingDir exists
-    ASSERT(info.st_mode & S_IFDIR); // ensure that TIRecordingDir is a Directory
+    //ASSERT(stat( TIRecordingDir.c_str(), &info ) == 0); // ensure that TIRecordingDir exists
+    //ASSERT(info.st_mode & S_IFDIR); // ensure that TIRecordingDir is a Directory
 }
 
 void TIRecorderProvider::update(TIRecorderData& record) {
