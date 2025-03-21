@@ -72,7 +72,7 @@
         DEFINES_PARAMETERS(
        {,
           (int)(100) targetOffset, // target behind penalty point
-          (float)(3000.f) timeOut, // how long after last State Change
+          (float)(7000.f) timeOut, // how long after last Penalty Kick (CornerKick) (6 sec)
           (Vector2f)(Vector2f(200.f,0.f)) interceptPoint, // just a few steps forward 
           (bool)(false) pointIsSelected, // InterceptPoint wird nur einmal berechnet
           (float)(1.2f) interceptFactor, // veringere diesen Wert um den Ball früher in seiner Lufbahn zu intercepten

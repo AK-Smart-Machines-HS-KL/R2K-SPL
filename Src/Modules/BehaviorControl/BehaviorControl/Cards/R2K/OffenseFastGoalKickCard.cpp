@@ -47,6 +47,8 @@
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/TeamCommStatus.h"
+#include "Representations/Infrastructure/ExtendedGameInfo.h"
+
 
 CARD(OffenseFastGoalKick,
   { ,
@@ -61,12 +63,14 @@ CARD(OffenseFastGoalKick,
     REQUIRES(TeamBehaviorStatus),
     REQUIRES(TeammateRoles),  // R2K
     REQUIRES(TeamCommStatus),  // wifi on off?
+    REQUIRES(ExtendedGameInfo),
 
     DEFINES_PARAMETERS(
     {,
       (float)(2500) minGoalDist,
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
+      (float)(5000.f) timeOutCorner, // how long after ownTeamCornerKick will I continue Kicking to 11 meter point
     }),
   });
 
@@ -96,15 +100,30 @@ class OffenseFastGoalKick : public OffenseFastGoalKickBase
       footIsSelected = true;
       leftFoot = theFieldBall.positionRelative.y() < 0;
     }
-    if (leftFoot)
-      theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::forwardFastLeft, false);
+
+    // we perform normal corner Kick if we are just slightly too late (5 sec)
+    if(theExtendedGameInfo.timeSinceLastFreeKickEnded < timeOutCorner){
+      if (leftFoot)
+      theGoToBallAndKickSkill(calcAngleToOppPenaltyMark(), KickInfo::forwardFastLeft, true);
     else
-      theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::forwardFastRight, false);
+      theGoToBallAndKickSkill(calcAngleToOppPenaltyMark(), KickInfo::forwardFastRight, true);
+      
+    }else{
+      if (leftFoot)
+        theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::forwardFastLeft, false);
+      else
+        theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::forwardFastRight, false);
+    }
   }
 
   Angle calcAngleToGoal() const
   {
     return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
+  }
+
+  Angle calcAngleToOppPenaltyMark() const
+  {
+    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentPenaltyMark, 0.f)).angle();
   }
 };
 
