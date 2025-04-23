@@ -2,7 +2,7 @@
  * @file WalkTestCard.cpp
  * @author Dennis Fuhrmann    
  * @brief This card is for testing the cabilities of the bots with a simple walk forward, backwards and sideways.
- * @version 0.1
+ * @version 0.5
  * @date 2025-04-23
  * 
  * 
