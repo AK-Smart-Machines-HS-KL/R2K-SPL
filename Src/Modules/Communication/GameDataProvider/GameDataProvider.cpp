@@ -157,6 +157,11 @@ void GameDataProvider::handleButtons()
   RoboCup::TeamInfo& team = gameCtrlData.teams[gameCtrlData.teams[0].teamNumber == Global::getSettings().teamNumber ? 0 : 1];
   RoboCup::RobotInfo& player = team.players[Global::getSettings().playerNumber - 1];
 
+  if(theEnhancedKeyStates.hitStreak[KeyStates::headMiddle]){
+    std::string output = "I'm deployed as Lone Bot Demo Striker";
+    SystemCall::say(output.c_str());
+  }
+
   if(mode == RobotInfo::active && !ignoreChestButton && theEnhancedKeyStates.hitStreak[KeyStates::chest] == 1)
   {
     if(player.penalty == PENALTY_NONE)
