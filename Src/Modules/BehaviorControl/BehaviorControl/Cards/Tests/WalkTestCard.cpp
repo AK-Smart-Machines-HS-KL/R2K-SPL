@@ -35,6 +35,7 @@ CARD(WalkTestCard,
         CALLS(Activity),
         CALLS(LookForward),
         CALLS(Stand),
+        CALLS(Say),
 
         DEFINES_PARAMETERS(
              {,
@@ -63,7 +64,7 @@ class WalkTestCard : public WalkTestCardBase
 
   bool postconditions() const override
   {
-    return true;   // set to true, when used as default card, ie, lowest card on stack
+    return false;   // set to true, when used as default card, ie, lowest card on stack
   }
 
   option
@@ -83,9 +84,9 @@ class WalkTestCard : public WalkTestCardBase
       action
       {
         // middle point
-        Pose2f targetMiddlePoint = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, 0) - Pose2f(0_deg, 0, 0);
+        Pose2f targetMiddlePoint = Pose2f(0_deg, 0, 0) - Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, 0);
         // walk to middle point
-        theWalkToPointSkill(targetMiddlePoint , 1.0f, false, true, true);
+        theWalkToPointSkill(targetMiddlePoint , 1.0f, false, false, true);
         
         theLookForwardSkill(); // Head Motion Request
       }
@@ -95,7 +96,7 @@ class WalkTestCard : public WalkTestCardBase
     {
       transition
       {
-        if(theRobotPose.inversePose.translation.y() >= (theFieldDimensions.yPosRightFieldBorder + 5))
+        if((- theRobotPose.inversePose.translation.y()) <= (theFieldDimensions.yPosRightFieldBorder + 5))
         {
           goto walkBackward;
         }
@@ -104,9 +105,9 @@ class WalkTestCard : public WalkTestCardBase
       action
       {
         // right field border
-        Pose2f targetRightBorder = Pose2f(0_deg, 0, 0) - Pose2f(0_deg, 0, theFieldDimensions.yPosRightFieldBorder);
+        Pose2f targetRightBorder = Pose2f(0_deg, 0, theFieldDimensions.yPosRightFieldBorder) - Pose2f(0_deg, 0, 0) ;
         // walk to field border
-        theWalkToPointSkill(targetRightBorder , 1.0f, false, true, true);
+        theWalkToPointSkill(targetRightBorder , 1.0f, false, false, true);
         
         theLookForwardSkill(); // Head Motion Request
       }
@@ -116,7 +117,7 @@ class WalkTestCard : public WalkTestCardBase
     {
       transition
       {
-        if(theRobotPose.inversePose.translation.x() >= (theFieldDimensions.xPosOwnPenaltyMark + 5))
+        if( (- theRobotPose.inversePose.translation.x()) <= (theFieldDimensions.xPosOwnPenaltyMark + 5))
         {
           goto walkSidewardLeft;
         }
@@ -125,9 +126,9 @@ class WalkTestCard : public WalkTestCardBase
       action
       {
         // right field border 
-        Pose2f targetBehind = Pose2f(0_deg, 0, theFieldDimensions.yPosRightFieldBorder) - Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, theFieldDimensions.yPosRightFieldBorder);
+        Pose2f targetBehind = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, theFieldDimensions.yPosRightFieldBorder) - Pose2f(0_deg, 0, theFieldDimensions.yPosRightFieldBorder);
         // walk backward
-        theWalkToPointSkill(targetBehind , 1.0f, false, true, true);
+        theWalkToPointSkill(targetBehind , 1.0f, false, false, true);
         
         theLookForwardSkill(); // Head Motion Request
       }
@@ -137,20 +138,35 @@ class WalkTestCard : public WalkTestCardBase
     {
       transition
       {
-        if(theRobotPose.inversePose.translation.y() >= (-5))
+        if(( - theRobotPose.inversePose.translation.y()) >= (-5))
         {
-          goto walkForward;
+          goto done;
         }
       }
 
       action
       {
         // Penaltymark 
-        Pose2f targetPenaltyMark = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, theFieldDimensions.yPosRightFieldBorder) - Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, 0);
+        Pose2f targetPenaltyMark = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, 0) - Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, theFieldDimensions.yPosRightFieldBorder);
         // walk backward
-        theWalkToPointSkill(targetPenaltyMark , 1.0f, false, true, true);
+        theWalkToPointSkill(targetPenaltyMark , 1.0f, false, false, true);
         
         theLookForwardSkill(); // Head Motion Request
+      }
+    }
+
+    state(done)
+    {
+      transition
+      {
+
+      }
+
+      action
+      {
+        theLookForwardSkill(); // Head Motion Request
+        theStandSkill;
+        theSaySkill("walking test done");
       }
     }
   }
