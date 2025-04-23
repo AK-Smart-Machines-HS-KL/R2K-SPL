@@ -74,13 +74,16 @@ class WalkTestCard : public WalkTestCardBase
     {
       transition
       {
-
+        if(theRobotPose.inversePose.translation.x() <= 5)
+        {
+          goto walkSidewardRight;
+        }
       }
 
       action
       {
         // middle point
-        Pose2f targetMiddlePoint = theRobotPose.toRelative(Pose2f(0_deg, 0, 0));
+        Pose2f targetMiddlePoint = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, 0) - Pose2f(0_deg, 0, 0);
         // walk to middle point
         theWalkToPointSkill(targetMiddlePoint , 1.0f, false, true, true);
         
@@ -92,13 +95,16 @@ class WalkTestCard : public WalkTestCardBase
     {
       transition
       {
-
+        if(theRobotPose.inversePose.translation.y() >= (theFieldDimensions.yPosRightFieldBorder + 5))
+        {
+          goto walkBackward;
+        }
       }
 
       action
       {
         // right field border
-        Pose2f targetRightBorder = Pose2f(0_deg, 0, 0) - Pose2f(0_deg, 0, theFieldDimensions.yPosRightSideline);
+        Pose2f targetRightBorder = Pose2f(0_deg, 0, 0) - Pose2f(0_deg, 0, theFieldDimensions.yPosRightFieldBorder);
         // walk to field border
         theWalkToPointSkill(targetRightBorder , 1.0f, false, true, true);
         
@@ -110,13 +116,16 @@ class WalkTestCard : public WalkTestCardBase
     {
       transition
       {
-        
+        if(theRobotPose.inversePose.translation.x() >= (theFieldDimensions.xPosOwnPenaltyMark + 5))
+        {
+          goto walkSidewardLeft;
+        }
       }
 
       action
       {
         // right field border 
-        Pose2f targetBehind = Pose2f(0_deg, 0, theFieldDimensions.yPosRightSideline) - Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, theFieldDimensions.yPosRightSideline);
+        Pose2f targetBehind = Pose2f(0_deg, 0, theFieldDimensions.yPosRightFieldBorder) - Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, theFieldDimensions.yPosRightFieldBorder);
         // walk backward
         theWalkToPointSkill(targetBehind , 1.0f, false, true, true);
         
@@ -128,13 +137,16 @@ class WalkTestCard : public WalkTestCardBase
     {
       transition
       {
-        
+        if(theRobotPose.inversePose.translation.y() >= (-5))
+        {
+          goto walkForward;
+        }
       }
 
       action
       {
         // Penaltymark 
-        Pose2f targetPenaltyMark = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, theFieldDimensions.yPosRightSideline) - Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, 0);
+        Pose2f targetPenaltyMark = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, theFieldDimensions.yPosRightFieldBorder) - Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, 0);
         // walk backward
         theWalkToPointSkill(targetPenaltyMark , 1.0f, false, true, true);
         
