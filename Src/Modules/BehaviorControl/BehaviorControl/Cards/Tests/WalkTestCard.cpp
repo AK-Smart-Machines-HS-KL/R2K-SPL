@@ -134,7 +134,7 @@ class WalkTestCard : public WalkTestCardBase
       action
       {
         // Penaltymark 
-        Pose2f targetPenaltyMark = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, theFieldDimensions.yPosRightSideline) - Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, theFieldDimensions.yPosOwnPenaltyMark);
+        Pose2f targetPenaltyMark = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, theFieldDimensions.yPosRightSideline) - Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, 0);
         // walk backward
         theWalkToPointSkill(targetPenaltyMark , 1.0f, false, true, true);
         
