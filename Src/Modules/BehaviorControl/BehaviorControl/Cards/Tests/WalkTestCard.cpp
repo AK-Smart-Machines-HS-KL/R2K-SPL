@@ -1,0 +1,147 @@
+/**
+ * @file WalkTestCard.cpp
+ * @author Dennis Fuhrmann    
+ * @brief This card is for testing the cabilities of the bots with a simple walk forward, backwards and sideways.
+ * @version 0.1
+ * @date 2025-04-23
+ * 
+ * 
+ * 
+ */
+
+// Skills - Must be included BEFORE Card Base
+#include "Representations/BehaviorControl/Skills.h"
+
+// Card Base
+#include "Tools/BehaviorControl/Framework/Card/Card.h"
+#include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
+
+// Representations
+#include "Representations/BehaviorControl/FieldBall.h"
+#include "Representations/Configuration/FieldDimensions.h"
+#include "Representations/Modeling/RobotPose.h"
+
+//#include <filesystem>
+
+// Modify this card but don't commit changes to keep it clean for other developers
+// Also don't forget to put this card at the top of your Card Stack!
+CARD(WalkTestCard,
+     {
+        ,
+        REQUIRES(RobotPose),
+        REQUIRES(FieldDimensions),
+
+        CALLS(WalkToPoint),
+        CALLS(Activity),
+        CALLS(LookForward),
+        CALLS(Stand),
+
+        DEFINES_PARAMETERS(
+             {,
+                //Define Params here
+             }),
+
+        /*
+        //Optionally, Load Config params here. DEFINES and LOADS can not be used together
+        LOADS_PARAMETERS(
+             {,
+                //Load Params here
+             }),
+             
+        */
+
+     });
+
+class WalkTestCard : public WalkTestCardBase
+{
+
+  //always active
+  bool preconditions() const override
+  {
+    return true;
+  }
+
+  bool postconditions() const override
+  {
+    return true;   // set to true, when used as default card, ie, lowest card on stack
+  }
+
+  option
+  {
+    theActivitySkill(BehaviorStatus::testingBehavior);
+
+    initial_state(walkForward)
+    {
+      transition
+      {
+
+      }
+
+      action
+      {
+        // middle point
+        Pose2f targetMiddlePoint = theRobotPose.toRelative(Pose2f(0_deg, 0, 0));
+        // walk to middle point
+        theWalkToPointSkill(targetMiddlePoint , 1.0f, false, true, true);
+        
+        theLookForwardSkill(); // Head Motion Request
+      }
+    }
+
+    state(walkSidewardRight)
+    {
+      transition
+      {
+
+      }
+
+      action
+      {
+        // right field border
+        Pose2f targetRightBorder = Pose2f(0_deg, 0, 0) - Pose2f(0_deg, 0, theFieldDimensions.yPosRightSideline);
+        // walk to field border
+        theWalkToPointSkill(targetRightBorder , 1.0f, false, true, true);
+        
+        theLookForwardSkill(); // Head Motion Request
+      }
+    }
+    
+    state(walkBackward)
+    {
+      transition
+      {
+        
+      }
+
+      action
+      {
+        // right field border 
+        Pose2f targetBehind = Pose2f(0_deg, 0, theFieldDimensions.yPosRightSideline) - Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, theFieldDimensions.yPosRightSideline);
+        // walk backward
+        theWalkToPointSkill(targetBehind , 1.0f, false, true, true);
+        
+        theLookForwardSkill(); // Head Motion Request
+      }
+    }
+
+    state(walkSidewardLeft)
+    {
+      transition
+      {
+        
+      }
+
+      action
+      {
+        // Penaltymark 
+        Pose2f targetPenaltyMark = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, theFieldDimensions.yPosRightSideline) - Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, theFieldDimensions.yPosOwnPenaltyMark);
+        // walk backward
+        theWalkToPointSkill(targetPenaltyMark , 1.0f, false, true, true);
+        
+        theLookForwardSkill(); // Head Motion Request
+      }
+    }
+  }
+};
+
+MAKE_CARD(WalkTestCard);
