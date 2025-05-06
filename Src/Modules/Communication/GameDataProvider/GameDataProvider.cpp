@@ -170,6 +170,11 @@ void GameDataProvider::handleButtons()
     SystemCall::say(output.c_str());
   }
 
+  if(theEnhancedKeyStates.hitStreak[KeyStates::headMiddle]){
+    std::string output = "I'm deployed as Demo Robot";
+    SystemCall::say(output.c_str());
+  }
+
   if(mode == RobotInfo::active && !ignoreChestButton && theEnhancedKeyStates.hitStreak[KeyStates::chest] == 1)
   {
     if(player.penalty == PENALTY_NONE)
