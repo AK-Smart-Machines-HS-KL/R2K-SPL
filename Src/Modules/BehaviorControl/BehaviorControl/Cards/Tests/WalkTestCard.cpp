@@ -86,7 +86,7 @@ class WalkTestCard : public WalkTestCardBase
       action
       {
         // targeting the middle point in robot relative coordinates, overshooting by half the width of the field lines
-        Pose2f targetMiddlePoint = Pose2f(0_deg, theFieldDimensions.xPosHalfWayLine + 25.f, 0) + theRobotPose.inversePose;
+        Pose2f targetMiddlePoint = Pose2f(0_deg, theFieldDimensions.xPosHalfWayLine + 50.f, 0) + theRobotPose.inversePose;
         // walk to middle point
         theWalkToPointSkill(targetMiddlePoint , 1.0f, false, false, true);
         
@@ -108,7 +108,7 @@ class WalkTestCard : public WalkTestCardBase
       action
       {
         // targeting the right field border
-        Pose2f targetRightBorder = Pose2f(0_deg, theFieldDimensions.xPosHalfWayLine, theFieldDimensions.yPosRightSideline - 25.f) + theRobotPose.inversePose;
+        Pose2f targetRightBorder = Pose2f(0_deg, theFieldDimensions.xPosHalfWayLine, theFieldDimensions.yPosRightSideline - 50.f) + theRobotPose.inversePose;
         // walk to field border
         theWalkToPointSkill(targetRightBorder , 1.0f, false, false, true);
         
@@ -130,7 +130,7 @@ class WalkTestCard : public WalkTestCardBase
       action
       {
         // target right field border 
-        Pose2f targetBehind = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark - 25.f, theFieldDimensions.yPosRightSideline) + theRobotPose.inversePose;
+        Pose2f targetBehind = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark - 50.f, theFieldDimensions.yPosRightSideline) + theRobotPose.inversePose;
         // walk backward
         theWalkToPointSkill(targetBehind , 1.0f, false, false, true);
         
@@ -152,7 +152,7 @@ class WalkTestCard : public WalkTestCardBase
       action
       {
         // target Penaltymark 
-        Pose2f targetPenaltyMark = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, 25.f) + theRobotPose.inversePose;
+        Pose2f targetPenaltyMark = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, 50.f) + theRobotPose.inversePose;
         // walk backward
         theWalkToPointSkill(targetPenaltyMark , 1.0f, false, false, true);
         
