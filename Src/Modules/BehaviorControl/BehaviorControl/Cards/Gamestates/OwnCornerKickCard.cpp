@@ -3,7 +3,7 @@
  * @author Andy Hobelsberger, Adrian Müller (R2K)
  * @brief Covers the Free Kick: Own Team has Corner Kick
  * @version 1.1
- *          1.2 intergration with CornerKickCatcher Card ball is played to penalty Point and kicked into the goal by second bot
+ *       
  * @date 2022-11-22
  * 
  * Notes: 
@@ -15,6 +15,7 @@
  * v1.4 (Asrar) card is  for  ballWasSeenStickyPeriod (5000msec), i.e., bot assumes ball to be at the last-seen position
  *                 Applied this parameter by changing the postcondition().
  * v1.5 Target is opponent penaly mark; assuming a body is waiting there (Adrian, 3/25)
+ * v1.51 small change to precondition to cover Case of no Offence present
  */
 
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
