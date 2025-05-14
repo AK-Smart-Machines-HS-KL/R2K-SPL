@@ -72,7 +72,7 @@
         DEFINES_PARAMETERS(
        {,
           (int)(100) targetOffset, // target behind penalty point
-          (float)(7000.f) timeOut, // how long after last Penalty Kick (CornerKick) (6 sec)
+          (float)(7000.f) timeOut, // how long after last Penalty Kick (CornerKick) (7 sec)
           (Vector2f)(Vector2f(200.f,0.f)) interceptPoint, // just a few steps forward 
           (bool)(false) pointIsSelected, // InterceptPoint wird nur einmal berechnet
           (float)(1.2f) interceptFactor, // veringere diesen Wert um den Ball früher in seiner Lufbahn zu intercepten
@@ -88,7 +88,7 @@
  class OwnCornerKickCatcherCard : public OwnCornerKickCatcherCardBase
  {
 
-        // active if last freee Kick was under 5 sec ago  
+        
      bool preconditions() const override
      {
        return  thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1  //  i am Supporter 
@@ -96,7 +96,7 @@
          // doesnt work how i want it to
          &&    ballIsInCorner()
          &&    theGameInfo.setPlay == SET_PLAY_NONE  // No Penalty
-         &&    theExtendedGameInfo.timeSinceLastFreeKickEnded < timeOut; // 3 sec since last penalty
+         &&    theExtendedGameInfo.timeSinceLastFreeKickEnded < timeOut; // 7 sec since last penalty
          
      }
  
@@ -127,7 +127,7 @@
               theWalkToPointSkill(Pose2f(0_deg, interceptPoint), 1.f, true, true, true, true);
               theLookAtBallSkill(); // HeadMotion controll
            
-            // we don't assume we already are at the correkt position
+            // we don't assume we already are at the correct position
               
          }else if (theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOpponentPenaltyMark - targetOffset, 0)) != Vector2f::Zero())
          {
@@ -152,8 +152,8 @@
        return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
      }
  
-     // Altenativ TimetoReachBall benutzen (konnte nicht herausfinden wie)  
-     // relativer Abstand nach Pytagoras
+     // 
+     // relative distance per pytagoras
      float calcDistanceToBall() const
      {
        Vector2f temp1 = theFieldBall.recentBallPositionRelative();
@@ -163,11 +163,11 @@
      }
  
     
-     // ifdef weil es unterschiedliche ergebnisse beim Simulator und im echten Roboter gibt
+     // ifdef because of difrences between simulator and real robot
      Vector2f calcInterceptPoint() const
      {
        Vector2f temp = BallPhysics::propagateBallPosition(theFieldBall.recentBallPositionOnField(), theBallModel.estimate.velocity, interceptFactor, theBallSpecification.friction);
-       //Für den Fehler beim echten Roboter (die Werte sind invertiert)
+       //for real robot just invert the results
  #ifdef TARGET_ROBOT
        Vector2f result = Vector2f(-(temp.x() + interceptOffset), -(temp.y() + interceptOffset));
  #else
@@ -177,27 +177,29 @@
      }
  
  
-     //berechnet den Schwellwert für die Distance zum Ball anhand der Geschwnidkeit des Balls
+     //calculates the min Distance to the ball for the robot to react
      float calcMinDistance() const
      {
-       // Geschwindigkeit des Balls durch Pythagoras
+       // speed of ball through pytagoras
        Vector2f temp1 = theBallModel.estimate.velocity;
        float temp2 = temp1.x() * temp1.x();
        float temp3 = temp1.y() * temp1.y();
        float result = std::sqrt(temp2 + temp3);
        float distance = 0.f;
-       // Ball stands still inclusive assumed sensor jitter
+       // ball stands still with assumed sensor jitter
          if (result >= 1) {
            distance = Geometry::getDistanceToLine(Geometry::Line(theFieldBall.recentBallPositionRelative(), temp1), Vector2f::Zero());
          }
        return (result + distance) * minDistanceFactor;
      }
+
     bool ballIsInCorner() const
     {
       return (theFieldBall.positionOnField.x() > theFieldDimensions.xPosOpponentPenaltyArea  // is behind penelty area line
               && (theFieldBall.positionOnField.y() <= theFieldDimensions.yPosLeftPenaltyArea // is Left of penalty area
               || theFieldBall.positionOnField.y() >= theFieldDimensions.yPosRightPenaltyArea)); // is Right of penalty area
     }
+    
  };
  
  MAKE_CARD(OwnCornerKickCatcherCard);

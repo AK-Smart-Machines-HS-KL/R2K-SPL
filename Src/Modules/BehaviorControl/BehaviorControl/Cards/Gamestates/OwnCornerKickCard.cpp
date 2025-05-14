@@ -48,6 +48,7 @@ CARD(OwnCornerKickCard,
   REQUIRES(FieldDimensions),
   REQUIRES(OwnTeamInfo),
   REQUIRES(GameInfo),
+  REQUIRES(PlayerRole),
   REQUIRES(TeamBehaviorStatus),
   REQUIRES(TeammateRoles),
   REQUIRES(TeamCommStatus),  // wifi on off?
@@ -74,7 +75,8 @@ class OwnCornerKickCard : public OwnCornerKickCardBase
     return  theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)  // I am the striker
       && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
       && theGameInfo.setPlay == SET_PLAY_CORNER_KICK
-      && theTeammateRoles.isTacticalOffense(theRobotInfo.number); // My recent role
+      && (theTeammateRoles.isTacticalOffense(theRobotInfo.number) // My recent role
+      ||  thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters); // Or i am most forward bot
   }
 
   /**
