@@ -74,10 +74,10 @@
           (int)(100) targetOffset, // target behind penalty point
           (float)(7000.f) timeOut, // how long after last Penalty Kick (CornerKick) (7 sec)
           (Vector2f)(Vector2f(200.f,0.f)) interceptPoint, // just a few steps forward 
-          (bool)(false) pointIsSelected, // InterceptPoint wird nur einmal berechnet
-          (float)(1.2f) interceptFactor, // veringere diesen Wert um den Ball früher in seiner Lufbahn zu intercepten
-          (float)(0.9f) minDistanceFactor, // eröhe diesen Wert um den distanz zu erhöhen die der Ball unterschreiten muss damit der Roboter reagiert
-          (float)(100.0f) interceptOffset, // sowohl x und y Werte sind betroffen
+          (bool)(false) pointIsSelected, // InterceptPoint only calculated once
+          (float)(1.2f) interceptFactor, // lower this value to intercept the ball earlier in its path
+          (float)(0.9f) minDistanceFactor, // increase to make the Bot react earlier
+          (float)(100.0f) interceptOffset, // both x and y value affected
           (Angle)(Angle(30_deg)) goalOffset, // needed so the Nao actually looks at the goal and not the goal post, Offset is relative to goal post
           (Angle)(Angle(2_deg)) goalPrecision, // (suggested Value) how precice the Nao turn towards the goal 
        }),
@@ -92,8 +92,6 @@
      bool preconditions() const override
      {
        return  thePlayerRole.supporterIndex() == thePlayerRole.numOfActiveSupporters - 1  //  i am Supporter 
-         //&&   (theLibTeam.strikerPose.translation.x() >= theFieldDimensions.xPosOpponentPenaltyMark && (theLibTeam.strikerPose.translation.y() >= theFieldDimensions.yPosLeftPenaltyArea || theLibTeam.strikerPose.translation.y() <= theFieldDimensions.yPosRightPenaltyArea)) // Striker is in Corner  
-         // doesnt work how i want it to
          &&    ballIsInCorner()
          &&    theGameInfo.setPlay == SET_PLAY_NONE  // No Penalty
          &&    theExtendedGameInfo.timeSinceLastFreeKickEnded < timeOut; // 7 sec since last penalty
@@ -111,19 +109,19 @@
  
       
  
-       //Berechnet die Distanz vom Roboter zum Balls 
+       //calcs the distance to the ball
        float minDistance = calcMinDistance();
        
          if (calcDistanceToBall() <= minDistance) {
            
               
-             // InterceptPoint wird nur einmal berechnet
+             // InterceptPoint only calculated once
            if (!pointIsSelected) {
              
              interceptPoint = calcInterceptPoint();
              pointIsSelected = true;
            }
-               //Die Kick Skills sind nicht schnell genug um einen rollenden Ball zu intercepten stadesssen nutzen wir einen Lauf in den Ball rein um einen Kick zu simulieren
+               //Kicks Skills aren`t fast enough instead we walk into the ball to simulate a kick
               theWalkToPointSkill(Pose2f(0_deg, interceptPoint), 1.f, true, true, true, true);
               theLookAtBallSkill(); // HeadMotion controll
            
@@ -146,13 +144,13 @@
          }
        
      }
-     // kopiert aus CornerKick
+     // copy from cornerkick
      Angle calcAngleToGoal() const
      {
        return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
      }
  
-     // 
+     
      // relative distance per pytagoras
      float calcDistanceToBall() const
      {
@@ -199,7 +197,7 @@
               && (theFieldBall.positionOnField.y() <= theFieldDimensions.yPosLeftPenaltyArea // is Left of penalty area
               || theFieldBall.positionOnField.y() >= theFieldDimensions.yPosRightPenaltyArea)); // is Right of penalty area
     }
-    
+
  };
  
  MAKE_CARD(OwnCornerKickCatcherCard);
