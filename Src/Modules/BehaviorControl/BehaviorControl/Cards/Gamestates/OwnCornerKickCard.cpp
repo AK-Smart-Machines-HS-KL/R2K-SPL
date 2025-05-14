@@ -3,6 +3,7 @@
  * @author Andy Hobelsberger, Adrian Müller (R2K)
  * @brief Covers the Free Kick: Own Team has Corner Kick
  * @version 1.1
+ *          1.2 intergration with CornerKickCatcher Card ball is played to penalty Point and kicked into the goal by second bot
  * @date 2022-11-22
  * 
  * Notes: 
