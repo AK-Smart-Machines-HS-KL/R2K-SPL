@@ -20,6 +20,7 @@ public:
     unstiff,
     active,
     calibration,
+    walktest,
   });
 
   int number; /**< The number of the robot. */

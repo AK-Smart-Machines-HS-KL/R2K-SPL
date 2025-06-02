@@ -20,6 +20,7 @@
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Modeling/RobotPose.h"
+#include "Representations/Communication/RobotInfo.h"
 
 //#include <filesystem>
 
@@ -30,6 +31,7 @@ CARD(WalkTestCard,
         ,
         REQUIRES(RobotPose),
         REQUIRES(FieldDimensions),
+        REQUIRES(RobotInfo),
 
         CALLS(WalkToPoint),
         CALLS(Activity),
@@ -59,12 +61,12 @@ class WalkTestCard : public WalkTestCardBase
   //always active
   bool preconditions() const override
   {
-    return true;
+    return theRobotInfo.mode == RobotInfo::walktest;
   }
 
   bool postconditions() const override
   {
-    return false;   // set to true, when used as default card, ie, lowest card on stack
+    return !preconditions();  
   }
 
   option
