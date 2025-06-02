@@ -78,17 +78,17 @@ class WalkTestCard : public WalkTestCardBase
       transition
       {
         theSaySkill("I start walking forward from the penalty point.");
-        if(theRobotPose.inversePose.translation.x() <= 5)
+        if(theRobotPose.translation.x() >= 0)
         {
-          theSaySkill("Reached center field. Now walking right.");
+          theSaySkill("I have reached the field center point. Now walking right.");
           goto walkSidewardRight;
         }
       }
 
       action
       {
-        // middle point
-        Pose2f targetMiddlePoint = Pose2f(0_deg, 0, 0) - Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, 0);
+        // targeting the middle point in robot relative coordinates, overshooting by half the width of the field lines
+        Pose2f targetMiddlePoint = Pose2f(0_deg, theFieldDimensions.xPosHalfWayLine + 50.f, 0) + theRobotPose.inversePose;
         // walk to middle point
         theWalkToPointSkill(targetMiddlePoint , 1.0f, false, false, true);
         
@@ -100,17 +100,17 @@ class WalkTestCard : public WalkTestCardBase
     {
       transition
       {
-        if((- theRobotPose.inversePose.translation.y()) <= (theFieldDimensions.yPosRightSideline + 5))
+        if((theRobotPose.translation.y()) <= (theFieldDimensions.yPosRightSideline))
         {
-          theSaySkill("Reached right sideline. Now walking backwards.");
+          theSaySkill("Now I have reached the right sideline and I'm walking backwards until I'm at about the height of the penalty point.");
           goto walkBackward;
         }
       }
 
       action
       {
-        // right field border
-        Pose2f targetRightBorder = Pose2f(0_deg, 0, theFieldDimensions.yPosRightSideline) - Pose2f(0_deg, 0, 0) ;
+        // targeting the right field border
+        Pose2f targetRightBorder = Pose2f(0_deg, theFieldDimensions.xPosHalfWayLine, theFieldDimensions.yPosRightSideline - 50.f) + theRobotPose.inversePose;
         // walk to field border
         theWalkToPointSkill(targetRightBorder , 1.0f, false, false, true);
         
@@ -122,17 +122,17 @@ class WalkTestCard : public WalkTestCardBase
     {
       transition
       {
-        if( (- theRobotPose.inversePose.translation.x()) <= (theFieldDimensions.xPosOwnPenaltyMark + 5))
+        if( (theRobotPose.translation.x()) <= (theFieldDimensions.xPosOwnPenaltyMark))
         {
-          theSaySkill("Reached penalty point parallel. Now walking left.");
+          theSaySkill("I reached the height of the penalty point. Now walking left towards it.");
           goto walkSidewardLeft;
         }
       }
 
       action
       {
-        // right field border 
-        Pose2f targetBehind = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, theFieldDimensions.yPosRightSideline) - Pose2f(0_deg, 0, theFieldDimensions.yPosRightSideline);
+        // target right field border 
+        Pose2f targetBehind = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark - 50.f, theFieldDimensions.yPosRightSideline) + theRobotPose.inversePose;
         // walk backward
         theWalkToPointSkill(targetBehind , 1.0f, false, false, true);
         
@@ -144,17 +144,17 @@ class WalkTestCard : public WalkTestCardBase
     {
       transition
       {
-        if(( - theRobotPose.inversePose.translation.y()) >= (-5))
+        if((theRobotPose.translation.y()) >= 0)
         {
-          theSaySkill("walking test done");
+          theSaySkill("I'm back at the starting point. Walking test done.");
           goto done;
         }
       }
 
       action
       {
-        // Penaltymark 
-        Pose2f targetPenaltyMark = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, 0) - Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, theFieldDimensions.yPosRightFieldBorder);
+        // target Penaltymark 
+        Pose2f targetPenaltyMark = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, 50.f) + theRobotPose.inversePose;
         // walk backward
         theWalkToPointSkill(targetPenaltyMark , 1.0f, false, false, true);
         

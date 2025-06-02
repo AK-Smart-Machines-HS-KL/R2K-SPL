@@ -14,6 +14,7 @@
 #include <netinet/in.h>
 #endif
 #include <cstring>
+#include <fstream>
 
 MAKE_MODULE(GameDataProvider, communication);
 
@@ -187,6 +188,13 @@ void GameDataProvider::handleButtons()
   if(theEnhancedKeyStates.hitStreak[KeyStates::headRear])
   {
     std::string output = "You are the best operator!";
+    SystemCall::say(output.c_str());
+  }
+
+  if(theEnhancedKeyStates.hitStreak[KeyStates::headMiddle])
+  {
+    std::string branchName = "2025 11 Walk Test";
+    std::string output = "I am deployed on branch " + branchName + "!";
     SystemCall::say(output.c_str());
   }
 
