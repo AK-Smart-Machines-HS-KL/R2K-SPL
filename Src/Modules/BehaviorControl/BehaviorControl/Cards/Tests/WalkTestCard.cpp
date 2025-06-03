@@ -9,6 +9,8 @@
  * 
  */
 
+double eps = 25.f // epsilon value for self location precision
+
 // Skills - Must be included BEFORE Card Base
 #include "Representations/BehaviorControl/Skills.h"
 
@@ -61,7 +63,7 @@ class WalkTestCard : public WalkTestCardBase
   //always active
   bool preconditions() const override
   {
-    return theRobotInfo.mode == RobotInfo::walktest;
+    return true;
   }
 
   bool postconditions() const override
@@ -77,10 +79,10 @@ class WalkTestCard : public WalkTestCardBase
     {
       transition
       {
-        theSaySkill("Now walking to start.");
-        if(theRobotPose.translation.x() > (theFieldDimensions.xPosOwnPenaltyMark - 50.f) &&
-           theRobotPose.translation.x() < (theFieldDimensions.xPosOwnPenaltyMark + 50.f) &&
-           theRobotPose.translation.y() > (-50.f) && theRobotPose.translation.y() < (50.f))
+        theSaySkill("Walking to start.");
+        if(theRobotPose.translation.x() > (theFieldDimensions.xPosOwnPenaltyMark - 250.f - 25.f) &&
+           theRobotPose.translation.x() < (theFieldDimensions.xPosOwnPenaltyMark - 250.f + 25.f) &&
+           theRobotPose.translation.y() > (-25.f) && theRobotPose.translation.y() < (25.f))
         {
           goto walkForward;
         }
@@ -88,12 +90,11 @@ class WalkTestCard : public WalkTestCardBase
 
       action
       {
-        //calc angle look to Middlepoint
-        Angle angle = (theRobotPose.inversePose * Vector2f(0.f, 0.f)).angle();;
         // target Penaltymark 
-        Pose2f targetPenaltyMark = Pose2f(angle, theFieldDimensions.xPosOwnPenaltyMark, 50.f) + theRobotPose.inversePose;
+        Pose2f targetPenaltyMark = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark - 250.f , 0.f) + theRobotPose.inversePose;
         // walk to starting point penaltymark
         theWalkToPointSkill(targetPenaltyMark , 1.0f, false, false, true);
+        theLookForwardSkill(); // Head Motion Request
       }
     }
 
@@ -103,7 +104,8 @@ class WalkTestCard : public WalkTestCardBase
       transition
       {
         theSaySkill("Now walking forward");
-        if(theRobotPose.translation.x() >= 0)
+        // trigger next state when reaching a distance of 30cm in front of middle point
+        if(theRobotPose.translation.x() >= -250.f)
         {
           theSaySkill("Now walking right.");
           goto walkSidewardRight;
@@ -112,8 +114,8 @@ class WalkTestCard : public WalkTestCardBase
 
       action
       {
-        // targeting the middle point in robot relative coordinates, overshooting by half the width of the field lines
-        Pose2f targetMiddlePoint = Pose2f(0_deg, theFieldDimensions.xPosHalfWayLine + 50.f, 0) + theRobotPose.inversePose;
+        // targeting the middle point in robot relative coordinates, trigger next state when 25cm from middle point
+        Pose2f targetMiddlePoint = Pose2f(0_deg, theFieldDimensions.xPosHalfWayLine - 250.f, 0) + theRobotPose.inversePose;
         // walk to middle point
         theWalkToPointSkill(targetMiddlePoint , 1.0f, false, false, true);
         
@@ -125,9 +127,10 @@ class WalkTestCard : public WalkTestCardBase
     {
       transition
       {
-        if((theRobotPose.translation.y()) <= (theFieldDimensions.yPosRightSideline))
+        // trigger next state when reaching a distance of 30cm from right sideline
+        if((theRobotPose.translation.y()) <= (theFieldDimensions.yPosRightSideline - 250.f))
         {
-          theSaySkill("I'm walking backwards");
+          theSaySkill("Now walking backwards");
           goto walkBackward;
         }
       }
@@ -135,7 +138,7 @@ class WalkTestCard : public WalkTestCardBase
       action
       {
         // targeting the right field border
-        Pose2f targetRightBorder = Pose2f(0_deg, theFieldDimensions.xPosHalfWayLine, theFieldDimensions.yPosRightSideline - 50.f) + theRobotPose.inversePose;
+        Pose2f targetRightBorder = Pose2f(0_deg, theFieldDimensions.xPosHalfWayLine - 250.f, theFieldDimensions.yPosRightSideline) + theRobotPose.inversePose;
         // walk to field border
         theWalkToPointSkill(targetRightBorder , 1.0f, false, false, true);
         
@@ -147,7 +150,7 @@ class WalkTestCard : public WalkTestCardBase
     {
       transition
       {
-        if( (theRobotPose.translation.x()) <= (theFieldDimensions.xPosOwnPenaltyMark))
+        if( (theRobotPose.translation.x()) <= (theFieldDimensions.xPosOwnPenaltyMark) - 250.f)
         {
           theSaySkill("Now walking left");
           goto walkSidewardLeft;
@@ -156,8 +159,8 @@ class WalkTestCard : public WalkTestCardBase
 
       action
       {
-        // target right field border 
-        Pose2f targetBehind = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark - 50.f, theFieldDimensions.yPosRightSideline) + theRobotPose.inversePose;
+        // target area behind penalty walkin point
+        Pose2f targetBehind = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark - 250.f, theFieldDimensions.yPosRightSideline) + theRobotPose.inversePose;
         // walk backward
         theWalkToPointSkill(targetBehind , 1.0f, false, false, true);
         
@@ -178,8 +181,8 @@ class WalkTestCard : public WalkTestCardBase
 
       action
       {
-        // target Penaltymark 
-        Pose2f targetPenaltyMark = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark, 50.f) + theRobotPose.inversePose;
+        // target area behind penalty mark 
+        Pose2f targetPenaltyMark = Pose2f(0_deg, theFieldDimensions.xPosOwnPenaltyMark - 250.f, 0.f) + theRobotPose.inversePose;
         // walk backward
         theWalkToPointSkill(targetPenaltyMark , 1.0f, false, false, true);
         
