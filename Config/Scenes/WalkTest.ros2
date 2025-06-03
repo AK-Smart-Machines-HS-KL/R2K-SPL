@@ -1,7 +1,7 @@
 <Simulation>
 
   <Include href="Includes/NaoV6H25.rsi2"/>
-  <Include href="Includes/1vsDummies.rsi2"/>
+  <Include href="Includes/LoneBotFromPenalty.rsi2"/>
   <Include href="Includes/Ball2016SPL.rsi2"/>
   <Include href="Includes/Field2020SPL.rsi2"/>
 
