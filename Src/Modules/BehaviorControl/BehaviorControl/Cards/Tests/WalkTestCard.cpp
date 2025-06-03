@@ -73,14 +73,39 @@ class WalkTestCard : public WalkTestCardBase
   {
     theActivitySkill(BehaviorStatus::testingBehavior);
 
-    initial_state(walkForward)
+    initial_state(walkPenaltyPoint)
     {
       transition
       {
-        theSaySkill("I start walking forward from the penalty point.");
+        theSaySkill("Now walking to start.");
+        if(theRobotPose.translation.x() > (theFieldDimensions.xPosOwnPenaltyMark - 50.f) &&
+           theRobotPose.translation.x() < (theFieldDimensions.xPosOwnPenaltyMark + 50.f) &&
+           theRobotPose.translation.y() > (-50.f) && theRobotPose.translation.y() < (50.f))
+        {
+          goto walkForward;
+        }
+      }
+
+      action
+      {
+        //calc angle look to Middlepoint
+        Angle angle = (theRobotPose.inversePose * Vector2f(0.f, 0.f)).angle();;
+        // target Penaltymark 
+        Pose2f targetPenaltyMark = Pose2f(angle, theFieldDimensions.xPosOwnPenaltyMark, 50.f) + theRobotPose.inversePose;
+        // walk to starting point penaltymark
+        theWalkToPointSkill(targetPenaltyMark , 1.0f, false, false, true);
+      }
+    }
+
+
+    state(walkForward)
+    {
+      transition
+      {
+        theSaySkill("Now walking forward");
         if(theRobotPose.translation.x() >= 0)
         {
-          theSaySkill("I have reached the field center point. Now walking right.");
+          theSaySkill("Now walking right.");
           goto walkSidewardRight;
         }
       }
@@ -102,7 +127,7 @@ class WalkTestCard : public WalkTestCardBase
       {
         if((theRobotPose.translation.y()) <= (theFieldDimensions.yPosRightSideline))
         {
-          theSaySkill("Now I have reached the right sideline and I'm walking backwards until I'm at about the height of the penalty point.");
+          theSaySkill("I'm walking backwards");
           goto walkBackward;
         }
       }
@@ -124,7 +149,7 @@ class WalkTestCard : public WalkTestCardBase
       {
         if( (theRobotPose.translation.x()) <= (theFieldDimensions.xPosOwnPenaltyMark))
         {
-          theSaySkill("I reached the height of the penalty point. Now walking left towards it.");
+          theSaySkill("Now walking left");
           goto walkSidewardLeft;
         }
       }
@@ -146,7 +171,7 @@ class WalkTestCard : public WalkTestCardBase
       {
         if((theRobotPose.translation.y()) >= 0)
         {
-          theSaySkill("I'm back at the starting point. Walking test done.");
+          theSaySkill("Walking test done.");
           goto done;
         }
       }
