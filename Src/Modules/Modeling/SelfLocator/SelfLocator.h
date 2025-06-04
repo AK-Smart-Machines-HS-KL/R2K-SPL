@@ -110,6 +110,7 @@ MODULE(SelfLocator,
     (bool)   demoUseCustomReturnFromPenaltyPoses,       /**< Flag to use the two following poses when localization is restarted after a penalty. This is only useful for certain demos on special fields. */
     (Pose2f) demoCustomReturnFromPenaltyPoseGoalie,     /**< Goalie pose is set to this pose after a penalty. */
     (Pose2f) demoCustomReturnFromPenaltyPoseFieldPlayer,/**< Field player pose is set to this pose after a penalty. */
+    (Pose2f) walktestCustomReturnFromPenaltyPose,       /**< Pose used when in mode walktest */
   }),
 });
 

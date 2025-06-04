@@ -782,6 +782,7 @@ Pose2f SelfLocator::getNewPoseBasedOnObservations(bool forceOwnHalf, const Pose2
 
 Pose2f SelfLocator::getNewPoseReturnFromPenaltyPosition(bool leftSideOfGoal)
 {
+  
   // Special stuff for some demos:
   if(demoUseCustomReturnFromPenaltyPoses)
   {
@@ -794,6 +795,11 @@ Pose2f SelfLocator::getNewPoseReturnFromPenaltyPosition(bool leftSideOfGoal)
   if(theStaticInitialPose.isActive && (theExtendedGameInfo.penaltyLastFrame == PENALTY_MANUAL || theExtendedGameInfo.penaltyLastFrame == PENALTY_SPL_PLAYER_PUSHING))
   {
     return theStaticInitialPose.staticPoseOnField;
+  }
+  // use when in mode Walktest:
+  if(theRobotInfo.mode == RobotInfo::walktest)
+  {
+    return walktestCustomReturnFromPenaltyPose;
   }
   // Normal stuff:
   float xPosition = Random::triangular(theFieldDimensions.xPosOwnPenaltyMark - returnFromPenaltyMaxXOffset,
