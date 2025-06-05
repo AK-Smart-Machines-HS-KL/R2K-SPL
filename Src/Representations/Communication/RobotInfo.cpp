@@ -38,6 +38,7 @@ std::string RobotInfo::getModeAsString() const
     case active: return "Active";
     case calibration: return "Calibatrion";
     case unstiff: return "Unstiff";
+    case walktest: return "Walk Test";
     default: return "Unknown";
   }
 }

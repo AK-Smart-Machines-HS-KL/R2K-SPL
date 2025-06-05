@@ -191,6 +191,15 @@ void LEDHandler::setChestButton(LEDRequest& ledRequest)
       ledRequest.ledStates[LEDRequest::chestRed] = LEDRequest::on;
       ledRequest.ledStates[LEDRequest::chestBlue] = LEDRequest::on;
       break;
+    case RobotInfo::walktest:
+    if(theRobotInfo.penalty != PENALTY_NONE){
+        ledRequest.ledStates[LEDRequest::chestRed] = LEDRequest::on;
+    }
+    else{
+        ledRequest.ledStates[LEDRequest::chestRed] = LEDRequest::on;
+        ledRequest.ledStates[LEDRequest::chestGreen] = LEDRequest::on;
+        ledRequest.ledStates[LEDRequest::chestBlue] = LEDRequest::on;
+    }
     case RobotInfo::active:
     default:
       if(theRobotInfo.penalty != PENALTY_NONE)

@@ -2,8 +2,9 @@
 
   <Compound name="robots">
     <Body ref="Nao" name="robot1">
-      <Translation x="3200mm" z="320mm"/>
-      <Rotation z="180degree"/>
+      <Translation x="3200mm" y="3000mm" z="320mm"/>
+      <Set name="NaoColor" value="red"/>
+      <Rotation z="270degree"/>
     </Body>
   </Compound>
 

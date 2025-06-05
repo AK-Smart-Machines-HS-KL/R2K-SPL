@@ -14,6 +14,7 @@
 #include <netinet/in.h>
 #endif
 #include <cstring>
+#include <fstream>
 
 MAKE_MODULE(GameDataProvider, communication);
 
@@ -60,6 +61,14 @@ void GameDataProvider::update(RobotInfo& theRobotInfo)
         gameCtrlData.state = STATE_PLAYING;
         mode = RobotInfo::calibration;
       }
+      else if(theEnhancedKeyStates.pressedDuration[KeyStates::headMiddle] > unstiffHeadButtonPressDuration &&
+              theEnhancedKeyStates.pressedDuration[KeyStates::headRear] > unstiffHeadButtonPressDuration &&
+              theEnhancedKeyStates.hitStreak[KeyStates::chest] == 1)
+            {
+              resetGameCtrlData();
+              mode = RobotInfo::walktest;
+              ignoreChestButton = true;
+            }
       break;
     case RobotInfo::calibration:
       if((theEnhancedKeyStates.pressedDuration[KeyStates::headFront] > unstiffHeadButtonPressDuration &&
@@ -70,6 +79,24 @@ void GameDataProvider::update(RobotInfo& theRobotInfo)
         resetGameCtrlData();
         mode = RobotInfo::unstiff;
       }
+      break;
+    case RobotInfo::walktest:
+      if(theEnhancedKeyStates.pressedDuration[KeyStates::headMiddle] > unstiffHeadButtonPressDuration &&
+              theEnhancedKeyStates.pressedDuration[KeyStates::headRear] > unstiffHeadButtonPressDuration &&
+              theEnhancedKeyStates.hitStreak[KeyStates::chest] == 1)
+        {
+          resetGameCtrlData();
+          mode = RobotInfo::active;
+          ignoreChestButton = true;
+        }
+      else if ((theEnhancedKeyStates.pressedDuration[KeyStates::headFront] > unstiffHeadButtonPressDuration &&
+              theEnhancedKeyStates.pressedDuration[KeyStates::headMiddle] > unstiffHeadButtonPressDuration &&
+              theEnhancedKeyStates.pressedDuration[KeyStates::headRear] > unstiffHeadButtonPressDuration) ||
+              theFrameInfo.getTimeSince(whenStateNotFinished) > unstiffFinishedDuration)
+        {
+          resetGameCtrlData();
+          mode = RobotInfo::unstiff;
+        }
       break;
   }
 
@@ -164,13 +191,20 @@ void GameDataProvider::handleButtons()
     SystemCall::say(output.c_str());
   }
 
+  if(theEnhancedKeyStates.hitStreak[KeyStates::headMiddle])
+  {
+    std::string branchName = "2025 11 Walk Test";
+    std::string output = "I am deployed on branch " + branchName + "!";
+    SystemCall::say(output.c_str());
+  }
+
   if(theEnhancedKeyStates.hitStreak[KeyStates::headFront])
   {
     std::string output = "I am in mode " + theRobotInfo.getModeAsString();
     SystemCall::say(output.c_str());
   }
 
-  if(mode == RobotInfo::active && !ignoreChestButton && theEnhancedKeyStates.hitStreak[KeyStates::chest] == 1)
+  if((mode == RobotInfo::active || mode == RobotInfo::walktest) && !ignoreChestButton && theEnhancedKeyStates.hitStreak[KeyStates::chest] == 1)
   {
     if(player.penalty == PENALTY_NONE)
       player.penalty = PENALTY_MANUAL;
