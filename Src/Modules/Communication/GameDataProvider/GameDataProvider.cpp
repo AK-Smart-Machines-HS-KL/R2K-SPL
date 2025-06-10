@@ -193,7 +193,7 @@ void GameDataProvider::handleButtons()
 
   if(theEnhancedKeyStates.hitStreak[KeyStates::headMiddle])
   {
-    std::string branchName = "2025 11 Walk Test";
+    std::string branchName = "main";
     std::string output = "I am deployed on branch " + branchName + "!";
     SystemCall::say(output.c_str());
   }
