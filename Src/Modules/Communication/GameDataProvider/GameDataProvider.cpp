@@ -187,13 +187,12 @@ void GameDataProvider::handleButtons()
   
   if(theEnhancedKeyStates.hitStreak[KeyStates::headRear])
   {
-    std::string output = "You are the best operator!";
+    std::string output = "Haha, that tickles!";
     SystemCall::say(output.c_str());
   }
 
   if(theEnhancedKeyStates.hitStreak[KeyStates::headMiddle])
   {
-    std::string branchName = "main";
     std::string output = "Vegas, Baby!";
     SystemCall::say(output.c_str());
   }
