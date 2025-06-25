@@ -193,8 +193,8 @@ void GameDataProvider::handleButtons()
 
   if(theEnhancedKeyStates.hitStreak[KeyStates::headMiddle])
   {
-    std::string branchName = "main";
-    std::string output = "I am deployed on branch " + branchName + "!";
+    std::string branchName = "2025. 16. W. I. O. Integration.";
+    std::string output = "Deployment code " + branchName + "!";
     SystemCall::say(output.c_str());
   }
 
