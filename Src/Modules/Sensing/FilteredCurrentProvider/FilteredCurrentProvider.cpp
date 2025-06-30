@@ -103,6 +103,42 @@ void FilteredCurrentProvider::checkMotorMalfunction(FilteredCurrent& theFiltered
           {
             SystemCall::playSound("sirene.wav");
             SystemCall::say("Motor malfunction!");
+            switch (i)
+            {
+            case Joints::rAnklePitch:
+              SystemCall::say("Right Ankle Pitch");
+              break;
+            case Joints::lAnklePitch:
+              SystemCall::say("Left Ankle Pitch");
+              break;
+            case Joints::rAnkleRoll:
+              SystemCall::say("Right Ankle Roll");
+              break;
+            case Joints::lAnkleRoll:
+              SystemCall::say("Left Ankle Roll");
+              break;
+            case Joints::rKneePitch:
+              SystemCall::say("Right Knee Pitch");
+              break;
+            case Joints::lKneePitch:
+              SystemCall::say("Left Knee Pitch");
+              break;
+            case Joints::rHipPitch:
+              SystemCall::say("Right Hip Pitch");
+              break;
+            case Joints::lHipPitch:
+              SystemCall::say("Left Hip Pitch");
+              break;
+            case Joints::rHipRoll:
+              SystemCall::say("Right Hip Roll");
+              break;
+            case Joints::lHipRoll:
+              SystemCall::say("Left Hip Roll");
+            default:
+              SystemCall::say("Unknown");
+              break;
+            }
+            
             SystemCall::say((std::string(TypeRegistry::getEnumName(Global::getSettings().fieldPlayerColour)) + " " + std::to_string(theRobotInfo.number)).c_str());
             if(!theGyroOffset.bodyDisconnect)
               theFilteredCurrent.legMotorMalfunction = true;
