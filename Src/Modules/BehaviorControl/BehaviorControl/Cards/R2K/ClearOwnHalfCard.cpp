@@ -93,7 +93,7 @@ class ClearOwnHalfCard : public ClearOwnHalfCardBase
   {
     return
       theGameInfo.setPlay == SET_PLAY_NONE &&  // no penalty active
-      theTeammateRoles.playsTheBall(theRobotInfo.number);
+      theTeammateRoles.playsTheBall(theRobotInfo.number) &&
       // theObstacleModel.opponentIsClose() &&  // see LongShotCard, !opponentIsTooClose()
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
       theFieldBall.positionOnField.x() < -500 &&
