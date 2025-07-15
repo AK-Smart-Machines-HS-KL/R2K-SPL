@@ -25,6 +25,7 @@ MODULE(RobotHealthProvider,
   LOADS_PARAMETERS(
   {,
     (char) batteryLow, /**< The voltage below which the robot gives low battery warnings. */
+    (char) batteryCritical, /**< The voltage below which the robot gives additional low battery warnings. */
     (int) cpuHeat,
     (unsigned) timeBetweenHeatScreams,
     (bool) enableName, /**< The robots mentions its name when complaining, if true */

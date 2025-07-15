@@ -39,7 +39,7 @@ void RobotHealthProvider::update(RobotHealth& robotHealth)
     highCPUTemperatureSince = theFrameInfo.time;
     if(enableName)
       SystemCall::playSound(wavName.c_str());
-    SystemCall::say("CPU temperature at exclamation mark");
+    SystemCall::say(("CPU temperature at " + std::to_string(static_cast<int>(robotHealth.cpuTemperature)) + " degrees.").c_str());
   }
 #ifdef TARGET_ROBOT
   if(theFrameInfo.getTimeSince(lastWlanCheckedTime) > 10 * 1000)
@@ -86,7 +86,9 @@ void RobotHealthProvider::update(RobotHealth& robotHealth)
       {
         if(enableName)
           SystemCall::playSound(wavName.c_str());
-        SystemCall::say("Low battery");
+        SystemCall::say("Battery low!");
+        if (robotHealth.batteryLevel < batteryCritical)
+          SystemCall::say("Getting critical!");
         // next warning in 90 seconds
         startBatteryLow = theFrameInfo.time + 30000;
         batteryVoltageFalling = false;
@@ -107,17 +109,17 @@ void RobotHealthProvider::update(RobotHealth& robotHealth)
         unsigned timeToNextScream = timeBetweenHeatScreams;
         if(robotHealth.maxJointTemperatureStatus >= JointSensorData::TemperatureStatus::criticallyHot)
         {
-          SystemCall::say("Fire exclamation mark");
+          SystemCall::playSound("fire.wav");
           timeToNextScream /= 4;
         }
         else if(robotHealth.maxJointTemperatureStatus >= JointSensorData::TemperatureStatus::veryHot)
         {
-          SystemCall::say("Fire");
+          SystemCall::playSound("fire.wav");
           timeToNextScream /= 2;
         }
         else
         {
-          SystemCall::say("Heat");
+          SystemCall::playSound("heat.wav");
         }
         highTemperatureSince = theFrameInfo.time + timeToNextScream;
       }
