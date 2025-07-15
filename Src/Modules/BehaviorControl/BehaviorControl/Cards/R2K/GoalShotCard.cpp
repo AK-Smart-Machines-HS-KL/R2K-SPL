@@ -114,7 +114,7 @@ class GoalShotCard : public GoalShotCardBase
         if(state_time > initalCheckTime) {
           currentShot = theShots.goalShot;
           OUTPUT_TEXT("Locking Target: (" << currentShot.target.x() << ", " << currentShot.target.y() << ")\n" << currentShot);
-          if (currentShot.failureProbability > 0.3) {
+          if (currentShot.failureProbability > 0.4) {
             OUTPUT_TEXT("Aborting! shot too likely to fail");
             timeLastFail = theFrameInfo.time;
             goto done;
