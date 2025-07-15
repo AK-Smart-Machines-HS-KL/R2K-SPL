@@ -166,13 +166,14 @@ class GoalShotCard : public GoalShotCardBase
       for (const auto& buddy : theTeamData.teammates) 
       {
         if (// buddy.theBehaviorStatus.activity == BehaviorStatus::OffenseChaseBallCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard )
-          // buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard)
+          //buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+          //buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
+          //buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
+          //buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard //||
+          //buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard ||
+          // buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard
+          )
           return true;
       }
       return false;
