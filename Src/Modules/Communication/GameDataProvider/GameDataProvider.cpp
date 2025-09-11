@@ -193,7 +193,7 @@
  
    if(theEnhancedKeyStates.hitStreak[KeyStates::headMiddle])
    {
-     std::string branchName = "main";
+     std::string branchName = "Beckerturm Prep";
      std::string output = "I am deployed on branch " + branchName + "!";
      SystemCall::say(output.c_str());
    }
