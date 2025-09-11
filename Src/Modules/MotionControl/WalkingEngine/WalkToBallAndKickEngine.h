@@ -57,7 +57,7 @@ MODULE(WalkToBallAndKickEngine,
     (Angle)(30_deg) forwardStealVFeetAngle, /**< Requested V-Shape of the feet. */
     (Rangef)(Rangef(-80.f, -40.f)) forwardFastYClipRange, /**< For the dynamic points, clip the y position. */
     (float)(0.8f) minBallDistanceForVelocity, /**< Subtract this much time to reach the ball, when propagating the ball position. */
-    (Pose2f)(Pose2f(4_deg, 10.f, 10.f)) kickPoseThresholds,
+    (Pose2f)(Pose2f(4_deg, 17.f, 17.f)) kickPoseThresholds,
   }),
 });
 
