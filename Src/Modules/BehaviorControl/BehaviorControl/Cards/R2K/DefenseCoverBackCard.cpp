@@ -94,7 +94,7 @@ class DefenseCoverBackCard : public DefenseCoverBackCardBase
       theFieldBall.ballWasSeen()&&
       distToGoal > 1000 &&
       theGameInfo.setPlay == SET_PLAY_NONE &&
-      !aBuddyIsChasingOrClearing() &&
+      aBuddyIsChasingOrClearing() &&
       theTeammateRoles.isTacticalDefense(theRobotInfo.number); // my recent role
       
   }
