@@ -188,7 +188,7 @@ private:
         // 2 player
             { {GN,OM,UN,UN,UN}, {GN,OM,UN,UN,UN}, {OR,OL,UN,UN,UN}, {OR,OL,UN,UN,UN} },
             // 3 player
-                { {GN,OL,OR,UN,UN}, {GN,DM,OM,UN,UN}, {DM,OL,OR,UN,UN}, {GN,OR,OL,UN,UN} },
+                { {GN,OL,OR,UN,UN}, {GN,OR,OM,UN,UN}, {DM,OL,OR,UN,UN}, {GN,OR,OL,UN,UN} },
                 // 4 player
                     { {GN,DM,OR,OM,UN}, {GN,DR,DL,OM,UN}, {GA,DM,DL,OM,UN}, {GN,DM,OL,OM,UN} },
                     // 5 player
