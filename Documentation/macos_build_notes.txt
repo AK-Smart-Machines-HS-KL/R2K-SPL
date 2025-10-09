@@ -1,0 +1,59 @@
+macOS Build Adjustments (October 2025)
+=====================================
+
+The macOS 15 / Xcode 16 toolchain required a few updates to restore the
+command-line build scripts.  These notes collect the changes we applied and
+the steps needed before invoking `./Make/macOS/compile ...`.
+
+Environment preparation
+-----------------------
+- Unlock the bundled signing keychain once per login session so Xcode can
+  codesign SimRobot and other bundles:
+    `security unlock-keychain -p nao ~/Library/Keychains/B-Human_Code_Release.keychain-db`
+
+Toolchain / CMake tweaks
+------------------------
+- `Make/Common/CMakeLists.txt`
+  * pin `CMAKE_OSX_DEPLOYMENT_TARGET` to 15.0 and
+    `CMAKE_XCODE_ATTRIBUTE_DRIVERKIT_DEPLOYMENT_TARGET` to 26.0 to stop the
+    SDK from injecting conflicting deployment targets.
+  * disable `CMAKE_AUTOMOC_COMPILER_PREDEFINES` to bypass moc's predefs probe.
+- `Make/macOS/compile`
+  * export default values for `MACOSX_DEPLOYMENT_TARGET=15.0` and
+    `DRIVERKIT_DEPLOYMENT_TARGET=26.0` before running `xcodebuild`.
+- `Make/CMake/SimulatedNao.cmake` / `Make/CMake/Nao.cmake`
+  * mark the span-lite, bitpacker, bitproto, and rapidcsv include directories
+    as `SYSTEM` so angle-includes (`<nonstd/span.hpp>`, etc.) resolve when
+    CMake passes them via `-isystem`.
+- `Make/CMake/Nao.cmake`
+  * added `CODE_SIGNING_ALLOWED` / `CODE_SIGNING_REQUIRED` = NO attributes to
+    silence Xcode's command-line tool signing complaint.
+- `Make/Common/CMakeLists.txt`
+  * set `CMAKE_AUTOMOC_COMPILER_PREDEFINES OFF`.
+
+Source fixes for newest clang/libc++
+------------------------------------
+- Converted a few includes to quoted form so they are found via `-iquote`:
+  * `Src/Modules/.../TeammateRoles.cpp` (`Tools/Communication/BNTP.h`)
+  * `Src/Modules/.../TI/*.cpp` (`rapidcsv.h`)
+  * `Src/Tools/Communication/RobotMessage.cpp` (`bitpacker.hpp`)
+- `Util/onnxruntime/.../CompiledNN.h`
+  * replaced the `_LIBCPP_STD_VER` hack with a span-lite fallback that works
+    under C++17 (`CompiledNNSpan` alias).
+
+Buildchain shim
+---------------
+- `Util/Buildchain/macOS/bin/libtool`
+  * added a `-V` handler returning `Apple Inc. version cctools-973.0.1` so
+    Xcode accepts the custom wrapper before it shells out to GNU `ar`.
+
+Commands verified
+-----------------
+With the keychain unlocked, the following succeed from the repo root:
+  - `./Make/macOS/compile bush Develop`
+  - `./Make/macOS/compile SimRobot Develop`
+  - `./Make/macOS/compile Tests Develop`
+  - `./Make/macOS/compile Nao Develop`
+
+Artifacts land in `Build/macOS/...` for desktop tools and in
+`Build/Linux/Nao/<config>/bhuman` for the robot binary.

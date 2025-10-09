@@ -8,6 +8,9 @@ cd "$(dirname "$(which "$0")")"
 
 ./generate >/dev/null
 
+export MACOSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET:-15.0}
+export DRIVERKIT_DEPLOYMENT_TARGET=${DRIVERKIT_DEPLOYMENT_TARGET:-26.0}
+
 ( xcodebuild -jobs `sysctl -n hw.ncpu` -parallelizeTargets -target $1 -configuration $2 \
   | grep --line-buffered "^[^ -]" \
   | grep --line-buffered -v \

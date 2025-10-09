@@ -18,7 +18,7 @@
  * defenseRoleIndex/1, offenseRoleIndex/2 loop over isTacticalDefense and isTacticalOffense, resp. 
  */
 
-#include <Tools/Communication/BNTP.h>
+#include "Tools/Communication/BNTP.h"
 #include "Representations/BehaviorControl/Libraries/LibCheck.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/BehaviorControl/TeamSkills.h"

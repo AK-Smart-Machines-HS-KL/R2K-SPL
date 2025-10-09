@@ -8,12 +8,15 @@
 
 #include <algorithm>
 #include <asmjit/asmjit.h>
-// HACK: std::span is only available in C++20.
-#pragma push_macro("_LIBCPP_STD_VER")
-#undef _LIBCPP_STD_VER
-#define _LIBCPP_STD_VER 20
-#include <span>
-#pragma pop_macro("_LIBCPP_STD_VER")
+#if __cplusplus >= 202002L
+  #include <span>
+  template<typename T>
+  using CompiledNNSpan = std::span<T>;
+#else
+  #include <nonstd/span.hpp>
+  template<typename T>
+  using CompiledNNSpan = nonstd::span<T>;
+#endif
 #include "Platform/BHAssert.h"
 #include <onnxruntime_cxx_api.h>
 #include "Model.h"
@@ -65,7 +68,7 @@ namespace NeuralNetwork
      * methods data(), rank(), and dims() as well as array access,
      * iteration, and copying the data from one tensor to another.
      */
-    class Tensor : public std::span<float>
+    class Tensor : public CompiledNNSpan<float>
     {
       float* tensor; /**< The actual tensor data. */
       const std::vector<int64_t>& dimensions; /**< The dimensions (shape) of the tensor. */
@@ -77,7 +80,7 @@ namespace NeuralNetwork
        * @param dimensions The dimensions (shape) of the tensor.
        */
       Tensor(float* tensor, size_t size, const std::vector<int64_t>& dimensions)
-        : span(tensor, size), tensor(tensor), dimensions(dimensions) {}
+        : CompiledNNSpan<float>(tensor, size), tensor(tensor), dimensions(dimensions) {}
 
     public:
       /**

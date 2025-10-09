@@ -32,6 +32,7 @@ set(OUTPUT_PREFIX "${PROJECT_SOURCE_DIR}/../..")
 
 if(APPLE)
   set(CMAKE_SUPPRESS_REGENERATION ON)
+  set(CMAKE_OSX_DEPLOYMENT_TARGET "15.0" CACHE STRING "" FORCE)
   add_definitions(
       -DMACOS
       -DFIX_MACOS_DOCKED_WIDGETS_DRAG_BUG
@@ -53,6 +54,9 @@ if(APPLE)
 
   set(CMAKE_XCODE_ATTRIBUTE_SHARED_PRECOMPS_DIR "${OUTPUT_PREFIX}/Build/${OS}/PrecompiledHeaders")
   set(CMAKE_XCODE_ATTRIBUTE_ALWAYS_SEARCH_USER_PATHS "NO")
+  # macOS 15 SDK (26.0) requires matching DriverKit deployment target; otherwise clang
+  # treats the default 25.0 injected by Xcode as a conflicting deployment target.
+  set(CMAKE_XCODE_ATTRIBUTE_DRIVERKIT_DEPLOYMENT_TARGET "26.0")
 elseif(WIN32)
   add_definitions(-DWINDOWS)
   set(PLATFORM "Windows")
@@ -80,6 +84,8 @@ set_property(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT
 set(CMAKE_CXX_FLAGS_DEBUG "")
 set(CMAKE_CXX_FLAGS_DEVELOP "")
 set(CMAKE_CXX_FLAGS_RELEASE "")
+
+set(CMAKE_AUTOMOC_COMPILER_PREDEFINES OFF)
 
 set(CMAKE_EXE_LINKER_FLAGS_DEBUG "")
 set(CMAKE_MODULE_LINKER_FLAGS_DEBUG "")

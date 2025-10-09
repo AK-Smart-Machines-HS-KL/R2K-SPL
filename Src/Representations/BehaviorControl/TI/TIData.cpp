@@ -8,7 +8,7 @@
  */
 
 #include "TIData.h"
-#include <rapidcsv.h>
+#include "rapidcsv.h"
 #include <iostream>
 #include <fstream>
 #include "Tools/Debugging/Debugging.h"

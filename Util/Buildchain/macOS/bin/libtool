@@ -9,6 +9,10 @@ while true; do
     "-arch_only")
       shift
       ;;
+    "-V")
+      echo "Apple Inc. version cctools-973.0.1"
+      exit 0
+      ;;
     "-D")
       ;;
     "-dependency_info")

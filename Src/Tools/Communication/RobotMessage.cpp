@@ -1,6 +1,6 @@
 #include "RobotMessage.h"
 #include "Tools/Settings.h"
-#include <bitpacker.hpp>
+#include "bitpacker.hpp"
 #include <vector>
 #include <algorithm>
 #include "Platform/Time.h"
@@ -169,6 +169,5 @@ void RobotMessage::compile() {
     }
   }
 }
-
 
 

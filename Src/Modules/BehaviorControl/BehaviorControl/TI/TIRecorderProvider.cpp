@@ -10,7 +10,7 @@
 
 #include "TIRecorderProvider.h"
 #include "Tools/Math/Geometry.h"
-#include <rapidcsv.h>
+#include "rapidcsv.h"
 #include "Platform/File.h"
 #include <sys/types.h>
 #include <sys/stat.h>
