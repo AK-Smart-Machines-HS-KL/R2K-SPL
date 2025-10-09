@@ -187,14 +187,24 @@ void GameDataProvider::handleButtons()
   
   if(theEnhancedKeyStates.hitStreak[KeyStates::headRear])
   {
-    std::string output = "Haha, that tickles!";
-    SystemCall::say(output.c_str());
+    //std::string output = "I'm running demo software right now!";
+    //SystemCall::say(output.c_str());
+    if(theRobotInfo.number == 5){
+      SystemCall::playSound("max.wav");
+    } else if(theRobotInfo.number == 4){
+      SystemCall::playSound("fritz.wav");
+    } else if(theRobotInfo.number == 1){
+      SystemCall::playSound("toni.wav");
+    } else {
+      SystemCall::say("I think I forgot my designated name?");
+    }
   }
 
   if(theEnhancedKeyStates.hitStreak[KeyStates::headMiddle])
   {
-    std::string output = "Vegas, Baby!";
-    SystemCall::say(output.c_str());
+    //std::string output = "Hello there.";
+    //SystemCall::say(output.c_str());
+    SystemCall::playSound("Hello_there.wav");
   }
 
   if(theEnhancedKeyStates.hitStreak[KeyStates::headFront])
