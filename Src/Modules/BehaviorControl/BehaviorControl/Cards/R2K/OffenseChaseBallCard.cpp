@@ -80,17 +80,8 @@ class OffenseChaseBallCard : public OffenseChaseBallCardBase
 
   bool preconditions() const override
   {  
-    //Abfragen Spielerposition
-   
-    //Vergleich ob die Spielerposition in der Opponentside liegt
-    //mit einem threshold damit Stürmer noch teils ins eigene Feld darf
-  
-    return
-      theFieldBall.ballWasSeen() && 
-      !aBuddyIsChasingOrClearing() && // prevent bots to cluster at ball
-      theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT
-      (theFieldBall.endPositionOnField.x() > (0 - threshold)) &&
-      theFieldBall.endPositionOnField.x() >= theRobotPose.translation.x() - threshold;
+    // Wenn der Roboter den Ball sieht, wird die Verfolgung aufgenommen
+    return theFieldBall.ballWasSeen();
   }
 
   bool postconditions() const override
@@ -144,24 +135,6 @@ class OffenseChaseBallCard : public OffenseChaseBallCardBase
   {
     return (theRobotPose.inversePose * Vector2f(theFieldBall.endPositionOnField.x(), theFieldBall.endPositionOnField.y())).angle();
   }
-
-    bool aBuddyIsChasingOrClearing() const
-    {
-      for (const auto& buddy : theTeamData.teammates) 
-      {
-        if (buddy.theBehaviorStatus.activity == BehaviorStatus::offenseChaseBallCard ||
-          //buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
-          //buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
-          //buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
-          //buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard 
-          //buddy.theBehaviorStatus.activity == BehaviorStatus::offenseReceivePassCard
-          )
-          return true;
-      }
-      return false;
-    }
 };
 
 MAKE_CARD(OffenseChaseBallCard);

@@ -68,11 +68,7 @@ class DefaultCard : public DefaultCardBase
   {
 
     theActivitySkill(BehaviorStatus::defaultBehavior);
-    
-    Pose2f targetRelative = theRobotPose.toRelative(theDefaultPose.ownDefaultPose);
-
-    theLookActiveSkill(); // Head Motion Request
-    theWalkToPointSkill(targetRelative, 1.0f, true);     
+    theLookActiveSkill(); // Head Motion Request    
 
   }
 };
