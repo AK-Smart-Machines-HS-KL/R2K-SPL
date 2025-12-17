@@ -187,17 +187,10 @@ void GameDataProvider::handleButtons()
   
   if(theEnhancedKeyStates.hitStreak[KeyStates::headRear])
   {
-    //std::string output = "I'm running demo software right now!";
-    //SystemCall::say(output.c_str());
-    if(theRobotInfo.number == 5){
-      SystemCall::playSound("max.wav");
-    } else if(theRobotInfo.number == 4){
-      SystemCall::playSound("fritz.wav");
-    } else if(theRobotInfo.number == 1){
-      SystemCall::playSound("toni.wav");
-    } else {
-      SystemCall::say("I think I forgot my designated name?");
-    }
+    std::string output = "I'm running demo software right now!";
+    SystemCall::say(output.c_str());
+    //std::string out = "I am deployed at position number " + (theRobotInfo.number).c_str();
+    //SystemCall::say(out.c_str());
   }
 
   if(theEnhancedKeyStates.hitStreak[KeyStates::headMiddle])

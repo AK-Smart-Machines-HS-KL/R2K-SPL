@@ -35,8 +35,9 @@ static bool shutdownNAO = false;
 static void bhumanStart(const Settings& settings)
 {
   fprintf(stderr, "B-Human: Start.\n");
-
   robot = new Robot(settings, std::string());
+  //SystemCall::say((robot->getName()).c_str());
+  SystemCall::say("Boot complete");
   robot->start();
 }
 
