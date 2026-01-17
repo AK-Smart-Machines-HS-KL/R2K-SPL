@@ -1,0 +1,24 @@
+
+# deactivate simulation time
+st off
+
+robot all
+
+call Includes/Normal
+
+# all views are defined in another script
+call Includes/Views
+
+dr debugDrawing3d:representation:RobotInfo
+
+
+
+
+# request behavior output
+dr representation:MotionRequest
+
+# request behavior messages
+dr representation:ActivationGraph
+dr representation:TeamActivationGraph
+
+call Includes/GameStates

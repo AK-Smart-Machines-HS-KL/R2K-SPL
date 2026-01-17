@@ -435,5 +435,6 @@ if(BUILD_DESKTOP AND (NOT DISABLE_NAO))
   include("../CMake/deploy.cmake")
 endif()
 
+
 source_group(PCH REGULAR_EXPRESSION ".*[ch]xx$")
 source_group(Visualizers REGULAR_EXPRESSION ".*natvis$")
