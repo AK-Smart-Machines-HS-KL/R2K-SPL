@@ -38,4 +38,6 @@ STREAMABLE(Obstacle,
   (Vector2f)(Vector2f::Zero()) velocity,  /**< Determined via extended Kalman filter (mm per ms) */
   (unsigned int) lastSeen,                /**< Timestamp of last measurement */
   (Type) type,                            /**< See enumeration 'Type' above */
+  (int)(-1) jerseyColor,                  /**< Erkannte Jersey-Farbe (TEAM_* Konstante aus RoboCupGameControlData.h), -1 wenn unbekannt */
+
 });

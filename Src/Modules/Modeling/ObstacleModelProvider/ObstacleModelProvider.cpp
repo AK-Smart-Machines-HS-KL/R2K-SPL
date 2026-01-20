@@ -6,6 +6,8 @@
  *
  * @author Florian Maaß
  * @author Jan Fiedler & Nicole Schrader
+ * @author Laura Hammerschmidt (HUETCHEN addition)
+
  */
 
 #include "ObstacleModelProvider.h"
@@ -200,6 +202,9 @@ void ObstacleModelProvider::addPlayerPercepts()
                                 percept.left.normalized(percept.left.norm() + Obstacle::getRobotDepth()),
                                 percept.right.normalized(percept.right.norm() + Obstacle::getRobotDepth()), theFrameInfo.time, type, 1);
 
+      // HUETCHEN ADDITION: übernimmt jerseycolor aus ObstaclesFieldPercept
+      obstacle.jerseyColor = percept.jerseyColor;
+
     // Obstacles have a minimum size
     if((obstacle.left - obstacle.right).squaredNorm() < sqr(2 * Obstacle::getRobotDepth()))
       obstacle.setLeftRight(Obstacle::getRobotDepth());
@@ -245,6 +250,11 @@ void ObstacleModelProvider::tryToMerge(const ObstacleHypothesis& measurement)
 
     obstacleHypotheses[atMerge].measurement(measurement, weightedSum, theFieldDimensions.goalPostRadius); // EKF
     obstacleHypotheses[atMerge].considerType(measurement, teamThreshold, uprightThreshold);
+
+    // HUETCHEN ADDITION: übernimmt jerseycolor von merge, wenn vorhanden
+    if(measurement.jerseyColor != -1)
+      obstacleHypotheses[atMerge].jerseyColor = measurement.jerseyColor;
+
     obstacleHypotheses[atMerge].seenCount += measurement.seenCount;
     obstacleHypotheses[atMerge].notSeenButShouldSeenCount = 0; // Reset that counter.
     merged[atMerge] = true;
@@ -357,6 +367,11 @@ void ObstacleModelProvider::mergeOverlapping()
         if(actual.type == Obstacle::goalpost)
           actual.setLeftRight(theFieldDimensions.goalPostRadius);
         actual.considerType(other, teamThreshold, uprightThreshold);
+
+        // HUETCHEN ADDITION: behält aktuelle jerseycolor bei overlapping merge
+        if(actual.jerseyColor == -1 && other.jerseyColor != -1)
+          actual.jerseyColor = other.jerseyColor;
+
         actual.lastSeen = std::max(actual.lastSeen, other.lastSeen);
         actual.seenCount = std::max(actual.seenCount, other.seenCount);
         actual.notSeenButShouldSeenCount = (actual.notSeenButShouldSeenCount + other.notSeenButShouldSeenCount) / 2;

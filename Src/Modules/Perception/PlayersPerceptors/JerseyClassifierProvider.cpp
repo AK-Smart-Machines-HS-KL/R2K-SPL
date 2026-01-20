@@ -8,6 +8,7 @@
  * @author Thomas Röfer (the algorithm)
  * @author Lukas Malte Monnerjahn (the algorithm)
  * @author Arne Hasselbring (the module)
+ * @author Laura Hammerschmidt (HUETCHEN addition)
  */
 
 #include "JerseyClassifierProvider.h"
@@ -15,6 +16,8 @@
 #include "Tools/Math/Transformation.h"
 #include <algorithm>
 #include <cmath>
+#include <cmath>
+#include <map>
 
 MAKE_MODULE(JerseyClassifierProvider, perception);
 
@@ -29,6 +32,14 @@ void JerseyClassifierProvider::update(JerseyClassifier& jerseyClassifier)
   {
     return detectJersey(obstacleInImage, obstacleOnField);
   };
+
+   //HUETCHEN addition start1
+   // Gibt die erkannte Jersey-Farbe zurück
+  jerseyClassifier.detectJerseyColor = [this](const ObstaclesImagePercept::Obstacle& obstacleInImage) -> int
+  {
+    return detectJerseyColor(obstacleInImage);
+  };
+  //HUETCHEN addition end1
 }
 
 /**
@@ -177,11 +188,20 @@ void JerseyClassifierProvider::detectJersey(const ObstaclesImagePercept::Obstacl
         if(ownPixels > opponentPixels)
         {
           obstacleOnField.type = ObstaclesFieldPercept::ownPlayer;
+
+          // HUETCHEN ADDITION: speichert die eigene Team-Farbe
+          obstacleOnField.jerseyColor = theOwnTeamInfo.fieldPlayerColour;
+
           DRAW_TEXT("module:JerseyClassifierProvider:jerseyClassification", obstacleInImage.left, obstacleInImage.top + 10, 10, ColorRGBA::black, "class: own player");
         }
         else
         {
           obstacleOnField.type = ObstaclesFieldPercept::opponentPlayer;
+
+          // HUETCHEN ADDITION: erkennt die genaue Gegner-Farbe
+          int detectedColor = detectJerseyColor(obstacleInImage);
+          obstacleOnField.jerseyColor = (detectedColor != -1) ? detectedColor : theOpponentTeamInfo.fieldPlayerColour;
+    
           DRAW_TEXT("module:JerseyClassifierProvider:jerseyClassification", obstacleInImage.left, obstacleInImage.top + 10, 10, ColorRGBA::black, "class: oponent");
         }
       }
@@ -190,8 +210,14 @@ void JerseyClassifierProvider::detectJersey(const ObstaclesImagePercept::Obstacl
         obstacleOnField.type = ObstaclesFieldPercept::unknown;
         DRAW_TEXT("module:JerseyClassifierProvider:jerseyClassification", obstacleInImage.left, obstacleInImage.top + 12, 10, ColorRGBA::black, "class: unknown");
       }
+      
     }
+
+    
   }
+
+ 
+  
 }
 
 std::function<bool(int, int)> JerseyClassifierProvider::getPixelClassifier(const int positiveColor, const std::vector<int> negativeColors, const int maxBrightness) const
@@ -290,3 +316,89 @@ std::function<bool(int, int)> JerseyClassifierProvider::getPixelClassifier(const
       return std::abs(static_cast<char>(hue - teamHue)) < std::min(std::abs(static_cast<char>(hue - otherHue)), hueSimilarityThreshold);
     };
 }
+
+
+//HUETCHEN addition start2 
+int JerseyClassifierProvider::detectJerseyColor(const ObstaclesImagePercept::Obstacle& obstacleInImage) const
+{
+  // Bestimme Jersey-Region (gleich wie in detectJersey)
+  const int width = obstacleInImage.right - obstacleInImage.left + 1;
+  const float yStart = static_cast<float>(obstacleInImage.top);
+  const float yEnd = yStart + (obstacleInImage.bottom - obstacleInImage.top) * 0.6f; // Obere 60%
+  
+  if(yEnd - yStart < 5) return -1; // Kleinere Schwelle
+
+  // Zähle Hue-Werte für jede Farbe
+  std::map<int, int> colorCounts; // TEAM_* -> Anzahl
+  int totalSamples = 0;
+
+  const float yStep = 5.f; // Kleinere Steps = mehr Samples
+  const float xStep = 5.f;
+
+  for(float y = yStart; y < yEnd && y < theCameraInfo.height; y += yStep)
+  {
+    for(float x = obstacleInImage.left; x < obstacleInImage.right && x < theCameraInfo.width; x += xStep)
+    {
+      const int ix = static_cast<int>(x);
+      const int iy = static_cast<int>(y);
+
+      // Nur saturierte Pixel analysieren (niedrigere Schwelle)
+      if(theECImage.saturated[iy][ix] > 40)
+      {
+        const unsigned char hue = theECImage.hued[iy][ix];
+        
+        // Finde nächste Farbe aus jerseyHues[]
+        int closestColor = -1;
+        int minDist = 256;
+        
+        for(int color = TEAM_BLUE; color <= TEAM_BROWN; ++color)
+        {
+          // Überspringe Grautöne
+          if(color == TEAM_BLACK || color == TEAM_WHITE || color == TEAM_GRAY)
+            continue;
+          
+          const int colorHue = jerseyHues[color];
+          // Berücksichtige Hue-Wraparound (0-255)
+          const int dist = std::min(std::abs(static_cast<int>(hue) - colorHue), 
+                                   256 - std::abs(static_cast<int>(hue) - colorHue));
+          
+          // Nutze größeren Threshold als hueSimilarityThreshold für mehr Toleranz
+          if(dist < minDist && dist < hueSimilarityThreshold + 10)
+          {
+            minDist = dist;
+            closestColor = color;
+          }
+        }
+        
+        if(closestColor != -1)
+        {
+          colorCounts[closestColor]++;
+          totalSamples++;
+        }
+      }
+    }
+  }
+
+  // Finde dominante Farbe
+  if(totalSamples < 5) return -1; // Niedrigere Schwelle
+
+  int dominantColor = -1;
+  int maxCount = 0;
+  
+  for(const auto& [color, count] : colorCounts)
+  {
+    if(count > maxCount)
+    {
+      maxCount = count;
+      dominantColor = color;
+    }
+  }
+
+  // Muss mindestens 25% der Samples sein (niedrigere Schwelle)
+  if(maxCount > totalSamples * 0.25f)
+    return dominantColor; // Gibt TEAM_RED, TEAM_BLUE, TEAM_PURPLE, etc. zurück!
+  
+  return -1; // Keine klare Farbe
+}
+
+//HUETCHEN addition end2

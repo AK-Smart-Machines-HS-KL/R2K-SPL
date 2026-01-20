@@ -1,0 +1,10 @@
+[33m690c434a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mhuetchen[m[33m)[m Demo mit GroundTruthWorldState und eigener Szene
+[33md0b4b71a[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;31morigin/2025-08-13-Alter-Genuflect-Keyframes[m[33m, [m[1;32mmain[m[33m)[m Merge pull request #55 from AK-Smart-Machines-HS-KL/2025-14-Robot_Kalibration
+[33m153ff586[m Merge branch 'main' into 2025-14-Robot_Kalibration
+[33mea93048c[m cemeraCalibration von Bender, joint Calibration TODO
+[33m8af36d25[m Calibtration 8of10 (8)
+[33m90d67e69[m Changed say task to branch name
+[33mc0ea3137[m Merge pull request #54 from AK-Smart-Machines-HS-KL/2025-17-MotorMalfunctionSayTask
+[33m173f69cf[m Reset Branch Say Task before Merge
+[33m0fc561ae[m Change setup for testing robots currently deployed in the lab
+[33mbdfdaba9[m Add say tasks for specifying motor malfunctions in legs

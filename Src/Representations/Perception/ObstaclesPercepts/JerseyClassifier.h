@@ -5,6 +5,7 @@
  * jerseys that players wear.
  *
  * @author Arne Hasselbring
+ * @author Laura Hammerschmidt (HUETCHEN addition)
  */
 
 #pragma once
@@ -22,5 +23,8 @@ STREAMABLE(JerseyClassifier,
    * @param obstacleOnField The fields detectedJersey and ownTeam will be updated if a
    *                        jersey color was detected.
    */
-  FUNCTION(void(const ObstaclesImagePercept::Obstacle& obstacleInImage, ObstaclesFieldPercept::Obstacle& obstacleOnField)) detectJersey,
+  FUNCTION(void(const ObstaclesImagePercept::Obstacle& obstacleInImage, ObstaclesFieldPercept::Obstacle& obstacleOnField)) detectJersey;
+
+  //HUETCHEN addition: gibt erkannte jerseyColor zurück
+  FUNCTION(int(const ObstaclesImagePercept::Obstacle& obstacleInImage)) detectJerseyColor,
 });

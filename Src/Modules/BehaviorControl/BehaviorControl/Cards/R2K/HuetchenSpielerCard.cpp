@@ -19,7 +19,11 @@
 #include "Representations/BehaviorControl/DefaultPose.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Modeling/RobotPose.h"
-#include "Representations/Infrastructure/GroundTruthWorldState.h"
+#include "Representations/Perception/ObstaclesPercepts/ObstaclesFieldPercept.h" 
+#include "Representations/Modeling/ObstacleModel.h"
+#include "Tools/Modeling/Obstacle.h"
+#include "Representations/Communication/TeamInfo.h"
+
 #include "Platform/Time.h"
 
 
@@ -36,12 +40,14 @@ CARD(HuetchenSpielerCard,
         REQUIRES(RobotInfo),
         REQUIRES(RobotPose),
         REQUIRES(FieldBall),
-        REQUIRES(GroundTruthWorldState),
+        REQUIRES(ObstacleModel),
+        REQUIRES(ObstaclesFieldPercept), 
+
+        
+
 
         DEFINES_PARAMETERS(
-             {,
-                // Parameter hier definieren
-             }),
+             {,}),
      });
 
 enum class ConeID { LEFT, MIDDLE, RIGHT };
@@ -60,13 +66,33 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
 
     State currentState = WAITING_FOR_SETUP;
     ConeID lastBallPosition = ConeID::MIDDLE;
+
+    int trackedJerseyColor = -1; 
+    Vector2f savedOpponentPosition = Vector2f::Zero(); 
+    
     int lastPlayerWithBall = -1;
+
     unsigned int waitStartTime = 0;
+    unsigned int revealingStartTime = 0; // NEU: Für Revealing Timeout
 
     unsigned int lastOutputTime = 0;  
     const unsigned int outputInterval = 1000;  // Ausgabe immer nach 1 sekunde
 
 
+    std::string getColorName(int teamColor) const
+    {
+        switch(teamColor)
+        {
+            case TEAM_BLUE: return "BLAU";
+            case TEAM_RED: return "ROT";
+            case TEAM_YELLOW: return "GELB";
+            case TEAM_GREEN: return "GRUEN";
+            case TEAM_ORANGE: return "ORANGE";
+            case TEAM_PURPLE: return "LILA";
+            case TEAM_BROWN: return "BRAUN";
+            default: return "UNBEKANNT";
+        }
+    }
 
 
    bool preconditions() const override
@@ -124,7 +150,8 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
                
                 //Ball erkannt?
                 if(ballSeen)
-               {
+               {    
+
                     if(y_ball < -200) //mittig definieren: [-200, 200]
                     {
                         
@@ -148,22 +175,92 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
                 {
                     OUTPUT_TEXT("BALL WURDE VERSTECKT");
 
+                    // nur weitermachen wenn Obstacles sichtbar sind
+                    if(theObstaclesFieldPercept.obstacles.empty())
+                    {   
+                        // bleibt in OBSERVING_HIDE und versucht es im nächsten frame erneut
+                        OUTPUT_TEXT("Keine Obstacles gefunden,... Warte auf nächsten Frame");
+                        
+                        break;
+                    }
+
+                    // DEBUG: Zeige alle erkannten Obstacles
+                    OUTPUT_TEXT("=== ALLE OBSTACLES (Anzahl: " << static_cast<int>(theObstaclesFieldPercept.obstacles.size()) << ") ===");
+                    for(const auto& obstacle : theObstaclesFieldPercept.obstacles)
+                    {
+                        std::string typeStr = "UNKNOWN";
+                        if(obstacle.type == ObstaclesFieldPercept::ownPlayer) typeStr = "OWN";
+                        else if(obstacle.type == ObstaclesFieldPercept::opponentPlayer) typeStr = "OPPONENT";
+                        
+                        OUTPUT_TEXT(typeStr << " JerseyColor: " << obstacle.jerseyColor << " ColorName: " << getColorName(obstacle.jerseyColor) << " Pos: (" << obstacle.center.x() << ", " << obstacle.center.y() << ")");
+                    }
+                    OUTPUT_TEXT("======================");
+
                     // Spieler mit Ball finden und merken
                     float minDist = std::numeric_limits<float>::max(); //minimaler abstand, startet mit max wert
-                    for(const auto& player : theGroundTruthWorldState.firstTeamPlayers) // alle spieler der einen mannschaft durchlaufen
+                    const ObstaclesFieldPercept::Obstacle* closestOpponent = nullptr; 
+
+                    //mit obstaclefieldpercept
+                    for(const auto& obstacle : theObstaclesFieldPercept.obstacles)
                     {
-                        float dist = (player.pose.translation - theFieldBall.positionOnField).norm(); //abstand zwischen spieler und ball
-                        if(dist < minDist)
+                        if(obstacle.type == ObstaclesFieldPercept::opponentPlayer)
                         {
-                            minDist = dist;
-                            lastPlayerWithBall = player.number;
+                            float dist = (obstacle.center - theFieldBall.positionRelative).norm(); //abstand zwischen spieler und ball
+                            if(dist < minDist)
+                            {
+                                minDist = dist;
+                                closestOpponent = &obstacle;
+                            }
+
                         }
-                    } 
-                
-                    OUTPUT_TEXT("SPIELER MIT BALL: " << lastPlayerWithBall);
-                        
+
+                    }
+
+                    if(closestOpponent != nullptr)
+                    {   
+                        savedOpponentPosition = closestOpponent->center; // Position speichern
+
+                        trackedJerseyColor = closestOpponent->jerseyColor;
+
+                        //DEBUG:output gesehene farbe
+                        OUTPUT_TEXT("CLOSEST OPPONENT GEFUNDEN");
+                        OUTPUT_TEXT("DEBUG: closestOpponent->jerseyColor = " << closestOpponent->jerseyColor);
+                        OUTPUT_TEXT("DEBUG: trackedJerseyColor = " << trackedJerseyColor);
+
+                         if(trackedJerseyColor != -1)
+                        {
+                            OUTPUT_TEXT("JERSEY-FARBE GEFUNDEN: " << getColorName(trackedJerseyColor) );
+                        }
+                        else
+                        {
+                            OUTPUT_TEXT("WARNUNG: Keine Jersey-Farbe erkannt");
+                        }
+
+
+                        OUTPUT_TEXT("CLOSEST OPPONENT GEFUNDEN");
+                        //OUTPUT_TEXT("Position: x=" << savedOpponentPosition.x() << " y=" << savedOpponentPosition.y());
+                        OUTPUT_TEXT("Jersey-Farbe: " << getColorName(trackedJerseyColor));
+
+                        float y_pos = savedOpponentPosition.y();
+
+                        if(y_pos < -200) //mittig definieren: [-200, 200]
+                        {
+                            OUTPUT_TEXT("PLAYER "<<getColorName(trackedJerseyColor)<<" MIT BALL IST RECHTS");
+                        } 
+                        else if(y_pos > 200)
+                        {
+                            OUTPUT_TEXT("PLAYER "<<getColorName(trackedJerseyColor)<<" MIT BALL IST LINKS");
+                        } 
+                        else 
+                        {
+                            OUTPUT_TEXT("PLAYER "<<getColorName(trackedJerseyColor)<<" MIT BALL IST MITTIG");
+                        }
+                    }
+                    OUTPUT_TEXT("BALL WURDE VERSTECKT - Gemerkte Farbe: " << trackedJerseyColor);
+
                     currentState = TRACKING_BALL;
-                }
+                }       
+                
                 break;
             }
 
@@ -189,49 +286,96 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
 
             case REVEALING_POSITION:
             {
-                OUTPUT_TEXT("REVEALING_POSITION...");
-               /* OUTPUT_TEXT("BALL IST: ");
-                switch(lastBallPosition)
+                // init Timeout beim ersten Mal
+                if(revealingStartTime == 0)
                 {
-                    case ConeID::LEFT:
-                        OUTPUT_TEXT("LINKS");
-                        break;
-                    case ConeID::MIDDLE:
-                        OUTPUT_TEXT("MITTIG");
-                        break;
-                    case ConeID::RIGHT:
-                        OUTPUT_TEXT("RECHTS");
-                        break;
-                }*/
-                
-                
-                for(const auto& player : theGroundTruthWorldState.firstTeamPlayers)
-                {
-                    if(player.number == lastPlayerWithBall)
-                    {   
-                        float y_player = player.pose.translation.y();
-                        if(y_player < -200) //mittig definieren: [-200, 200]
-                        {
-                            OUTPUT_TEXT("SPIELER" << player.number <<" MIT BALL IST RECHTS");
-                            //lastBallPosition = ConeID::RIGHT;
+                    revealingStartTime = Time::getCurrentSystemTime();
+                    OUTPUT_TEXT("Starte Suche nach Farbe: " << getColorName(trackedJerseyColor));
+                }
 
-                        } 
-                        else if(y_player > 200)
+                // sind 5sek vergangen?
+                unsigned int elapsedTime = Time::getCurrentSystemTime() - revealingStartTime;
+                if(elapsedTime > 5000)
+                {
+                    OUTPUT_TEXT("TIMEOUT: Farbe " << getColorName(trackedJerseyColor) << " nicht gefunden nach 5 Sekunden ");
+                    revealingStartTime = 0;
+                    trackedJerseyColor = -1;
+                    currentState = WAITING_FOR_SETUP;
+                    break;
+                }
+
+                OUTPUT_TEXT("REVEALING_POSITION... (" << (elapsedTime/1000.0f) << "s)");
+                OUTPUT_TEXT("Suche Spieler mit Farbe: " << getColorName(trackedJerseyColor));
+
+                // WICHTIG: nur weitermachen wenn Obstacles sichtbar 
+                if(theObstaclesFieldPercept.obstacles.empty())
+                {
+                    OUTPUT_TEXT("WARNUNG: keine Obstacles gefunden,... Warte auf nächsten Frame");
+                    // bleibt in REVEALING_POSITION und versucht es im nächsten Frame nochmal
+                    break;
+                }
+
+                // DEBUG: Zeige alle erkannten Obstacles
+                OUTPUT_TEXT("=== ALLE OBSTACLES (Anzahl: " << static_cast<int>(theObstaclesFieldPercept.obstacles.size()) << ") ===");
+                for(const auto& obstacle : theObstaclesFieldPercept.obstacles)
+                {
+                    std::string typeStr = "UNKNOWN";
+                    if(obstacle.type == ObstaclesFieldPercept::ownPlayer) typeStr = "OWN";
+                    else if(obstacle.type == ObstaclesFieldPercept::opponentPlayer) typeStr = "OPPONENT";
+                    
+                    OUTPUT_TEXT(typeStr << " JerseyColor: " << obstacle.jerseyColor << " ColorName: " << getColorName(obstacle.jerseyColor) << " Pos: (" << obstacle.center.x() << ", " << obstacle.center.y() << ")");
+                }
+                OUTPUT_TEXT("======================");
+
+                const ObstaclesFieldPercept::Obstacle* foundOpponent = nullptr; 
+                // Suche Spieler mit der gespeicherten Jersey-Farbe
+                for(const auto& obstacle : theObstaclesFieldPercept.obstacles)
+                {
+                    if(obstacle.type == ObstaclesFieldPercept::opponentPlayer)
+                    {
+                        if(obstacle.jerseyColor == trackedJerseyColor && trackedJerseyColor != -1)
                         {
-                            OUTPUT_TEXT("SPIELER" << player.number <<" MIT BALL IST LINKS");
-                            //lastBallPosition = ConeID::LEFT;
-                        } 
-                        else 
-                        {
-                            OUTPUT_TEXT("SPIELER" << player.number <<" MIT BALL IST MITTIG");
-                            //lastBallPosition = ConeID::MIDDLE;
+                            OUTPUT_TEXT("SPIELER MIT FARBE " << getColorName(trackedJerseyColor) << " GEFUNDEN!");
+                            foundOpponent = &obstacle;
+                            break;
                         }
-
-                        //OUTPUT_TEXT("SPIELER " << player.number << " STEHT JETZT BEI X=" << player.pose.translation.x() << " Y=" << player.pose.translation.y());
                     }
                 }
+                
+                if(foundOpponent != nullptr)
+                {
+                    revealingStartTime = 0; // Reset timeout
+                    OUTPUT_TEXT("PLAYER MIT FARBE " << getColorName(trackedJerseyColor) << " WIEDERGEFUNDEN!");
+
+                    float y_pos = foundOpponent->center.y();
+                    if(y_pos < -200) //mittig definieren: [-200, 200]
+                    {
+                        OUTPUT_TEXT("PLAYER MIT BALL IST RECHTS");
+                    } 
+                    else if(y_pos > 200)
+                    {
+                        OUTPUT_TEXT("PLAYER MIT BALL IST LINKS");
+                    } 
+                    else 
+                    {
+                        OUTPUT_TEXT("PLAYER MIT BALL IST MITTIG");
+                    }
+                }
+                else
+                {
+                    OUTPUT_TEXT("SPIELER MIT FARBE " << getColorName(trackedJerseyColor) << " IN DIESEM FRAME NICHT GEFUNDEN - warte weiter... ");
+                    // bleibt in REVEALING_POSITION und versucht es weiter
+                    break;
+                }
+
+                // Nur hier ankommen wenn gefunden
+                  
                 //reset
                 currentState = WAITING_FOR_SETUP;
+                trackedJerseyColor = -1; // Reset
+                savedOpponentPosition = Vector2f::Zero();
+
+
                 break;
             }
                 

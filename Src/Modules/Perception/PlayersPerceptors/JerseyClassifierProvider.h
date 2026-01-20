@@ -8,6 +8,7 @@
  * @author Thomas Röfer (the algorithm)
  * @author Lukas Malte Monnerjahn (the algorithm)
  * @author Arne Hasselbring (the module)
+ * @author Laura Hammerschmidt (HUETCHEN addition)
  */
 
 #pragma once
@@ -72,6 +73,14 @@ class JerseyClassifierProvider : public JerseyClassifierProviderBase
    *                        jersey color was detected.
    */
   void detectJersey(const ObstaclesImagePercept::Obstacle& obstacleInImage, ObstaclesFieldPercept::Obstacle& obstacleOnField) const;
+
+
+  
+  /** 
+   * 
+   * HUETCHEN addition: gibt erkannte farbe zurück
+   */
+  int detectJerseyColor(const ObstaclesImagePercept::Obstacle& obstacleInImage) const;
 
   /**
    * The method determines the best way to detect whether a pixel belongs to the jersey

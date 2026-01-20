@@ -8,6 +8,8 @@
  * @author Andre Mühlenbrock
  * @author Tim Laue
  * @author Thomas Röfer
+ * @author Laura Hammerschmidt (HUETCHEN addition)
+
  */
 
 #pragma once
@@ -33,6 +35,9 @@ STREAMABLE(ObstaclesFieldPercept,
     (Vector2f) right, /**< Obstacle's right edge in robot-relative coordinates (in mm). */
     (bool) fallen, /**< Is the obstacle a player lying on the field? */
     (Type) type, /**< The type of the obstacle. */
+
+    // HUETCHEN ADDITION: Jersey-Farbe
+    (int)(-1) jerseyColor, // detected jerseyColor (TEAM_* const  RoboCupGameControlData.h), -1 else
   });
 
   /** Draws this percept. */

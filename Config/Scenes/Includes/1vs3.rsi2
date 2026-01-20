@@ -17,12 +17,12 @@
     <!-- Gegner 2 -->
     <Body ref="NaoDummy" name="robot2">
       <Translation x="-1500mm" y="0mm" z="320mm"/>
-      <Set name="NaoColor" value="dblue"/>
+      <Set name="NaoColor" value="red"/>
     </Body>
     <!-- Gegner 3 -->
     <Body ref="NaoDummy" name="robot3">
       <Translation x="-1500mm" y="1000mm" z="320mm"/>
-      <Set name="NaoColor" value="dblue"/>
+      <Set name="NaoColor" value="yellow"/>
     </Body>
   </Compound>
 
