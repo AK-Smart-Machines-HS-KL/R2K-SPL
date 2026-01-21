@@ -3,7 +3,7 @@
  * @author Laura Hammerschmidt
  * @brief Card for Huetchenspieler behavior
  * @version 1.0
- * @date 2025-12-13
+ * @date 2025-01-20
  *
  */
 
@@ -73,10 +73,11 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
     int lastPlayerWithBall = -1;
 
     unsigned int waitStartTime = 0;
-    unsigned int revealingStartTime = 0; // NEU: Für Revealing Timeout
+    unsigned int revealingStartTime = 0; 
 
     unsigned int lastOutputTime = 0;  
     const unsigned int outputInterval = 1000;  // Ausgabe immer nach 1 sekunde
+    bool hasOutputWelcome = false;  //nur einmal HuetchenspielerCard active ausgeben
 
 
     std::string getColorName(int teamColor) const
@@ -114,9 +115,15 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
         unsigned int currentTime = Time::getCurrentSystemTime();
         bool shouldOutput = (currentTime - lastOutputTime >= outputInterval); //ist 1 sekunde vergangen?
 
-        if(shouldOutput)
+        if(!hasOutputWelcome)
         {
             OUTPUT_TEXT("HuetchenspielerCard active for robot " << theRobotInfo.number);
+            OUTPUT_TEXT("WILLKOMMEN BEIM HUETCHENSPIEL!");
+            hasOutputWelcome = true;
+        }
+
+        if(shouldOutput)
+        {
             lastOutputTime = currentTime; //einmal setzen, damit die zeit im zyklus synchron bleibt
         }
 
@@ -135,7 +142,7 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
 
                 if(ballSeen)
                 {
-                    OUTPUT_TEXT("BALL WIRD GESEHEN");
+                    OUTPUT_TEXT("Ball wird gesehen");
                     currentState = OBSERVING_HIDE;
                 }
                 break;
@@ -155,18 +162,18 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
                     if(y_ball < -200) //mittig definieren: [-200, 200]
                     {
                         
-                        if(shouldOutput) OUTPUT_TEXT("BALL IST RECHTS");
+                        if(shouldOutput) OUTPUT_TEXT("Ball ist rechts");
                         lastBallPosition = ConeID::RIGHT;
 
                     } 
                     else if(y_ball > 200)
                     {
-                        if (shouldOutput) OUTPUT_TEXT("BALL IST LINKS");
+                        if (shouldOutput) OUTPUT_TEXT("Ball ist links");
                         lastBallPosition = ConeID::LEFT;
                     } 
                     else 
                     {
-                        if(shouldOutput) OUTPUT_TEXT("BALL IST MITTIG");
+                        if(shouldOutput) OUTPUT_TEXT("Ball ist mittig");
                         lastBallPosition = ConeID::MIDDLE;
                     }
                 }
@@ -183,18 +190,6 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
                         
                         break;
                     }
-
-                    // DEBUG: Zeige alle erkannten Obstacles
-                    OUTPUT_TEXT("=== ALLE OBSTACLES (Anzahl: " << static_cast<int>(theObstaclesFieldPercept.obstacles.size()) << ") ===");
-                    for(const auto& obstacle : theObstaclesFieldPercept.obstacles)
-                    {
-                        std::string typeStr = "UNKNOWN";
-                        if(obstacle.type == ObstaclesFieldPercept::ownPlayer) typeStr = "OWN";
-                        else if(obstacle.type == ObstaclesFieldPercept::opponentPlayer) typeStr = "OPPONENT";
-                        
-                        OUTPUT_TEXT(typeStr << " JerseyColor: " << obstacle.jerseyColor << " ColorName: " << getColorName(obstacle.jerseyColor) << " Pos: (" << obstacle.center.x() << ", " << obstacle.center.y() << ")");
-                    }
-                    OUTPUT_TEXT("======================");
 
                     // Spieler mit Ball finden und merken
                     float minDist = std::numeric_limits<float>::max(); //minimaler abstand, startet mit max wert
@@ -218,45 +213,24 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
 
                     if(closestOpponent != nullptr)
                     {   
-                        savedOpponentPosition = closestOpponent->center; // Position speichern
-
+                        savedOpponentPosition = closestOpponent->center;
                         trackedJerseyColor = closestOpponent->jerseyColor;
-
-                        //DEBUG:output gesehene farbe
-                        OUTPUT_TEXT("CLOSEST OPPONENT GEFUNDEN");
-                        OUTPUT_TEXT("DEBUG: closestOpponent->jerseyColor = " << closestOpponent->jerseyColor);
-                        OUTPUT_TEXT("DEBUG: trackedJerseyColor = " << trackedJerseyColor);
-
-                         if(trackedJerseyColor != -1)
-                        {
-                            OUTPUT_TEXT("JERSEY-FARBE GEFUNDEN: " << getColorName(trackedJerseyColor) );
-                        }
-                        else
-                        {
-                            OUTPUT_TEXT("WARNUNG: Keine Jersey-Farbe erkannt");
-                        }
-
-
-                        OUTPUT_TEXT("CLOSEST OPPONENT GEFUNDEN");
-                        //OUTPUT_TEXT("Position: x=" << savedOpponentPosition.x() << " y=" << savedOpponentPosition.y());
-                        OUTPUT_TEXT("Jersey-Farbe: " << getColorName(trackedJerseyColor));
 
                         float y_pos = savedOpponentPosition.y();
 
-                        if(y_pos < -200) //mittig definieren: [-200, 200]
+                        if(y_pos < -200)
                         {
-                            OUTPUT_TEXT("PLAYER "<<getColorName(trackedJerseyColor)<<" MIT BALL IST RECHTS");
+                            OUTPUT_TEXT("SPIELER "<<getColorName(trackedJerseyColor)<<" MIT BALL IST RECHTS");
                         } 
                         else if(y_pos > 200)
                         {
-                            OUTPUT_TEXT("PLAYER "<<getColorName(trackedJerseyColor)<<" MIT BALL IST LINKS");
+                            OUTPUT_TEXT("SPIELER "<<getColorName(trackedJerseyColor)<<" MIT BALL IST LINKS");
                         } 
                         else 
                         {
-                            OUTPUT_TEXT("PLAYER "<<getColorName(trackedJerseyColor)<<" MIT BALL IST MITTIG");
+                            OUTPUT_TEXT("SPIELER "<<getColorName(trackedJerseyColor)<<" MIT BALL IST MITTIG");
                         }
                     }
-                    OUTPUT_TEXT("BALL WURDE VERSTECKT - Gemerkte Farbe: " << trackedJerseyColor);
 
                     currentState = TRACKING_BALL;
                 }       
@@ -292,6 +266,7 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
                     revealingStartTime = Time::getCurrentSystemTime();
                     OUTPUT_TEXT("Starte Suche nach Farbe: " << getColorName(trackedJerseyColor));
                 }
+                    
 
                 // sind 5sek vergangen?
                 unsigned int elapsedTime = Time::getCurrentSystemTime() - revealingStartTime;
@@ -303,6 +278,7 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
                     currentState = WAITING_FOR_SETUP;
                     break;
                 }
+                
 
                 OUTPUT_TEXT("REVEALING_POSITION... (" << (elapsedTime/1000.0f) << "s)");
                 OUTPUT_TEXT("Suche Spieler mit Farbe: " << getColorName(trackedJerseyColor));
@@ -315,18 +291,6 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
                     break;
                 }
 
-                // DEBUG: Zeige alle erkannten Obstacles
-                OUTPUT_TEXT("=== ALLE OBSTACLES (Anzahl: " << static_cast<int>(theObstaclesFieldPercept.obstacles.size()) << ") ===");
-                for(const auto& obstacle : theObstaclesFieldPercept.obstacles)
-                {
-                    std::string typeStr = "UNKNOWN";
-                    if(obstacle.type == ObstaclesFieldPercept::ownPlayer) typeStr = "OWN";
-                    else if(obstacle.type == ObstaclesFieldPercept::opponentPlayer) typeStr = "OPPONENT";
-                    
-                    OUTPUT_TEXT(typeStr << " JerseyColor: " << obstacle.jerseyColor << " ColorName: " << getColorName(obstacle.jerseyColor) << " Pos: (" << obstacle.center.x() << ", " << obstacle.center.y() << ")");
-                }
-                OUTPUT_TEXT("======================");
-
                 const ObstaclesFieldPercept::Obstacle* foundOpponent = nullptr; 
                 // Suche Spieler mit der gespeicherten Jersey-Farbe
                 for(const auto& obstacle : theObstaclesFieldPercept.obstacles)
@@ -335,7 +299,7 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
                     {
                         if(obstacle.jerseyColor == trackedJerseyColor && trackedJerseyColor != -1)
                         {
-                            OUTPUT_TEXT("SPIELER MIT FARBE " << getColorName(trackedJerseyColor) << " GEFUNDEN!");
+                            OUTPUT_TEXT("Spieler mit Farbe " << getColorName(trackedJerseyColor) << " gefunden!");
                             foundOpponent = &obstacle;
                             break;
                         }
@@ -345,20 +309,20 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
                 if(foundOpponent != nullptr)
                 {
                     revealingStartTime = 0; // Reset timeout
-                    OUTPUT_TEXT("PLAYER MIT FARBE " << getColorName(trackedJerseyColor) << " WIEDERGEFUNDEN!");
+                    OUTPUT_TEXT("Spieler mit Farbe " << getColorName(trackedJerseyColor) << " wiedergefunden!");
 
                     float y_pos = foundOpponent->center.y();
                     if(y_pos < -200) //mittig definieren: [-200, 200]
                     {
-                        OUTPUT_TEXT("PLAYER MIT BALL IST RECHTS");
+                        OUTPUT_TEXT("SPIELER "<< getColorName(trackedJerseyColor) << "MIT BALL IST RECHTS");
                     } 
                     else if(y_pos > 200)
                     {
-                        OUTPUT_TEXT("PLAYER MIT BALL IST LINKS");
+                        OUTPUT_TEXT("SPIELER "<< getColorName(trackedJerseyColor) << " MIT BALL IST LINKS");
                     } 
                     else 
                     {
-                        OUTPUT_TEXT("PLAYER MIT BALL IST MITTIG");
+                        OUTPUT_TEXT("SPIELER "<< getColorName(trackedJerseyColor) << "MIT BALL IST MITTIG");
                     }
                 }
                 else
