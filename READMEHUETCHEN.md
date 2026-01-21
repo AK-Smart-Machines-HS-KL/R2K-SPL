@@ -4,42 +4,78 @@
 
 Dieses Projekt implementiert ein "Hütchenspiel" für NAO-Roboter im RoboCup SPL-Kontext. Der Roboter beobachtet, hinter welchem von drei verschiedenfarbigen Robotern ein Ball versteckt wird, verfolgt die Position während einer Mischphase und identifiziert anschließend den korrekten Roboter anhand seiner Trikotfarbe. Und findet so den Ball wieder.
 
-### Projektziel
+## Inhaltsverzeichnis
+
+1. Projektziel
+2. Projektverlauf
+3. Anleitung zur Ausführung
+4. Ergebnisse und aktueller Stand
+5. Modifizierte Dateien 
+6. Datenfluss 
+7. Farbkonstanten und Konfiguration
+8. Debugging und Fehlersuche
+9. Ausblick und Erweiterungen
+
+---
+
+## 1. Projektziel
 
 - **Primäres Ziel**: Roboter soll beobachten, welcher von 3 farbigen "Bechern" (Robotern) einen Ball versteckt
 - **Tracking-Mechanismus**: Verwendung von Trikot-Farberkennung 
-- **Robustheit**: System muss mit Wahrnehmungsfehlern umgehen können (Roboter schaut weg, Hindernisse nicht sichtbar)
 - **Integration**: Nahtlose Einbindung in das B-Human Framework
 
-### Aktueller Stand
 
-**Was funktioniert:**
-- Zustandsautomat mit 4 Zuständen (WAITING_FOR_SETUP, OBSERVING_HIDE, TRACKING_BALL, REVEALING_POSITION)
-- Trikotfarberkennung für 7 Farben (ROT, BLAU, GELB, GRÜN, ORANGE, LILA, BRAUN)
-- Robuste Wartemechanismen (keine vorzeitigen Zustandswechsel)
-- Timeout-Mechanismen (10s für Mischphase, 5s für Aufdeckphase)
-- Debug-Ausgaben mit Farbnamen und Positionsinformationen
 
-**Was noch hinzugefügt werden kann:**
-- Roboter durch echte Hütchen ersetzen (Neuronales Netz)
-- Tracking überarbeiten, sodass alle Hütchen die gleiche Farben haben können
--
+## 2.Projektverlauf
 
-## Ausführung
+## Ablauf:
+- Zuerst hab ich eine HuetchenSpielerCard erstellt und diese ganz oben, in der gameplayCard abgelegt, damit sie sofort drankommt, und die preCondition true gesetzt und die postCondition false. Resultiert in einer Dauerschleife der Card.
+- Dann hab ich meinen Zustandsautomaten gebaut. Der nichts konnte außer den aktuellen Zustand ausgeben. Und dann langsam darauf hingearbeitet, dass ausgegeben wurde, wo sich der Ball aktuell befindet. Relativ zum Roboter und generell auf dem Feld. Und das dann in eine Ausgabe umgewandelt. Da hab ich dann mit den Definitionen von links,mittig und rechts rumprobiert.
+-> Der Roboter konnte dann sagen, vor welchem Gegner aktuell der Ball liegt.(LINKS/MITTIG/RECHTS)
+- Als das dann funktioniert hat, hab ich dafür gesorgt, dass wenn der Ball versteckt wird, der Roboter sagen kann, wo er zuletzt war.
 
-### 0.Download
+- Jetzt kam das Problem, mit der BH.ros2 Szene. Hier waren zuviele Roboter auf dem Feld, und ich musste die ständig nach jedem neuen Build wieder an die richtigen Positionen (link,mittig und rechts vor dem Roboter) stellen. Deshalb hab ich mir eine eigene Szene geschrieben: 1vs3.ros2
+- Da hab ich lange rumprobiert, was ich alles brauchte und wo alles plaziert werden sollte, und das sie überhaupt lädt.
+
+- Als das dann funktionierte, gings an das Tracking. Damit das Hütchenspiel einfach mal läuft, hab ich bisschen geschummelt und mir durch das GroundTruthModel, den Spieler der am nächsten zum Ball war, ausgeben lassen, mir gemerkt und dann nach dem mischen wieder suchen lassen. So lief dann das erste funktionierende Hütchenspiel :)
+
+- Und ich hab die Consolen-Ausgabe überarbeitet, weil die gab für jeden Frame aus, wo der Ball gerade war, sodass man wirklich keine Übersicht hatte. 
+- Danach hab ich dann das GroundTruthModel gegen das ObstacleModel ausgetauscht. Das Tracking hat dann natürlich nicht mehr geklappt. 
+
+- Dann hab die ganze Farberkennung angefangen...
+- Das hat gedauert, bis das am Ende funktioniert hat. Da sind nämlich sehr viele Probleme aufgetaucht. Gestartet mit den Obstacles und deren Jersey Farberkennung. Die war nämlich schon implementiert. Ich hab mir dann in meiner HuetchenspielerCard eine eigene Methode zur Farberkennung geschrieben, basierend auf den schon vorhandenen Klassen der Farb-/ und Jerseyerkennung. Allerdings kann da ein Gegnerteam nur eine Farbe haben, und die Obstacles speichern ihre eigene Farbe nicht. Meine "Hütchen" sollen ja aber drei verschiedenen Farben besitzen. 
+
+- Weil ich anfangs nicht schon vorhandenen Code ändern wollte, hab ich mir die benötigten Klassen und Header kopiert und Huetchen am Ende eingefügt, und in diesen dann weitergearbeitet. Mein Plan war es dann, in der JerseyClassifierProvider Klasse eine Methode einzufügen, die die genaue Jerseyfarbe zurückgibt. Dafür musste ich allerdings durch die ganzen zusammenhängenden Klassen durch, und da das Attribut jerseyColor speichern, und weiterreichen. Dabei bin ich vom ObstacleModel auf ObstaclesFieldPercept gewechselt, weil mir das einfacher vorkam.
+
+- Als ich dachte, dass ich das jetzt testen könnte, stand ich vor einem Problem. In der Simulation kam dann: 
+Error: Cognition: Representation CameraImage is provided by multiple threads!
+- Und an diesem Error, kam ich auch nicht vorbei. Ich hab versucht die 1vs3 Konfigurationsdatei zu ändern, das hat nicht geklappt, dann die Provider anzupassen, meine eigene Card anzupassen, alles erfolglos.
+
+- Also hab ich die ganzen kopierten und angepassten Klassen und Header gelöscht und die schon existierenden abgeändert. Dann bekam ich nochmal so einen Art Error, und da war das problem, dass ich in meiner Card REQUIRES(JerseyClassifier) stehen hatte, und das verursacht einen Thread-Konflikt.
+
+- Beim Testen, wurde dann die Farbe zwar erkannt, aber nach dem Mischen nicht korrekt gefunden. Oft hat der Roboter vor oder nach dem Mischen keine Obstacles mehr erkannt,deshalb hab ich das so geändert, dass solange wartet, bis er in einem Frame wieder welche sieht. Und mir vorher als DEBUG die erkannten Obstacles auf der For-Schleife mit deren Farben ausgeben lassen. 
+- Für den REVEALING_POSITION Zustand hab ich dann auch noch eine Wartelogik implementiert, weil er sofort abgebrochen hat, wenn er die gesuchte Farbe nicht sofort gesehen hat.
+
+-Und dadurch ist mein kleines Hütchenspieler-Projekt entstanden :)
+
+
+
+
+## 3. Anleitung zur Ausführung
+
+### 3.0.Download
 -Codebase installieren: https://github.com/AK-Smart-Machines-HS-KL/R2K-SPL/wiki/Die-Codebase-installieren
 
-### 1. Kompilierung
+### 3.1. Kompilierung
 - In Visual Studio 2022 (Bhuman.sln offen!)
 - Mit Develop starten lassen (Grüner Pfeil)
 
-### 2. SimRobot starten
+### 3.2. SimRobot starten
 - Nach erfolgreichem Build öffnet sich SimRobot
 - Im SimRobot Fenster oben links auf File open, und dann 1vs3.ros2 öffnen
 - 1vs3.ros2 ist eine eigene Szene für das Hütchenspiel mit einem Spieler und drei Gegnern in verschiedenfarbigen Jerseys
 
-### 3. Hütchen spielen
+### 3.3. Hütchen spielen
 - Jetzt den Ball einem der Gegner-Roboter vor die Füße legen
 - In die Console eingeben: gc playing
 - Dann sieht man, für welchen Roboter die HuetchenSpielerCard aktiv ist: Roboter 4
@@ -58,16 +94,136 @@ Dieses Projekt implementiert ein "Hütchenspiel" für NAO-Roboter im RoboCup SPL
 
 
 
+## 4. Ergebnisse und aktueller Stand
+
+**Was wurde gemacht?**
+- Zustandsautomat mit 4 Zuständen (WAITING_FOR_SETUP, OBSERVING_HIDE, TRACKING_BALL, REVEALING_POSITION)
+- Trikotfarberkennung für 7 Farben (ROT, BLAU, GELB, GRÜN, ORANGE, LILA, BRAUN)
+- Robuste Wartemechanismen (keine vorzeitigen Zustandswechsel)
+- Timeout-Mechanismen (10s für Mischphase, 5s für Aufdeckphase)
+- Ausgaben mit Farbnamen und Positionsinformationen
+
+**Was funktioniert?**
+- Zustandautomat wechselt korrekt zwischen Zuständen
+- Roboter kann Position des Balles und Jerseyfarbe des Gegners korrekt erkennen, und diese wiederfinden
+- Timeout-Schleife verhindert, dass der Roboter in eine Endlosschleife rutscht
+
+**Was ist fehlerhaft?**
+- Wenn der Ball zu schnell hin und her bewegt wird, verliert der Roboter ihn aus den Augen und merkt sich die letzte Position des Balles sofort und wechselt den Zustand
+- Obstacles werden manchmal nicht direkt erkannt, wenn sie nicht im Frame sind
+- Farberkennung ist fehlerhaft, bei zu ähnlichen Farber
+- Erkennung funktioniert nur mit farbigen Trikots und nicht mit echten Hütchen in einer Farbe
 
 
 
-### Datenfluss
+## 5. Modifizierte Dateien
+
+### 5.1. HuetchenSpielerCard.cpp (NEU ERSTELLT)
+**Pfad**: `\Src\Modules\BehaviorControl\BehaviorControl\Cards\R2K\HuetchenSpielerCard.cpp`
+
+**Zweck**: Hauptverhalten für das Hütchenspiel mit 4-Zustands-Automat
+
+**Zustandsautomat**:
+```cpp
+enum State {
+  WAITING_FOR_SETUP,    // Wartet, bis der Ball gesehen wurde
+  OBSERVING_HIDE,       // Beobachtet, welcher Roboter Ball versteckt und Merkt sich jerseyColor dieses Roboters
+  TRACKING_BALL,        // Wartet 10 Sekunden
+  REVEALING_POSITION    // Findet Roboter mit gemerkter jerseyColor wieder
+};
+
+State state = WAITING_FOR_SETUP;
+int targetJerseyColor = -1;
+unsigned waitStartTime = 0;
+unsigned revealingStartTime = 0;
+```
+
+
+### 5.2. JerseyClassifierProvider.cpp
+**Pfad**: `\Src\Modules\Perception\PlayersPerceptors\JerseyClassifierProvider.cpp`
+
+**Zweck**: Erkennt Trikotfarben in Kamerabildern durch Hue-Analyse
+
+**Neue Methode**: `detectJerseyColor()` (Zeilen 321-405)
+
+**Algorithmus**:
+1. **Scan-Bereich**: Obere 60% des erkannten Hindernisses (Trikot-Region)
+2. **Sampling**: 5-Pixel-Schritte für Performance (y+=5, x+=5)
+3. **Sättigungs-Filter**: Nur Pixel mit sat > 40 (filtert Grau/Weiß/Schwarz)
+4. **Hue-Matching**: Zirkuläre Distanz zu jerseyHues[] mit Wraparound
+5. **Toleranz**: ±30 Hue-Einheiten pro Farbe
+6. **Dominanz-Schwelle**: Farbe muss >25% aller gültigen Samples ausmachen
+7. **Rückgabewert**: `TEAM_*`-Konstante (z.B `TEAM_RED`,`TEAM_BLUE`,...)
+
+**Integration in Perception-Pipeline**: Zeilen 36-42, 193, 201-203
+
+
+### 5.3. ObstaclesFieldPercept.h
+**Pfad**: `\Src\Representations\Perception\ObstaclesPercepts\ObstaclesFieldPercept.h`
+
+**Hinzugefügt (Zeile 40)**:
+```cpp
+(int)(-1) jerseyColor, /**< TEAM_* color constant or -1 if unknown */
+```
+**Zweck**: Erweitert Hindernis-Perzept um Trikotfarbe 
+
+
+### 5.4. JerseyClassifier.h
+**Pfad**: `\Src\Representations\Perception\ObstaclesPercepts\JerseyClassifier.h`
+
+**Änderung (Zeilen 29)**:
+```cpp
+FUNCTION(int(const ObstaclesImagePercept::Obstacle&)) detectJerseyColor;
+/**< Detects jersey color. Returns TEAM_* constant or -1 */
+```
+**Zweck**: Deklariert detectJerseyColor als aufrufbare Funktion 
+
+
+### 5.5. Obstacle.h
+**Pfad**: `\Src\Tools\Modeling\Obstacle.h`
+
+**Änderung (Zeile 41)**:
+```cpp
+(int)(-1) jerseyColor, /**< TEAM_* color constant or -1 if unknown */
+```
+**Zweck**: Erweitert die Obstacle-Datenstruktur um Trikotfarbe
+
+
+### 5.6. ObstacleModelProvider.cpp
+**Pfad**: `\Src\Modules\Modeling\ObstacleModelProvider\ObstacleModelProvider.cpp`
+
+**Änderungen**:
+- **Zeile 206** (addPlayerPercepts): `obstacle.jerseyColor = percept.jerseyColor;`
+- **Zeile 255,256** (tryToMerge): 
+  ```cpp
+  if(measurement.jerseyColor != -1) {
+    obstacleHypotheses[atMerge].jerseyColor = measurement.jerseyColor;
+  }
+  ```
+- **Zeile 371-373** (mergeOverlapping): 
+  ```cpp
+   if(actual.jerseyColor == -1 && other.jerseyColor != -1)
+          actual.jerseyColor = other.jerseyColor;
+  ```
+
+**Zweck**: Stellt sicher, dass jerseyColor korrekt beibehalten wird
+
+
+## 5.7. gameplayCard.cfg
+**Pfad**: `\Config\Scenarios\Default\BehaviorControl\gameplayCard.cfg`
+- **Zeile 43**: HuetchenSpielerCard 
+
+**Zweck**: ganz oben auf den "Stapel" gelegt, damit diese Card als Erstes ausgeführt wird
+
+
+
+## 6. Datenfluss
 
 #### Globale Pipeline (Perception → Modeling → Behavior)
-1. **Kamerabild (ECImage)** → JerseyClassifierProvider
-2. **detectJerseyColor()** analysiert Pixel → ermittelt TEAM_*-Farbe
+1. **Kamerabild (ECImage)** -> JerseyClassifierProvider
+2. **detectJerseyColor()** analysiert Pixel -> ermittelt TEAM_*-Farbe
 3. **ObstaclesFieldPercept** erhält jerseyColor-Feld
-4. **ObstacleModelProvider** fusioniert Daten → Obstacle.jerseyColor
+4. **ObstacleModelProvider** fusioniert Daten -> Obstacle.jerseyColor
 5. **HuetchenSpielerCard** liest ObstaclesFieldPercept und trifft Entscheidungen
 
 #### HuetchenSpielerCard - Verwendete Datenstrukturen
@@ -130,107 +286,7 @@ ObstaclesFieldPercept.obstacles[] durchsuchen:
 ```
 
 
-## Modifizierte Dateien
-
-### 1. HuetchenSpielerCard.cpp (NEU ERSTELLT)
-**Pfad**: `\Src\Modules\BehaviorControl\BehaviorControl\Cards\R2K\HuetchenSpielerCard.cpp`
-
-**Zweck**: Hauptverhalten für das Hütchenspiel mit 4-Zustands-Automat
-
-**Zustandsautomat**:
-```cpp
-enum State {
-  WAITING_FOR_SETUP,    // Wartet, bis der Ball gesehen wurde
-  OBSERVING_HIDE,       // Beobachtet, welcher Roboter Ball versteckt und Merkt sich jerseyColor dieses Roboters
-  TRACKING_BALL,        // Wartet 10 Sekunden
-  REVEALING_POSITION    // Findet Roboter mit gemerkter jerseyColor wieder
-};
-
-State state = WAITING_FOR_SETUP;
-int targetJerseyColor = -1;
-unsigned waitStartTime = 0;
-unsigned revealingStartTime = 0;
-```
-
-
-### 2. JerseyClassifierProvider.cpp
-**Pfad**: `\Src\Modules\Perception\PlayersPerceptors\JerseyClassifierProvider.cpp`
-
-**Zweck**: Erkennt Trikotfarben in Kamerabildern durch Hue-Analyse
-
-**Neue Methode**: `detectJerseyColor()` (Zeilen 321-405)
-
-**Algorithmus**:
-1. **Scan-Bereich**: Obere 60% des erkannten Hindernisses (Trikot-Region)
-2. **Sampling**: 5-Pixel-Schritte für Performance (y+=5, x+=5)
-3. **Sättigungs-Filter**: Nur Pixel mit sat > 40 (filtert Grau/Weiß/Schwarz)
-4. **Hue-Matching**: Zirkuläre Distanz zu jerseyHues[] mit Wraparound
-5. **Toleranz**: ±30 Hue-Einheiten pro Farbe
-6. **Dominanz-Schwelle**: Farbe muss >25% aller gültigen Samples ausmachen
-7. **Rückgabewert**: `TEAM_*`-Konstante (z.B `TEAM_RED`,`TEAM_BLUE`,...)
-
-**Integration in Perception-Pipeline**: Zeilen 36-42, 193, 201-203
-
-
-
-
-
-### 3. ObstaclesFieldPercept.h
-**Pfad**: `\Src\Representations\Perception\ObstaclesPercepts\ObstaclesFieldPercept.h`
-
-**Hinzugefügt (Zeile 40)**:
-```cpp
-(int)(-1) jerseyColor, /**< TEAM_* color constant or -1 if unknown */
-```
-**Zweck**: Erweitert Hindernis-Perzept um Trikotfarbe 
-
-
-
-### 4. JerseyClassifier.h
-**Pfad**: `\Src\Representations\Perception\ObstaclesPercepts\JerseyClassifier.h`
-
-**Änderung (Zeilen 29)**:
-```cpp
-FUNCTION(int(const ObstaclesImagePercept::Obstacle&)) detectJerseyColor;
-/**< Detects jersey color. Returns TEAM_* constant or -1 */
-```
-**Zweck**: Deklariert detectJerseyColor als aufrufbare Funktion 
-
-
-
-### 5. Obstacle.h
-**Pfad**: `\Src\Tools\Modeling\Obstacle.h`
-
-**Änderung (Zeile 41)**:
-```cpp
-(int)(-1) jerseyColor, /**< TEAM_* color constant or -1 if unknown */
-```
-**Zweck**: Erweitert die Obstacle-Datenstruktur um Trikotfarbe
-
-
-
-### 6. ObstacleModelProvider.cpp
-**Pfad**: `\Src\Modules\Modeling\ObstacleModelProvider\ObstacleModelProvider.cpp`
-
-**Änderungen**:
-- **Zeile 206** (addPlayerPercepts): `obstacle.jerseyColor = percept.jerseyColor;`
-- **Zeile 255,256** (tryToMerge): 
-  ```cpp
-  if(measurement.jerseyColor != -1) {
-    obstacleHypotheses[atMerge].jerseyColor = measurement.jerseyColor;
-  }
-  ```
-- **Zeile 371-373** (mergeOverlapping): 
-  ```cpp
-   if(actual.jerseyColor == -1 && other.jerseyColor != -1)
-          actual.jerseyColor = other.jerseyColor;
-  ```
-
-**Zweck**: Stellt sicher, dass jerseyColor korrekt beibehalten wird
-
-
-
-
+## 7. Farbkonstanten und Konfiguration
 
 ### Farbkonstanten (TEAM_*)
 ```cpp
@@ -247,21 +303,30 @@ TEAM_BROWN   = 8  // Braun (Hue ~20-30)
 ### Timeouts & Robustheit
 - **Mischphase**: 10 Sekunden (ermöglicht manuelles Mischen)
 - **Aufdeckphase**: 5 Sekunden (verhindert Endlosschleifen)
-- **Warteschleifen**: System bleibt in Zustand wenn Hindernisse nicht sichtbar 
+- **Warteschleifen**: System bleibt in Zustand wenn Hindernisse nicht sichtbar
 
 
 
+## 8. Debugging und Fehlersuche
 
 ### Console-Ausgaben interpretieren
 
 **Wichtige Meldungen**:
-- `"X Hindernisse gefunden"` → Prüfe ob 3 Roboter im Sichtfeld
-- `"Ball ist weg"` → Übergang zu OBSERVING_HIDE funktioniert
-- `"Ball bei [FARBE] gefunden!"` → Tracking erfolgreich gestartet
-- `"PLAYER [FARBE] MIT BALL IST [POSITION]"` → Ball versteckt, Position gemerkt
-- `"SPIELER MIT FARBE [FARBE] GEFUNDEN"` → Finaler Roboter korrekt identifiziert
-- `"Timeout erreicht!"` → Roboter nicht im Sichtfeld, Zustand zurückgesetzt
+- `"Ball wurde versteckt"` -> Übergang zu OBSERVING_HIDE funktioniert
+- `"Ball bei [FARBE] gefunden!"` ->Tracking erfolgreich gestartet
+- `"Spieler [FARBE] MIT BALL IST [POSITION]"` -> Ball versteckt und Position gemerkt
+- `"Pause gestartet, jetzt mischen!"` -> 10 Sekunden zählen runter, jetzt mischen
+- `"SPIELER MIT FARBE [FARBE] GEFUNDEN"` -> Finaler Roboter korrekt identifiziert
+- `"Keine Obstacles gefunden,... Warte auf nächsten Frame"` → Prüfe ob 3 Roboter im Sichtfeld
+-`"TIMEOUT: Farbe [FARBE] nicht gefunden nach 5 Sekunden "` -> Farbe nicht erkannt
+- `"Timeout erreicht!"` -> Roboter nicht im Sichtfeld, Zustand zurückgesetzt
 
+
+
+## 9. Ausblick und Erweiterungen
+- Implementierung eines neuronalen Netzen(z.B YOLO), um echte Hütchen zu erkennen
+- Tracking-Mechanismus überarbeiten, so dass alle Hütchen die gleiche Farbe besitzen können (Positionsverfolgung)
+- ObstaclesFieldPercept am Besten nochmal gegen ObstacleModel tauschen, so bleiben dann die Obstacles, die nicht mehr gesehen werden, trotzdem im Modell
 
 
 **Projekt-Status**: ✅ Funktional mit 80-90% Erfolgsrate bei optimalen Bedingungen
