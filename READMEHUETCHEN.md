@@ -46,6 +46,7 @@ Dieses Projekt implementiert ein "Hütchenspiel" für NAO-Roboter im RoboCup SPL
 - Wir befinden uns im ersten Zustand: WAITING_FOR_SETUP
 - Sobald der Roboter den Ball sieht, gehen wir in Zustand: OBSERVING_HIDE über
 - Den Ball kann man jetzt den drei Robotern abwechselnd vor die Füße legen, und bekommt eine Nachricht in der Console, welcher dre drei den Ball aktuell hat. (In Form von: LINKS,MITTE,RECHTS)
+- **Fehleranfällig** wenn ein Ball zu schnell von links nach rechts oder von rechts nach links gelegt wird(Mitte wird übersprungen) -> Dann denkt der Roboter, der Ball wurde versteckt und springt in Zustand TRACKING_BALL
 - Sobald man sich für einen Roboter entschieden hat, der den Ball verstecken soll, legt man den Ball HINTER diesen Roboter. 
 - Wenn der Ball verschwindet, erscheint: DER BALL WURDE VERSTECKT und wo und bei wem der Ball zuletzt war (bspw. PLAYER BLAU MIT BALL IST LINKS)
 - Es gab einen Zustandswechsel in: TRACKING_BALL. 
