@@ -3,7 +3,8 @@
  * @author Laura Hammerschmidt
  * @brief Card for Huetchenspieler behavior
  * @version 1.0
- * @date 2025-01-20
+ * @date 2025-01-23
+ * !!! Nicht Stresssave
  *
  */
 
@@ -26,8 +27,6 @@
 
 #include "Platform/Time.h"
 
-
-
 #include "Tools/Debugging/Annotation.h"
 #include "Tools/Debugging/DebugDrawings.h"
 
@@ -46,8 +45,12 @@ CARD(HuetchenSpielerCard,
         
 
 
-        DEFINES_PARAMETERS(
-             {,}),
+        LOADS_PARAMETERS(
+             {,
+             (float) coneThresholdY,
+             (unsigned int) mixingDuration,
+             (unsigned int) revealTimeout,
+             }),
      });
 
 enum class ConeID { LEFT, MIDDLE, RIGHT };
@@ -65,19 +68,22 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
     };
 
     State currentState = WAITING_FOR_SETUP;
+    State lastOutputState = WAITING_FOR_SETUP; // Track last output state
     ConeID lastBallPosition = ConeID::MIDDLE;
+    ConeID lastOutputBallPosition = ConeID::MIDDLE; // Track last output ball position
+    ConeID lastOutputPlayerPosition = ConeID::MIDDLE; // Track last output player position
 
-    int trackedJerseyColor = -1; 
+    int trackedJerseyColor = TEAM_RED; 
     Vector2f savedOpponentPosition = Vector2f::Zero(); 
     
-    int lastPlayerWithBall = -1;
-
     unsigned int waitStartTime = 0;
     unsigned int revealingStartTime = 0; 
 
-    unsigned int lastOutputTime = 0;  
-    const unsigned int outputInterval = 1000;  // Ausgabe immer nach 1 sekunde
     bool hasOutputWelcome = false;  //nur einmal HuetchenspielerCard active ausgeben
+    bool hasOutputBallPosition = false; // Track if any ball position was output yet
+    bool hasOutputBallHidden = false; // Track if "Ball versteckt" was output
+    bool hasOutputMixingStarted = false; // Track if mixing message was output
+    bool hasOutputSearchStart = false; // Track if search start was output
 
 
     std::string getColorName(int teamColor) const
@@ -112,19 +118,11 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
         theActivitySkill(BehaviorStatus::defaultBehavior);
         theStandSkill();
 
-        unsigned int currentTime = Time::getCurrentSystemTime();
-        bool shouldOutput = (currentTime - lastOutputTime >= outputInterval); //ist 1 sekunde vergangen?
-
         if(!hasOutputWelcome)
         {
             OUTPUT_TEXT("HuetchenspielerCard active for robot " << theRobotInfo.number);
             OUTPUT_TEXT("WILLKOMMEN BEIM HUETCHENSPIEL!");
             hasOutputWelcome = true;
-        }
-
-        if(shouldOutput)
-        {
-            lastOutputTime = currentTime; //einmal setzen, damit die zeit im zyklus synchron bleibt
         }
 
 
@@ -136,21 +134,33 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
         {
             case WAITING_FOR_SETUP:
             {
-                if(shouldOutput) OUTPUT_TEXT("WAITING_FOR_SETUP...");
+                // Output state nur beim ersten Mal oder bei Zustandswechsel
+                if(lastOutputState != currentState)
+                {
+                    OUTPUT_TEXT("WAITING_FOR_SETUP...");
+                    lastOutputState = currentState;
+                }
+                
                 bool ballSeen = theFieldBall.ballWasSeen();
-
 
                 if(ballSeen)
                 {
                     OUTPUT_TEXT("Ball wird gesehen");
                     currentState = OBSERVING_HIDE;
+                    hasOutputBallHidden = false; // Reset for next cycle
+                    hasOutputBallPosition = false; // Reset to output initial ball position
                 }
                 break;
             }
 
             case OBSERVING_HIDE:
             {   
-                if(shouldOutput) OUTPUT_TEXT("OBSERVING_HIDE...");
+                // Output state nur beim ersten Mal oder bei Zustandswechsel
+                if(lastOutputState != currentState)
+                {
+                    OUTPUT_TEXT("OBSERVING_HIDE...");
+                    lastOutputState = currentState;
+                }
 
                 bool ballSeen = theFieldBall.ballWasSeen(); //ball wird in kamera gesehen
                 float y_ball = theFieldBall.positionRelative.y();
@@ -158,36 +168,51 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
                 //Ball erkannt?
                 if(ballSeen)
                {    
-
-                    if(y_ball < -200) //mittig definieren: [-200, 200]
+                    ConeID currentBallPosition;
+                    
+                    if(y_ball < -coneThresholdY)
                     {
-                        
-                        if(shouldOutput) OUTPUT_TEXT("Ball ist rechts");
-                        lastBallPosition = ConeID::RIGHT;
-
+                        currentBallPosition = ConeID::RIGHT;
                     } 
-                    else if(y_ball > 200)
+                    else if(y_ball > coneThresholdY)
                     {
-                        if (shouldOutput) OUTPUT_TEXT("Ball ist links");
-                        lastBallPosition = ConeID::LEFT;
+                        currentBallPosition = ConeID::LEFT;
                     } 
                     else 
                     {
-                        if(shouldOutput) OUTPUT_TEXT("Ball ist mittig");
-                        lastBallPosition = ConeID::MIDDLE;
+                        currentBallPosition = ConeID::MIDDLE;
                     }
+                    
+                    // Output beim ersten Mal oder wenn sich Position geändert hat
+                    if(!hasOutputBallPosition || currentBallPosition != lastOutputBallPosition)
+                    {
+                        if(currentBallPosition == ConeID::RIGHT)
+                            OUTPUT_TEXT("Ball ist rechts");
+                        else if(currentBallPosition == ConeID::LEFT)
+                            OUTPUT_TEXT("Ball ist links");
+                        else
+                            OUTPUT_TEXT("Ball ist mittig");
+                        
+                        lastOutputBallPosition = currentBallPosition;
+                        hasOutputBallPosition = true;
+                    }
+                    
+                    lastBallPosition = currentBallPosition;
                 }
                 // Ball nicht mehr sichtbar?
                 else
                 {
-                    OUTPUT_TEXT("BALL WURDE VERSTECKT");
+                    // Nur einmal ausgeben
+                    if(!hasOutputBallHidden)
+                    {
+                        OUTPUT_TEXT("BALL WURDE VERSTECKT");
+                        hasOutputBallHidden = true;
+                    }
 
                     // nur weitermachen wenn Obstacles sichtbar sind
                     if(theObstaclesFieldPercept.obstacles.empty())
                     {   
                         // bleibt in OBSERVING_HIDE und versucht es im nächsten frame erneut
-                        OUTPUT_TEXT("Keine Obstacles gefunden,... Warte auf nächsten Frame");
-                        
                         break;
                     }
 
@@ -217,22 +242,29 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
                         trackedJerseyColor = closestOpponent->jerseyColor;
 
                         float y_pos = savedOpponentPosition.y();
+                        ConeID playerPosition;
 
-                        if(y_pos < -200)
+                        if(y_pos < -coneThresholdY)
                         {
+                            playerPosition = ConeID::RIGHT;
                             OUTPUT_TEXT("SPIELER "<<getColorName(trackedJerseyColor)<<" MIT BALL IST RECHTS");
                         } 
-                        else if(y_pos > 200)
+                        else if(y_pos > coneThresholdY)
                         {
+                            playerPosition = ConeID::LEFT;
                             OUTPUT_TEXT("SPIELER "<<getColorName(trackedJerseyColor)<<" MIT BALL IST LINKS");
                         } 
                         else 
                         {
+                            playerPosition = ConeID::MIDDLE;
                             OUTPUT_TEXT("SPIELER "<<getColorName(trackedJerseyColor)<<" MIT BALL IST MITTIG");
                         }
+                        
+                        lastOutputPlayerPosition = playerPosition;
                     }
 
                     currentState = TRACKING_BALL;
+                    hasOutputMixingStarted = false; // Reset for next state
                 }       
                 
                 break;
@@ -240,53 +272,68 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
 
             case TRACKING_BALL:
             {
-                if(shouldOutput) OUTPUT_TEXT("TRACKING_BALL...");
+                // Output state nur beim ersten Mal oder bei Zustandswechsel
+                if(lastOutputState != currentState)
+                {
+                    OUTPUT_TEXT("TRACKING_BALL...");
+                    lastOutputState = currentState;
+                }
 
                 if(waitStartTime == 0)
                 {
                     waitStartTime = Time::getCurrentSystemTime();
 
-                    OUTPUT_TEXT("Pause gestartet, jetzt mischen!");
-                    //jetzt spieler mischen
+                    if(!hasOutputMixingStarted)
+                    {
+                        OUTPUT_TEXT("Pause gestartet, jetzt mischen!");
+                        hasOutputMixingStarted = true;
+                    }
                 }
                 
-                if(Time::getCurrentSystemTime() - waitStartTime >= 10000)//10 sek vergangen?
+                if(Time::getCurrentSystemTime() - waitStartTime >= mixingDuration)
                 {
                     waitStartTime = 0; //reset
                     currentState = REVEALING_POSITION;
+                    hasOutputSearchStart = false; // Reset for next state
                 }
                 break;
             }   
 
             case REVEALING_POSITION:
             {
+                // Output state nur beim ersten Mal oder bei Zustandswechsel
+                if(lastOutputState != currentState)
+                {
+                    OUTPUT_TEXT("REVEALING_POSITION...");
+                    lastOutputState = currentState;
+                }
+                
                 // init Timeout beim ersten Mal
                 if(revealingStartTime == 0)
                 {
                     revealingStartTime = Time::getCurrentSystemTime();
-                    OUTPUT_TEXT("Starte Suche nach Farbe: " << getColorName(trackedJerseyColor));
-                }
                     
+                    if(!hasOutputSearchStart)
+                    {
+                        OUTPUT_TEXT("Starte Suche nach Farbe: " << getColorName(trackedJerseyColor));
+                        hasOutputSearchStart = true;
+                    }
+                }
 
-                // sind 5sek vergangen?
+                // Timeout überschritten?
                 unsigned int elapsedTime = Time::getCurrentSystemTime() - revealingStartTime;
-                if(elapsedTime > 5000)
+                if(elapsedTime > revealTimeout)
                 {
-                    OUTPUT_TEXT("TIMEOUT: Farbe " << getColorName(trackedJerseyColor) << " nicht gefunden nach 5 Sekunden ");
+                    OUTPUT_TEXT("TIMEOUT: Farbe " << getColorName(trackedJerseyColor) << " nicht gefunden nach " << (revealTimeout/1000) << " Sekunden ");
                     revealingStartTime = 0;
                     trackedJerseyColor = -1;
                     currentState = WAITING_FOR_SETUP;
                     break;
                 }
-                
-
-                OUTPUT_TEXT("REVEALING_POSITION... (" << (elapsedTime/1000.0f) << "s)");
-                OUTPUT_TEXT("Suche Spieler mit Farbe: " << getColorName(trackedJerseyColor));
 
                 // WICHTIG: nur weitermachen wenn Obstacles sichtbar 
                 if(theObstaclesFieldPercept.obstacles.empty())
                 {
-                    OUTPUT_TEXT("WARNUNG: keine Obstacles gefunden,... Warte auf nächsten Frame");
                     // bleibt in REVEALING_POSITION und versucht es im nächsten Frame nochmal
                     break;
                 }
@@ -299,7 +346,6 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
                     {
                         if(obstacle.jerseyColor == trackedJerseyColor && trackedJerseyColor != -1)
                         {
-                            OUTPUT_TEXT("Spieler mit Farbe " << getColorName(trackedJerseyColor) << " gefunden!");
                             foundOpponent = &obstacle;
                             break;
                         }
@@ -308,27 +354,48 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
                 
                 if(foundOpponent != nullptr)
                 {
+                    OUTPUT_TEXT("Spieler mit Farbe " << getColorName(trackedJerseyColor) << " gefunden!");
                     revealingStartTime = 0; // Reset timeout
-                    OUTPUT_TEXT("Spieler mit Farbe " << getColorName(trackedJerseyColor) << " wiedergefunden!");
-
+                    
                     float y_pos = foundOpponent->center.y();
-                    if(y_pos < -200) //mittig definieren: [-200, 200]
+                    ConeID foundPlayerPosition;
+                    
+                    if(y_pos < -coneThresholdY)
                     {
-                        OUTPUT_TEXT("SPIELER "<< getColorName(trackedJerseyColor) << "MIT BALL IST RECHTS");
+                        foundPlayerPosition = ConeID::RIGHT;
                     } 
-                    else if(y_pos > 200)
+                    else if(y_pos > coneThresholdY)
                     {
-                        OUTPUT_TEXT("SPIELER "<< getColorName(trackedJerseyColor) << " MIT BALL IST LINKS");
+                        foundPlayerPosition = ConeID::LEFT;
                     } 
                     else 
                     {
-                        OUTPUT_TEXT("SPIELER "<< getColorName(trackedJerseyColor) << "MIT BALL IST MITTIG");
+                        foundPlayerPosition = ConeID::MIDDLE;
+                    }
+                    
+                    // Vergleiche mit letzter gespeicherter Position
+                    if(foundPlayerPosition != lastOutputPlayerPosition)
+                    {
+                        if(foundPlayerPosition == ConeID::RIGHT)
+                            OUTPUT_TEXT("SPIELER "<< getColorName(trackedJerseyColor) << " MIT BALL IST JETZT RECHTS");
+                        else if(foundPlayerPosition == ConeID::LEFT)
+                            OUTPUT_TEXT("SPIELER "<< getColorName(trackedJerseyColor) << " MIT BALL IST JETZT LINKS");
+                        else
+                            OUTPUT_TEXT("SPIELER "<< getColorName(trackedJerseyColor) << " MIT BALL IST JETZT MITTIG");
+                    }
+                    else
+                    {
+                        if(foundPlayerPosition == ConeID::RIGHT)
+                            OUTPUT_TEXT("SPIELER "<< getColorName(trackedJerseyColor) << " MIT BALL IST IMMER NOCH RECHTS");
+                        else if(foundPlayerPosition == ConeID::LEFT)
+                            OUTPUT_TEXT("SPIELER "<< getColorName(trackedJerseyColor) << " MIT BALL IST IMMER NOCH LINKS");
+                        else
+                            OUTPUT_TEXT("SPIELER "<< getColorName(trackedJerseyColor) << " MIT BALL IST IMMER NOCH MITTIG");
                     }
                 }
                 else
                 {
-                    OUTPUT_TEXT("SPIELER MIT FARBE " << getColorName(trackedJerseyColor) << " IN DIESEM FRAME NICHT GEFUNDEN - warte weiter... ");
-                    // bleibt in REVEALING_POSITION und versucht es weiter
+                    // Keine Ausgabe mehr bei jedem Frame - warten still
                     break;
                 }
 
@@ -336,7 +403,7 @@ class HuetchenSpielerCard : public HuetchenSpielerCardBase
                   
                 //reset
                 currentState = WAITING_FOR_SETUP;
-                trackedJerseyColor = -1; // Reset
+                trackedJerseyColor = TEAM_RED; // Reset
                 savedOpponentPosition = Vector2f::Zero();
 
 
