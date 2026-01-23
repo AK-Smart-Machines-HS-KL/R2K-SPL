@@ -18,48 +18,60 @@ Dieses Projekt implementiert ein "Hütchenspiel" für NAO-Roboter im RoboCup SPL
 
 ---
 
+<details>
+<summary><strong>1. Projektziel</strong></summary>
+
 ## 1. Projektziel
 
 - **Primäres Ziel**: Roboter soll beobachten, welcher von 3 farbigen "Bechern" (Robotern) einen Ball versteckt
 - **Tracking-Mechanismus**: Verwendung von Trikot-Farberkennung 
 - **Integration**: Nahtlose Einbindung in das B-Human Framework
 
+</details>
 
 
-## 2.Projektverlauf
+<details>
+<summary><strong>2. Projektverlauf</strong></summary>
 
-## Ablauf:
+## 2. Projektverlauf
+
+### Ablauf:
 - Zuerst hab ich eine HuetchenSpielerCard erstellt und diese ganz oben, in der gameplayCard abgelegt, damit sie sofort drankommt, und die preCondition true gesetzt und die postCondition false. Resultiert in einer Dauerschleife der Card.
-- Dann hab ich meinen Zustandsautomaten gebaut. Der nichts konnte außer den aktuellen Zustand ausgeben. Und dann langsam darauf hingearbeitet, dass ausgegeben wurde, wo sich der Ball aktuell befindet. Relativ zum Roboter und generell auf dem Feld. Und das dann in eine Ausgabe umgewandelt. Da hab ich dann mit den Definitionen von links,mittig und rechts rumprobiert.
+- Dann hab ich meinen Zustandsautomaten gebaut. Dieser konnte noch nichts, außer den aktuellen Zustand ausgeben. Und dann langsam darauf hingearbeitet, dass ausgegeben wurde, wo sich der Ball aktuell befindet. Relativ zum Roboter und generell auf dem Feld. Und das dann in eine Ausgabe umgewandelt. Da hab ich dann mit den Definitionen von links, mittig und rechts herumprobiert.
 -> Der Roboter konnte dann sagen, vor welchem Gegner aktuell der Ball liegt.(LINKS/MITTIG/RECHTS)
 - Als das dann funktioniert hat, hab ich dafür gesorgt, dass wenn der Ball versteckt wird, der Roboter sagen kann, wo er zuletzt war.
 
-- Jetzt kam das Problem, mit der BH.ros2 Szene. Hier waren zuviele Roboter auf dem Feld, und ich musste die ständig nach jedem neuen Build wieder an die richtigen Positionen (link,mittig und rechts vor dem Roboter) stellen. Deshalb hab ich mir eine eigene Szene geschrieben: 1vs3.ros2
-- Da hab ich lange rumprobiert, was ich alles brauchte und wo alles plaziert werden sollte, und das sie überhaupt lädt.
+- Jetzt kam das Problem, mit der BH.ros2 Szene. Hier waren zu viele Roboter auf dem Feld, und ich musste sie ständig nach jedem neuen Build wieder an die richtigen Positionen (link, mittig und rechts vor dem Roboter) stellen. Deshalb hab ich mir eine eigene Szene geschrieben: 1vs3.ros2
+- Da hab ich lange herumprobiert, was ich alles brauchte und wo alles platziert werden sollte, und das sie überhaupt lädt.
 
-- Als das dann funktionierte, gings an das Tracking. Damit das Hütchenspiel einfach mal läuft, hab ich bisschen geschummelt und mir durch das GroundTruthModel, den Spieler der am nächsten zum Ball war, ausgeben lassen, mir gemerkt und dann nach dem mischen wieder suchen lassen. So lief dann das erste funktionierende Hütchenspiel :)
+- Als das dann funktionierte, gings an das Tracking. Damit das Hütchenspiel einfach mal läuft, hab ich ein bisschen geschummelt und mir durch das GroundTruthModel, den Spieler der am nächsten zum Ball war, ausgeben lassen, mir gemerkt und dann nach dem Mischen wieder suchen lassen. So lief dann das erste funktionierende Hütchenspiel :)
 
-- Und ich hab die Consolen-Ausgabe überarbeitet, weil die gab für jeden Frame aus, wo der Ball gerade war, sodass man wirklich keine Übersicht hatte. 
+- Und ich hab die Konsolen-Ausgabe überarbeitet, weil die gab für jeden Frame aus, wo der Ball gerade war, sodass man wirklich keine Übersicht hatte. 
 - Danach hab ich dann das GroundTruthModel gegen das ObstacleModel ausgetauscht. Das Tracking hat dann natürlich nicht mehr geklappt. 
 
 - Dann hab die ganze Farberkennung angefangen...
 - Das hat gedauert, bis das am Ende funktioniert hat. Da sind nämlich sehr viele Probleme aufgetaucht. Gestartet mit den Obstacles und deren Jersey Farberkennung. Die war nämlich schon implementiert. Ich hab mir dann in meiner HuetchenspielerCard eine eigene Methode zur Farberkennung geschrieben, basierend auf den schon vorhandenen Klassen der Farb-/ und Jerseyerkennung. Allerdings kann da ein Gegnerteam nur eine Farbe haben, und die Obstacles speichern ihre eigene Farbe nicht. Meine "Hütchen" sollen ja aber drei verschiedenen Farben besitzen. 
 
-- Weil ich anfangs nicht schon vorhandenen Code ändern wollte, hab ich mir die benötigten Klassen und Header kopiert und Huetchen am Ende eingefügt, und in diesen dann weitergearbeitet. Mein Plan war es dann, in der JerseyClassifierProvider Klasse eine Methode einzufügen, die die genaue Jerseyfarbe zurückgibt. Dafür musste ich allerdings durch die ganzen zusammenhängenden Klassen durch, und da das Attribut jerseyColor speichern, und weiterreichen. Dabei bin ich vom ObstacleModel auf ObstaclesFieldPercept gewechselt, weil mir das einfacher vorkam.
+- Weil ich anfangs nicht schon vorhandenen Code ändern wollte, hab ich mir die benötigten Klassen und Header kopiert und Huetchen am Ende eingefügt, und in diesen dann weitergearbeitet. Mein Plan war es dann, in der JerseyClassifierProvider Klasse eine Methode einzufügen, die die genaue Jerseyfarbe zurückgibt. Dafür musste ich allerdings durch die ganzen zusammenhängenden Klassen durch, und da das Attribut jerseyColor speichern, und weiterreichen. Dabei bin ich vom ObstacleModel auf ObstaclesFieldPercept gewechselt, weil mir das einfacher vorkam. Dadurch sind wir jetzt in der simulierten Kamera.
 
 - Als ich dachte, dass ich das jetzt testen könnte, stand ich vor einem Problem. In der Simulation kam dann: 
 Error: Cognition: Representation CameraImage is provided by multiple threads!
-- Und an diesem Error, kam ich auch nicht vorbei. Ich hab versucht die 1vs3 Konfigurationsdatei zu ändern, das hat nicht geklappt, dann die Provider anzupassen, meine eigene Card anzupassen, alles erfolglos.
+- Und an diesem Error kam ich auch nicht vorbei. Ich hab versucht die 1vs3 Konfigurationsdatei zu ändern, das hat nicht geklappt, dann die Provider anzupassen, meine eigene Card anzupassen, alles erfolglos.
 
-- Also hab ich die ganzen kopierten und angepassten Klassen und Header gelöscht und die schon existierenden abgeändert. Dann bekam ich nochmal so einen Art Error, und da war das problem, dass ich in meiner Card REQUIRES(JerseyClassifier) stehen hatte, und das verursacht einen Thread-Konflikt.
+- Also hab ich die ganzen kopierten und angepassten Klassen und Header gelöscht und die schon existierenden abgeändert. Dann bekam ich nochmal so einen Art Error, und da war das Problem, dass ich in meiner Card REQUIRES(JerseyClassifier) stehen hatte, und das verursacht einen Thread-Konflikt.
 
-- Beim Testen, wurde dann die Farbe zwar erkannt, aber nach dem Mischen nicht korrekt gefunden. Oft hat der Roboter vor oder nach dem Mischen keine Obstacles mehr erkannt,deshalb hab ich das so geändert, dass solange wartet, bis er in einem Frame wieder welche sieht. Und mir vorher als DEBUG die erkannten Obstacles auf der For-Schleife mit deren Farben ausgeben lassen. 
+- Beim Testen, wurde dann die Farbe zwar erkannt, aber nach dem Mischen nicht korrekt gefunden. Oft hat der Roboter vor oder nach dem Mischen keine Obstacles mehr erkannt, deshalb hab ich das so geändert, dass er so lange wartet, bis er in einem Frame wieder welche sieht. Und mir vorher als DEBUG die erkannten Obstacles aus der For-Schleife mit ihren Farben ausgeben lassen. 
 - Für den REVEALING_POSITION Zustand hab ich dann auch noch eine Wartelogik implementiert, weil er sofort abgebrochen hat, wenn er die gesuchte Farbe nicht sofort gesehen hat.
 
 -Und dadurch ist mein kleines Hütchenspieler-Projekt entstanden :)
 
+</details>
 
 
+
+
+<details>
+<summary><strong>3. Anleitung zur Ausführung</strong></summary>
 
 ## 3. Anleitung zur Ausführung
 
@@ -92,7 +104,12 @@ Error: Cognition: Representation CameraImage is provided by multiple threads!
 - Und es erscheint auf der Console: bspw SPIELER MIT FARBE BLAU GEFUNDEN. SPIELER MIT BALL IST RECHTS.
 - Danach sind wir wieder im ersten Zustand: WAITING_FOR_SETUP. Zum Weiterspielen :)
 
+</details>
 
+
+
+<details>
+<summary><strong>4. Ergebnisse und aktueller Stand</strong></summary>
 
 ## 4. Ergebnisse und aktueller Stand
 
@@ -114,7 +131,12 @@ Error: Cognition: Representation CameraImage is provided by multiple threads!
 - Farberkennung ist fehlerhaft, bei zu ähnlichen Farber
 - Erkennung funktioniert nur mit farbigen Trikots und nicht mit echten Hütchen in einer Farbe
 
+</details>
 
+
+
+<details>
+<summary><strong>5. Modifizierte Dateien</strong></summary>
 
 ## 5. Modifizierte Dateien
 
@@ -215,7 +237,12 @@ FUNCTION(int(const ObstaclesImagePercept::Obstacle&)) detectJerseyColor;
 
 **Zweck**: ganz oben auf den "Stapel" gelegt, damit diese Card als Erstes ausgeführt wird
 
+</details>
 
+
+
+<details>
+<summary><strong>6. Datenfluss</strong></summary>
 
 ## 6. Datenfluss
 
@@ -285,6 +312,10 @@ ObstaclesFieldPercept.obstacles[] durchsuchen:
       └─ JA (Timeout) → Reset zu WAITING_FOR_SETUP 
 ```
 
+</details>
+
+<details>
+<summary><strong>7. Farbkonstanten und Konfiguration</strong></summary>
 
 ## 7. Farbkonstanten und Konfiguration
 
@@ -305,7 +336,10 @@ TEAM_BROWN   = 8  // Braun (Hue ~20-30)
 - **Aufdeckphase**: 5 Sekunden (verhindert Endlosschleifen)
 - **Warteschleifen**: System bleibt in Zustand wenn Hindernisse nicht sichtbar
 
+</details>
 
+<details>
+<summary><strong>8. Debugging und Fehlersuche</strong></summary>
 
 ## 8. Debugging und Fehlersuche
 
@@ -321,13 +355,27 @@ TEAM_BROWN   = 8  // Braun (Hue ~20-30)
 -`"TIMEOUT: Farbe [FARBE] nicht gefunden nach 5 Sekunden "` -> Farbe nicht erkannt
 - `"Timeout erreicht!"` -> Roboter nicht im Sichtfeld, Zustand zurückgesetzt
 
+</details>
 
+<details>
+<summary><strong>9. Ausblick und Erweiterungen</strong></summary>
 
 ## 9. Ausblick und Erweiterungen
+- Zustandsautomat des Frameworks nutzen
+- Team-Farben ändern, eigene Farben
+- Karte läuft in Dauerschleife -> init und exit Trigger
+- ASSERTS hinzufügen
+- Shuffle automatisieren
+- Perception-Modell für die Realität prüfen
+- Tracking-Mechanismus erarbeiten, so dass alle Hütchen die gleiche Farbe besitzen können (Positionsverfolgung), keine Farberkennung
+- "Wie schnell kann man die Roboter in der Kamera bewegen, ohne das das Tracking fehlschlägt?"
+- Für DEBUG: mit DEBUG_DRAW die Nummern und Positionen(links/mittig/rechts) in der Simulation zeichnen lassen 
 - Implementierung eines neuronalen Netzen(z.B YOLO), um echte Hütchen zu erkennen
-- Tracking-Mechanismus überarbeiten, so dass alle Hütchen die gleiche Farbe besitzen können (Positionsverfolgung)
-- ObstaclesFieldPercept am Besten nochmal gegen ObstacleModel tauschen, so bleiben dann die Obstacles, die nicht mehr gesehen werden, trotzdem im Modell
 
+
+</details>
+
+---
 
 **Projekt-Status**: ✅ Funktional mit 80-90% Erfolgsrate bei optimalen Bedingungen
 
