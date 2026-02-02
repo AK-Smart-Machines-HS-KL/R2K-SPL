@@ -38,10 +38,49 @@ static void bhumanStart(const Settings& settings)
   robot = new Robot(settings, std::string());
   std::string head = Global::getSettings().headName;
   std::string body = Global::getSettings().bodyName;
-  SystemCall::say(Global::getSettings().headName.c_str()); // roll call on boot
+  std::string headCall;
+  std::string bodyCall;
+  // overwrite say task for edge cases
+  if (!head.compare("Mrvn")){
+    headCall = "Marvin";
+  } else if (!head.compare("Problemkind"))
+  {
+    headCall = "Problem Kint";
+  } else if (!head.compare("Problemkind"))
+  {
+    headCall = "Problem Kint";
+  } else if (!head.compare("Gummibaerchen"))
+  {
+    headCall = "Gummy Bear";
+  } else if (!head.compare("TheDuke"))
+  {
+    headCall = "Duke";
+  } else {
+    headCall = head;
+  }
+  // overwrite say task for edge cases
+  if (!body.compare("Mrvn")){
+    bodyCall = "Marvin";
+  } else if (!body.compare("Problemkind"))
+  {
+    bodyCall = "Problem Kint";
+  } else if (!body.compare("Problemkind"))
+  {
+    bodyCall = "Problem Kint";
+  } else if (!body.compare("Gummibaerchen"))
+  {
+    bodyCall = "Gummy Bear";
+  } else if (!body.compare("TheDuke"))
+  {
+    bodyCall = "Duke";
+  } else {
+    bodyCall = body;
+  }
+  
+  SystemCall::say(headCall.c_str()); // roll call on boot
   if (head.compare(body)){
     SystemCall::say("Deployed on body of ");
-    SystemCall::say(Global::getSettings().bodyName.c_str());
+    SystemCall::say(bodyCall.c_str());
   }
   SystemCall::say("Boot complete");
   robot->start();
