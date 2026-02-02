@@ -36,13 +36,20 @@ static void bhumanStart(const Settings& settings)
 {
   fprintf(stderr, "B-Human: Start.\n");
   robot = new Robot(settings, std::string());
-  //SystemCall::say((robot->getName()).c_str());
+  std::string head = Global::getSettings().headName;
+  std::string body = Global::getSettings().bodyName;
+  SystemCall::say(Global::getSettings().headName.c_str()); // roll call on boot
+  if (head.compare(body)){
+    SystemCall::say("Deployed on body of ");
+    SystemCall::say(Global::getSettings().bodyName.c_str());
+  }
   SystemCall::say("Boot complete");
   robot->start();
 }
 
 static void bhumanStop()
 {
+  SystemCall::say("Shutting down");
   fprintf(stderr, "B-Human: Stop.\n");
   robot->announceStop();
   robot->stop();
