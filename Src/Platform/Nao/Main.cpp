@@ -45,10 +45,13 @@ static void bhumanStart(const Settings& settings)
     headCall = "Marvin";
   } else if (!head.compare("Problemkind"))
   {
-    headCall = "Problem Kint";
-  } else if (!head.compare("Problemkind"))
+    headCall = "Touny";
+  } else if (!head.compare("BigMama"))
   {
-    headCall = "Problem Kint";
+    headCall = "Max";
+  } else if (!head.compare("Junior"))
+  {
+    headCall = "Fritz";
   } else if (!head.compare("Gummibaerchen"))
   {
     headCall = "Gummy Bear";
@@ -63,10 +66,13 @@ static void bhumanStart(const Settings& settings)
     bodyCall = "Marvin";
   } else if (!body.compare("Problemkind"))
   {
-    bodyCall = "Problem Kint";
-  } else if (!body.compare("Problemkind"))
+    bodyCall = "Touny";
+  } else if (!body.compare("BigMama"))
   {
-    bodyCall = "Problem Kint";
+    bodyCall = "Max";
+  } else if (!body.compare("Junior"))
+  {
+    bodyCall = "Fritz";
   } else if (!body.compare("Gummibaerchen"))
   {
     bodyCall = "Gummy Bear";
