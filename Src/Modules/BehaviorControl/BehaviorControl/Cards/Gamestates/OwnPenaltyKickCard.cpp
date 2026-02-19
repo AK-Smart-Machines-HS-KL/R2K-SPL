@@ -23,20 +23,15 @@
 
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/BehaviorControl/FieldBall.h"
-#include "Representations/BehaviorControl/TeamBehaviorStatus.h"
-
-#include "Representations/Configuration/FieldDimensions.h"
+#include "Representations/BehaviorControl/TeammateRoles.h"
 
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/TeamInfo.h"
 #include "Representations/Communication/RobotInfo.h"
-#include "Representations/Infrastructure/FrameInfo.h"
 #include "Representations/BehaviorControl/Shots.h"
 
 #include "Representations/Modeling/RobotPose.h"
 #include "Representations/Communication/TeamCommStatus.h"
-
-#include "Tools/Math/Geometry.h"
 
  // Debug Drawings
 #include "Tools/Debugging/DebugDrawings.h"
@@ -46,24 +41,18 @@
 CARD(OwnPenaltyKickCard,
     { ,
       CALLS(Activity),
-      CALLS(LookForward),
       CALLS(GoToBallAndKick),
       CALLS(LookActive),
       CALLS(Stand),
       CALLS(WalkAtRelativeSpeed),
-      CALLS(PenaltyStrikerGoToBallAndKick),
 
       REQUIRES(FieldBall),
       REQUIRES(RobotPose),
       REQUIRES(RobotInfo),
-      REQUIRES(FieldDimensions),
       REQUIRES(OwnTeamInfo),
       REQUIRES(GameInfo),
-      REQUIRES(TeamBehaviorStatus),
       REQUIRES(TeammateRoles),
-      REQUIRES(PlayerRole),
       REQUIRES(Shots),
-      REQUIRES(FrameInfo),
       REQUIRES(TeamCommStatus),  // wifi on off?
 
       DEFINES_PARAMETERS(

@@ -39,11 +39,8 @@
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/BehaviorControl/FieldBall.h"
-#include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/TeamData.h"
 #include "Representations/BehaviorControl/TeammateRoles.h"
-#include "Representations/Communication/GameInfo.h"
-#include "Representations/Communication/TeamCommStatus.h"
 
 
 
@@ -54,16 +51,12 @@ CARD(OffenseChaseBallCard,
         CALLS(LookForward),
         CALLS(GoToBallAndDribble),
         CALLS(WalkAtRelativeSpeed),
-        USES(GameInfo),
-        REQUIRES(ObstacleModel),
-        REQUIRES(TeamBehaviorStatus),
         REQUIRES(RobotPose),
         REQUIRES(RobotInfo),
         REQUIRES(FieldBall),
         REQUIRES(FieldDimensions),
         REQUIRES(TeamData),   // check behavior
         REQUIRES(TeammateRoles),
-        REQUIRES(TeamCommStatus),  // wifi on off?
 
         DEFINES_PARAMETERS(
              {,

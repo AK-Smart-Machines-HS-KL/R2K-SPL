@@ -12,19 +12,13 @@
  * v1.2. Card migrated (Adrian)
  */
 
-#include "Representations/BehaviorControl/DefaultPose.h"
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/TeamInfo.h"
-#include "Representations/Configuration/GlobalOptions.h"
 #include "Representations/Communication/RobotInfo.h"
-#include "Representations/Modeling/RobotPose.h"
-#include "Representations/BehaviorControl/TeamBehaviorStatus.h" 
 #include "Representations/BehaviorControl/TeammateRoles.h"
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/BehaviorControl/FieldBall.h"
-
-#include "Tools/Math/Geometry.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 
@@ -32,12 +26,9 @@
 CARD(GoalieOppPenaltyKickCard,
   {,
     CALLS(Activity),
-    CALLS(LookActive),
     CALLS(WalkToKickoffPose),
-    REQUIRES(DefaultPose),
     REQUIRES(GameInfo),
     REQUIRES(OwnTeamInfo),
-    REQUIRES(RobotPose),
   REQUIRES(RobotInfo),
   REQUIRES(TeammateRoles),
   REQUIRES(FieldDimensions),

@@ -15,46 +15,33 @@
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 
-#include "Representations/BehaviorControl/Libraries/LibWalk.h"
 #include "Representations/BehaviorControl/Skills.h"
-#include "Representations/BehaviorControl/TeamBehaviorStatus.h"
 
 #include "Representations/Configuration/FieldDimensions.h"
 
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/TeamInfo.h"
-#include "Representations/Communication/RobotInfo.h"
 
 #include "Representations/Modeling/RobotPose.h"
-
-#include "Tools/Math/Geometry.h"
 
 // default actions for GORE2022
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/BehaviorControl/DefaultPose.h"
-#include "Representations/Configuration/GlobalOptions.h"
 
 
 
 CARD(OppPushingFreeKickCard,
 {,
-  CALLS(Stand),
   CALLS(Activity),
   CALLS(LookForward),
-  CALLS(GoToBallAndDribble),
   CALLS(WalkToPoint),
 
   REQUIRES(DefaultPose),
   REQUIRES(FieldBall),
   REQUIRES(FieldDimensions),
   REQUIRES(GameInfo),
-  REQUIRES(GlobalOptions),
   REQUIRES(RobotPose),
-  REQUIRES(RobotInfo),
-  REQUIRES(LibWalk),
   REQUIRES(OwnTeamInfo),
-  REQUIRES(TeamBehaviorStatus),
-  REQUIRES(TeammateRoles),
 });
 
 class OppPushingFreeKickCard : public OppPushingFreeKickCardBase

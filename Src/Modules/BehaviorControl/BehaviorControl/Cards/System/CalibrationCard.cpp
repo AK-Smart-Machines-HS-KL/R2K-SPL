@@ -7,14 +7,12 @@
  */
 
 #include "Representations/BehaviorControl/Skills.h"
-#include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/Dealer.h"
 
 CARD(CalibrationCard,
 {,
-  REQUIRES(GameInfo),
   REQUIRES(RobotInfo),
   LOADS_PARAMETERS(
   {,

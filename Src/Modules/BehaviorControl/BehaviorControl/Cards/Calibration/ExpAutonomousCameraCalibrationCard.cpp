@@ -14,9 +14,7 @@
 #include "Representations/Configuration/CalibrationRequest.h"
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Configuration/RobotDimensions.h"
-#include "Representations/Infrastructure/JointAngles.h"
 #include "Representations/Modeling/RobotPose.h"
-#include "Representations/MotionControl/HeadMotionInfo.h"
 #include "Representations/MotionControl/HeadMotionRequest.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
@@ -28,14 +26,11 @@ CARD(ExpAutonomousCameraCalibrationCard,
   CALLS(LookAtAngles),
   CALLS(LookAtPoint),
   CALLS(LookForward),
-  CALLS(PanAndTiltGrid),
   CALLS(Say),
   CALLS(Stand),
   CALLS(TurnAngle),
   CALLS(WalkToPoint),
   REQUIRES(FieldDimensions),
-  REQUIRES(HeadMotionInfo),
-  REQUIRES(JointAngles),
   REQUIRES(RobotDimensions),
   REQUIRES(RobotPose),
   USES(CameraCalibration),

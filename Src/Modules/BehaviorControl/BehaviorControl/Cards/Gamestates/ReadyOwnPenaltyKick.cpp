@@ -14,19 +14,14 @@
  * 
  */
 
-#include "Representations/BehaviorControl/DefaultPose.h"
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/TeamInfo.h"
-#include "Representations/Configuration/GlobalOptions.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Modeling/RobotPose.h"
-#include "Representations/BehaviorControl/TeamBehaviorStatus.h" 
 #include "Representations/BehaviorControl/TeammateRoles.h"
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Communication/TeamCommStatus.h"
-
-#include "Tools/Math/Geometry.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 
@@ -36,7 +31,6 @@ CARD(ReadyOwnPenaltyKickCard,
     CALLS(Activity),
     CALLS(LookActive),
     CALLS(WalkToPoint),
-    REQUIRES(DefaultPose),
     REQUIRES(GameInfo),
     REQUIRES(OwnTeamInfo),
     REQUIRES(RobotPose),

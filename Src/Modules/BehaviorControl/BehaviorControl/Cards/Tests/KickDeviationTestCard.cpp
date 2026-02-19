@@ -9,7 +9,6 @@
 #include "Platform/SystemCall.h"
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/BehaviorControl/Skills.h"
-#include "Representations/Communication/RobotInfo.h"
 #include "Representations/Configuration/KickInfo.h"
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Representations/Infrastructure/SensorData/KeyStates.h"
@@ -23,7 +22,6 @@ CARD(KickDeviationTestCard,
   CALLS(Activity),
   CALLS(GoToBallAndKick),
   CALLS(LookLeftAndRight),
-  CALLS(LookActive),
   CALLS(LookAtBall),
   CALLS(Stand),
   CALLS(WalkToPoint),
@@ -35,7 +33,6 @@ CARD(KickDeviationTestCard,
   REQUIRES(MotionInfo),
   REQUIRES(ObstacleModel),
   REQUIRES(OdometryData),
-  REQUIRES(RobotInfo),
   LOADS_PARAMETERS(
   {,
     (int) lookAtStartTime,

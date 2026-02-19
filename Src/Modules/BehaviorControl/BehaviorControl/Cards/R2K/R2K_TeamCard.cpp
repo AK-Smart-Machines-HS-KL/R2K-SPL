@@ -85,7 +85,6 @@
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h"  
 #include "Representations/Communication/TeamData.h"
 #include "Representations/Infrastructure/FrameInfo.h"
-#include "Tools/BehaviorControl/Framework/Card/TeamCard.h"
 #include "Representations/Communication/GameInfo.h"  // to sync time inbetween bots
 
 #include "Representations/Communication/EventBasedCommunicationData.h"
@@ -97,7 +96,6 @@
 #include "Representations/Communication/RobotInfo.h"
 
 #include "Representations/Modeling/RobotPose.h" // supporterindex
-#include <algorithm>  // min()
 #include "Representations/BehaviorControl/TeammateRoles.h"  // GOALKEEPER, DEFENSE,...
 #include "Representations/Communication/TeamInfo.h"         // access scores, OwnTeamInfo, OppTeamInfo
 #include "Representations/Communication/TeamCommStatus.h"

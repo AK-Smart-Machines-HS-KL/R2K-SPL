@@ -11,7 +11,6 @@
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/Infrastructure/ExtendedGameInfo.h"
 #include "Representations/Infrastructure/FrameInfo.h"
-#include "Representations/Modeling/RobotPose.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/Math/Random.h"
 
@@ -22,7 +21,6 @@ CARD(LookAroundBeforeCalibrationCard,
   CALLS(LookLeftAndRight),
   REQUIRES(ExtendedGameInfo),
   REQUIRES(FrameInfo),
-  REQUIRES(RobotPose),
   DEFINES_PARAMETERS(
   {,
     (int)(3000) duration, /**< This card will be active for at least this duration. */

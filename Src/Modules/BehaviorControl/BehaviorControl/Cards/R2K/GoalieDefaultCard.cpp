@@ -20,7 +20,6 @@
 
 // Representations
 #include "Representations/BehaviorControl/FieldBall.h"
-#include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/BehaviorControl/DefaultPose.h"
 #include "Representations/BehaviorControl/TeammateRoles.h"
@@ -34,7 +33,6 @@ CARD(GoalieDefaultCard,
         CALLS(Stand),
         CALLS(LookActive),
         CALLS(LookAtBall),
-        CALLS(LookForward),
         CALLS(WalkAtRelativeSpeed),
         CALLS(WalkToPoint),
         REQUIRES(DefaultPose),

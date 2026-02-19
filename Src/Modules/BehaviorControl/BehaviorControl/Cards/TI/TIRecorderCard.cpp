@@ -30,15 +30,9 @@
 #include "Representations/BehaviorControl/Skills.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
-#include "Tools/Math/Pose3f.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Modeling/RobotPose.h"
-#include "Representations/BehaviorControl/FieldBall.h"
-
-#include "Representations/Communication/TeamInfo.h"
-
 #include "Representations/Communication/TeamData.h"
-#include "Representations/Communication/TeamInfo.h"
 
 #include "Representations/BehaviorControl/TI/TIData.h"
 #include "Representations/BehaviorControl/TI/TIRecorderData.h"
@@ -49,7 +43,6 @@ CARD(TIRecorderCard, {
   CALLS(Activity),
   CALLS(LookForward),
   CALLS(TIExecute),
-  CALLS(Stand),
   REQUIRES(RobotInfo),
   REQUIRES(RobotPose),
   REQUIRES(FrameInfo),

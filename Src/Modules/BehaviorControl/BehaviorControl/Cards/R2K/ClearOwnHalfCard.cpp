@@ -43,7 +43,6 @@
 // B-Human includes
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/BehaviorControl/Skills.h"
-#include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Modeling/ObstacleModel.h"
 
 #include "Representations/Modeling/RobotPose.h"
@@ -55,11 +54,9 @@
 
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h" 
 #include "Representations/BehaviorControl/TeammateRoles.h"
-#include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/TeamData.h"
-#include "Representations/Communication/TeamCommStatus.h"
 
 
 CARD(ClearOwnHalfCard,
@@ -68,15 +65,12 @@ CARD(ClearOwnHalfCard,
     CALLS(GoToBallAndKick),
     USES(GameInfo),
     REQUIRES(FieldBall),
-    REQUIRES(FieldDimensions),
-    REQUIRES(PlayerRole),  // R2K
     REQUIRES(ObstacleModel),
     REQUIRES(RobotInfo),
     REQUIRES(RobotPose),
     REQUIRES(TeamBehaviorStatus),
     REQUIRES(TeamData),
     REQUIRES(TeammateRoles),  // R2K
-    REQUIRES(TeamCommStatus),  // wifi on off?
 
     DEFINES_PARAMETERS(
     {,
