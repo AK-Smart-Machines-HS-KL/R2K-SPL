@@ -1,5 +1,5 @@
 /**
- * @file ClearOwnHalfCardGoalie.cpp
+ * @file ClearOwnHalfGoalieCard.cpp
  * @author  Adrian Müller 
  * @version: 1.0
  *
@@ -61,7 +61,7 @@
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/TeamCommStatus.h"
 
-CARD(ClearOwnHalfCardGoalie,
+CARD(ClearOwnHalfGoalieCard,
   { ,
     CALLS(Activity),
     CALLS(GoToBallAndKick),
@@ -83,7 +83,7 @@ CARD(ClearOwnHalfCardGoalie,
     }),
   });
 
-class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
+class ClearOwnHalfGoalieCard : public ClearOwnHalfGoalieCardBase
 {
   bool preconditions() const override
   {
@@ -109,7 +109,7 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
   void execute() override
   {
 
-    theActivitySkill(BehaviorStatus::clearOwnHalfCardGoalie);
+    theActivitySkill(BehaviorStatus::clearOwnHalfGoalieCard);
 
     if (!footIsSelected) {  // select only once
       footIsSelected = true;
@@ -137,7 +137,7 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
     for (const auto& buddy : theTeamData.teammates)
     {
       if (buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
-        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie)
+        buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfGoalieCard)
         return true;
     }
     return false;
@@ -145,4 +145,4 @@ class ClearOwnHalfCardGoalie : public ClearOwnHalfCardGoalieBase
   
 };
 
-MAKE_CARD(ClearOwnHalfCardGoalie);
+MAKE_CARD(ClearOwnHalfGoalieCard);

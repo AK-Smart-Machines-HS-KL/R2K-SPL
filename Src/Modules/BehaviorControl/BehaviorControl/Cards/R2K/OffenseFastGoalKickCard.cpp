@@ -44,7 +44,7 @@
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/TeamCommStatus.h"
 
-CARD(OffenseFastGoalKick,
+CARD(OffenseFastGoalKickCard,
   { ,
     CALLS(Activity),
     CALLS(GoToBallAndKick),
@@ -63,7 +63,7 @@ CARD(OffenseFastGoalKick,
     }),
   });
 
-class OffenseFastGoalKick : public OffenseFastGoalKickBase
+class OffenseFastGoalKickCard : public OffenseFastGoalKickCardBase
 {
   bool preconditions() const override
   {
@@ -101,5 +101,5 @@ class OffenseFastGoalKick : public OffenseFastGoalKickBase
   }
 };
 
-MAKE_CARD(OffenseFastGoalKick);
+MAKE_CARD(OffenseFastGoalKickCard);
 

@@ -41,7 +41,7 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanCompressedMessageParticle<Behavior
     defenseChaseBallCard,      
     offenseChaseBallCard,      
     clearOwnHalfCard,  
-    clearOwnHalfCardGoalie,
+    clearOwnHalfGoalieCard,
     defenseCard,        
     defenseLongShotCard,
     dive,
