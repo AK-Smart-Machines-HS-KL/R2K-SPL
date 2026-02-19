@@ -22,8 +22,6 @@ CARD(KickCalibrationCard,
      {
         ,
         CALLS(Activity),
-        CALLS(LookForward),
-        CALLS(Stand),
         CALLS(GoToBallAndKick),
         CALLS(WalkToPoint),
         CALLS(LookActive),

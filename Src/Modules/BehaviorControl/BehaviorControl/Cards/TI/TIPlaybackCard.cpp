@@ -53,7 +53,6 @@
 
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/BehaviorControl/TI/TIPlaybackData.h"
-#include "Representations/Configuration/GlobalOptions.h" 
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Modeling/RobotPose.h"
@@ -69,7 +68,6 @@ CARD(TIPlaybackCard,
   CALLS(Stand),
   CALLS(TIExecute),
   REQUIRES(FrameInfo),
-	REQUIRES(GlobalOptions),
   REQUIRES(GameInfo),
 	REQUIRES(RobotInfo),
 	REQUIRES(RobotPose),

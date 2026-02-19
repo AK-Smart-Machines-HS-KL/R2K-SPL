@@ -21,7 +21,7 @@
 
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/BehaviorControl/FieldBall.h"
-#include "Representations/BehaviorControl/TeamBehaviorStatus.h"
+#include "Representations/BehaviorControl/TeammateRoles.h"
 
 #include "Representations/Configuration/FieldDimensions.h"
 
@@ -32,14 +32,10 @@
 #include "Representations/Modeling/RobotPose.h"
 #include "Representations/Communication/TeamCommStatus.h"
 
-#include "Tools/Math/Geometry.h"
-
 
 CARD(OwnCornerKickCard,
 {,
-  CALLS(Stand),
   CALLS(Activity),
-  CALLS(LookForward),
   CALLS(GoToBallAndKick),
 
   REQUIRES(FieldBall),
@@ -48,7 +44,6 @@ CARD(OwnCornerKickCard,
   REQUIRES(FieldDimensions),
   REQUIRES(OwnTeamInfo),
   REQUIRES(GameInfo),
-  REQUIRES(TeamBehaviorStatus),
   REQUIRES(TeammateRoles),
   REQUIRES(TeamCommStatus),  // wifi on off?
 

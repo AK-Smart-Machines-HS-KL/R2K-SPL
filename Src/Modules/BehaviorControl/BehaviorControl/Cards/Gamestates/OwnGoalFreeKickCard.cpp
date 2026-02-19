@@ -17,9 +17,7 @@
 
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/BehaviorControl/FieldBall.h"
-#include "Representations/BehaviorControl/TeamBehaviorStatus.h"
-
-#include "Representations/Configuration/FieldDimensions.h"
+#include "Representations/BehaviorControl/TeammateRoles.h"
 
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/TeamInfo.h"
@@ -27,23 +25,17 @@
 
 #include "Representations/Modeling/RobotPose.h"
 
-#include "Tools/Math/Geometry.h"
-
 
 CARD(OwnGoalFreeKickCard,
 {,
-  CALLS(Stand),
   CALLS(Activity),
-  CALLS(LookForward),
   CALLS(GoToBallAndKick),
 
   REQUIRES(FieldBall),
   REQUIRES(RobotPose),
   REQUIRES(RobotInfo),
-  REQUIRES(FieldDimensions),
   REQUIRES(OwnTeamInfo),
   REQUIRES(GameInfo),
-  REQUIRES(TeamBehaviorStatus),
   REQUIRES(TeammateRoles),
 
   DEFINES_PARAMETERS(

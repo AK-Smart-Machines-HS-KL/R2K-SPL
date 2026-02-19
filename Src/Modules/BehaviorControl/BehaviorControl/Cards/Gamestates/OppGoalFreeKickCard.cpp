@@ -12,12 +12,9 @@
  * V1.1 Card migrated (Nicholas)
  */
 
-#include "Representations/BehaviorControl/Libraries/LibWalk.h"
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/TeamInfo.h"
-
-#include "Tools/Math/Geometry.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 
@@ -26,11 +23,9 @@
 // default actions for GORE2022
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/BehaviorControl/DefaultPose.h"
-#include "Representations/Configuration/GlobalOptions.h"
 
 CARD(OppGoalFreeKickCard,
 {,
-  CALLS(Stand),
   CALLS(Activity),
   CALLS(LookForward),
   CALLS(WalkToPoint),
@@ -38,8 +33,6 @@ CARD(OppGoalFreeKickCard,
 	REQUIRES(DefaultPose),
 	REQUIRES(FieldBall), 
   REQUIRES(GameInfo),
-  REQUIRES(GlobalOptions),
-  REQUIRES(LibWalk),
   REQUIRES(OwnTeamInfo),
   REQUIRES(RobotPose),
 });

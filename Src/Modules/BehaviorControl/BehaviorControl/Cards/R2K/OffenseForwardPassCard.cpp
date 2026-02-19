@@ -24,10 +24,7 @@
  */
 
 // B-Human includes
-#include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/BehaviorControl/Skills.h"
-#include "Representations/Configuration/FieldDimensions.h"
-#include "Representations/Modeling/ObstacleModel.h"
 #include "Representations/Modeling/RobotPose.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
@@ -35,7 +32,6 @@
 #include "Representations/Communication/TeamData.h"
 
 // this is the R2K specific stuff
-#include "Representations/BehaviorControl/TeamBehaviorStatus.h"
 #include "Representations/BehaviorControl/TeammateRoles.h"
 #include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
@@ -47,15 +43,8 @@ CARD(OffenseForwardPassCard,
     ,
     CALLS(Activity),
     CALLS(GoToBallAndKick),
-    CALLS(LookForward),
-    CALLS(Stand),
-    CALLS(WalkAtRelativeSpeed),
-    REQUIRES(FieldBall),
-    REQUIRES(FieldDimensions),
-    REQUIRES(ObstacleModel),
     REQUIRES(RobotPose),
     REQUIRES(TeamData),
-    REQUIRES(TeamBehaviorStatus),   
     REQUIRES(TeammateRoles),        
     REQUIRES(PlayerRole),           
     REQUIRES(RobotInfo),           

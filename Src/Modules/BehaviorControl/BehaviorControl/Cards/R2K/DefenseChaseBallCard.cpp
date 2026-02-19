@@ -39,7 +39,6 @@
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/BehaviorControl/FieldBall.h"
-#include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/TeamData.h"
 #include "Representations/BehaviorControl/TeammateRoles.h"
 #include "Representations/Communication/GameInfo.h"
@@ -55,8 +54,6 @@ CARD(DefenseChaseBallCard,
         CALLS(GoToBallAndDribble),
         CALLS(WalkAtRelativeSpeed),
         USES(GameInfo),
-        REQUIRES(ObstacleModel),
-        REQUIRES(TeamBehaviorStatus),
         REQUIRES(RobotPose),
         REQUIRES(RobotInfo),
         REQUIRES(FieldBall),

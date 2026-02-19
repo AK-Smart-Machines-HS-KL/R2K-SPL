@@ -18,17 +18,11 @@
 
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/BehaviorControl/FieldBall.h"
-#include "Representations/BehaviorControl/TeamBehaviorStatus.h"
-#include "Representations/Infrastructure/FrameInfo.h"
+#include "Representations/BehaviorControl/TeammateRoles.h"
 #include "Representations/Infrastructure/ExtendedGameInfo.h"
-#include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/TeamInfo.h"
 #include "Representations/Communication/RobotInfo.h"
-
-#include "Representations/Modeling/RobotPose.h"
-
-#include "Tools/Math/Geometry.h"
 
 
 CARD(OppKickoffCard,
@@ -36,17 +30,12 @@ CARD(OppKickoffCard,
     CALLS(Stand),
     CALLS(Activity),
     CALLS(LookForward),
-    CALLS(GoToBallAndKick),
 
     REQUIRES(FieldBall),
-    REQUIRES(FieldDimensions),
-    REQUIRES(FrameInfo),
     REQUIRES(GameInfo),
     REQUIRES(ExtendedGameInfo),
     REQUIRES(RobotInfo),
-    REQUIRES(RobotPose),
     REQUIRES(OwnTeamInfo),
-    REQUIRES(TeamBehaviorStatus),
     REQUIRES(TeammateRoles),
 
     DEFINES_PARAMETERS(

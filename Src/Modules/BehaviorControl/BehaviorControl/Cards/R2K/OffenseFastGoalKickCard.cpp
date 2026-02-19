@@ -33,7 +33,6 @@
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/Configuration/FieldDimensions.h"
-#include "Representations/Modeling/ObstacleModel.h"
 
 #include "Representations/Modeling/RobotPose.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
@@ -42,9 +41,7 @@
 
 // this is the R2K specific stuff
 
-#include "Representations/BehaviorControl/TeamBehaviorStatus.h" 
 #include "Representations/BehaviorControl/TeammateRoles.h"
-#include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/TeamCommStatus.h"
 
@@ -54,11 +51,8 @@ CARD(OffenseFastGoalKickCard,
     CALLS(GoToBallAndKick),
     REQUIRES(FieldBall),
     REQUIRES(FieldDimensions),
-    REQUIRES(PlayerRole),  // R2K
-    REQUIRES(ObstacleModel),
     REQUIRES(RobotInfo),
     REQUIRES(RobotPose),
-    REQUIRES(TeamBehaviorStatus),
     REQUIRES(TeammateRoles),  // R2K
     REQUIRES(TeamCommStatus),  // wifi on off?
 

@@ -58,7 +58,6 @@
 // this is the R2K specific stuff
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h" 
 #include "Representations/BehaviorControl/TeammateRoles.h"
-#include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
 #include "Representations/Communication/TeamCommStatus.h"
 
@@ -68,7 +67,6 @@ CARD(DefenseLongShotCard,
     CALLS(GoToBallAndKick),
     REQUIRES(FieldBall),
     REQUIRES(FieldDimensions),
-    REQUIRES(PlayerRole),  // R2K
     REQUIRES(ObstacleModel),
     REQUIRES(RobotInfo),
     REQUIRES(RobotPose),

@@ -7,27 +7,15 @@
  */
 
 #include "Representations/BehaviorControl/Skills.h"
-#include "Representations/BehaviorControl/TeamBehaviorStatus.h"
 #include "Representations/Communication/GameInfo.h"
-#include "Representations/Communication/TeamInfo.h"
-#include "Representations/Configuration/BallSpecification.h"
-#include "Representations/Configuration/FieldDimensions.h"
-#include "Representations/Modeling/RobotPose.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 
 CARD(SetCard,
 {,
   CALLS(Activity),
   CALLS(LookActive),
-  CALLS(LookAtPoint),
-  CALLS(LookForward),
   CALLS(Stand),
-  REQUIRES(BallSpecification),
-  REQUIRES(FieldDimensions),
   REQUIRES(GameInfo),
-  REQUIRES(OwnTeamInfo),
-  REQUIRES(RobotPose),
-  REQUIRES(TeamBehaviorStatus),
 });
 
 class SetCard : public SetCardBase

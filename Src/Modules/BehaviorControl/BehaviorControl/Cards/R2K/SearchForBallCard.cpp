@@ -29,7 +29,6 @@
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 
 // Representations
-#include "Representations/BehaviorControl/DefaultPose.h"
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/Modeling/RobotPose.h"
 #include "Representations/Communication/RobotInfo.h"
@@ -48,7 +47,6 @@ CARD(SearchForBallCard,
         CALLS(LookAtBall),
         CALLS(WalkAtRelativeSpeed),
 
-        REQUIRES(DefaultPose),
         REQUIRES(FieldBall),
         REQUIRES(RobotPose),
         REQUIRES(RobotInfo),

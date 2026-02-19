@@ -61,19 +61,15 @@
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h" 
 #include "Representations/Communication/TeamData.h"
 #include "Representations/BehaviorControl/TeammateRoles.h"
-#include "Representations/BehaviorControl/PlayerRole.h"
 #include "Representations/Communication/RobotInfo.h"
-#include "Representations/Communication/GameInfo.h"
 #include "Representations/Communication/TeamCommStatus.h"
 
 CARD(ClearOwnHalfGoalieCard,
   { ,
     CALLS(Activity),
     CALLS(GoToBallAndKick),
-    USES(GameInfo),
     REQUIRES(FieldBall),
     REQUIRES(FieldDimensions),
-    REQUIRES(PlayerRole),  // R2K
     REQUIRES(ObstacleModel),
     REQUIRES(RobotInfo),
     REQUIRES(RobotPose),

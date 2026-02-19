@@ -20,8 +20,6 @@
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/Modeling/RobotPose.h"
 #include "Representations/Communication/RobotInfo.h"
-
-#include "Tools/Math/Geometry.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Representations/Configuration/FieldDimensions.h"
@@ -30,9 +28,7 @@
 
 CARD(OwnPushingFreeKickCard,
   { ,
-    CALLS(Stand),
     CALLS(Activity),
-    CALLS(LookForward),
     CALLS(GoToBallAndKick),
     REQUIRES(OwnTeamInfo),
     REQUIRES(GameInfo),
