@@ -156,7 +156,7 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
       {
         if (
           // buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
-          // buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
+          // buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfGoalieCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard ||

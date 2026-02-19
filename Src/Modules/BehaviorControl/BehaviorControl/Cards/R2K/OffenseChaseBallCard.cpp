@@ -17,7 +17,7 @@
  * * 
  * 
  * v1.1. avoid that our  offense bots struggle for ball. loop over buddies -> 
- *      if BehaviorStatus::OffenseChaseBallCard or clearOwnHalfCard or clearOwnHalfCardGoalie exit this card
+ *      if BehaviorStatus::OffenseChaseBallCard or clearOwnHalfCard or clearOwnHalfGoalieCard exit this card
  * 
  * v.1.2 card now checks wether there is an passing event active (OffenseForwardPassCard, OffenseReceivePassCard)
  * v 1.3: (Asrar) "theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)"
@@ -151,7 +151,7 @@ class OffenseChaseBallCard : public OffenseChaseBallCardBase
       {
         if (buddy.theBehaviorStatus.activity == BehaviorStatus::offenseChaseBallCard ||
           //buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
-          //buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
+          //buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfGoalieCard ||
           //buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
           //buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::goalShotCard ||
