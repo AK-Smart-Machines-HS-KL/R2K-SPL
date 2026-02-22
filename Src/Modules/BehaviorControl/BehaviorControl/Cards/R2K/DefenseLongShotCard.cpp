@@ -47,11 +47,13 @@
 #include "Representations/Configuration/FieldDimensions.h"
 #include "Representations/Modeling/ObstacleModel.h"
 #include "Representations/Communication/TeamData.h"
+#include "Representations/Infrastructure/FrameInfo.h"
 
 #include "Representations/Modeling/RobotPose.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
 #include "Tools/Math/BHMath.h"
+#include "Tools/BehaviorControl/R2KClearShotLogic.h"
 
 // this is the R2K specific stuff
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h" 
@@ -66,6 +68,7 @@ CARD(DefenseLongShotCard,
     REQUIRES(FieldBall),
     REQUIRES(FieldDimensions),
     REQUIRES(ObstacleModel),
+    REQUIRES(FrameInfo),
     REQUIRES(RobotInfo),
     REQUIRES(RobotPose),
     REQUIRES(TeamBehaviorStatus),
@@ -80,6 +83,9 @@ CARD(DefenseLongShotCard,
       (int)(-1000) offsetX,
       (int)(1200) minOpponentDistanceMm,
       (int)(500) emergencyOpponentDistanceMm,
+      (float)(30.f) shotDirectionScanAngleDeg,
+      (int)(2500) postKickExitTimeoutMs,
+      (unsigned)(0) kickStartTime,
     }),
   });
 
@@ -107,7 +113,9 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
     return !preconditions() ||
            theObstacleModel.opponentIsClose(emergencyOpponentDistanceMm) ||
            !theTeammateRoles.isTacticalDefense(theRobotInfo.number) ||
-           !(theFieldBall.endPositionOnField.x() < 200);
+           !(theFieldBall.endPositionOnField.x() < 200) ||
+           theGoToBallAndKickSkill.isDone() ||
+           (kickStartTime != 0 && theFrameInfo.getTimeSince(kickStartTime) > static_cast<unsigned>(postKickExitTimeoutMs));
   }
 
  
@@ -118,22 +126,23 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
 
     if (!footIsSelected) {  // select only once
       footIsSelected = true;
+      kickStartTime = theFrameInfo.time;
       leftFoot = theFieldBall.positionRelative.y() < 0;
     }
-    KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeftLong : KickInfo::forwardFastRightLong;
-    
+    const KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeftLong : KickInfo::forwardFastRightLong;
+    const Angle clearAngle = R2KClearShotLogic::chooseClearAngleToGoal(theObstacleModel,
+                                                                        theRobotPose,
+                                                                        theFieldDimensions,
+                                                                        shotDirectionScanAngleDeg);
+
     switch (theObstacleModel.opponentIsTooClose(theFieldBall.positionRelative))
     {
-      case(KickInfo::LongShotType::fast): theGoToBallAndKickSkill(calcAngleToGoal(), kickType, false); break;
-      case(KickInfo::LongShotType::precise): theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true); break;
-      default: theGoToBallAndKickSkill(calcAngleToGoal(), kickType); break;
+      case(KickInfo::LongShotType::fast): theGoToBallAndKickSkill(clearAngle, kickType, false); break;
+      case(KickInfo::LongShotType::precise): theGoToBallAndKickSkill(clearAngle, kickType, true); break;
+      default: theGoToBallAndKickSkill(clearAngle, kickType); break;
     }
   }
 
-  Angle calcAngleToGoal() const
-  {
-    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
-  }
 
   bool aBuddyIsClearingOwnHalf() const
   {

@@ -77,7 +77,7 @@ class ReferenceCard : public ReferenceCardBase
       // be more specific:
       // theTeammateRoles.roles[theRobotInfo.number-1] == TeammateRoles::OFFENSE_RIGHT;  // my recent R2K strategy dependent role
 
-    // OpenPoints: OFFENSE_LEFT,  ANY_OFFENSE (l,m,r)
+    // Finalized decision: ANY_OFFENSE is allowed (OFFENSE_RIGHT, OFFENSE_MIDDLE, OFFENSE_LEFT).
   }
 
   bool postconditions() const override

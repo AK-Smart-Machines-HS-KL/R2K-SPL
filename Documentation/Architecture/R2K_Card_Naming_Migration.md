@@ -1,34 +1,25 @@
-# R2K Card Naming Migration (Non-Breaking Plan)
+# R2K Card Naming Migration (controlled)
 
-## Goal
-Unify R2K card names into a stable schema to improve readability, tooling, and long-term portability.
+This document tracks the controlled naming migration requested in the implementation plan.
 
-## Canonical Scheme
-`<Domain><Intent><Action>Card`
+## Canonical naming rule
+- Card class names use the `*Card` suffix and are referenced in `gameplayCard.cfg` exactly by class name.
+- Runtime activity naming remains represented by `BehaviorStatus::Activity` enums.
 
-Examples:
-- `OffenseBallAdvanceCard`
-- `DefenseBallInterceptCard`
-- `GoalieGoalLineBlockCard`
-- `SystemRelocalizationRecoveryCard`
+## Mapping table (legacy -> canonical)
+- `OffenseFastGoalKick` -> `OffenseFastGoalKickCard`
+- `OffenseForwardPass` -> `OffenseForwardPassCard`
+- `OffenseReceivePass` -> `OffenseReceivePassCard`
+- `GoalShot` -> `GoalShotCard`
+- `DefenseLongShot` -> `DefenseLongShotCard`
+- `GoalieLongShot` -> `GoalieLongShotCard`
+- `ClearOwnHalf` -> `ClearOwnHalfCard`
+- `ClearOwnHalfGoalie` -> `ClearOwnHalfGoalieCard`
 
-## Current -> Target Mapping (Phase-wise)
-- `OffenseChaseBallCard` -> `OffenseBallAdvanceCard`
-- `DefenseChaseBallCard` -> `DefenseBallInterceptCard`
-- `OffenseFastGoalKickCard` -> `OffenseFastFinishCard`
-- `OffenseForwardPassCard` -> `OffensePassInitiateCard`
-- `OffenseReceivePassCard` -> `OffensePassReceiveCard`
-- `RelocalizeRecoveryCard` -> `SystemRelocalizationRecoveryCard`
-- `GoalShotCard` -> `OffenseGoalShotCard`
-- `GoalieDefaultCard` -> `GoalieGoalLineBlockCard`
+## Validation strategy
+- `Scripts/behavior/check_r2k_cards.py` validates card invariants.
+- `Scripts/behavior/check_r2k_card_naming.py` validates that gameplay stack names resolve to existing `MAKE_CARD(...)` classes and warns on legacy aliases.
 
-## Migration Strategy
-1. Keep old names in code for now, only add mapping table.
-2. Introduce aliases in config stacks (where framework allows).
-3. Rename cards incrementally with one behavior group per PR.
-4. Remove legacy names after all configs/scripts are switched.
-
-## Safety Rules
-- Never mix semantic dimensions in one token (e.g. avoid combining role + implementation detail).
-- Keep role-independent utility cards under `System*` domain.
-- Any renamed card must keep pre/postconditions and behavior equivalent in the rename PR.
+## Current status
+- Configured normal-play card names in default scenario resolve to canonical card classes.
+- Legacy aliases are kept here for documentation and migration traceability only.

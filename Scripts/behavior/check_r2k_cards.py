@@ -7,6 +7,7 @@ CARDS = ROOT / "Src/Modules/BehaviorControl/BehaviorControl/Cards/R2K"
 
 pre_re = re.compile(r"bool\s+preconditions\s*\(\)\s*const\s*override")
 post_re = re.compile(r"bool\s+postconditions\s*\(\)\s*const\s*override")
+requires_re = re.compile(r"REQUIRES\(([^)]+)\)")
 
 issues = []
 
@@ -28,6 +29,12 @@ for path in sorted(CARDS.glob("*.cpp")):
     # Heuristic: postconditions should usually include !preconditions()
     if has_post and "!preconditions()" not in text:
         issues.append((path, "postcondition-nonstandard", "postconditions() does not include !preconditions()."))
+
+    # Heuristic: REQUIRES symbols should usually appear as the<Representation> in the implementation body.
+    for representation in requires_re.findall(text):
+        symbol = f"the{representation.strip()}"
+        if symbol not in text:
+            issues.append((path, "requires-possibly-unused", f"{representation.strip()} declared but '{symbol}' not found."))
 
 if not issues:
     print("R2K card check: OK")
