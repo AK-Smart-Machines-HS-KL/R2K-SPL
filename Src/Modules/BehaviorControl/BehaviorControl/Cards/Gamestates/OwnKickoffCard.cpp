@@ -4,13 +4,14 @@
  * @brief Covers Own Kickoff
  * @version 0.1
  * @date 2022-11-22
- * 
- * Behavior: During the Own Kickoff, Robot 5 attempts to kick the ball 20_deg to the left 
- * 
+ *
+ * Behavior: During the Own Kickoff, Robot 5 attempts to kick the ball 20_deg to the left
+ *
  * V1.1 Card migrated (Nicholas)
  * V 1.2. changed to long kick (Adrian)
  * v 1.3 card disabled
- * 
+ * v 1.4 card re-enabled with missing REQUIRES (GameInfo, OwnTeamInfo, RobotInfo, TeammateRoles, TeamCommStatus)
+ *
  * Note: all tactical offense try to kick the ball. So default position is crucial
  */
 
@@ -19,7 +20,12 @@
 
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/BehaviorControl/FieldBall.h"
+#include "Representations/BehaviorControl/TeammateRoles.h"
 #include "Representations/Configuration/FieldDimensions.h"
+#include "Representations/Communication/GameInfo.h"
+#include "Representations/Communication/TeamInfo.h"
+#include "Representations/Communication/RobotInfo.h"
+#include "Representations/Communication/TeamCommStatus.h"
 #include "Representations/Modeling/RobotPose.h"
 
 
@@ -31,7 +37,12 @@ CARD(OwnKickoffCard,
 
   REQUIRES(FieldBall),
   REQUIRES(RobotPose),
+  REQUIRES(RobotInfo),
   REQUIRES(FieldDimensions),
+  REQUIRES(OwnTeamInfo),
+  REQUIRES(GameInfo),
+  REQUIRES(TeammateRoles),
+  REQUIRES(TeamCommStatus),
 
   DEFINES_PARAMETERS(
   {,
@@ -45,11 +56,12 @@ class OwnKickoffCard : public OwnKickoffCardBase
 {
   KickInfo::KickType kickType;
 
-  // v 1.3: card explicitly disabled; original preconditions require GameInfo/TeammateRoles
-  // which are not REQUIRES'd in the CARD macro above.
   bool preconditions() const override
   {
-    return false;
+    return theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)
+      && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
+      && theGameInfo.setPlay == SET_PLAY_NONE
+      && theGameInfo.state == STATE_PLAYING;
   }
 
   bool postconditions() const override
@@ -65,9 +77,9 @@ class OwnKickoffCard : public OwnKickoffCardBase
       leftFoot = theFieldBall.positionRelative.y() < 0;
     }
     KickInfo::KickType kickType = leftFoot ? KickInfo::forwardFastLeftLong : KickInfo::forwardFastRightLong;
-    theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true); 
+    theGoToBallAndKickSkill(calcAngleToGoal(), kickType, true);
     }
- 
+
   Angle calcAngleToGoal() const
   {
     return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
