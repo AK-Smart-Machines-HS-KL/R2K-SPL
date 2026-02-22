@@ -18,7 +18,7 @@
  *
  *
  *
- * ToDo:
+ * OpenPoints:
  * - Precondition needs to be fixed
  * - If everything works -> Card clean
  */
@@ -28,8 +28,9 @@
 #include "Representations/Modeling/RobotPose.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
-#include "Tools/Math/BHMath.h"
 #include "Representations/Communication/TeamData.h"
+#include "Tools/BehaviorControl/R2KDecisionLog.h"
+#include <string>
 
 // this is the R2K specific stuff
 #include "Representations/BehaviorControl/TeammateRoles.h"
@@ -50,10 +51,6 @@ CARD(OffenseForwardPassCard,
     REQUIRES(RobotInfo),           
     REQUIRES(TeamCommStatus),
     REQUIRES(ExtendedGameInfo),
-    DEFINES_PARAMETERS(
-                       {,
-                           (float)(0.8f) walkSpeed,
-                       }),
     
     /*
      //Optionally, Load Config params here. DEFINES and LOADS can not be used together
@@ -128,6 +125,19 @@ class OffenseForwardPassCard : public OffenseForwardPassCardBase
         // If we just enetered the card, grab the best passing target
         if (targetAbsolute == Vector2f::Zero()) {
             targetAbsolute = getTarget();
+            int targetMate = -1;
+            for(const auto& buddy : theTeamData.teammates)
+              if(!buddy.isPenalized && buddy.isUpright && buddy.theRobotPose.translation.x() > theRobotPose.translation.x() &&
+                 std::abs((buddy.theRobotPose.translation - targetAbsolute).norm()) < 2000.f)
+              {
+                targetMate = buddy.number;
+                break;
+              }
+            R2KDecisionLog::annotation("pass_intent", {{"card", "OffenseForwardPass"},
+                                                 {"passer", std::to_string(theRobotInfo.number)},
+                                                 {"target", std::to_string(targetMate)},
+                                                 {"targetX", std::to_string(static_cast<int>(targetAbsolute.x()))},
+                                                 {"targetY", std::to_string(static_cast<int>(targetAbsolute.y()))}});
         }
         
         theActivitySkill(BehaviorStatus::offenseForwardPassCard);

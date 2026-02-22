@@ -78,7 +78,7 @@ class GoalShotCard : public GoalShotCardBase
 
   bool postconditions() const override
   {
-    return done;   
+    return !preconditions() || done;
   }
 
   option
