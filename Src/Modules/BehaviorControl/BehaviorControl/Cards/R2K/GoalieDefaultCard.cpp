@@ -78,9 +78,7 @@ class GoalieDefaultCard : public GoalieDefaultCardBase
 
   bool postconditions() const override
   {
-    // return !preconditions();   // i.e. When preconditions are false, card exits. Equivalent to !preconditions()
-    // return state_time > (headSweepDuration + bodyTurnDuration);
-    return state_time > 100;
+    return !preconditions();
   }
 
   option
