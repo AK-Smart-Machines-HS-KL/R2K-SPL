@@ -32,6 +32,7 @@
 
  // B-Human includes
 #include "Representations/BehaviorControl/FieldBall.h"
+#include "Representations/BehaviorControl/Shots.h"
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/Configuration/FieldDimensions.h"
 
@@ -57,6 +58,7 @@ CARD(OffenseFastGoalKickCard,
     CALLS(GoToBallAndKick),
     REQUIRES(FieldBall),
     REQUIRES(FieldDimensions),
+    REQUIRES(Shots),
     REQUIRES(RobotInfo),
     REQUIRES(RobotPose),
     REQUIRES(TeammateRoles),  // R2K
@@ -80,7 +82,8 @@ class OffenseFastGoalKickCard : public OffenseFastGoalKickCardBase
     return
       theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) &&   // I am the striker
       theTeammateRoles.isTacticalOffense(theRobotInfo.number) && // my recent role
-      theFieldBall.endPositionOnField.x() >= (theFieldDimensions.xPosOpponentGoalArea-1000);
+      theFieldBall.endPositionOnField.x() >= (theFieldDimensions.xPosOpponentGoalArea-1000) &&
+      theShots.goalShot.failureProbability >= 0.50f; // GoalShotCard has priority for better opportunities
   }
 
   bool postconditions() const override
