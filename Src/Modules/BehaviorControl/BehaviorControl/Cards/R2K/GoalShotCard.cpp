@@ -22,7 +22,6 @@
 #include "Representations/Modeling/RobotPose.h"
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/Infrastructure/FrameInfo.h"
-#include "Tools/Math/Geometry.h"
 #include "Representations/Communication/TeamData.h"
 
 // Debug Drawings

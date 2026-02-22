@@ -53,7 +53,6 @@
 #include "Representations/Modeling/RobotPose.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
-#include "Tools/Math/BHMath.h"
 
 // this is the R2K specific stuff
 #include "Representations/BehaviorControl/TeamBehaviorStatus.h" 
