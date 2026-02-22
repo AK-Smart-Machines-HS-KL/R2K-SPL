@@ -61,7 +61,7 @@
 
 MAKE_MODULE(PathPlannerProvider, behaviorControl);
 
-static const float epsilon = 0.1f; /**< Small offset in mm. */
+static constexpr float epsilon = 0.1f; /**< Small offset in mm. */
 
 PathPlannerProvider::PathPlannerProvider()
 {
