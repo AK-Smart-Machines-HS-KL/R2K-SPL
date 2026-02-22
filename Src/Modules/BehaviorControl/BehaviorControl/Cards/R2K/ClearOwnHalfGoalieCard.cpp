@@ -39,7 +39,7 @@
  * - minOppDistance must be maintained with the ...LongShotCards
  * 
  * 
- * ToDo:
+ * OpenPoints:
  * - we need a better shooting direction!! 
  * - maybe add OFFENSIVE mode as a blocker?
  */

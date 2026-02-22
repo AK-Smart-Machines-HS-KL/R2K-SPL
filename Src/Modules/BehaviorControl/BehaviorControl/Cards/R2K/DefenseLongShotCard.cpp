@@ -35,11 +35,9 @@
  *  v.1.3 precond: x < 0 - threshold. 
  *      Activated !aBuddyIsClearingOwnHalf
  *  v.1.4 Added the online & offline role assignment(Asrar)
- * ToDo: 
- * check for free shoot vector and opt. change y-coordinate
- * check whether isDone () works correctly 
- * 
- * provide max opp distance as LOAD_PARAMETERS
+ * OpenPoints status:
+ * - max opponent distance thresholds are now configurable parameters
+ * - free shoot-vector optimization and post-kick isDone() tuning remain future work
  */
 
 
@@ -80,6 +78,8 @@ CARD(DefenseLongShotCard,
       (bool)(false) footIsSelected,  // freeze the first decision
       (bool)(true) leftFoot,
       (int)(-1000) offsetX,
+      (int)(1200) minOpponentDistanceMm,
+      (int)(500) emergencyOpponentDistanceMm,
     }),
   });
 
@@ -90,7 +90,7 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
     
     return
       theTeammateRoles.playsTheBall(&theRobotInfo , theTeamCommStatus.isWifiCommActive) &&  // I am the striker
-      !theObstacleModel.opponentIsClose(1200) && // see below: min distance is minOppDistance
+      !theObstacleModel.opponentIsClose(minOpponentDistanceMm) &&
       !aBuddyIsClearingOwnHalf() &&
       theTeammateRoles.isTacticalDefense(theRobotInfo.number) && // my recent role
 
@@ -104,10 +104,10 @@ class DefenseLongShotCard : public DefenseLongShotCardBase
 
   bool postconditions() const override
   {
-    return 
-    theObstacleModel.opponentIsClose(500) ||
-    !theTeammateRoles.isTacticalDefense(theRobotInfo.number) ||
-    !(theFieldBall.endPositionOnField.x() < 200);
+    return !preconditions() ||
+           theObstacleModel.opponentIsClose(emergencyOpponentDistanceMm) ||
+           !theTeammateRoles.isTacticalDefense(theRobotInfo.number) ||
+           !(theFieldBall.endPositionOnField.x() < 200);
   }
 
  

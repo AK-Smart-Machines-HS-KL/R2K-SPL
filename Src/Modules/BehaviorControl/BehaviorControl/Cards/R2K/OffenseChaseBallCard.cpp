@@ -33,6 +33,8 @@
 // Card Base
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
+#include "Tools/BehaviorControl/R2KDecisionLog.h"
+#include "Tools/BehaviorControl/R2KDribbleLogic.h"
 
 // Representations
 #include "Representations/Modeling/RobotPose.h"
@@ -41,6 +43,7 @@
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/Communication/TeamData.h"
 #include "Representations/BehaviorControl/TeammateRoles.h"
+#include <string>
 
 
 
@@ -64,6 +67,7 @@ CARD(OffenseChaseBallCard,
                 (float)(0.8f) walkSpeed,
                 (int)(5000) ballNotSeenTimeout,
                 (int)(1000) threshold,
+                (float)(200.f) stableBallTravelThresholdMm,
              }),
 
      });
@@ -100,15 +104,33 @@ class OffenseChaseBallCard : public OffenseChaseBallCardBase
       transition
       {
         if(!theFieldBall.ballWasSeen(ballNotSeenTimeout))
+        {
+          R2KDecisionLog::annotation("ball_loss_transition", {{"card", "OffenseChaseBall"},
+                                                         {"to", "searchForBall"},
+                                                         {"reason", "ballNotSeenTimeout"},
+                                                         {"player", std::to_string(theRobotInfo.number)}});
           goto searchForBall;
+        }
       }
 
-        action
+      action
       {
-        // theGoToBallAndKickSkill(calcAngleToGoal(), KickInfo::walkForwardsLeft);
-        // SKILL_INTERFACE(GoToBallAndDribble, (Angle) targetDirection, (bool)(false) alignPrecisely, (float)(1.f) kickPower, (bool)(true) preStepAllowed, (bool)(true) turnKickAllowed, (const Rangea&)(Rangea(0_deg, 0_deg)) directionPrecision);
+        const bool ballSeenRecently = theFieldBall.ballWasSeen(ballNotSeenTimeout);
+        const bool localizationPoor = theRobotPose.quality == RobotPose::poor;
+        const float ballTravelEstimateMm = (theFieldBall.endPositionRelative - theFieldBall.positionRelative).norm();
+        const auto dribbleDecision = R2KDribbleLogic::decide(ballSeenRecently, localizationPoor, ballTravelEstimateMm, stableBallTravelThresholdMm);
 
-        theGoToBallAndDribbleSkill(calcAngleToGoal(),true);
+        R2KDecisionLog::annotation("dribble_state_change", {{"card", "OffenseChaseBall"},
+                                                      {"player", std::to_string(theRobotInfo.number)},
+                                                      {"mode", R2KDribbleLogic::toString(dribbleDecision.mode)},
+                                                      {"reason", R2KDribbleLogic::toString(dribbleDecision.reason)}});
+
+        if(dribbleDecision.mode == R2KDribbleLogic::DribbleMode::recover)
+          theWalkAtRelativeSpeedSkill(Pose2f(0.5f, 0.f, 0.f));
+        else if(dribbleDecision.mode == R2KDribbleLogic::DribbleMode::cautiousAdvance)
+          theGoToBallAndDribbleSkill(calcAngleToGoal(), true, 0.6f);
+        else
+          theGoToBallAndDribbleSkill(calcAngleToGoal(), true);
       }
     }
 
@@ -131,11 +153,6 @@ class OffenseChaseBallCard : public OffenseChaseBallCardBase
     Angle calcAngleToGoal() const
   {
     return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
-  }
-
-    Angle calcAngleToBall() const
-  {
-    return (theRobotPose.inversePose * Vector2f(theFieldBall.endPositionOnField.x(), theFieldBall.endPositionOnField.y())).angle();
   }
 
     bool aBuddyIsChasingOrClearing() const

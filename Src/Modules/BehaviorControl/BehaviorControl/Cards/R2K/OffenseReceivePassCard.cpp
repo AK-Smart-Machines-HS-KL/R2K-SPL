@@ -17,17 +17,17 @@
  * maybe we should another card, so the potential receiver actively walks to a promising position on field.
  *
  *
- * ToDo:
+ * OpenPoints:
  *  we need to verify this approach is ok with EBC 
  */
 
 // B-Human includes
 #include "Representations/BehaviorControl/Skills.h"
-#include "Representations/Modeling/RobotPose.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
-#include "Tools/Math/BHMath.h"
 #include "Representations/Communication/TeamData.h"
+#include "Tools/BehaviorControl/R2KDecisionLog.h"
+#include <string>
 
 // this is the R2K specific stuff
 #include "Representations/BehaviorControl/TeammateRoles.h"
@@ -41,16 +41,11 @@ CARD(OffenseReceivePassCard,
     CALLS(Activity),
     CALLS(LookActive),
     CALLS(Stand),
-    REQUIRES(RobotPose),
     REQUIRES(TeamData),
     REQUIRES(TeammateRoles),       
     REQUIRES(PlayerRole),          
     REQUIRES(RobotInfo),           
     REQUIRES(TeamCommStatus),
-    DEFINES_PARAMETERS(
-                       {,
-                           (float)(0.8f) walkSpeed,
-                       }),
     
     /*
      //Optionally, Load Config params here. DEFINES and LOADS can not be used together
@@ -86,18 +81,23 @@ class OffenseReceivePassCard : public OffenseReceivePassCardBase
     
     void execute() override
     {
-        
+        int passer = -1;
+        for (const auto& buddy : theTeamData.teammates)
+          if (buddy.theBehaviorStatus.activity == BehaviorStatus::offenseForwardPassCard)
+          {
+            passer = buddy.number;
+            break;
+          }
+
+        R2KDecisionLog::annotation("pass_ack", {{"card", "OffenseReceivePass"},
+                                          {"receiver", std::to_string(theRobotInfo.number)},
+                                          {"passer", std::to_string(passer)}});
+
         theActivitySkill(BehaviorStatus::offenseReceivePassCard);
         theLookActiveSkill();
         theStandSkill();
-        
-        
     }
     
-    Angle calcAngleToOffense(float xPos, float yPos) const
-    {
-        return (theRobotPose.inversePose * Vector2f(xPos, yPos)).angle();
-    }
     bool aBuddyIsPassing() const
     {
       for (const auto& buddy : theTeamData.teammates)

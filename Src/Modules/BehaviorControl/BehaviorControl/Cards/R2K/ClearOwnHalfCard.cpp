@@ -34,7 +34,7 @@
  * v.1.3 precond: x < 0 - threshold. 
  *      Activated !aBuddyIsClearingOwnHalf
  * v.1.4 Added the online & offline role assignment(Asrar)
- * ToDo:
+ * OpenPoints:
  * - we need a better shooting direction!! 
  * - maybe add OFFENSIVE mode as a blocker?
  */

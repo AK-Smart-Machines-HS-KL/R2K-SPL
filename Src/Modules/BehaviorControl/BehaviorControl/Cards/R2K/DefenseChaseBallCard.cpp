@@ -33,6 +33,10 @@
 // Card Base
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
+#include "Tools/BehaviorControl/R2KDecisionLog.h"
+#include "Tools/BehaviorControl/R2KDribbleLogic.h"
+#include "Tools/BehaviorControl/R2KBallSourceLogic.h"
+#include <string>
 
 // Representations
 #include "Representations/Modeling/RobotPose.h"
@@ -68,6 +72,7 @@ CARD(DefenseChaseBallCard,
                 (float)(0.8f) walkSpeed,
                 (int)(5000) ballNotSeenTimeout,
                 (int)(1000) threshold,
+                (float)(200.f) stableBallTravelThresholdMm,
              }),
 
      });
@@ -109,7 +114,30 @@ class DefenseChaseBallCard : public DefenseChaseBallCardBase
 
         action
       {
-        theGoToBallAndDribbleSkill(calcAngleToGoal(),true);
+        const bool ballSeenRecently = theFieldBall.ballWasSeen(ballNotSeenTimeout);
+        const bool useForecast = (theFieldBall.endPositionRelative - theFieldBall.positionRelative).norm() > stableBallTravelThresholdMm;
+        const auto ballSource = R2KBallSourceLogic::chooseBallSource(ballSeenRecently, theTeamCommStatus.isWifiCommActive, useForecast);
+        const bool localizationPoor = theRobotPose.quality == RobotPose::poor;
+        const float ballTravelEstimateMm = (theFieldBall.endPositionRelative - theFieldBall.positionRelative).norm();
+        const auto dribbleDecision = R2KDribbleLogic::decide(ballSeenRecently, localizationPoor, ballTravelEstimateMm, stableBallTravelThresholdMm);
+
+        if(ballSource == R2KBallSourceLogic::BallSource::forecast)
+          R2KDecisionLog::annotation("ball_prediction_source", {{"card", "DefenseChaseBall"},
+                                                           {"player", std::to_string(theRobotInfo.number)},
+                                                           {"source", R2KBallSourceLogic::toString(ballSource)}});
+
+        R2KDecisionLog::annotation("intercept_decision", {{"card", "DefenseChaseBall"},
+                                                     {"player", std::to_string(theRobotInfo.number)},
+                                                     {"action", "dribble_intercept"},
+                                                     {"ballSource", R2KBallSourceLogic::toString(ballSource)},
+                                                     {"mode", R2KDribbleLogic::toString(dribbleDecision.mode)}});
+
+        if(dribbleDecision.mode == R2KDribbleLogic::DribbleMode::recover)
+          theWalkAtRelativeSpeedSkill(Pose2f(0.5f, 0.f, 0.f));
+        else if(dribbleDecision.mode == R2KDribbleLogic::DribbleMode::cautiousAdvance)
+          theGoToBallAndDribbleSkill(calcAngleToGoal(), true, 0.6f);
+        else
+          theGoToBallAndDribbleSkill(calcAngleToGoal(), true);
       }
     }
 
@@ -132,11 +160,6 @@ class DefenseChaseBallCard : public DefenseChaseBallCardBase
     Angle calcAngleToGoal() const
   {
     return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
-  }
-
-    Angle calcAngleToBall() const
-  {
-    return (theRobotPose.inversePose * Vector2f(theFieldBall.endPositionOnField.x(), theFieldBall.endPositionOnField.y())).angle();
   }
 
     bool aBuddyIsChasingOrClearing() const

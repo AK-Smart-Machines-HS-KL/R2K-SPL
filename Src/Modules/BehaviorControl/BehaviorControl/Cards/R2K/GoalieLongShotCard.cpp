@@ -32,7 +32,7 @@
  * - because this is a long shot, the flag "playsTheBall" typicall is re-set after the shot, as a side effect.
  * - However, if the ball is stuck, the flag may still be set, and the player will follow the ball
  *
- * ToDo:
+ * OpenPoints:
  * check for free shoot vector and opt. change y-coordinate
  * check whether isDone () works correctly
  * 

@@ -61,7 +61,7 @@ class DefaultCard : public DefaultCardBase
 
   bool postconditions() const override
   {
-    return false; 
+    return !preconditions();
   }
 
   void execute() override
