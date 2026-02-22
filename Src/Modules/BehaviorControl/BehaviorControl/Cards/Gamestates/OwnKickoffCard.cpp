@@ -45,20 +45,13 @@ class OwnKickoffCard : public OwnKickoffCardBase
 {
   KickInfo::KickType kickType;
 
-  /**
-   * @brief all tactical offense try to kick the ball
-   * 
+  // v 1.3: card explicitly disabled; original preconditions require GameInfo/TeammateRoles
+  // which are not REQUIRES'd in the CARD macro above.
   bool preconditions() const override
   {
-    return theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
-      && theExtendedGameInfo.timeSincePlayingStarted < 10000 // 10sec
-      && theGameInfo.state == STATE_PLAYING
-      && theTeammateRoles.isTacticalOffense(theRobotInfo.number); // my recent role;
+    return false;
   }
 
-  /**
-   * @brief The condition that needs to be met to exit the this card
-   */
   bool postconditions() const override
   {
     return !preconditions();

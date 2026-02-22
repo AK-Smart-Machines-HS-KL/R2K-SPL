@@ -5,9 +5,9 @@
  * @version 1.0
  * 
  * Note: we have two checks for theShots.goalShot.failureProbability < x
- * x = 0.5 in pre-cond
- * x = 0.4 in state machine (aka "done")
- * 
+ * x = 0.5 in pre-cond (entry threshold)
+ * x = 0.3 in state machine (abort threshold, hysteresis gap intentional)
+ *
  */
 
 // Skills - Must be included BEFORE Card Base
@@ -46,8 +46,6 @@ CARD(GoalShotCard,
         DEFINES_PARAMETERS(
              {,
                 (unsigned int)(500) initalCheckTime,
-                (bool)(false) done,
-                (Shot) currentShot,
                 (unsigned int) (0) timeLastFail,
                 (unsigned int) (6000) cooldown,
              }),
@@ -56,7 +54,8 @@ CARD(GoalShotCard,
 
 class GoalShotCard : public GoalShotCardBase
 {
-  
+  bool done = false;      // runtime state, not a config parameter
+  Shot currentShot;       // runtime state, not a config parameter
   void preProcess() override {
     DECLARE_DEBUG_DRAWING(drawID, "drawingOnField");
   }
@@ -156,7 +155,6 @@ class GoalShotCard : public GoalShotCardBase
       
       action
       {
-        reset();
         theLookActiveSkill();
         theStandSkill();
         done = true;
