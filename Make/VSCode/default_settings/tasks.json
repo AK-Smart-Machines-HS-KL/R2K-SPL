@@ -74,7 +74,7 @@
             "options": {
                 "statusbar": {
                     "hide" : false,
-                    "color": "#000000",
+                    "color": "#888888",
                     "label": "bush"
                 }
             }
@@ -92,7 +92,7 @@
                 "statusbar": {
                     "hide" : false,
                     "color": "#fbff00",
-                    "label": "Sim"
+                    "label": "SimRobot Release"
                 }
             }
         },
@@ -109,7 +109,24 @@
                 "statusbar": {
                     "hide" : false,
                     "color": "#fbff00",
-                    "label": "Sim Dev"
+                    "label": "SimRobot Develop"
+                }
+            }
+        },
+
+        {
+            "label": "Sim Debug",
+            "type": "shell",
+            "command": "${workspaceFolder}/Build/Linux/SimRobot/Debug/SimRobot",
+            "dependsOn": "build sim debug",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "options": {
+                "statusbar": {
+                    "hide" : false,
+                    "color": "#fbff00",
+                    "label": "SimRobot Debug"
                 }
             }
         },
@@ -124,27 +141,6 @@
             ],
             "group": {
                 "kind": "build"
-            }
-        },
-
-        {
-            "label": "build nao develop",
-            "type": "shell",
-            "command": "${workspaceFolder}/Make/Linux/compile Nao Develop",
-            "dependsOn": "generate ninja project",
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": {
-                "kind": "build"
-            }, 
-
-            "options": {
-                "statusbar": {
-                    "hide" : false,
-                    "color": "#0ad41b",
-                    "label": "Build Nao Dev"
-                }
             }
         },
 
@@ -164,7 +160,49 @@
                 "statusbar": {
                     "hide" : false,
                     "color": "#0ad41b",
-                    "label": "Build Nao"
+                    "label": "Build Nao Release"
+                }
+            }
+        },
+
+        {
+            "label": "build nao develop",
+            "type": "shell",
+            "command": "${workspaceFolder}/Make/Linux/compile Nao Develop",
+            "dependsOn": "generate ninja project",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build"
+            }, 
+
+            "options": {
+                "statusbar": {
+                    "hide" : false,
+                    "color": "#0ad41b",
+                    "label": "Build Nao Develop"
+                }
+            }
+        },
+
+        {
+            "label": "build nao debug",
+            "type": "shell",
+            "command": "${workspaceFolder}/Make/Linux/compile Nao Debug",
+            "dependsOn": "generate ninja project",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build"
+            }, 
+
+            "options": {
+                "statusbar": {
+                    "hide" : false,
+                    "color": "#0ad41b",
+                    "label": "Build Nao Debug"
                 }
             }
         },
