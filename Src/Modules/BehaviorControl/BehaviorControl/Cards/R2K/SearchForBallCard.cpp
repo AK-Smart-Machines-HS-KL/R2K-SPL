@@ -134,13 +134,16 @@ class SearchForBallCard : public SearchForBallCardBase
     {
       transition
       {
-        srand(theRobotInfo.number);
         if (state_time > bodyTurnDuration)
         goto search;
       }
 
       action
       {
+        // Initialize random seed only once when entering the state
+        if (state_time == 0)
+          srand(theRobotInfo.number);
+        
         theLookForwardSkill();
         if (theRobotPose.translation.y() > 0 ) {
           theWalkAtRelativeSpeedSkill(Pose2f(-2.5f, 0.f, 0.f));
