@@ -61,7 +61,6 @@ CARD(DefenseCoverBackCard,
         REQUIRES(FieldDimensions),
         REQUIRES(TeamData),   // check behavior
         REQUIRES(TeammateRoles),
-        REQUIRES(TeamCommStatus),  // wifi on off?
 
         DEFINES_PARAMETERS(
              {,

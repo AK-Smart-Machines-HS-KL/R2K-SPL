@@ -43,8 +43,6 @@
 // B-Human includes
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/BehaviorControl/Skills.h"
-#include "Representations/Modeling/ObstacleModel.h"
-
 #include "Representations/Modeling/RobotPose.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
@@ -64,7 +62,6 @@ CARD(ClearOwnHalfCard,
     CALLS(GoToBallAndKick),
     USES(GameInfo),
     REQUIRES(FieldBall),
-    REQUIRES(ObstacleModel),
     REQUIRES(RobotInfo),
     REQUIRES(RobotPose),
     REQUIRES(TeamBehaviorStatus),

@@ -49,8 +49,6 @@
 #include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/Configuration/FieldDimensions.h"
-#include "Representations/Modeling/ObstacleModel.h"
-
 #include "Representations/Modeling/RobotPose.h"
 #include "Tools/BehaviorControl/Framework/Card/Card.h"
 #include "Tools/BehaviorControl/Framework/Card/CabslCard.h"
@@ -69,7 +67,6 @@ CARD(ClearOwnHalfCardGoalie,
     CALLS(GoToBallAndKick),
     REQUIRES(FieldBall),
     REQUIRES(FieldDimensions),
-    REQUIRES(ObstacleModel),
     REQUIRES(RobotInfo),
     REQUIRES(RobotPose),
     REQUIRES(TeamBehaviorStatus),
