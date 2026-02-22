@@ -628,7 +628,12 @@ int Geometry::raycastCircle(const Circle& circle, const Vector2f& rayBase, const
   float h = u2.norm();
   if (h > circle.radius) { // no intersect
     return 0;
-  } else if (h == circle.radius) // tangent
+  }
+
+  if (u.norm() > circle.radius && u.dot(rayDirection) < 0.f)
+    return 0;
+
+  if (h == circle.radius) // tangent
   {
     result1 = rayBase + u - u2;
     result2 = result1;
@@ -640,8 +645,10 @@ int Geometry::raycastCircle(const Circle& circle, const Vector2f& rayBase, const
   if (u.norm() > circle.radius) {
     result1 = rayBase + u1 + unitDir * m;
     result2 = rayBase + u1 - unitDir * m;
+    return 2;
   } else { // ray begins inside circle, so only one instersect
     result1 = rayBase + u1 + unitDir * m;
+    return 1;
   }
 }
 

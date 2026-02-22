@@ -11,6 +11,7 @@
  */
 
 #include <cctype>
+#include <cstring>
 #ifndef WINDOWS
 #include <cstdlib>
 #include <cxxabi.h>
