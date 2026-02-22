@@ -15,7 +15,7 @@ The codebase is based on **B-Human 2019**, but has undergone four years of signi
 
 ### 2. B-Human Framework Fundamentals
 - **CARD Concept:** Top-down search, pre-conditions, and post-conditions.
-- **CABS:** Integration with 'tim'.
+- **CABSL:** Integration with 'tim'.
 - **Behavior Graph:** Correct usage of `USES` vs. `REQUIRES` vs. `CALLS`.
 - **Skill Concept:** Implementation and execution of low-level skills.
 
@@ -38,6 +38,6 @@ The codebase may contain legacy issues. Actively scan for and suggest fixes for:
 - Always verify if a proposed solution aligns with the **R2K-specific adaptive logic** (e.g., data compression or role assignment).
 
 ## Scoping & Context
-- **Primary Scope:** When analyzing the codebase, prioritize files located in `/Src/R2K` and `/docs`.
+- **Primary Scope:** When analyzing the codebase, prioritize files located in `/Src/Modules/BehaviourControl/BehaviourControl/Cards/R2K` and `/docs`.
 - **Exclusion Bias:** Treat information in `/Install` or `/Util` or `/build` as deprecated unless explicitly asked.
 - **Search Strategy:** Always perform a workspace search within the R2K-specific folders first before suggesting general B-Human 2019 solutions.
