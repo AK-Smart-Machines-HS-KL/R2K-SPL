@@ -182,9 +182,23 @@ class GoalieDefaultCard : public GoalieDefaultCardBase
     {
       transition
       {
-        // if (isNearGoal()) goto init;
+        // Check if reached default position
+        Pose2f targetRelative = theRobotPose.toRelative(theDefaultPose.ownDefaultPose);
+        if (targetRelative.translation.norm() < 100.f)
+        {
+          if (theFieldBall.ballWasSeen())
+            goto block;
+          else
+            goto findBall;
+        }
+        
+        // Original conditions for early transition
         if ((theRobotPose.translation.y() < -4200) && !theFieldBall.ballWasSeen()) goto findBall;
         if ((theRobotPose.translation.y() < -4200) &&  theFieldBall.ballWasSeen()) goto block;
+        
+        // Defensive timeout fallback to prevent getting stuck
+        if (state_time > 15000)
+          goto findBall;
       }
         action
       {

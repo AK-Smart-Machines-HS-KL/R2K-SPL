@@ -170,6 +170,8 @@ class AutomaticFootSoleCalibrationCard : public AutomaticFootSoleCalibrationCard
     {
       transition
       {
+        // Terminal state - exits via postconditions() when isFinished == true
+        // No further transitions needed - calibration is complete
       }
       action
       {

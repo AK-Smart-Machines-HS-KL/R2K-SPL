@@ -153,6 +153,14 @@ class OwnPenaltyKickCard : public OwnPenaltyKickCardBase
 
   state(done)
   {
+    transition
+    {
+      // Terminal state - exits via postconditions() when done == true or ball not seen
+      // Defensive timeout in case postconditions fail
+      if (state_time > 5000)
+        goto done; // Stay in done state (postconditions will handle exit)
+    }
+    
     action
     {
       reset();

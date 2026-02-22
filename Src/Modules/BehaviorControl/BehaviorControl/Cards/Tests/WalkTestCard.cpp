@@ -213,11 +213,14 @@ class WalkTestCard : public WalkTestCardBase
     {
       transition
       {
-        theSaySkill("Walking test done.");
+        // Terminal state - exits via postconditions()
       }
 
       action
       {
+        if (state_time == 0)
+          theSaySkill("Walking test done.");
+        
         theLookForwardSkill(); // Head Motion Request
         theStandSkill();
       }

@@ -146,6 +146,14 @@ class GoalShotCard : public GoalShotCardBase
 
     state(done)
     {
+      transition
+      {
+        // Terminal state - exits via postconditions() when done == true
+        // Defensive timeout in case postconditions fail
+        if (state_time > 5000)
+          goto done; // Stay in done state (postconditions will handle exit)
+      }
+      
       action
       {
         reset();
