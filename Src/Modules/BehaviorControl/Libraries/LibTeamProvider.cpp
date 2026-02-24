@@ -12,9 +12,9 @@ void LibTeamProvider::update(LibTeam& libTeam)
 {
   // Merged pass 1: compute keeper and striker data in a single loop
   int keeperNum = theTeamBehaviorStatus.role.isGoalkeeper() ? theRobotInfo.number : -1;
-  Pose2f keeperPose = (keeperNum != -1) ? theRobotPose : Pose2f(0.f, 1000000.f, 1000000.f);
+  Pose2f keeperPose = (keeperNum != -1) ? static_cast<const Pose2f&>(theRobotPose) : Pose2f(0.f, 1000000.f, 1000000.f);
   int strikerNum = theTeamBehaviorStatus.role.playsTheBall() ? theRobotInfo.number : -1;
-  Pose2f strikerPose = (strikerNum != -1) ? theRobotPose : Pose2f(0.f, 1000000.f, 1000000.f);
+  Pose2f strikerPose = (strikerNum != -1) ? static_cast<const Pose2f&>(theRobotPose) : Pose2f(0.f, 1000000.f, 1000000.f);
 
   if(keeperNum == -1 || strikerNum == -1)
   {
