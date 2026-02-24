@@ -49,9 +49,13 @@ void DribbleEngine::update(DribbleGenerator& dribbleGenerator)
       isInPositionForKick = theWalkKickGenerator.canStart(WalkKickVariant(kickLeg == Legs::left ? KickInfo::walkForwardsLeft : KickInfo::walkForwardsRight, WalkKicks::Type::forward, kickLeg, power, directionSCS), lastPhase, motionRequest.directionPrecision, motionRequest.alignPrecisely, motionRequest.preStepAllowed, motionRequest.turnKickAllowed, 0.f);
     }
 
-    isInPositionForKick &= motionRequest.ballTimeWhenLastSeen >= theMotionInfo.lastKickTimestamp;
-    // velocity.norm() does not need to be transformed to another coordinate system.
-    isInPositionForKick &= motionRequest.ballEstimate.velocity.norm() < 50.f;
+    // Enges Dribbling: Häufige sanfte Kicks damit Ball nah am Roboter bleibt
+    const unsigned timeSinceLastKick = theFrameInfo.time - theMotionInfo.lastKickTimestamp;
+    const bool ballSeenRecently = motionRequest.ballTimeWhenLastSeen >= theMotionInfo.lastKickTimestamp || timeSinceLastKick > 150; // 150ms Cooldown für sehr häufige Kicks
+    const bool ballNotTooFast = motionRequest.ballEstimate.velocity.norm() < 300.f; // 300mm/s Limit für kontrollierten Ball
+    
+    isInPositionForKick &= ballSeenRecently;
+    isInPositionForKick &= ballNotTooFast;
 
     if(isInPositionForKick)
     {
