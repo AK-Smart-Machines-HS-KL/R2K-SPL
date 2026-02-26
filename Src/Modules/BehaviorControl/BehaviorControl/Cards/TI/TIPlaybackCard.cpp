@@ -175,11 +175,15 @@ class TIPlaybackCard : public TIPlaybackCardBase
 		// check: this next action is out of bounds -> we reached the end
 		if(static_cast<size_t>(actionIndex) >= theTIPlaybackSequences.data[cardIndex].actions.size())
 		{
-			OUTPUT_TEXT("Reached end of playback sequence");
+			DECLARED_DEBUG_RESPONSE("TIPlaybackCard:sequenceEnd");
+			DEBUG_RESPONSE("TIPlaybackCard:sequenceEnd")
+			{
+				OUTPUT_TEXT("Reached end of playback sequence");
+			}
 			currentAction = {};
 			actionIndex   = -2;  // set post condition
-      timeLastRun = theFrameInfo.time;
-      startTime = 0;
+            timeLastRun = theFrameInfo.time;
+            startTime = 0;
 			return currentAction;
 		}
 

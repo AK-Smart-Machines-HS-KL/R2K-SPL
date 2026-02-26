@@ -68,26 +68,29 @@ void TIPlaybackProvider::printLoadedData(TIPlaybackSequences &playbackData)
 {
     if (theRobotInfo.number != 1) return; // do not tell this info 5 times
     
-    OUTPUT_TEXT("Worldmodel: (count: " << static_cast<int>(playbackData.models.size()) << ")");
-
-    // Print the names of all loaded worldmodels to the console
-    for (const WorldData& model : playbackData.models)
+    // Summary output
+    OUTPUT_TEXT("TI: Loaded " << static_cast<int>(playbackData.models.size()) << " worldmodels, " 
+      << static_cast<int>(playbackData.data.size()) << " playback sequences");
+    
+    // Detailed output only via debug request
+    DECLARED_DEBUG_RESPONSE("TIPlaybackProvider:detailed");
+    DEBUG_RESPONSE("TIPlaybackProvider:detailed")
     {
-        if (model.trigger.robotPose.translation.x() != 0.0f || model.trigger.robotPose.translation.y() != 0.0f)
+        OUTPUT_TEXT("Worldmodels:");
+        for (const WorldData& model : playbackData.models)
         {
-            OUTPUT_TEXT("  " << model.fileName << " -> " << model.trigger.robotPose.translation.x() << " " << model.trigger.robotPose.translation.y());
+            if (model.trigger.robotPose.translation.x() != 0.0f || model.trigger.robotPose.translation.y() != 0.0f)
+            {
+                OUTPUT_TEXT("  " << model.fileName << " @ (" << model.trigger.robotPose.translation.x() << ", " << model.trigger.robotPose.translation.y() << ")");
+            }
         }
-    }
-
-    OUTPUT_TEXT("------- (count: " << static_cast<int>(playbackData.data.size()) << ")");
-    OUTPUT_TEXT("Playback:");
-
-    // Print the names of all loaded playbacks to the console
-    for (const PlaybackSequence& data : playbackData.data)
-    {
-        if (!data.fileName.empty())
+        OUTPUT_TEXT("Playback sequences:");
+        for (const PlaybackSequence& data : playbackData.data)
         {
-            OUTPUT_TEXT("  " << data.fileName << " (actions: " << static_cast<int>(data.actions.size()) << ")");
+            if (!data.fileName.empty())
+            {
+                OUTPUT_TEXT("  " << data.fileName << " (" << static_cast<int>(data.actions.size()) << " actions)");
+            }
         }
     }
 }
@@ -100,6 +103,10 @@ void TIPlaybackProvider::loadTeachInData(TIPlaybackSequences &playbackData)
         std::string teachInDir = std::string(File::getBHDir()) + "/Config/TeachIn/";
         std::list<std::string> subDirs = File::getSubDirs(teachInDir);
 
+        // Count files for summary
+        int filesProcessed = 0;
+        int filesFailed = 0;
+
         for (std::string dir : subDirs)
         {
             // Get a list of all files inside each directory
@@ -107,8 +114,7 @@ void TIPlaybackProvider::loadTeachInData(TIPlaybackSequences &playbackData)
             for (std::string file : files)
             {
                 std::string name = dir + "/" + file;
-                if (theRobotInfo.number == 1)  // do not tell this info 5 times
-                  OUTPUT_TEXT("Loading: " + name);
+                filesProcessed++;
 
                 std::string fullPath = teachInDir + name;
 
@@ -121,10 +127,18 @@ void TIPlaybackProvider::loadTeachInData(TIPlaybackSequences &playbackData)
                 // Loading failed
                 if (!wasLoaded)
                 {
-                    if (theRobotInfo.number == 1)  // do not tell this info 5 times
-                        OUTPUT_ERROR(name + " is corrupted.");
+                    filesFailed++;
+                    OUTPUT_ERROR(name + " is corrupted.");
                 }
             }
+        }
+
+        // Output summary only via debug request
+        DECLARED_DEBUG_RESPONSE("TIPlaybackProvider:fileLoadSummary");
+        DEBUG_RESPONSE("TIPlaybackProvider:fileLoadSummary")
+        {
+            if (theRobotInfo.number == 1)
+                OUTPUT_TEXT("TI: Processed " << filesProcessed << " files (" << filesFailed << " failed)");
         }
     }
     catch (const std::exception& e)
@@ -138,8 +152,12 @@ void TIPlaybackProvider::enforceConsistency(TIPlaybackSequences &playbackData)
     // Guard against empty data structures
     if (playbackData.models.empty())
     {
-        if (theRobotInfo.number == 1)
-            OUTPUT_TEXT("TI: No worldmodels loaded, skipping consistency check");
+        DECLARED_DEBUG_RESPONSE("TIPlaybackProvider:consistency");
+        DEBUG_RESPONSE("TIPlaybackProvider:consistency")
+        {
+            if (theRobotInfo.number == 1)
+                OUTPUT_TEXT("TI: No worldmodels loaded, skipping consistency check");
+        }
         return;
     }
 
