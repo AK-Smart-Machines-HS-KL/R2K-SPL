@@ -142,6 +142,13 @@ class TIPlaybackCard : public TIPlaybackCardBase
 
   PlaybackAction setNextAction()
 	{
+		// Guard against invalid cardIndex
+		if (cardIndex < 0 || cardIndex >= static_cast<int>(theTIPlaybackSequences.data.size()))
+		{
+      OUTPUT_ERROR("TI: setNextAction called with invalid cardIndex: " << cardIndex << " (data size: " << static_cast<int>(theTIPlaybackSequences.data.size()) << ")");
+			actionIndex = -1;
+			return {};
+		}
 
 		if(!startTime)
 		// set for first action now
@@ -226,6 +233,13 @@ class TIPlaybackCard : public TIPlaybackCardBase
 
   int indexOfBestTeachInScore(int Number)
   {
+    // Guard against empty models
+    if (theTIPlaybackSequences.models.empty())
+    {
+      OUTPUT_ERROR("TI: indexOfBestTeachInScore called but no models available");
+      return -1;
+    }
+
     float minimal_distance = 500.0f;
     int world_model_index = -1;  // start counting at 0
     int current_bestWorldModelIndex = -1;
@@ -236,6 +250,12 @@ class TIPlaybackCard : public TIPlaybackCardBase
     {
       WorldModel& model = data.trigger;
       world_model_index++;
+      // Verify world_model_index is within bounds
+      if (world_model_index >= static_cast<int>(theTIPlaybackSequences.models.size()))
+      {
+        OUTPUT_ERROR("TI: world_model_index out of bounds in indexOfBestTeachInScore");
+        break;
+      }
       // OUTPUT_TEXT(model.fileName);
       if ( //model.robotNumber == Number && // when this is disabled, any robot close to the point of recording will trigger
         thisIsATriggerPoint(model)) // this is the first OR a better trigger point
@@ -245,8 +265,15 @@ class TIPlaybackCard : public TIPlaybackCardBase
       }
     }  // rof: scan all world models
 
-    ASSERT(current_bestWorldModelIndex >= 0);  // there must be at least one trigger point, because teachInScoreReached() was true in the pre-condition
-    OUTPUT_TEXT("trigger became active for robot " << Number << " from file " << theTIPlaybackSequences.models[current_bestWorldModelIndex].fileName);
+    // Verify bounds of returned index before accessing
+    if (current_bestWorldModelIndex >= 0 && current_bestWorldModelIndex < static_cast<int>(theTIPlaybackSequences.models.size()))
+    {
+      OUTPUT_TEXT("trigger became active for robot " << Number << " from file " << theTIPlaybackSequences.models[current_bestWorldModelIndex].fileName);
+    }
+    else
+    {
+      ASSERT(current_bestWorldModelIndex >= 0);  // there must be at least one trigger point, because teachInScoreReached() was true in the pre-condition
+    }
 
     return current_bestWorldModelIndex;
   };

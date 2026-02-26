@@ -30,43 +30,24 @@ TIPlaybackProvider::TIPlaybackProvider()
 void TIPlaybackProvider::update(TIPlaybackSequences &playbackData)
 {
   // activate with:
-// dr debugDrawing3d:representation:TIPlaybackProvider 
+  // dr debugDrawing3d:representation:TIPlaybackProvider 
 
   DEBUG_DRAWING3D("representation:TIPlaybackProvider", "field");
 
-  for (WorldData model : playbackData.models)
+  // Guard against empty models before drawing
+  if (!playbackData.models.empty())
   {
-
-
-    // OUTPUT_TEXT(model.trigger.robotPose.translation.x() << " " << model.trigger.robotPose.translation.y());
-    // if(-1 == model.fileName.find("Standard"))
-    if (model.trigger.setPlay == SET_PLAY_CORNER_KICK)
-      CYLINDER3D("representation:TIPlaybackProvider", model.trigger.robotPose.translation.x(), model.trigger.robotPose.translation.y(), -1.f, 0.f, 0.f, 0.f, (int)model.trigger.ballDistanceToBot/10, 2,  ColorRGBA::yellow);
-
-      // RECTANGLE("representation:TIPlaybackProvider", 100, 100, 200, 200, 20, Drawings::solidPen, ColorRGBA::yellow);
-    else
-      CYLINDER3D("representation:TIPlaybackProvider", model.trigger.robotPose.translation.x(), model.trigger.robotPose.translation.y(), -1.f, 0.f, 0.f, 0.f, std::max(50,(int)model.trigger.ballDistanceToBot/10), 2, ColorRGBA::gray);
-      // CYLINDER3D("representation:TIPlaybackProvider", model.trigger.robotPose.translation.x(), model.trigger.robotPose.translation.y(), 100, 0.f, 0.f, 0.f, 50, 2, ColorRGBA::red);
-  }
-  /* CIRCLE("representation:TIPlaybackProvider", "",
-    position.x(), position.y(), 45, 0, // pen width
-    Drawings::solidPen, ColorRGBA::black,
-    Drawings::solidBrush, violet);
-    */
-  /*
-
-  COMPLEX_DRAWING("module:TIPlaybackProvider:points") {
-    const Vector3f ballPos3d = Vector3f(100.0f, 200.0f, 0.0f);
-    SPHERE3D("module:TIPlaybackProvider:points", ballPos3d.x(), ballPos3d.y(), 350.f, 350.f, ColorRGBA(128, 64, 0));
+    for (WorldData model : playbackData.models)
+    {
+      // OUTPUT_TEXT(model.trigger.robotPose.translation.x() << " " << model.trigger.robotPose.translation.y());
+      // if(-1 == model.fileName.find("Standard"))
+      if (model.trigger.setPlay == SET_PLAY_CORNER_KICK)
+        CYLINDER3D("representation:TIPlaybackProvider", model.trigger.robotPose.translation.x(), model.trigger.robotPose.translation.y(), -1.f, 0.f, 0.f, 0.f, (int)model.trigger.ballDistanceToBot/10, 2,  ColorRGBA::yellow);
+      else
+        CYLINDER3D("representation:TIPlaybackProvider", model.trigger.robotPose.translation.x(), model.trigger.robotPose.translation.y(), -1.f, 0.f, 0.f, 0.f, std::max(50,(int)model.trigger.ballDistanceToBot/10), 2, ColorRGBA::gray);
+    }
   }
 
-  DECLARE_DEBUG_DRAWING("module:TIPlaybackProvider", "drawingOnField");
-  DEBUG_DRAWING3D("module:TIPlaybackProvider", "field") {
-    const Vector3f ballPos3d = Vector3f(100.0f, 200.0f, 0.0f);
-    SPHERE3D("representation:TIPlaybackProvider", ballPos3d.x(), ballPos3d.y(), 350.f, 350.f, ColorRGBA(128, 64, 0));
-  }
-
-  */
   if (!playbackData.loaded) {
       loadTeachInData(playbackData);
       enforceConsistency(playbackData);
@@ -80,73 +61,105 @@ void TIPlaybackProvider::update(TIPlaybackSequences &playbackData)
       loadTeachInData(playbackData);
       enforceConsistency(playbackData);
       printLoadedData(playbackData);
-
   }
 }
 
 void TIPlaybackProvider::printLoadedData(TIPlaybackSequences &playbackData)
 {
     if (theRobotInfo.number != 1) return; // do not tell this info 5 times
-    OUTPUT_TEXT("Worldmodel:");
+    
+    OUTPUT_TEXT("Worldmodel: (count: " << static_cast<int>(playbackData.models.size()) << ")");
 
     // Print the names of all loaded worldmodels to the console
-    for (WorldData model : playbackData.models)
+    for (const WorldData& model : playbackData.models)
     {
-        // OUTPUT_TEXT(model.fileName);
-      OUTPUT_TEXT(model.trigger.robotPose.translation.x() << " " << model.trigger.robotPose.translation.y());
-
+        if (model.trigger.robotPose.translation.x() != 0.0f || model.trigger.robotPose.translation.y() != 0.0f)
+        {
+            OUTPUT_TEXT("  " << model.fileName << " -> " << model.trigger.robotPose.translation.x() << " " << model.trigger.robotPose.translation.y());
+        }
     }
 
-    OUTPUT_TEXT("-------------");
+    OUTPUT_TEXT("------- (count: " << static_cast<int>(playbackData.data.size()) << ")");
     OUTPUT_TEXT("Playback:");
 
     // Print the names of all loaded playbacks to the console
-    for (PlaybackSequence data : playbackData.data)
+    for (const PlaybackSequence& data : playbackData.data)
     {
-        OUTPUT_TEXT(data.fileName);
+        if (!data.fileName.empty())
+        {
+            OUTPUT_TEXT("  " << data.fileName << " (actions: " << static_cast<int>(data.actions.size()) << ")");
+        }
     }
 }
 
 void TIPlaybackProvider::loadTeachInData(TIPlaybackSequences &playbackData)
 {
-
-        // Get all sub-directories inside the TeachIn directory
-    std::string teachInDir = std::string(File::getBHDir()) + "/Config/TeachIn/";
-    std::list<std::string> subDirs = File::getSubDirs(teachInDir);
-
-    for (std::string dir : subDirs)
+    try
     {
-        // Get a list of all files inside each directory
-        std::list<std::string> files = File::getFiles(teachInDir + dir);
-        for (std::string file : files)
+        // Get all sub-directories inside the TeachIn directory
+        std::string teachInDir = std::string(File::getBHDir()) + "/Config/TeachIn/";
+        std::list<std::string> subDirs = File::getSubDirs(teachInDir);
+
+        for (std::string dir : subDirs)
         {
-            std::string name = dir + "/" + file;
-            if (theRobotInfo.number == 1)  // do not tell this info 5 times
-              OUTPUT_TEXT("Loading: " + name);
-
-            std::string fullPath = teachInDir + name;
-
-            // Determine if the csv is a worldmodel or playback file
-            bool isPlayback = (file.find("worldmodel") == std::string::npos);
-
-            // Attempt to load and parse each csv
-            bool wasLoaded = isPlayback ? loadPlayback(playbackData, name, fullPath) : loadWorldModel(playbackData, name, fullPath);
-
-            // Loading failed
-            if (!wasLoaded)
+            // Get a list of all files inside each directory
+            std::list<std::string> files = File::getFiles(teachInDir + dir);
+            for (std::string file : files)
             {
+                std::string name = dir + "/" + file;
                 if (theRobotInfo.number == 1)  // do not tell this info 5 times
-                    OUTPUT_ERROR(name + " is corrupted.");
+                  OUTPUT_TEXT("Loading: " + name);
+
+                std::string fullPath = teachInDir + name;
+
+                // Determine if the csv is a worldmodel or playback file
+                bool isPlayback = (file.find("worldmodel") == std::string::npos);
+
+                // Attempt to load and parse each csv
+                bool wasLoaded = isPlayback ? loadPlayback(playbackData, name, fullPath) : loadWorldModel(playbackData, name, fullPath);
+
+                // Loading failed
+                if (!wasLoaded)
+                {
+                    if (theRobotInfo.number == 1)  // do not tell this info 5 times
+                        OUTPUT_ERROR(name + " is corrupted.");
+                }
             }
         }
+    }
+    catch (const std::exception& e)
+    {
+        OUTPUT_ERROR("TIPlaybackProvider::loadTeachInData failed: " << e.what());
     }
 }
 
 void TIPlaybackProvider::enforceConsistency(TIPlaybackSequences &playbackData)
 {
+    // Guard against empty data structures
+    if (playbackData.models.empty())
+    {
+        if (theRobotInfo.number == 1)
+            OUTPUT_TEXT("TI: No worldmodels loaded, skipping consistency check");
+        return;
+    }
+
+    if (playbackData.data.empty())
+    {
+        OUTPUT_WARNING("TI: Worldmodels loaded but no playback data found. Clearing all worldmodels.");
+        playbackData.models.clear();
+        return;
+    }
+
     std::vector<std::string> matches;
     for (WorldData &data : playbackData.models)
     {
+        // Verify fileName is not empty before processing
+        if (data.fileName.empty())
+        {
+            OUTPUT_WARNING("TI: Encountered empty fileName in worldmodel, marking for removal");
+            matches.push_back(data.fileName);
+            continue;
+        }
 
         // find the last instance of the word worldmodel in the filename
         std::string name = data.fileName;
@@ -169,9 +182,12 @@ void TIPlaybackProvider::enforceConsistency(TIPlaybackSequences &playbackData)
     }
 
     // remove the marked worldmodels
-    playbackData.models.erase(std::remove_if(playbackData.models.begin(), playbackData.models.end(), [matches](WorldData current)
-                                                   { return (std::find(matches.begin(), matches.end(), current.fileName) != matches.end()); }),
-                                    playbackData.models.end());
+    if (!matches.empty())
+    {
+        playbackData.models.erase(std::remove_if(playbackData.models.begin(), playbackData.models.end(), [matches](WorldData current)
+                                                       { return (std::find(matches.begin(), matches.end(), current.fileName) != matches.end()); }),
+                                        playbackData.models.end());
+    }
 }
 
 bool TIPlaybackProvider::loadWorldModel(TIPlaybackSequences &playbackData, std::string name, std::string path)
