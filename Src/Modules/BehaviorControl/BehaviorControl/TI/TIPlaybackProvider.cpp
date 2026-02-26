@@ -121,7 +121,7 @@ void TIPlaybackProvider::loadTeachInData(TIPlaybackSequences &playbackData)
         for (std::string file : files)
         {
             std::string name = dir + "/" + file;
-            if (theRobotInfo.number == 1)  // do not tell this info 5 timesOUTPUT_TEXT("Loading: " + name);
+            if (theRobotInfo.number == 1)  // do not tell this info 5 times
               OUTPUT_TEXT("Loading: " + name);
 
             std::string fullPath = teachInDir + name;
@@ -134,8 +134,10 @@ void TIPlaybackProvider::loadTeachInData(TIPlaybackSequences &playbackData)
 
             // Loading failed
             if (!wasLoaded)
-                { if (theRobotInfo.number == 1)  // do not tell this info 5 timesOUTPUT_TEXT("Loading: " + name);
-                    OUTPUT_ERROR(name + " is corrupted.");}
+            {
+                if (theRobotInfo.number == 1)  // do not tell this info 5 times
+                    OUTPUT_ERROR(name + " is corrupted.");
+            }
         }
     }
 }

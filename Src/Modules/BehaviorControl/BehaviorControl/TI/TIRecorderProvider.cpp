@@ -98,7 +98,9 @@ void TIRecorderProvider::save(TIRecorderData& record) {
         record.worldData.save(worldPath);
         record.sequence.save(playbackPath);
         record.clear();
-    } else {OUTPUT_TEXT("Stop The recording before saving!");}
+    } else {
+        OUTPUT_TEXT("Stop The recording before saving!");
+    }
 }
 
 WorldModel TIRecorderProvider::getWorldModel() {

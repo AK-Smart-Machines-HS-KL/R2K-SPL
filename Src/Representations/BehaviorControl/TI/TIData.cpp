@@ -21,7 +21,7 @@ PlaybackSequence::PlaybackSequence(std::string file, bool isRelative) {
         if(isRelative) {
             fileName = TI_Directory + file;
         } else {
-			fileName = file;
+            fileName = file;
         }
         // Load the playback file
         rapidcsv::Document doc(fileName);
@@ -132,12 +132,12 @@ WorldData::WorldData(std::string file, bool isRelative) {
         if(isRelative) {
             fileName = TI_Directory + file;
         } else {
-			fileName = file;
+            fileName = file;
         }
         // Load the playback file
         rapidcsv::Document doc(fileName);
 
-         for(size_t i = 0; i < doc.GetRowCount(); i++) {
+        for(size_t i = 0; i < doc.GetRowCount(); i++) {
             // Read the data from the csv file
             WorldModel world;
             // use name from path instead?
