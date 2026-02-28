@@ -3,6 +3,8 @@
 #include "Platform/File.h"
 #include <iostream>
 #include <fstream>
+#include <map>
+#include <algorithm>
 #include <rapidcsv.h>
 #include "Tools/RingBuffer.h"
 #include "Tools/Math/Geometry.h"
@@ -50,17 +52,22 @@ void TIPlaybackProvider::update(TIPlaybackSequences &playbackData)
 
   if (!playbackData.loaded) {
       loadTeachInData(playbackData);
-      enforceConsistency(playbackData);
+      std::vector<std::string> inconsistentFiles = enforceConsistency(playbackData);
+      
+      // Report inconsistencies once per session (robot #1 only)
+      static bool hasReportedInconsistencies = false;
+      if (!inconsistentFiles.empty() && theRobotInfo.number == 1 && !hasReportedInconsistencies)
+      {
+          OUTPUT_WARNING("TI: Removed " << static_cast<int>(inconsistentFiles.size()) << " inconsistent file(s):");
+          for (const auto& file : inconsistentFiles)
+          {
+              OUTPUT_WARNING("  - " << file);
+          }
+          hasReportedInconsistencies = true;
+      }
+      
       printLoadedData(playbackData);
       playbackData.loaded = true;
-  }
-
-  // dr loadTeachInData
-  DEBUG_RESPONSE_ONCE("loadTeachInData")
-  {
-      loadTeachInData(playbackData);
-      enforceConsistency(playbackData);
-      printLoadedData(playbackData);
   }
 }
 
@@ -103,16 +110,64 @@ void TIPlaybackProvider::loadTeachInData(TIPlaybackSequences &playbackData)
         std::string teachInDir = std::string(File::getBHDir()) + "/Config/TeachIn/";
         std::list<std::string> subDirs = File::getSubDirs(teachInDir);
 
+        // Global tracking for duplicate detection across all subdirectories
+        std::map<std::string, std::string> filenameToPath;
+
         // Count files for summary
         int filesProcessed = 0;
         int filesFailed = 0;
+        int duplicatesFound = 0;
 
-        for (std::string dir : subDirs)
+        // First pass: detect duplicates across all subdirectories
+        for (const std::string& dir : subDirs)
         {
             // Get a list of all files inside each directory
             std::list<std::string> files = File::getFiles(teachInDir + dir);
-            for (std::string file : files)
+            for (const std::string& file : files)
             {
+                // Skip non-CSV files
+                if (file.find(".csv") == std::string::npos)
+                    continue;
+
+                // Check if this filename has been seen before (global duplicate)
+                auto existingFile = filenameToPath.find(file);
+                if (existingFile != filenameToPath.end())
+                {
+                    duplicatesFound++;
+                    // Report duplicates once per session (robot #1 only)
+                    static bool hasReportedDuplicates = false;
+                    if (theRobotInfo.number == 1 && !hasReportedDuplicates)
+                    {
+                        OUTPUT_ERROR("TI: Duplicate filename detected! " << file << " exists in both " 
+                                     << existingFile->second << " and " << dir << ". Using first occurrence.");
+                        hasReportedDuplicates = true;
+                    }
+                }
+                else
+                {
+                    filenameToPath[file] = dir;
+                }
+            }
+        }
+
+        // Second pass: load files, skipping duplicates
+        for (const std::string& dir : subDirs)
+        {
+            // Get a list of all files inside each directory
+            std::list<std::string> files = File::getFiles(teachInDir + dir);
+            for (const std::string& file : files)
+            {
+                // Skip non-CSV files
+                if (file.find(".csv") == std::string::npos)
+                    continue;
+
+                // Skip if this is a duplicate (not the first occurrence)
+                if (filenameToPath[file] != dir)
+                {
+                    filesProcessed++;
+                    continue;
+                }
+
                 std::string name = dir + "/" + file;
                 filesProcessed++;
 
@@ -138,7 +193,10 @@ void TIPlaybackProvider::loadTeachInData(TIPlaybackSequences &playbackData)
         DEBUG_RESPONSE("TIPlaybackProvider:fileLoadSummary")
         {
             if (theRobotInfo.number == 1)
-                OUTPUT_TEXT("TI: Processed " << filesProcessed << " files (" << filesFailed << " failed)");
+            {
+                OUTPUT_TEXT("TI: Processed " << filesProcessed << " files (" << filesFailed << " failed, " 
+                           << duplicatesFound << " duplicates skipped)");
+            }
         }
     }
     catch (const std::exception& e)
@@ -147,35 +205,31 @@ void TIPlaybackProvider::loadTeachInData(TIPlaybackSequences &playbackData)
     }
 }
 
-void TIPlaybackProvider::enforceConsistency(TIPlaybackSequences &playbackData)
+std::vector<std::string> TIPlaybackProvider::enforceConsistency(TIPlaybackSequences &playbackData)
 {
+    std::vector<std::string> removedFiles;
+
     // Guard against empty data structures
-    if (playbackData.models.empty())
+    if (playbackData.models.empty() && playbackData.data.empty())
     {
         DECLARED_DEBUG_RESPONSE("TIPlaybackProvider:consistency");
         DEBUG_RESPONSE("TIPlaybackProvider:consistency")
         {
             if (theRobotInfo.number == 1)
-                OUTPUT_TEXT("TI: No worldmodels loaded, skipping consistency check");
+                OUTPUT_TEXT("TI: No TeachIn data loaded, skipping consistency check");
         }
-        return;
+        return removedFiles;
     }
 
-    if (playbackData.data.empty())
-    {
-        OUTPUT_WARNING("TI: Worldmodels loaded but no playback data found. Clearing all worldmodels.");
-        playbackData.models.clear();
-        return;
-    }
-
-    std::vector<std::string> matches;
-    for (WorldData &data : playbackData.models)
+    // Check for worldmodels without matching playbacks
+    std::vector<std::string> orphanedWorldmodels;
+    for (const WorldData &data : playbackData.models)
     {
         // Verify fileName is not empty before processing
         if (data.fileName.empty())
         {
-            OUTPUT_WARNING("TI: Encountered empty fileName in worldmodel, marking for removal");
-            matches.push_back(data.fileName);
+            removedFiles.push_back("(empty filename)");
+            orphanedWorldmodels.push_back(data.fileName);
             continue;
         }
 
@@ -196,16 +250,60 @@ void TIPlaybackProvider::enforceConsistency(TIPlaybackSequences &playbackData)
             continue;
 
         // no corresponding playback exists -> mark for removal
-        matches.push_back(data.fileName);
+        removedFiles.push_back(data.fileName);
+        orphanedWorldmodels.push_back(data.fileName);
+    }
+
+    // Check for playbacks without matching worldmodels
+    std::vector<std::string> orphanedPlaybacks;
+    for (const PlaybackSequence &data : playbackData.data)
+    {
+        // Verify fileName is not empty before processing
+        if (data.fileName.empty())
+        {
+            removedFiles.push_back("(empty filename)");
+            orphanedPlaybacks.push_back(data.fileName);
+            continue;
+        }
+
+        // find the last instance of the word playback in the filename
+        std::string name = data.fileName;
+        size_t rpos = name.rfind("playback");
+
+        // if it was found we replace playback with worldmodel
+        if (rpos != std::string::npos)
+            name.replace(rpos, 8, "worldmodel");
+
+        // search for the file inside the worldmodel stack
+        auto result = std::find_if(playbackData.models.begin(), playbackData.models.end(), [name](WorldData current)
+                                   { return (current.fileName == name); });
+
+        // result was found -> skip
+        if (result != playbackData.models.end())
+            continue;
+
+        // no corresponding worldmodel exists -> mark for removal
+        removedFiles.push_back(data.fileName);
+        orphanedPlaybacks.push_back(data.fileName);
     }
 
     // remove the marked worldmodels
-    if (!matches.empty())
+    if (!orphanedWorldmodels.empty())
     {
-        playbackData.models.erase(std::remove_if(playbackData.models.begin(), playbackData.models.end(), [matches](WorldData current)
-                                                       { return (std::find(matches.begin(), matches.end(), current.fileName) != matches.end()); }),
+        playbackData.models.erase(std::remove_if(playbackData.models.begin(), playbackData.models.end(), [orphanedWorldmodels](WorldData current)
+                                                       { return (std::find(orphanedWorldmodels.begin(), orphanedWorldmodels.end(), current.fileName) != orphanedWorldmodels.end()); }),
                                         playbackData.models.end());
     }
+
+    // remove the marked playbacks
+    if (!orphanedPlaybacks.empty())
+    {
+        playbackData.data.erase(std::remove_if(playbackData.data.begin(), playbackData.data.end(), [orphanedPlaybacks](PlaybackSequence current)
+                                                     { return (std::find(orphanedPlaybacks.begin(), orphanedPlaybacks.end(), current.fileName) != orphanedPlaybacks.end()); }),
+                                      playbackData.data.end());
+    }
+
+    return removedFiles;
 }
 
 bool TIPlaybackProvider::loadWorldModel(TIPlaybackSequences &playbackData, std::string name, std::string path)
