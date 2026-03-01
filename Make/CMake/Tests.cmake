@@ -49,9 +49,9 @@ target_link_libraries(Tests PRIVATE $<$<PLATFORM_ID:Linux>:-lpthread>)
 
 target_link_libraries(Tests PRIVATE Eigen::Eigen)
 target_link_libraries(Tests PRIVATE GameController::GameController)
-target_link_libraries(Tests PRIVATE GTest::GTest)
+# target_link_libraries(Tests PRIVATE GTest::GTest)
 
-target_compile_definitions(Tests PRIVATE TARGET_TOOL GTEST_DONT_DEFINE_FAIL GTEST_DONT_DEFINE_TEST GTEST_HAS_TR1_TUPLE=0)
+target_compile_definitions(Tests PRIVATE TARGET_TOOL)
 
 target_link_libraries(Tests PRIVATE Flags::ForDevelop)
 

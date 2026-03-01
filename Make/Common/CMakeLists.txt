@@ -204,16 +204,17 @@ if(BUILD_DESKTOP)
     endif()
   endif()
 
-  add_library(GTest::GTest STATIC IMPORTED)
-  set_target_properties(GTest::GTest PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${BHUMAN_PREFIX}/Util/gtest/include")
-  if((${PLATFORM} STREQUAL Linux) OR APPLE)
-    set_target_properties(GTest::GTest PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/gtest/lib/${PLATFORM}/libgtest.a")
-  elseif(${PLATFORM} STREQUAL Windows)
-    set_target_properties(GTest::GTest PROPERTIES
-        IMPORTED_CONFIGURATIONS "Debug"
-        IMPORTED_LOCATION_DEBUG "${BHUMAN_PREFIX}/Util/gtest/lib/${PLATFORM}/gtestd.lib"
-        IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/gtest/lib/${PLATFORM}/gtest.lib")
-  endif()
+  # GTest references removed - Util/gtest directory does not exist
+  # add_library(GTest::GTest STATIC IMPORTED)
+  # set_target_properties(GTest::GTest PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${BHUMAN_PREFIX}/Util/gtest/include")
+  # if((${PLATFORM} STREQUAL Linux) OR APPLE)
+  #   set_target_properties(GTest::GTest PROPERTIES IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/gtest/lib/${PLATFORM}/libgtest.a")
+  # elseif(${PLATFORM} STREQUAL Windows)
+  #   set_target_properties(GTest::GTest PROPERTIES
+  #       IMPORTED_CONFIGURATIONS "Debug"
+  #       IMPORTED_LOCATION_DEBUG "${BHUMAN_PREFIX}/Util/gtest/lib/${PLATFORM}/gtestd.lib"
+  #       IMPORTED_LOCATION "${BHUMAN_PREFIX}/Util/gtest/lib/${PLATFORM}/gtest.lib")
+  # endif()
 endif()
 
 set(EIGEN_NAN_INITIALIZATION_CONDITION "$<NOT:$<CONFIG:Release>>")

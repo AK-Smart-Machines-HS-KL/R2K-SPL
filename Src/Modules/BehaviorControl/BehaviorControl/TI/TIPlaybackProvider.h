@@ -118,8 +118,9 @@ public:
     /**
      * @brief This function checks if each worldmodel has a corresponding playback, if not the worldmodel is removed from the representation
      * @param worldModelPlayback The worldModelPlayback aggregates both structures
+     * @return Vector of filenames that were removed due to inconsistency
      */
-    void enforceConsistency(TIPlaybackSequences &worldModelPlayback);
+    std::vector<std::string> enforceConsistency(TIPlaybackSequences &worldModelPlayback);
 
     /**
      * @brief This function loads a worldmodel file

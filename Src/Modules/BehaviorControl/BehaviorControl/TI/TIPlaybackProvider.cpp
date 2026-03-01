@@ -316,6 +316,45 @@ bool TIPlaybackProvider::loadWorldModel(TIPlaybackSequences &playbackData, std::
         if (data.models.empty())
             return false;
 
+        // Validate trigger point data bounds
+        const WorldModel& trigger = data.trigger;
+        
+        // Check gameState and setPlay enums are within valid range (0-5)
+        if (trigger.gameState < 0 || trigger.gameState > 5)
+        {
+            OUTPUT_WARNING(name << ": Invalid gameState " << trigger.gameState << " (must be 0-5)");
+            return false;
+        }
+        if (trigger.setPlay < 0 || trigger.setPlay > 5)
+        {
+            OUTPUT_WARNING(name << ": Invalid setPlay " << trigger.setPlay << " (must be 0-5)");
+            return false;
+        }
+
+        // Check coordinate bounds (SPL field: 9000mm x 6000mm, so ±4500 x ±3000)
+        const float MAX_X = 4500.0f;
+        const float MAX_Y = 3000.0f;
+        const float MAX_R = M_PI;
+        
+        if (std::abs(trigger.robotPose.translation.x()) > MAX_X)
+        {
+            OUTPUT_WARNING(name << ": Robot X coordinate " << trigger.robotPose.translation.x() 
+                          << " exceeds bounds [" << -MAX_X << ", " << MAX_X << "]");
+            return false;
+        }
+        if (std::abs(trigger.robotPose.translation.y()) > MAX_Y)
+        {
+            OUTPUT_WARNING(name << ": Robot Y coordinate " << trigger.robotPose.translation.y() 
+                          << " exceeds bounds [" << -MAX_Y << ", " << MAX_Y << "]");
+            return false;
+        }
+        if (std::abs(trigger.robotPose.rotation) > MAX_R)
+        {
+            OUTPUT_WARNING(name << ": Robot rotation " << trigger.robotPose.rotation 
+                          << " exceeds bounds [" << -MAX_R << ", " << MAX_R << "]");
+            return false;
+        }
+
         // World Track is valid -> store it
         playbackData.models.push_back(data);
     }
