@@ -1,0 +1,134 @@
+# Kamera-Einstellung: Schnell-Referenzkarte zum Ausdrucken
+
+```
+╔════════════════════════════════════════════════════════════════════════╗
+║           KAMERAEINSTELLUNG VOR SPIEL - SCHNELLREFERENZ               ║
+║         zur Vermeidung von Überexposure & besserer Ballerkennung      ║
+╚════════════════════════════════════════════════════════════════════════╝
+
+⚡ SOFORT-FIXES (vor Spiel)
+───────────────────────────────────────────────────────────────────────
+❌ PROBLEM: Bild ist ÜBERBELICHTET (weiß, Linien nicht sichtbar)
+✅ LÖSUNG:
+   1. autoExposureBrightness: 0 → -30 bis -50
+   2. saturation: +10 Punkte (z.B. 80 → 90)
+   3. contrast: +10 Punkte (z.B. 70 → 80)
+   4. NEU LADEN & TESTEN
+
+❌ PROBLEM: Bild ist UNTERBELICHTET (dunkel, Ball invisible)
+✅ LÖSUNG:
+   1. autoExposureBrightness: 0 → +10 bis +30
+   2. saturation: bleiben lassen
+   3. contrast: -5 Punkte
+   4. NEU LADEN & TESTEN
+
+───────────────────────────────────────────────────────────────────────
+
+📍 KONFIGURATIONSDATEI LOCATION:
+   Config/Locations/Default/cameraSettings.cfg
+
+🔧 WICHTIGSTE PARAMETER:
+   • autoExposureBrightness    [-255 bis 255]  ← HAUPTREGLER!
+   • saturation                [0 bis 255]      ← Farben sichtbar
+   • contrast                  [0 bis 255]      ← Linien/Schatten
+   • autoExposure              [true/false]     ← Auto-Modus
+   • exposure / gain           [nur wenn autoExposure=false]
+
+───────────────────────────────────────────────────────────────────────
+
+🌞 LICHTVERHÄLTNIS → EMPFOHLENE EINSTELLUNG:
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ GRELLES LICHT (Sonnenlicht, Spotlights, sehr helle Halle)          │
+├─────────────────────────────────────────────────────────────────────┤
+│ autoExposure = true;                                                 │
+│ autoExposureBrightness = -50;   ← DUNKLERE ZIELHELLIGKEITSWERT!   │
+│ saturation = 100;               ← HÖHERE FARBSÄTTIGUNG             │
+│ contrast = 85;                  ← STARKER KONTRAST                 │
+│ sharpness = 5;                  ← SCHÄRFER                         │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ NORMALES HALLENLICHT (Standard RoboCup Umgebung)                     │
+├─────────────────────────────────────────────────────────────────────┤
+│ autoExposure = true;                                                 │
+│ autoExposureBrightness = -20;   ← LEICHT DUNKLER                   │
+│ saturation = 85;                ← NORMAL                            │
+│ contrast = 70;                  ← NORMAL                            │
+│ sharpness = 4;                  ← NORMAL                            │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ SCHWACHES/GEDIMMTES LICHT (Schule, dunkle Halle)                   │
+├─────────────────────────────────────────────────────────────────────┤
+│ autoExposure = true;                                                 │
+│ autoExposureBrightness = +10;   ← HELLERE ZIELHELLIGKEITSWERT      │
+│ saturation = 80;                ← NORMAL/LEICHT HÖHER              │
+│ contrast = 65;                  ← ETWAS WENIGER                     │
+│ sharpness = 4;                  ← NORMAL                            │
+└─────────────────────────────────────────────────────────────────────┘
+
+───────────────────────────────────────────────────────────────────────
+
+🧪 TESTPROZESS (VOR SPIEL):
+
+  1. Ort erkunden → Lichtverhältnisse beurteilen
+  2. Passende Config auswählen (siehe oben) 
+  3. Datei öffnen: Config/Locations/Default/cameraSettings.cfg
+  4. upper UND lower Sektion anpassen
+  5. Speichern → Robot neu laden / SimRobot neustarten
+  6. Simulator: Debugging → Representations → CameraImage anschauen
+  7. Überexposure? → autoExposureBrightness weiter senken (bis -70 möglich)
+  8. Zu dunkel? → autoExposureBrightness erhöhen
+  9. Farben der Linien korrekt? → saturation/contrast anpassen
+
+───────────────────────────────────────────────────────────────────────
+
+⚙️ MANUELLE MODE (wenn Auto-Belichtung instabil):
+
+  autoExposure = false;
+  exposure = 2500;           # Belichtungszeit reduzieren → weniger hell
+  gain = 150;                # Verstärkung reduzieren → weniger hell
+  saturation = 90;
+  contrast = 75;
+
+───────────────────────────────────────────────────────────────────────
+
+📋 BEIDE KAMERAS GETRENNT ANPASSBAR:
+
+  → Obere Kamera (upper):  Schaut nach oben (Ball hauptsächlich)
+  → Untere Kamera (lower): Schaut nach unten (Feldlinien)
+  
+  Es ist NORMAL, dass beide unterschiedliche Einstellungen brauchen!
+  Untere Kamera braucht oft MEHR Kontrast/Saturation.
+
+───────────────────────────────────────────────────────────────────────
+
+🎯 FINAL-CHECKS VOR SPIEL:
+
+  ☐ Beide Kamera-Bilder angeschaut?
+  ☐ Feldlinien klar erkennbar?
+  ☐ Ball deutlich zu sehen?
+  ☐ Keine "Weiß-Flecken" (Überexposure)?
+  ☐ Ist das Bild zu dunkel?
+  ☐ Farben wirken realistisch?
+  ☐ Config datei gespeichert?
+  ☐ Robot/Simulator neu geladen?
+
+───────────────────────────────────────────────────────────────────────
+
+💡 NOTIZEN ZUM SPIELFELD:
+
+Lichtverhältnis: ___________________
+Obere Kamera autoExposureBrightness: ______
+Untere Kamera autoExposureBrightness: ______
+saturation (upper/lower): _______ / _______
+contrast (upper/lower): _______ / _______
+
+Funktioniert gut? JA ☐  NEIN ☐
+Nachbesserung nötig? _____________________________
+
+═════════════════════════════════════════════════════════════════════════
+Vollständiger Guide: docs/Camera_Adjustment_Guide.md
+═════════════════════════════════════════════════════════════════════════
+```
