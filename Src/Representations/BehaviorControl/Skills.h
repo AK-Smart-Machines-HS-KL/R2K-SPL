@@ -372,6 +372,13 @@ namespace Skills
 
   /**
    * ACTION SKILL
+   * This skill walks toward the ball until reaching it (used by TeachIn sequences).
+   * Continues walking with relative speed until ball distance drops below threshold.
+   */
+  SKILL_INTERFACE(WalkToBall);
+
+  /**
+   * ACTION SKILL
    * This skill walks very carefully to a kick pose and executes a kick there.
    * Specifically made for penalty kicks
    * @param kickPose The pose at which the kick should be executed in robot-relative coordinates

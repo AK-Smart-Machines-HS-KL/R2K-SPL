@@ -47,7 +47,7 @@ SKILL_IMPLEMENTATION(TIExecuteImpl,
   CALLS(WalkAtRelativeSpeed),
   CALLS(GoToBallAndKick),
   CALLS(WalkToPoint),
- 
+  CALLS(WalkToBall),
 });
 
 class TIExecuteImpl : public TIExecuteImplBase
@@ -64,8 +64,7 @@ class TIExecuteImpl : public TIExecuteImplBase
     MAP(PlaybackAction::Skills::WalkAtRelativeSpeed, theWalkAtRelativeSpeedSkill, (action.poseParam));
     MAP(PlaybackAction::Skills::KickAtGoal, theGoToBallAndKickSkill, (0_deg, KickInfo::KickType::forwardFastRight));
  
-    MAP(PlaybackAction::Skills::WalkToBall, theWalkAtRelativeSpeedSkill, (action.poseParam));
-    // theWalkToPointSkill(Pose2f(0.f, 0.f, theFieldBall.intersectionPositionWithOwnYAxis.y()), 1.f, /* rough: */ false, /* disableObstacleAvoidance: */ false, /* disableAligning: */ true);
+    MAP_EXPLICIT(PlaybackAction::Skills::WalkToBall, theWalkToBallSkill, {theWalkToBallSkill();});
     MAP(PlaybackAction::Skills::WalkToPoint, theWalkToPointSkill, (action.poseParam, action.floatParam, true, false, false, true));
    // MAP_DONE(PlaybackAction::Skills::GoToTarget, { return theWalkToTargetSkill.isDone(); });
     //MAP_ABORT(PlaybackAction::Skills::GoToTarget, { return theWalkToTargetSkill.isAborted(); });

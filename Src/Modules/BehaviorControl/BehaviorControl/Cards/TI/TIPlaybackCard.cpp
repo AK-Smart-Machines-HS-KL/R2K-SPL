@@ -107,9 +107,9 @@ class TIPlaybackCard : public TIPlaybackCardBase
 
 	bool postconditions() const override
 	{
-		// Exit the card if no more playback actions have to be done
-		// return !preconditions();
-    return -2 == actionIndex;
+		if(-2 != actionIndex) return false; // keep running while sequence is executing
+		// Sequence done: exit to allow card stack to continue searching for applicable cards
+		return true;
 	}
 
 	void execute() override
@@ -118,16 +118,20 @@ class TIPlaybackCard : public TIPlaybackCardBase
 		theActivitySkill(BehaviorStatus::testingBehavior);
 		// OUTPUT_TEXT("ti started");
 
-    // if (-2 == actionIndex && theFrameInfo.getTimeSince(timeLastRun) > cooldown) actionIndex = -1;
-		// called only one
-		if(!startTime) cardIndex = indexOfBestTeachInScore(theRobotInfo.number); // selects best sequence in playback0001.csv, plaback0002.csv,...
+		// After cooldown: reset from holding-alive state so the sequence can restart (only if trigger still valid)
+		if(actionIndex == -2 && theFrameInfo.getTimeSince(timeLastRun) > cooldown
+		   && teachInScoreReached(theRobotInfo.number))
+			actionIndex = -1;
+
+		// Select best sequence only on fresh start, not when holding alive after completion
+		if(actionIndex == -1) cardIndex = indexOfBestTeachInScore(theRobotInfo.number);
 		ASSERT(-1 != cardIndex); // at least one model must qualify, since teachInScoreReached() is called in pre-cond
 
 		// Figure out which action to play; sets startTime 
 		currentAction =  setNextAction();
 
 		// Playback reached the end (OR no model found, which should not happen) -> stand still
-		if(actionIndex == -1)
+		if(actionIndex < 0)
 		{
 			theLookForwardSkill();
 			theStandSkill();
@@ -150,6 +154,9 @@ class TIPlaybackCard : public TIPlaybackCardBase
 			return {};
 		}
 
+		// Sequence completed and holding alive: don't restart
+		if(actionIndex == -2) return {};
+
 		if(!startTime)
 		// set for first action now
 		{
@@ -158,7 +165,7 @@ class TIPlaybackCard : public TIPlaybackCardBase
 			actionIndex    = 0;
 		}
 		// Replay is finished, nothing more to do.
-		if(-1 == actionIndex) return {};
+		if(actionIndex < 0) return {};
 
 
 		
@@ -175,11 +182,7 @@ class TIPlaybackCard : public TIPlaybackCardBase
 		// check: this next action is out of bounds -> we reached the end
 		if(static_cast<size_t>(actionIndex) >= theTIPlaybackSequences.data[cardIndex].actions.size())
 		{
-			DECLARED_DEBUG_RESPONSE("TIPlaybackCard:sequenceEnd");
-			DEBUG_RESPONSE("TIPlaybackCard:sequenceEnd")
-			{
-				OUTPUT_TEXT("Reached end of playback sequence");
-			}
+			OUTPUT_TEXT("Reached end of playback sequence for robot " << theRobotInfo.number);
 			currentAction = {};
 			actionIndex   = -2;  // set post condition
             timeLastRun = theFrameInfo.time;
