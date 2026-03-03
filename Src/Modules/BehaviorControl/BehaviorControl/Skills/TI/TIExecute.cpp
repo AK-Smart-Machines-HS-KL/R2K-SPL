@@ -10,9 +10,11 @@
 
 #include "Representations/BehaviorControl/Skills.h"
 #include "Representations/BehaviorControl/TI/TIData.h"
+#include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/Infrastructure/FrameInfo.h"
 #include "Tools/Streams/TypeRegistry.h"
 #include <functional>
+#include <cmath>
 
 struct SkillMapping {
   bool mapped = false;
@@ -42,12 +44,14 @@ struct SkillMapping {
 SKILL_IMPLEMENTATION(TIExecuteImpl,
 {,
   IMPLEMENTS(TIExecute),
+  REQUIRES(FieldBall),
   REQUIRES(FrameInfo),
   CALLS(Stand),
   CALLS(WalkAtRelativeSpeed),
   CALLS(GoToBallAndKick),
   CALLS(WalkToPoint),
   CALLS(WalkToBall),
+  CALLS(Dribble),
 });
 
 class TIExecuteImpl : public TIExecuteImplBase
@@ -66,6 +70,25 @@ class TIExecuteImpl : public TIExecuteImplBase
  
     MAP_EXPLICIT(PlaybackAction::Skills::WalkToBall, theWalkToBallSkill, {theWalkToBallSkill();});
     MAP(PlaybackAction::Skills::WalkToPoint, theWalkToPointSkill, (action.poseParam, action.floatParam, true, false, false, true));
+    MAP_EXPLICIT(PlaybackAction::Skills::Dribble, theDribbleSkill, {
+      // Always aim towards the ball for continuous rotation tracking
+      float ballBearing = std::atan2(theFieldBall.endPositionRelative.y(), theFieldBall.endPositionRelative.x());
+      Angle targetDir = Angle(ballBearing);  // Always face the ball
+      
+      // Forward motion: use poseParam X if provided, otherwise 0.3 m/s as default walk speed
+      float forwardSpeed = action.poseParam.translation.x() > 0.f ? action.poseParam.translation.x() : 0.3f;
+      
+      theDribbleSkill(
+        targetDir,  // Always rotate towards ball
+        Pose2f(0.f, forwardSpeed, action.poseParam.translation.y()),  // Walk towards ball with forward speed
+        MotionRequest::ObstacleAvoidance{},  // Default: no obstacle avoidance
+        false,  // alignPrecisely = false: natural smooth movement
+        action.floatParam > 0.f ? action.floatParam : 1.f,  // kickPower from CSV, default 1.0 (full)
+        true,  // preStepAllowed = true
+        true,  // turnKickAllowed = true: can kick while turning
+        Rangea(0_deg, 0_deg)  // directionPrecision: exact direction
+      );
+    });
    // MAP_DONE(PlaybackAction::Skills::GoToTarget, { return theWalkToTargetSkill.isDone(); });
     //MAP_ABORT(PlaybackAction::Skills::GoToTarget, { return theWalkToTargetSkill.isAborted(); });
 

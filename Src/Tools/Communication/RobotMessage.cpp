@@ -138,9 +138,22 @@ void RobotMessage::compile() {
 
   // Sorts ComponenentMetadata by Component priority
   struct PrioritySortPredicate {
-    inline bool operator() (const ComponentMetadata& a, const ComponentMetadata& b)
+    inline bool operator() (const ComponentMetadata& a, const ComponentMetadata& b) const
     {
-      return *a.priority > *b.priority;
+      // Both have valid priorities - compare them (higher priority first)
+      if (a.priority && b.priority) {
+        return *a.priority > *b.priority;
+      }
+      // Only a has priority - a goes first (higher priority sorts before null)
+      if (a.priority && !b.priority) {
+        return true;
+      }
+      // Only b has priority - b goes first
+      if (!a.priority && b.priority) {
+        return false;
+      }
+      // Neither has priority - maintain order (no sorting needed)
+      return false;
     }
   };
 

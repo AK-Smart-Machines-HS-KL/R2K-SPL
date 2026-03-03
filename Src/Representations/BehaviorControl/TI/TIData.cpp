@@ -14,6 +14,7 @@
 #include "Tools/Debugging/Debugging.h"
 #include "Tools/Streams/AutoStreamable.h"
 #include "Tools/Streams/Enum.h"
+#include "Tools/Streams/TypeRegistry.h"
 
 PlaybackSequence::PlaybackSequence(std::string file, bool isRelative) {
     try

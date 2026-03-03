@@ -79,6 +79,21 @@ void TIPlaybackProvider::printLoadedData(TIPlaybackSequences &playbackData)
     OUTPUT_TEXT("TI: Loaded " << static_cast<int>(playbackData.models.size()) << " worldmodels, " 
       << static_cast<int>(playbackData.data.size()) << " playback sequences");
     
+    // Special detailed logging for PENALTY_DRIBBLE sequences
+    for (const PlaybackSequence& data : playbackData.data)
+    {
+        if (data.fileName.find("PENALTY_DRIBBLE") != std::string::npos)
+        {
+            OUTPUT_TEXT("TI: PENALTY_DRIBBLE sequence loaded: " << data.fileName << " (" << static_cast<int>(data.actions.size()) << " actions)");
+            for (size_t i = 0; i < data.actions.size(); ++i)
+            {
+                const PlaybackAction& action = data.actions[i];
+                // Output skill enum value and maxTime
+                OUTPUT_TEXT("  [" << static_cast<int>(i) << "] skill=" << static_cast<int>(action.skill) << " maxTime=" << action.maxTime << "ms");
+            }
+        }
+    }
+    
     // Detailed output only via debug request
     DECLARED_DEBUG_RESPONSE("TIPlaybackProvider:detailed");
     DEBUG_RESPONSE("TIPlaybackProvider:detailed")

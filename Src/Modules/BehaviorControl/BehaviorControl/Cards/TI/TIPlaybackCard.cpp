@@ -66,6 +66,7 @@ CARD(TIPlaybackCard,
 {,
   CALLS(Activity),
   CALLS(LookForward),
+  CALLS(LookActive),
   CALLS(Stand),
   CALLS(TIExecute),
   REQUIRES(FrameInfo),
@@ -133,14 +134,15 @@ class TIPlaybackCard : public TIPlaybackCardBase
 		// Playback reached the end (OR no model found, which should not happen) -> stand still
 		if(actionIndex < 0)
 		{
-			theLookForwardSkill();
-			theStandSkill();
+			theLookForwardSkill();  // Ensure head motion is set when sequence completes
+			theStandSkill();        // Ensure motion request is set
 			return;
 		}
 
-		// TODO: Better Conditions for action Execution
-    if(currentAction.skill != PlaybackAction::Skills::KickAtGoal)
-		  theLookForwardSkill();  // ToDo: this is just a generic action to prevent MEEKs
+		// Execute the current action with active head tracking
+		// TIExecute internally calls appropriate skills that set motionRequest.
+		// Call LookActive to ensure headMotionRequest is always set (required for every cycle).
+		theLookActiveSkill(/* withBall: */ true);
 		theTIExecuteSkill(currentAction);
 	}
 

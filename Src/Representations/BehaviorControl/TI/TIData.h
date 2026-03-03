@@ -79,6 +79,19 @@ const std::string TI_Directory = ((std::string) File::getBHDir()) + "/Config/Tea
  *                   0 = forward kick, π/2 = left kick, -π/2 = right kick
  *    Example: "WalkToBall, 6000, 0.0, , , , , , , "
  * 
+ * 6. Dribble
+ *    Purpose: Dribble the ball in a controlled manner toward a direction
+ *    Parameters used: angleParam1 (dribble direction) ONLY
+ *    maxTime: Duration of dribble (2000-4000ms typical)
+ *    - angleParam1: Direction to dribble in radians (range: -π to +π)
+ *                   0 = forward, π/2 = left, -π/2 = right
+ *    - floatParam: IGNORED - dribble always executes at maximum speed
+ *                  (kept for potential future enhancements, currently unused)
+ *    Example: "Dribble, 3000, 0.785, , , , , , , "
+ *    Note: Dribble always uses full speed regardless of floatParam value.
+ *          Direction is controlled solely by angleParam1.
+ *    Note: Tactical repositioning skill for moving the ball short distances with control
+ * 
  * ============================================================================
  * PARAMETER FORMAT REFERENCE
  * ============================================================================
@@ -279,6 +292,7 @@ STREAMABLE(PlaybackAction,
       WalkToPoint,
       KickAtGoal,
       WalkToBall,
+      Dribble,
     }),
 
   (PlaybackAction::Skills) skill,    // Enum value of Skill to execute
