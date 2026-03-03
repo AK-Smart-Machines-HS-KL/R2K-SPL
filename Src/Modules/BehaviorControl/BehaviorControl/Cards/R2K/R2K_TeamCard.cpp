@@ -39,6 +39,7 @@
 #include "Tools/BehaviorControl/Framework/Card/TeamCard.h"
 
 #include <algorithm>
+#include <cmath>
 #include <vector>
 
 #include "Tools/Math/Geometry.h"
@@ -134,6 +135,16 @@ class R2K_TeamCard : public R2K_TeamCardBase
   // Sentinel distance [mm] used when ball has not been seen recently.
   // Should eventually be replaced by a value read from the field config.
   static constexpr int MAX_FIELD_DISTANCE_MM = 9000;
+
+  // Cell width [mm] used when sorting bots by field-depth (x-axis).
+  // Bots whose x-positions fall in the same cell are ordered by robot number instead of x.
+  // This prevents rank-thrashing for roles that share similar field depth, notably DR (x=-2700)
+  // and DL (x=-2500): their 200 mm x-difference is smaller than this cell, so they always
+  // sort by robot number → stable assignment regardless of approach direction or overshoot.
+  // Must be larger than the maximum x-difference between same-depth tactical positions.
+  // 1000 mm verified: DR(-2700) and DL(-2500) → cell -3; DM(-2000) → cell -2; GN(-4000) → cell -4;
+  // OR(1000) → cell 1; OL(2000) → cell 2. All role-pairs at distinct tactical depths stay separated.
+  static constexpr float X_SORT_CELL_MM = 1000.f;
 
   // lineUp stores the last-known sorted robot numbers (left-to-right on field).
   // Size is TEACH_IN_MARKER_THRESHOLD so that index (robotNumber - 1) is always valid
@@ -550,7 +561,18 @@ private:
 
     BotOnField(int n, float x) : number(n), xPos(x) {}
 
-    bool operator<(const BotOnField& other) const { return xPos < other.xPos; }
+    bool operator<(const BotOnField& other) const
+    {
+      // Primary key: quantised depth cell (floor division → valid strict weak ordering).
+      // Bots within one X_SORT_CELL_MM band compare equal in depth and fall through to the
+      // secondary key, preventing rank-thrashing between roles at similar field depth
+      // (e.g. DR x=-2700 vs DL x=-2500, which are only 200 mm apart).
+      const int myCell    = static_cast<int>(std::floor(xPos       / X_SORT_CELL_MM));
+      const int theirCell = static_cast<int>(std::floor(other.xPos / X_SORT_CELL_MM));
+      if (myCell != theirCell) return myCell < theirCell;
+      // Secondary key: robot number — deterministic, stable tiebreaker.
+      return number < other.number;
+    }
   };
 };
 
