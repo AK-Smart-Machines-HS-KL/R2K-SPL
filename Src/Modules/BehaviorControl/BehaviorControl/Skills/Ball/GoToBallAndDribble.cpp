@@ -39,7 +39,7 @@ class GoToBallAndDribbleImpl : public GoToBallAndDribbleImplBase
 {
   option(GoToBallAndDribble)
   {
-    Pose2f dribblePose(p.targetDirection, theFieldBall.endPositionRelative);
+    Pose2f dribblePose(p.targetDirection, theFieldBall.recentBallEndPositionRelative());
 
     theRecordTargetAndSpeedSkill(dribblePose.translation, 1.f);
     theGoToBallHeadControlSkill(dribblePose.translation.norm());
