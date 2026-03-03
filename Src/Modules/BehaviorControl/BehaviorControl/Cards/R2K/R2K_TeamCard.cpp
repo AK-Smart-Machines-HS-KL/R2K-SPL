@@ -528,8 +528,13 @@ private:
     auto minDist = 0;
     auto buddyDist = 9000;
 
+    // TeamBall fallback mechanism
+    bool useTeamBall = (theFieldBall.timeSinceBallWasSeen > decayPlaysTheBall && 
+                        theFieldBall.timeSinceTeamBallWasValid < decayPlaysTheBall);
+    bool ballSeen = theFieldBall.ballWasSeen(decayPlaysTheBall);
+    bool useBall = ballSeen || useTeamBall;
    
-    if (theFieldBall.ballWasSeen(decayPlaysTheBall))  // to be on the safe side
+    if (useBall)  // to be on the safe side
       // dist = (int)Geometry::distance(theFieldBall.endPositionRelative, Vector2f(0, 0));
       dist = (int)Geometry::distance(theFieldBall.teamPositionOnField, theRobotPose.translation);  // see line 573
     // if (theRobotInfo.number == 2) OUTPUT_TEXT("dist:" << dist);
@@ -553,7 +558,10 @@ private:
       */
       // compute and compare my buddies distance with minimal distance
       if(!buddy.isPenalized)
-        minDist = std::min(minDist, buddyDist = (int) Geometry::distance(theFieldBall.teamPositionOnField, buddy.theRobotPose.translation)); // see line 573
+      {
+        buddyDist = (int) Geometry::distance(theFieldBall.teamPositionOnField, buddy.theRobotPose.translation); // see line 573
+        minDist = std::min(minDist, buddyDist);
+      }
     } // rof: scan team
    
     // if (theRobotInfo.number == 2)OUTPUT_TEXT("min dist:" << minDist);
