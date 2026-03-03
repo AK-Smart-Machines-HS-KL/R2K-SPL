@@ -52,6 +52,7 @@
  */
 
 #include "Representations/BehaviorControl/Skills.h"
+#include "Representations/BehaviorControl/FieldBall.h"
 #include "Representations/BehaviorControl/TI/TIPlaybackData.h"
 #include "Representations/Configuration/GlobalOptions.h" 
 #include "Representations/Communication/GameInfo.h"
@@ -74,6 +75,7 @@ CARD(TIPlaybackCard,
   REQUIRES(GameInfo),
 	REQUIRES(RobotInfo),
 	REQUIRES(RobotPose),
+  REQUIRES(FieldBall),
   REQUIRES(TIPlaybackSequences),
 
     DEFINES_PARAMETERS(
@@ -88,11 +90,14 @@ CARD(TIPlaybackCard,
            (unsigned int)(0) timeLastRun,
            (unsigned int)(15000) cooldown,  // waiting time, until next playback will be executed
            (unsigned int)(500) min_distance, // radial distance bot from trigger point
+           (int)(0) dynamicMaxTime,          // computed max time for current action (overrides CSV value for movement skills)
+           (int)(-1) triggerSetPlay,         // setPlay value captured when sequence started — used to detect game-state change
+           (int)(-1) triggerGameState,       // gameState value captured when sequence started — used to detect game-state change
     }),
 });
 
 
-// TODO: mapping of isDone()
+// TODO: mapping of head movements
 class TIPlaybackCard : public TIPlaybackCardBase
 {
 	bool preconditions() const override
@@ -139,10 +144,14 @@ class TIPlaybackCard : public TIPlaybackCardBase
 			return;
 		}
 
-		// Execute the current action with active head tracking
-		// TIExecute internally calls appropriate skills that set motionRequest.
-		// Call LookActive to ensure headMotionRequest is always set (required for every cycle).
-		theLookActiveSkill(/* withBall: */ true);
+		// Execute the current action with active head tracking.
+		// GoToBallAndDribble (Dribble) and GoToBallAndKick (KickAtGoal) manage head control
+		// internally via GoToBallHeadControl → LookActive. Calling LookActive here too would
+		// trigger a "headMotionRequest set more than once" Meeek error for those skills.
+		const bool skillHandlesHead = (currentAction.skill == PlaybackAction::Skills::Dribble ||
+		                               currentAction.skill == PlaybackAction::Skills::KickAtGoal);
+		if(!skillHandlesHead)
+			theLookActiveSkill(/* withBall: */ true);
 		theTIExecuteSkill(currentAction);
 	}
 
@@ -171,10 +180,11 @@ class TIPlaybackCard : public TIPlaybackCardBase
 
 
 		
-		// Switch to next action if maxTime was exceeded OR skillIsDone
-		// OUTPUT_TEXT("start" << startTime << " state " << state_time);
-
-		if(((state_time - startTime) > currentAction.maxTime) ) // || theTIExecuteSkill.isDone())
+		// Switch to next action if dynamicMaxTime was exceeded OR robot reached target.
+		// dynamicMaxTime is computed per-action from distance; movementTargetReached() checks proximity.
+		const bool timeExceeded = (state_time - startTime) > dynamicMaxTime;
+		const bool skillDone    = movementTargetReached(currentAction);
+		if(timeExceeded || skillDone)
 		{
 			actionIndex++;
 			action_changed = true; // flag for one-time setups below
@@ -184,7 +194,7 @@ class TIPlaybackCard : public TIPlaybackCardBase
 		// check: this next action is out of bounds -> we reached the end
 		if(static_cast<size_t>(actionIndex) >= theTIPlaybackSequences.data[cardIndex].actions.size())
 		{
-			OUTPUT_TEXT("Reached end of playback sequence for robot " << theRobotInfo.number);
+			OUTPUT_TEXT("TI: Playback done — robot " << theRobotInfo.number << ", sequence: " << theTIPlaybackSequences.data[cardIndex].fileName);
 			currentAction = {};
 			actionIndex   = -2;  // set post condition
             timeLastRun = theFrameInfo.time;
@@ -196,20 +206,65 @@ class TIPlaybackCard : public TIPlaybackCardBase
 		currentAction = theTIPlaybackSequences.data[cardIndex].actions[actionIndex];
 		if(action_changed)  // do setups for the new action
 		{
-			action_changed = false;
-			startTime      = state_time;
-			// OUTPUT_TEXT("Action: " + std::to_string(actionIndex));
-			// OUTPUT_TEXT("playback000" << cardIndex + 1 << " action Index and Name: " << actionIndex << " " << TypeRegistry::getEnumName(theTIPlaybackSequences.data[cardIndex].actions[actionIndex].skill));
-			// OUTPUT_TEXT("remaining time" << diff);
-
-
-			// obsolete code
-			// prepare check for isDone(): set exit criterion
-			// destPos = theRobotPose * theTIPlaybackSequences.data[cardIndex].actions[actionIndex].poseParam;
+			action_changed  = false;
+			startTime       = state_time;
+			dynamicMaxTime  = computeDynamicMaxTime(currentAction);
 		}
     return currentAction;
 	}
 
+  /**
+   * @brief Compute a per-action time budget from current distance to target.
+   *
+   * For movement-to-target skills (WalkToPoint, WalkToBall) the CSV maxTime is
+   * discarded in favour of: estimated_travel_time + buffer.
+   * All other skills keep their CSV maxTime unchanged.
+   *
+   * walkSpeed: conservative SPL walk speed (mm/s) used for the travel estimate.
+   * buffer:    extra time (ms) added on top of the travel estimate.
+   * minimum:   floor (ms) so the skill always gets at least one motion cycle.
+   */
+  int computeDynamicMaxTime(const PlaybackAction& pa) const
+  {
+    constexpr float walkSpeed = 160.f;  // mm/s – conservative; accounts for turning, acceleration, obstacle avoidance
+    constexpr int   buffer    = 5000;   // ms
+    constexpr int   minimum   = 1000;   // ms
+
+    float dist = 0.f;
+    switch(pa.skill)
+    {
+      case PlaybackAction::Skills::WalkToPoint:
+        dist = (theRobotPose.translation - pa.poseParam.translation).norm();
+        break;
+      case PlaybackAction::Skills::WalkToBall:
+        // Ball is a moving target: use current relative distance as an educated guess
+        dist = theFieldBall.endPositionRelative.norm();
+        break;
+      default:
+        return pa.maxTime;  // non-movement skill: keep CSV value
+    }
+    return std::max(minimum, static_cast<int>(dist / walkSpeed * 1000.f) + buffer);
+  }
+
+  /**
+   * @brief True when the robot has reached the action's target within 200 mm.
+   *
+   * Only meaningful for movement-to-target skills.
+   * Returns false for all other skills so their maxTime drives the transition.
+   */
+  bool movementTargetReached(const PlaybackAction& pa) const
+  {
+    constexpr float threshold = 200.f;  // mm
+    switch(pa.skill)
+    {
+      case PlaybackAction::Skills::WalkToPoint:
+        return (theRobotPose.translation - pa.poseParam.translation).norm() <= threshold;
+      case PlaybackAction::Skills::WalkToBall:
+        return theFieldBall.endPositionRelative.norm() <= threshold;
+      default:
+        return false;
+    }
+  }
 
   bool thisIsATriggerPoint(const WorldModel& model) const
 
@@ -282,9 +337,24 @@ class TIPlaybackCard : public TIPlaybackCardBase
     else
     {
       ASSERT(current_bestWorldModelIndex >= 0);  // there must be at least one trigger point, because teachInScoreReached() was true in the pre-condition
+      return -1;
     }
 
-    return current_bestWorldModelIndex;
+    // Translate models[] index → data[] index by name-matching.
+    // models[] and data[] are loaded independently and may differ in order
+    // (e.g. due to orphan removal in enforceConsistency). Using a positional
+    // index from models[] directly into data[] causes the wrong playback to run.
+    std::string playbackName = theTIPlaybackSequences.models[current_bestWorldModelIndex].fileName;
+    size_t rpos = playbackName.rfind("worldmodel");
+    if (rpos != std::string::npos)
+      playbackName.replace(rpos, 10, "playback");
+    for (int i = 0; i < static_cast<int>(theTIPlaybackSequences.data.size()); i++)
+    {
+      if (theTIPlaybackSequences.data[i].fileName == playbackName)
+        return i;
+    }
+    OUTPUT_ERROR("TI: No matching playback for triggered worldmodel: " << theTIPlaybackSequences.models[current_bestWorldModelIndex].fileName);
+    return -1;
   };
 
 };
