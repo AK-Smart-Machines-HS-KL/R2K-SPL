@@ -45,13 +45,14 @@ const std::string TI_Directory = ((std::string) File::getBHDir()) + "/Config/Tea
  *    Example: "Stand, 100, , , , , , , , "
  * 
  * 2. WalkAtRelativeSpeed
- *    Purpose: Walk at a given relative speed (forward/backward/sideways)
- *    Parameters used: floatParam (speed), angleParam1 (direction)
+ *    Purpose: Walk at a given relative speed (forward/backward/sideways/rotation)
+ *    Parameters used: poseParam (all three speed components)
  *    maxTime: Duration of walk (1000-5000ms typical)
- *    - floatParam: Speed in mm/s (range: -500 to +500, negative = backward)
- *    - angleParam1: Walk direction in radians (range: -π to +π)
- *                   0 = forward, π/2 = left, -π/2 = right
- *    Example: "WalkAtRelativeSpeed, 2000, 1.57, , , , 250.0, , , "
+ *    - poseParam.x: Forward/backward speed (range: -1.0 to +1.0, negative = backward)
+ *    - poseParam.y: Lateral speed (range: -1.0 to +1.0, negative = right)
+ *    - poseParam.rotation: Rotation speed (range: -1.0 to +1.0)
+ *    Note: All components are normalized fractions of max speed (recorded automatically).
+ *    Example: "WalkAtRelativeSpeed, 2000, , , 1.0|0.0|0.0, , , , , "
  * 
  * 3. WalkToPoint
  *    Purpose: Walk to a specific point on the field relative to robot pose
@@ -64,12 +65,15 @@ const std::string TI_Directory = ((std::string) File::getBHDir()) + "/Config/Tea
  *    Note: Format in CSV is "x|y|rotation"
  * 
  * 4. KickAtGoal
- *    Purpose: Kick the ball toward the opponent goal
- *    Parameters used: floatParam (kick power/strength)
- *    maxTime: Duration of kick execution (500-1500ms typical)
- *    - floatParam: Kick power percentage (range: 0.0 to 1.0, where 1.0 = full power)
- *                  Recommended: 0.5-0.8 for reliable kicks, <0.2 for gentle kicks
- *    Example: "KickAtGoal, 800, , , , , 0.7, , , "
+ *    Purpose: Kick the ball toward a field-absolute target position
+ *    Parameters used: poseParam (kick target in field coordinates), boolParam (foot selection)
+ *    maxTime: Safety cap in ms (sequence ends via game-state abort when kick lands; 15000 typical)
+ *    - poseParam.translation.x(): Field-absolute target X in mm  (e.g. 0 = center)
+ *    - poseParam.translation.y(): Field-absolute target Y in mm  (e.g. 0 = center)
+ *    - boolParam: Foot selection — true = left foot, false = right foot
+ *    Note: The bearing to the target is computed dynamically from theRobotPose each frame,
+ *          so the kick direction is always correct regardless of the robot's current heading.
+ *    Example (kick to center): "KickAtGoal, 15000, , , 0, 0, , , , , 1, , "
  * 
  * 5. WalkToBall
  *    Purpose: Walk to the ball and align for kicking
@@ -80,17 +84,14 @@ const std::string TI_Directory = ((std::string) File::getBHDir()) + "/Config/Tea
  *    Example: "WalkToBall, 6000, 0.0, , , , , , , "
  * 
  * 6. Dribble
- *    Purpose: Dribble the ball in a controlled manner toward a direction
- *    Parameters used: angleParam1 (dribble direction) ONLY
- *    maxTime: Duration of dribble (2000-4000ms typical)
+ *    Purpose: Navigate to ball and dribble it in a controlled direction (uses GoToBallAndDribble)
+ *    Parameters used: angleParam1 (dribble direction), floatParam (kick power)
+ *    maxTime: Duration of dribble (2000-8000ms typical)
  *    - angleParam1: Direction to dribble in radians (range: -π to +π)
  *                   0 = forward, π/2 = left, -π/2 = right
- *    - floatParam: IGNORED - dribble always executes at maximum speed
- *                  (kept for potential future enhancements, currently unused)
- *    Example: "Dribble, 3000, 0.785, , , , , , , "
- *    Note: Dribble always uses full speed regardless of floatParam value.
- *          Direction is controlled solely by angleParam1.
- *    Note: Tactical repositioning skill for moving the ball short distances with control
+ *    - floatParam: Kick power (range: 0.0 to 1.0; defaults to 1.0 if unset/zero)
+ *    Example: "Dribble, 8000, 0.785, , , , , 0.5, , "
+ *    Note: Navigates to the ball automatically before dribbling. poseParam is ignored.
  * 
  * ============================================================================
  * PARAMETER FORMAT REFERENCE
@@ -103,9 +104,10 @@ const std::string TI_Directory = ((std::string) File::getBHDir()) + "/Config/Tea
  * 
  * Pose Parameter (poseParam):
  *   - Format in CSV: "x|y|rotation" (pipe-separated)
- *   - x, y: Position in millimeters (range: ±10000 typical)
- *   - rotation: Angle in radians (range: -π to +π)
- *   - Example: "1500.0|500.0|0.0" means position (1500mm, 500mm) facing forward
+ *   - For WalkToPoint: x, y = position in mm; rotation = heading in radians
+ *   - For WalkAtRelativeSpeed/Dribble: x, y = normalized speed fractions (-1.0 to +1.0)
+ *   - Example (position): "1500.0|500.0|0.0" = position (1500mm, 500mm) facing forward
+ *   - Example (speed):    "1.0|0.0|0.0"      = full forward speed, no lateral/rotation
  * 
  * Vector3 Parameter (vector3Param):
  *   - Format in CSV: "x|y|z" (pipe-separated)
