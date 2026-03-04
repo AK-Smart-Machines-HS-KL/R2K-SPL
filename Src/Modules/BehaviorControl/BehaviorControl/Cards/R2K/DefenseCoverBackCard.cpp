@@ -1,30 +1,25 @@
 /**
  * @file DefenseCoverBackCard.cpp
- * @author Niklas Schmidts, Adrian Müller   
- * @brief Allows Offenseplayer to chase the Ball and kick to goal
- * @version 1.2
+ * @author Niklas Schmidts, Adrian Müller
+ * @brief Defender covers the angle to own goal by positioning between ball and goal.
+ * @version 1.4
  * @date 2023-01-06
- * 
- * Functions, values, side effects: 
- * OffensePlayer tries to catch the ball (ie ´walks in this direction) if
- * - ball is nearer to opponent goal as his x postion (minus threshold)
- * - player is in range from middle line - threshold, or closer to opp. goal
- * - ignores thePlayerRole.playsTheBall()
- * 
- * 
- * Details
- * if bot is closest to ball (playsTheBall()) card ShootAtGoalCard will take over
- * * 
- * 
- * v1.1. avoid that our  offense bots struggle for ball. loop over buddies -> 
- *      if BehaviorStatus::DefenseCoverBackCard or clearOwnHalfCard or clearOwnHalfCardGoalie exit this card
- * 
- * v.1.2 card now checks wether there is an passing event active (OffenseForwardPassCard, OffenseReceivePassCard)
- * v 1.3: (Asrar) "theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)"
-          this is for online and offline role assignment
-    
- * - Check: GoalShot has higher priority and takes over close to opp.goal
- * v 1.3 DEFENSE only x < 0 - threshold
+ *
+ * Behaviour:
+ *   Activates for any robot with a DEFENSE tactical role when no teammate is already
+ *   chasing/clearing the ball.  The robot positions itself 600 mm ahead of the ball
+ *   on the ball-to-own-goal axis, facing the ball.  This blocks the direct shot angle.
+ *
+ * v1.1  Avoid two defenders fighting over the ball: exit if any buddy is already
+ *       DefenseChaseBallCard / ClearOwnHalfCard / blocking.
+ * v1.2  Quit if a passing event (OffenseForwardPassCard / OffenseReceivePassCard) is active.
+ * v1.3  (Asrar) Use TeammateRoles::playsTheBall() for both wifi-on and wifi-off.
+ *       Restrict activation to own half (x < 0 - threshold).
+ * v1.4  Replaced WalkAtRelativeSpeed near-range branch with WalkToPoint for all distances.
+ *       Side-stepping was physically much slower than a pivot-and-walk on the NAO; the
+ *       previous close-range path caused "lame side-step" interception behaviour.
+ *       Removed unused CALLS (GoToBallAndDribble, LookForward, WalkAtRelativeSpeed),
+ *       unused walkSpeed parameter, and dead helper methods.
  */
 
 // Skills - Must be included BEFORE Card Base
@@ -46,16 +41,12 @@
 #include "Representations/Communication/TeamCommStatus.h"
 
 
-
 CARD(DefenseCoverBackCard,
      {
         ,
         CALLS(Activity),
-        CALLS(LookForward),
-        CALLS(GoToBallAndDribble),
-        CALLS(WalkToPoint),
-        CALLS(WalkAtRelativeSpeed),
         CALLS(LookAtBall),
+        CALLS(WalkToPoint),
         CALLS(Stand),
         USES(GameInfo),
         REQUIRES(ObstacleModel),
@@ -64,16 +55,20 @@ CARD(DefenseCoverBackCard,
         REQUIRES(RobotInfo),
         REQUIRES(FieldBall),
         REQUIRES(FieldDimensions),
-        REQUIRES(TeamData),   // check behavior
+        REQUIRES(TeamData),
         REQUIRES(TeammateRoles),
-        REQUIRES(TeamCommStatus),  // wifi on off?
+        REQUIRES(TeamCommStatus),
 
         DEFINES_PARAMETERS(
              {,
-                //Define Params here
-                (float)(0.8f) walkSpeed,
                 (int)(5000) ballNotSeenTimeout,
-                (int)(1000) threshold,
+                // Offset [mm] from the ball toward own goal where the defender aims to stand.
+                // Large enough to not interfere with a chasing teammate, small enough to be
+                // a meaningful obstacle for an opponent shot.
+                (float)(600.f) blockingOffset,
+                // Distance tolerance [mm] below which the robot considers itself arrived.
+                // Matches PositionTolerance in defaultPoseProvider.cfg (250 mm).
+                (float)(250.f) arrivalTolerance,
              }),
 
      });
@@ -82,21 +77,16 @@ class DefenseCoverBackCard : public DefenseCoverBackCardBase
 {
 
   bool preconditions() const override
-  {  
-    //Abfragen Spielerposition
-   
-    //Vergleich ob die Spielerposition in der Opponentside liegt
-    //mit einem threshold damit Stürmer noch teils ins eigene Feld darf
+  {
     Vector2f ownGoal = Vector2f(theFieldDimensions.xPosOwnGroundLine, 0);
     float distToGoal = (ownGoal - theFieldBall.positionOnField).norm();
 
     return
-      theFieldBall.ballWasSeen()&&
-      distToGoal > 1000 &&
-      theGameInfo.setPlay == SET_PLAY_NONE &&
-      !aBuddyIsChasingOrClearing() &&
-      theTeammateRoles.isTacticalDefense(theRobotInfo.number); // my recent role
-      
+      theFieldBall.ballWasSeen()                                        &&
+      distToGoal > 1000                                                 &&
+      theGameInfo.setPlay == SET_PLAY_NONE                              &&
+      !aBuddyIsChasingOrClearing()                                      &&
+      theTeammateRoles.isTacticalDefense(theRobotInfo.number);
   }
 
   bool postconditions() const override
@@ -104,53 +94,45 @@ class DefenseCoverBackCard : public DefenseCoverBackCardBase
     return !preconditions();
   }
 
-  void execute() override {
-    Vector2f ownGoal = theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOwnGroundLine, 0));
-
-    Vector2f ballToGoal = ownGoal - theFieldBall.positionRelative;
-    Vector2f ballToGoalDirection = ballToGoal.normalized();
-
-    Pose2f target = Pose2f(theFieldBall.positionRelative.angle(), theFieldBall.positionRelative + ballToGoalDirection * 600);
+  void execute() override
+  {
+    // Target: blockingOffset mm from ball toward own goal, facing the ball
+    Vector2f ownGoalRel   = theRobotPose.toRelative(Vector2f(theFieldDimensions.xPosOwnGroundLine, 0));
+    Vector2f ballToGoal   = ownGoalRel - theFieldBall.positionRelative;
+    Vector2f blockDir     = ballToGoal.normalized();
+    Pose2f   target       = Pose2f(theFieldBall.positionRelative.angle(),
+                                   theFieldBall.positionRelative + blockDir * blockingOffset);
 
     theActivitySkill(BehaviorStatus::blocking);
     theLookAtBallSkill();
-    
-    if (target.translation.norm() > 600) {  // I am far
-      theWalkToPointSkill(target); 
-    } else if(target.translation.norm() > 100 || target.rotation > 10_deg) {    // I am close
-      Pose2f normedTargetDirection = Pose2f(std::clamp((float) target.rotation, -1.0f, 1.0f) , target.translation.normalized());
-      theWalkAtRelativeSpeedSkill(normedTargetDirection);
-    } else { // I have arrived
+
+    if (target.translation.norm() > arrivalTolerance || std::abs(target.rotation) > 10_deg)
+    {
+      // WalkToPoint pivots then walks forward regardless of direction — much faster than
+      // the previous WalkAtRelativeSpeed path which produced pure lateral side-stepping.
+      theWalkToPointSkill(target);
+    }
+    else
+    {
       theStandSkill();
     }
-
   }
 
-    Angle calcAngleToGoal() const
+  bool aBuddyIsChasingOrClearing() const
   {
-    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
-  }
-
-    Angle calcAngleToBall() const
-  {
-    return (theRobotPose.inversePose * Vector2f(theFieldBall.endPositionOnField.x(), theFieldBall.endPositionOnField.y())).angle();
-  }
-
-    bool aBuddyIsChasingOrClearing() const
+    for (const auto& buddy : theTeamData.teammates)
     {
-      for (const auto& buddy : theTeamData.teammates) 
-      {
-        if (buddy.theBehaviorStatus.activity == BehaviorStatus::defenseChaseBallCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::blocking ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
+      if (buddy.theBehaviorStatus.activity == BehaviorStatus::defenseChaseBallCard  ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::ballContestCard        ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::blocking               ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard       ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
-          buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard 
-          )
-          return true;
-      }
-      return false;
+          buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard    ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::goalieLongShotCard)
+        return true;
     }
+    return false;
+  }
 };
 
 MAKE_CARD(DefenseCoverBackCard);
