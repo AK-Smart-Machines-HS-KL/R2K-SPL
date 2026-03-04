@@ -86,7 +86,7 @@ class GoToBallAndDribbleImpl : public GoToBallAndDribbleImplBase
         dribbleDirection = p.targetDirection - avoidanceAngle;
     }
 
-    Pose2f dribblePose(dribbleDirection, theFieldBall.endPositionRelative);
+    Pose2f dribblePose(dribbleDirection, theFieldBall.recentBallEndPositionRelative());
 
     theRecordTargetAndSpeedSkill(dribblePose.translation, 1.f);
     theGoToBallHeadControlSkill(dribblePose.translation.norm());
