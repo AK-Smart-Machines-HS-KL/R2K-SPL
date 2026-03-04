@@ -38,7 +38,8 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanCompressedMessageParticle<Behavior
     // R2K stuff
     searchingForBall,
     blocking,
-    defenseChaseBallCard,      
+    defenseChaseBallCard,
+    ballContestCard,
     offenseChaseBallCard,      
     clearOwnHalfCard,  
     clearOwnHalfCardGoalie,
