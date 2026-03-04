@@ -150,6 +150,7 @@ class OffenseChaseBallCard : public OffenseChaseBallCardBase
       for (const auto& buddy : theTeamData.teammates) 
       {
         if (buddy.theBehaviorStatus.activity == BehaviorStatus::offenseChaseBallCard ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::ballContestCard ||
           //buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
           //buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
           //buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||

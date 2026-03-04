@@ -147,6 +147,7 @@ class DefenseChaseBallCard : public DefenseChaseBallCardBase
       for (const auto& buddy : theTeamData.teammates) 
       {
         if (buddy.theBehaviorStatus.activity == BehaviorStatus::blocking ||
+          buddy.theBehaviorStatus.activity == BehaviorStatus::ballContestCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCard ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::clearOwnHalfCardGoalie ||
           buddy.theBehaviorStatus.activity == BehaviorStatus::defenseLongShotCard ||
