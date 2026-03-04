@@ -12,6 +12,7 @@
 #include "Representations/Configuration/BallSpecification.h"
 #include "Representations/Configuration/KickInfo.h"
 #include "Representations/Configuration/RobotDimensions.h"
+#include "Representations/Infrastructure/FrameInfo.h"
 #include "Representations/MotionControl/DribbleGenerator.h"
 #include "Representations/MotionControl/MotionInfo.h"
 #include "Representations/MotionControl/OdometryData.h"
@@ -26,6 +27,7 @@
 MODULE(DribbleEngine,
 {,
   REQUIRES(BallSpecification),
+  REQUIRES(FrameInfo),
   USES(MotionInfo),
   USES(OdometryData),
   REQUIRES(KickInfo),
