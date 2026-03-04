@@ -352,17 +352,8 @@ void SelfLocator::sensorUpdate()
         int numberOfLinesForValidityComputation = thePerceptRegistration.totalNumberOfAvailableLines - thePerceptRegistration.totalNumberOfIgnoredLines;
         if(numberOfLinesForValidityComputation > 0)
         {
-                    // Apply side constraint penalty: reduce validity of particles on wrong side
-          float lineValidityFactor = validityFactorLineMeasurement;
-          if(samplePose.translation.x() > theSideInformation.largestXCoordinatePossible && 
-             theSideInformation.largestXCoordinatePossible < theFieldDimensions.xPosOpponentFieldBorder)
-          {
-            // Particle is on wrong side of field: penalize its line measurements
-            // Only penalize if the side constraint is actively limiting the robot (not in unrestricted scenarios like penalty shootout)
-            lineValidityFactor *= sideConstraintLineMeasurementPenalty;
-          }
-          numerator += lineValidityFactor * static_cast<float>(lines.size()) / numberOfLinesForValidityComputation;
-          denominator += lineValidityFactor;
+          numerator += validityFactorLineMeasurement * static_cast<float>(lines.size()) / numberOfLinesForValidityComputation;
+          denominator += validityFactorLineMeasurement;
         }
       }
     }
@@ -889,19 +880,9 @@ bool SelfLocator::isMirrorCloser(const Pose2f& currentPose, const Pose2f& lastPo
   Vector2f opponentGoal(theFieldDimensions.xPosOpponentGoalPost, 0.f);
   const Vector2f rotation = Pose2f(Geometry::angleTo(currentPose, opponentGoal)) * rotationWeight;
   const Vector2f lastRotation = Pose2f(Geometry::angleTo(lastPose, opponentGoal)) * rotationWeight;
-    const float normalDistance = (lastPose.translation - translation).norm() + (lastRotation - rotation).norm();
-  const float mirrorDistance = (lastPose.translation + translation).norm() + (lastRotation + rotation).norm();
-
-  // Post-getup safety: Prevent sudden field flips after unsafe motions (getup, falling, etc.)
-  // Only flip sides if the mirrored pose is SIGNIFICANTLY better than the normal pose
-  if(theFrameInfo.getTimeSince(lastTimeNotInStandWalkKick) < postGetupSideFlipPreventionTimeout)
-  {
-    // Mirror must be noticeably better (by a factor) to override the prevention window
-    return mirrorDistance < normalDistance * postGetupSideFlipMinimumThreshold;
-  }
-
-  // Normal case: flip if mirrored pose is closer to last pose
-  return normalDistance > mirrorDistance;
+  bool result = (lastPose.translation - translation).norm() + (lastRotation - rotation).norm() >
+                (lastPose.translation + translation).norm() + (lastRotation + rotation).norm();
+  return result;
 }
 
 MAKE_MODULE(SelfLocator, modeling);

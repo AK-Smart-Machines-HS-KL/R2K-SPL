@@ -48,8 +48,7 @@ class GoToBallAndKickImpl : public GoToBallAndKickImplBase
 {
   option(GoToBallAndKick)
   {
-    const Vector2f ballPosition = theFieldBall.recentBallEndPositionRelative();
-    const Pose2f kickPose = Pose2f(p.targetDirection, ballPosition).rotate(theKickInfo[p.kickType].rotationOffset).translate(theKickInfo[p.kickType].ballOffset);
+    const Pose2f kickPose = Pose2f(p.targetDirection, theFieldBall.endPositionRelative).rotate(theKickInfo[p.kickType].rotationOffset).translate(theKickInfo[p.kickType].ballOffset);
 
     theRecordTargetAndSpeedSkill(kickPose.translation, 1.f);
 
@@ -78,7 +77,7 @@ class GoToBallAndKickImpl : public GoToBallAndKickImplBase
         const float kickPower = kickLengthToPower(p.kickType, p.length, p.targetDirection);
         auto obstacleAvoidance = thePathPlanner.plan(theRobotPose * kickPose, p.speed);
         theGoToBallHeadControlSkill(kickPose.translation.norm(), /* lookAtKickTarget: */ true,
-                                    /* kickTargetRelative: */ ballPosition + Vector2f(theKickInfo[p.kickType].range.max, 0.f).rotated(p.targetDirection));
+                                    /* kickTargetRelative: */ theFieldBall.endPositionRelative + Vector2f(theKickInfo[p.kickType].range.max, 0.f).rotated(p.targetDirection));
         theWalkToBallAndKickSkill(p.targetDirection, p.kickType, p.alignPrecisely, kickPower, p.speed, obstacleAvoidance, p.preStepAllowed, p.turnKickAllowed, p.directionPrecision);
       }
     }
@@ -108,7 +107,7 @@ class GoToBallAndKickImpl : public GoToBallAndKickImplBase
         const float kickPower = kickLengthToPower(p.kickType, p.length, p.targetDirection);
         auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(kickPose, /* rough: */ true, /* disableObstacleAvoidance: */ false);
         theGoToBallHeadControlSkill(kickPose.translation.norm(), /* lookAtKickTarget: */ true,
-                                    /* kickTargetRelative: */ ballPosition + Vector2f(theKickInfo[p.kickType].range.max, 0.f).rotated(p.targetDirection));
+                                    /* kickTargetRelative: */ theFieldBall.endPositionRelative + Vector2f(theKickInfo[p.kickType].range.max, 0.f).rotated(p.targetDirection));
         theWalkToBallAndKickSkill(p.targetDirection, p.kickType, p.alignPrecisely, kickPower, p.speed, obstacleAvoidance, p.preStepAllowed, p.turnKickAllowed, p.directionPrecision);
       }
     }
@@ -138,7 +137,7 @@ class GoToBallAndKickImpl : public GoToBallAndKickImplBase
         const float kickPower = kickLengthToPower(p.kickType, p.length, p.targetDirection);
         auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(kickPose, /* rough: */ true, /* disableObstacleAvoidance: */ true);
         theGoToBallHeadControlSkill(kickPose.translation.norm(), /* lookAtKickTarget: */ true,
-                                    /* kickTargetRelative: */ ballPosition + Vector2f(theKickInfo[p.kickType].range.max, 0.f).rotated(p.targetDirection));
+                                    /* kickTargetRelative: */ theFieldBall.endPositionRelative + Vector2f(theKickInfo[p.kickType].range.max, 0.f).rotated(p.targetDirection));
         theWalkToBallAndKickSkill(p.targetDirection, p.kickType, p.alignPrecisely, kickPower, p.speed, obstacleAvoidance, p.preStepAllowed, p.turnKickAllowed, p.directionPrecision);
       }
     }
@@ -182,7 +181,7 @@ class GoToBallAndKickImpl : public GoToBallAndKickImplBase
         const float kickPower = kickLengthToPower(p.kickType, p.length, p.targetDirection);
         auto obstacleAvoidance = theLibWalk.calcObstacleAvoidance(kickPose, /* rough: */ true, /* disableObstacleAvoidance: */ true);
         theGoToBallHeadControlSkill(kickPose.translation.norm(), /* lookAtKickTarget: */ true,
-                                    /* kickTargetRelative: */ ballPosition + Vector2f(theKickInfo[p.kickType].range.max, 0.f).rotated(p.targetDirection));
+                                    /* kickTargetRelative: */ theFieldBall.endPositionRelative + Vector2f(theKickInfo[p.kickType].range.max, 0.f).rotated(p.targetDirection));
         theWalkToBallAndKickSkill(p.targetDirection, p.kickType, p.alignPrecisely, kickPower, p.speed, obstacleAvoidance, p.preStepAllowed, p.turnKickAllowed, p.directionPrecision);
       }
     }

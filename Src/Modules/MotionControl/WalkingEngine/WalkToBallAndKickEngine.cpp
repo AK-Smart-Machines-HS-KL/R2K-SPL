@@ -118,25 +118,6 @@ void WalkToBallAndKickEngine::update(WalkToBallAndKickGenerator& walkToBallAndKi
       // TODO: (lastPerception - estimate.position).norm() < 10
     }
 
-    // Handle kick preparation timeout to prevent endless tippling
-    if(isInPositionForKick && !lastPhaseWasKick)
-    {
-      if(kickPreparationStartTime == 0)
-        kickPreparationStartTime = theFrameInfo.time;
-      
-      // If we've been preparing for too long, force the kick
-      if(theFrameInfo.time - kickPreparationStartTime > kickPreparationTimeout)
-      {
-        OUTPUT_WARNING("WalkToBallAndKickEngine: Forcing kick after " << (theFrameInfo.time - kickPreparationStartTime) << "ms of preparation");
-        // Force the kick by bypassing further alignment checks
-      }
-    }
-    else if(!isInPositionForKick)
-    {
-      // Reset timer when robot is no longer in position
-      kickPreparationStartTime = 0;
-    }
-
     if(isInPositionForKick)
     {
       auto kickPhase = createKickPhase(motionRequest, lastPhase, motionRequest.targetDirection, mirrorKick, precisionRange, kickPoseShiftY);

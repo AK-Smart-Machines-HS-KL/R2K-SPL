@@ -89,7 +89,7 @@ bool BallModelComponent::decompress(uint8_t* compressed) {
   model.lastPerception.x() = lx;
 
   float ly;
-  memcpy(&ly, compressed + byteOffset, sizeof(ly));
+  memcpy(&lx, compressed + byteOffset, sizeof(ly));
   byteOffset += sizeof(ly);
   model.lastPerception.y() = ly;
 

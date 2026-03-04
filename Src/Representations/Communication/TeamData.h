@@ -64,7 +64,7 @@ STREAMABLE(Teammate,
   (unsigned)(0) timeWhenStatusChanged,    // Derived in TeamMessageHandler
 
   (RobotPose) theRobotPose,               // SYNCED
-  (BallModel) theBallModel,               // SYNCED (individual observations)
+  (BallModel) theBallModel,               // NOT SYNCED
   (ObstacleModel) theObstacleModel,       // NOT SYNCED
   (BehaviorStatus) theBehaviorStatus,     // SYNCED
 });
