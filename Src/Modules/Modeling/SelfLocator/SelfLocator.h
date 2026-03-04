@@ -111,9 +111,6 @@ MODULE(SelfLocator,
     (Pose2f) demoCustomReturnFromPenaltyPoseGoalie,     /**< Goalie pose is set to this pose after a penalty. */
     (Pose2f) demoCustomReturnFromPenaltyPoseFieldPlayer,/**< Field player pose is set to this pose after a penalty. */
     (Pose2f) walktestCustomReturnFromPenaltyPose,       /**< Pose used when in mode walktest */
-    (int)    postGetupSideFlipPreventionTimeout,        /**< Time in milliseconds after unsafe motions (getup, fall) during which side flips are strongly discouraged. */
-    (float)  postGetupSideFlipMinimumThreshold,         /**< Multiplier: mirror must be this much better (as a factor) than normal pose to flip sides during prevention window. */
-    (float)  sideConstraintLineMeasurementPenalty,      /**< Penalty factor for line measurements from particles on wrong side (opposite to largestXCoordinatePossible constraint). */
   }),
 });
 
@@ -130,7 +127,8 @@ private:
   unsigned lastTimeFarFieldBorderSeen;          /**< Timestamp for checking goalie localization */
   unsigned lastTimeJumpSound;                   /**< When has the last sound been played? Avoid to flood the sound player in some situations */
   unsigned timeOfLastReturnFromPenalty;         /**< Point of time when the last penalty of this robot was over */
-  unsigned lastTimeNotInStandWalkKick; /**< Timestamp to keep track of the time during which the robot was either standing, walking, or kicking. Used to prevent side flips after getup. */  bool sampleSetHasBeenReset;                   /**< Flag indicating that all samples have been replaced in the current frame */
+  unsigned lastTimeNotInStandWalkKick;          /**< Timestamp to keep track of the time during which the robot was either standing, walking, or kicking */
+  bool sampleSetHasBeenReset;                   /**< Flag indicating that all samples have been replaced in the current frame */
   int nextSampleNumber;                         /**< Unique sample identifiers */
   int idOfLastBestSample;                       /**< Identifier of the best sample of the last frame */
   float averageWeighting;                       /**< The average of the weightings of all samples in the sample set */
