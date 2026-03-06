@@ -1,0 +1,28 @@
+<Simulation>
+
+  <Compound name="robots">
+    <Body ref="Nao" name="robot1">
+      <Translation x="750mm" z="320mm"/>
+      <Rotation z="180degree"/>
+    </Body>
+  </Compound>
+
+  <Compound name="extras">
+    <!-- Gegner Dummy 1 -->
+    <Body ref="NaoDummy" name="robot7">
+      <Translation x="-2" y="0.4" z="320mm"/>
+      <Set name="NaoColor" value="dblue"/>
+    </Body>
+    <!-- Gegner Dummy 2 -->
+    <Body ref="NaoDummy" name="robot8">
+      <Translation x="-1.5" y="-0.9" z="320mm"/>
+      <Set name="NaoColor" value="dblue"/>
+    </Body>
+    <!-- Gegner Dummy 3 -->
+    <Body ref="NaoDummy" name="robot9">
+      <Translation x="-1.1" y="1.3" z="320mm"/>
+      <Set name="NaoColor" value="dblue"/>
+    </Body>
+  </Compound>
+
+</Simulation>
