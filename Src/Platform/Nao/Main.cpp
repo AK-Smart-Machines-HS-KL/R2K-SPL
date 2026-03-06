@@ -45,13 +45,13 @@ static void bhumanStart(const Settings& settings)
     headCall = "Marvin";
   } else if (!head.compare("Problemkind"))
   {
-    headCall = "Touny";
+    headCall = "Problem Kint";
   } else if (!head.compare("BigMama"))
   {
-    headCall = "Max";
+    headCall = "Big Momma";
   } else if (!head.compare("Junior"))
   {
-    headCall = "Fritz";
+    headCall = "Junior";
   } else if (!head.compare("Gummibaerchen"))
   {
     headCall = "Gummy Bear";
@@ -66,13 +66,13 @@ static void bhumanStart(const Settings& settings)
     bodyCall = "Marvin";
   } else if (!body.compare("Problemkind"))
   {
-    bodyCall = "Touny";
+    bodyCall = "Problem Kint";
   } else if (!body.compare("BigMama"))
   {
-    bodyCall = "Max";
+    bodyCall = "Big Momma";
   } else if (!body.compare("Junior"))
   {
-    bodyCall = "Fritz";
+    bodyCall = "Junior";
   } else if (!body.compare("Gummibaerchen"))
   {
     bodyCall = "Gummy Bear";
@@ -88,13 +88,14 @@ static void bhumanStart(const Settings& settings)
     SystemCall::say("Deployed on body of ");
     SystemCall::say(bodyCall.c_str());
   }
-  SystemCall::say("Boot complete");
+  SystemCall::playSound("Hello_there.wav");
+  SystemCall::say("I am ready and able!");
   robot->start();
 }
 
 static void bhumanStop()
 {
-  SystemCall::say("Shutting down");
+  SystemCall::say("Be right back!");
   fprintf(stderr, "B-Human: Stop.\n");
   robot->announceStop();
   robot->stop();
