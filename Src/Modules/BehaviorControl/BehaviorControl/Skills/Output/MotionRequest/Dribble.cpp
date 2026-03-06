@@ -37,7 +37,8 @@ class DribbleImpl : public DribbleImplBase
 
   bool isDone(const Dribble&) const override
   {
-    return theMotionInfo.executedPhase == MotionPhase::walk;
+    // Kontinuierliches Dribbling - bleibt aktiv bis abgebrochen
+    return false;
   }
 };
 
