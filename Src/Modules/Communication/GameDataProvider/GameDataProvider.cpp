@@ -187,7 +187,7 @@ void GameDataProvider::handleButtons()
   
   if(theEnhancedKeyStates.hitStreak[KeyStates::headRear])
   {
-    std::string output = "I'm running demo software right now!";
+    std::string output = "Study Digital Engineering with us!";
     SystemCall::say(output.c_str());
     //std::string out = "I am deployed at position number " + (theRobotInfo.number).c_str();
     //SystemCall::say(out.c_str());
@@ -197,7 +197,9 @@ void GameDataProvider::handleButtons()
   {
     //std::string output = "Hello there.";
     //SystemCall::say(output.c_str());
-    SystemCall::playSound("Hello_there.wav");
+    //SystemCall::playSound("Hello_there.wav");
+    std::string output = "Welcome to Gurr Murrs Hyme!";
+    SystemCall::say(output.c_str());
   }
 
   if(theEnhancedKeyStates.hitStreak[KeyStates::headFront])
