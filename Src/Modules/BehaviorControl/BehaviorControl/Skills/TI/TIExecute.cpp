@@ -100,7 +100,7 @@ class TIExecuteImpl : public TIExecuteImplBase
 
     MAP_EXPLICIT(PlaybackAction::Skills::WalkToPoint, theWalkToPointSkill, {
       // poseParam stores field-absolute coordinates; WalkToPoint expects robot-relative.
-      const Pose2f relTarget = theRobotPose.inverse() * action.poseParam;
+      const Pose2f relTarget = theRobotPose.inversePose * action.poseParam;
       theWalkToPointSkill(relTarget, action.floatParam > 0.f ? action.floatParam : 1.f, true, false, false, true);
     });
     // WalkToPoint: isDone() is reliable (done when destination reached)

@@ -128,6 +128,9 @@ void TIPlaybackProvider::loadTeachInData(TIPlaybackSequences &playbackData)
                 // Skip non-CSV files
                 if (file.find(".csv") == std::string::npos)
                     continue;
+                // Skip LibreOffice/editor lock files (.~lock.*.csv#)
+                if (file.find(".~lock.") == 0)
+                    continue;
 
                 // Check if this filename has been seen before (global duplicate)
                 auto existingFile = filenameToPath.find(file);
@@ -159,6 +162,9 @@ void TIPlaybackProvider::loadTeachInData(TIPlaybackSequences &playbackData)
             {
                 // Skip non-CSV files
                 if (file.find(".csv") == std::string::npos)
+                    continue;
+                // Skip LibreOffice/editor lock files (.~lock.*.csv#)
+                if (file.find(".~lock.") == 0)
                     continue;
 
                 // Skip if this is a duplicate (not the first occurrence)
@@ -332,8 +338,10 @@ bool TIPlaybackProvider::loadWorldModel(TIPlaybackSequences &playbackData, std::
         }
 
         // Check coordinate bounds (SPL field: 9000mm x 6000mm, so ±4500 x ±3000)
+        // Trigger poses may validly be placed slightly outside the field boundary (e.g. Y ≈ ±3500
+        // for corner kick triggers that fire as the robot arrives at the sideline corner flag).
         const float MAX_X = 4500.0f;
-        const float MAX_Y = 3000.0f;
+        const float MAX_Y = 4000.0f; // field ±3000, +1000mm margin for out-of-bounds trigger poses
         const float MAX_R = M_PI;
         
         if (std::abs(trigger.robotPose.translation.x()) > MAX_X)
