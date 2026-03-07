@@ -10,14 +10,63 @@ MAKE_MODULE(LibTeamProvider, behaviorControl);
 
 void LibTeamProvider::update(LibTeam& libTeam)
 {
-  libTeam.keeperPlayerNumber = getKeeperPlayerNumber();
-  libTeam.strikerPlayerNumber = getStrikerPlayerNumber();
-  libTeam.keeperPose = getKeeperPose();
-  libTeam.strikerPose = getStrikerPose();
-  libTeam.iAmClosestToBall = iAmClosestToBall();
-  libTeam.minTeammateDistanceToBall = getMinTeammateDistanceToBall();
+  // Merged pass 1: compute keeper and striker data in a single loop
+  int keeperNum = theTeamBehaviorStatus.role.isGoalkeeper() ? theRobotInfo.number : -1;
+  Pose2f keeperPose = (keeperNum != -1) ? static_cast<const Pose2f&>(theRobotPose) : Pose2f(0.f, 1000000.f, 1000000.f);
+  int strikerNum = theTeamBehaviorStatus.role.playsTheBall() ? theRobotInfo.number : -1;
+  Pose2f strikerPose = (strikerNum != -1) ? static_cast<const Pose2f&>(theRobotPose) : Pose2f(0.f, 1000000.f, 1000000.f);
+
+  if(keeperNum == -1 || strikerNum == -1)
+  {
+    for(const auto& teammate : theTeamData.teammates)
+    {
+      if(teammate.status != Teammate::PENALIZED)
+      {
+        if(keeperNum == -1)
+        {
+          keeperNum = teammate.number;
+          keeperPose = teammate.theRobotPose;
+        }
+        if(strikerNum == -1)
+        {
+          strikerNum = teammate.number;
+          strikerPose = teammate.theRobotPose;
+        }
+        if(keeperNum != -1 && strikerNum != -1)
+          break;
+      }
+    }
+  }
+
+  libTeam.keeperPlayerNumber = keeperNum;
+  libTeam.strikerPlayerNumber = strikerNum;
+  libTeam.keeperPose = keeperPose;
+  libTeam.strikerPose = strikerPose;
+  libTeam.numberOfBallPlayingTeammate = strikerNum;
+
+  // Merged pass 2: compute iAmClosestToBall and minTeammateDistanceToBall together
+  const Vector2f ballPositionOnField(theFieldBall.recentBallPositionOnField(3000));
+  const float selfDistanceSq = (theRobotPose.translation - ballPositionOnField).squaredNorm();
+  bool iAmClosest = true;
+  float minTeammateDistSq = std::numeric_limits<float>::max();
+
+  for(const Teammate& teammate : theTeamData.teammates)
+  {
+    if(teammate.status != Teammate::PENALIZED)
+    {
+      const float distSq = (teammate.theRobotPose.translation - ballPositionOnField).squaredNorm();
+      if(distSq < selfDistanceSq)
+        iAmClosest = false;
+      if(distSq < minTeammateDistSq)
+        minTeammateDistSq = distSq;
+    }
+  }
+
+  libTeam.iAmClosestToBall = iAmClosest;
+  libTeam.minTeammateDistanceToBall = std::sqrt(minTeammateDistSq);
+
   libTeam.numberOfNonKeeperTeammateInOwnGoalArea = numberOfNonKeeperTeammateInOwnGoalArea();
-  libTeam.numberOfBallPlayingTeammate = getStrikerPlayerNumber();
+
   libTeam.getTeammatePose = [this](int player)->Pose2f
   {
     return getTeammatePose(player);
@@ -40,34 +89,6 @@ void LibTeamProvider::update(LibTeam& libTeam)
   };
 }
 
-Pose2f LibTeamProvider::getKeeperPose() const
-{
-  if(theTeamBehaviorStatus.role.isGoalkeeper())
-    return theRobotPose;
-  for(auto const& teammate : theTeamData.teammates)
-  {
-    if(teammate.status != Teammate::PENALIZED)
-    {
-      return teammate.theRobotPose;
-    }
-  }
-  return Pose2f(0.f, 1000000.f, 1000000.f);
-}
-
-Pose2f LibTeamProvider::getStrikerPose() const
-{
-  if(theTeamBehaviorStatus.role.playsTheBall())
-    return theRobotPose;
-  for(auto const& teammate : theTeamData.teammates)
-  {
-    if(teammate.status != Teammate::PENALIZED)
-    {
-      return teammate.theRobotPose;
-    }
-  }
-  return Pose2f(0.f, 1000000.f, 1000000.f);
-}
-
 Pose2f LibTeamProvider::getTeammatePose(int player) const
 {
   if(player == theRobotInfo.number)
@@ -83,34 +104,6 @@ Pose2f LibTeamProvider::getTeammatePose(int player) const
     }
   }
   return Pose2f(0.f, 1000000.f, 1000000.f);
-}
-
-int LibTeamProvider::getKeeperPlayerNumber() const
-{
-  if(theTeamBehaviorStatus.role.isGoalkeeper())
-    return theRobotInfo.number;
-  for(auto const& teammate : theTeamData.teammates)
-  {
-    if(teammate.status != Teammate::PENALIZED)
-    {
-      return teammate.number;
-    }
-  }
-  return -1;
-}
-
-int LibTeamProvider::getStrikerPlayerNumber() const
-{
-  if(theTeamBehaviorStatus.role.playsTheBall())
-    return theRobotInfo.number;
-  for(auto const& teammate : theTeamData.teammates)
-  {
-    if(teammate.status != Teammate::PENALIZED)
-    {
-      return teammate.number;
-    }
-  }
-  return -1;
 }
 
 BehaviorStatus::Activity LibTeamProvider::getActivity(int player) const
@@ -177,32 +170,4 @@ int LibTeamProvider::numberOfNonKeeperTeammateInOwnGoalArea(const float distance
     }
   }
   return -1;
-}
-
-bool LibTeamProvider::iAmClosestToBall() const
-{
-  const Vector2f ballPositionOnField(theFieldBall.recentBallPositionOnField(3000));
-  const float distanceToBall = (theRobotPose.translation - ballPositionOnField).squaredNorm();
-  for(const Teammate& teammate : theTeamData.teammates)
-  {
-    if(teammate.status != Teammate::PENALIZED && (teammate.theRobotPose.translation - ballPositionOnField).squaredNorm() < distanceToBall)
-      return false;
-  }
-  return true;
-}
-
-float LibTeamProvider::getMinTeammateDistanceToBall() const
-{
-  const Vector2f ballPositionOnField(theFieldBall.recentBallPositionOnField(3000));
-  float minDistance = std::numeric_limits<float>::max();
-  for(const Teammate& teammate : theTeamData.teammates)
-  {
-    if(teammate.status != Teammate::PENALIZED)
-    {
-      const float distance = (teammate.theRobotPose.translation - ballPositionOnField).squaredNorm();
-      if(distance < minDistance)
-        minDistance = distance;
-    }
-  }
-  return std::sqrt(minDistance);
 }

@@ -41,17 +41,6 @@ class LibTeamProvider : public LibTeamProviderBase
 private:
   void update(LibTeam& libTeam) override;
 
-  int getKeeperPlayerNumber() const;
-
-  /** returns player number of striker or -1 if striker was not found */
-  int getStrikerPlayerNumber() const;
-
-  /** returns the pose of the keeper */
-  Pose2f getKeeperPose() const;
-
-  /** returns the pose of the striker */
-  Pose2f getStrikerPose() const;
-
   /** returns the pose of a team mate in field coordinates
       @player player number of team mate */
   Pose2f getTeammatePose(int player) const;
@@ -70,8 +59,4 @@ private:
 
   /** Returns the number of the teammates in the own goal area */
   int numberOfNonKeeperTeammateInOwnGoalArea(const float distanceThreshold = 50.f) const;
-
-  bool iAmClosestToBall() const;
-
-  float getMinTeammateDistanceToBall() const;
 };
