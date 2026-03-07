@@ -9,49 +9,41 @@ MAKE_MODULE(LibTeammatesProvider, behaviorControl);
 
 void LibTeammatesProvider::update(LibTeammates& libTeammates)
 {
-  libTeammates.nonKeeperTeammatesInOwnPenaltyArea = nonKeeperTeammatesInOwnPenaltyArea();
-  libTeammates.teammatesInOpponentPenaltyArea = teammatesInOpponentPenaltyArea();
-}
-
-int LibTeammatesProvider::nonKeeperTeammatesInOwnPenaltyArea() const
-{
-  float distanceThreshold = outsideDistanceThreshold;
-  bool isNear = false;
+  // Pre-calculate thresholds for own penalty area based on this robot's position
+  float ownDistanceThreshold = outsideDistanceThreshold;
+  bool ownIsNear = false;
   if(theLibPosition.isNearOwnPenaltyArea(theRobotPose.translation, -theRobotPose.getXAxisStandardDeviation(), -theRobotPose.getYAxisStandardDeviation()))
-    distanceThreshold = insideDistanceThreshold;
+    ownDistanceThreshold = insideDistanceThreshold;
   else if(theLibPosition.isNearOwnPenaltyArea(theRobotPose.translation, outsideDistanceThreshold, outsideDistanceThreshold))
-    isNear = true;
-  int teammatesInPenaltyArea = 0;
-  for(auto const& teammate : theTeamData.teammates)
-  {
-    if(teammate.status != Teammate::PENALIZED
-       && !teammate.isGoalkeeper
-       && theLibPosition.isNearOwnPenaltyArea(teammate.theRobotPose.translation, distanceThreshold, distanceThreshold))
-    {
-      if(isNear && !theLibPosition.isNearOwnPenaltyArea(teammate.theRobotPose.translation, insideDistanceThreshold, insideDistanceThreshold))
-      {
+    ownIsNear = true;
 
-      }
-      else
-        ++teammatesInPenaltyArea;
-    }
-  }
-  return teammatesInPenaltyArea;
-}
-
-int LibTeammatesProvider::teammatesInOpponentPenaltyArea() const
-{
-  float distanceThreshold = outsideDistanceThreshold;
+  // Pre-calculate threshold for opponent penalty area based on this robot's position
+  float oppDistanceThreshold = outsideDistanceThreshold;
   if(theLibPosition.isNearOpponentPenaltyArea(theRobotPose.translation, -theRobotPose.getXAxisStandardDeviation(), -theRobotPose.getYAxisStandardDeviation()))
-    distanceThreshold = insideDistanceThreshold;
-  int teammatesInPenaltyArea = 0;
-  for(auto const& teammate : theTeamData.teammates)
+    oppDistanceThreshold = insideDistanceThreshold;
+
+  int nonKeeperInOwn = 0;
+  int inOpponent = 0;
+
+  // Single pass through all teammates instead of two separate loops
+  for(const auto& teammate : theTeamData.teammates)
   {
-    if(teammate.status != Teammate::PENALIZED
-       && theLibPosition.isNearOpponentPenaltyArea(teammate.theRobotPose.translation, distanceThreshold, distanceThreshold))
+    if(teammate.status == Teammate::PENALIZED)
+      continue;
+
+    // Check own penalty area for non-goalkeepers
+    if(!teammate.isGoalkeeper
+       && theLibPosition.isNearOwnPenaltyArea(teammate.theRobotPose.translation, ownDistanceThreshold, ownDistanceThreshold))
     {
-      ++teammatesInPenaltyArea;
+      if(!ownIsNear || theLibPosition.isNearOwnPenaltyArea(teammate.theRobotPose.translation, insideDistanceThreshold, insideDistanceThreshold))
+        ++nonKeeperInOwn;
     }
+
+    // Check opponent penalty area
+    if(theLibPosition.isNearOpponentPenaltyArea(teammate.theRobotPose.translation, oppDistanceThreshold, oppDistanceThreshold))
+      ++inOpponent;
   }
-  return teammatesInPenaltyArea;
+
+  libTeammates.nonKeeperTeammatesInOwnPenaltyArea = nonKeeperInOwn;
+  libTeammates.teammatesInOpponentPenaltyArea = inOpponent;
 }
