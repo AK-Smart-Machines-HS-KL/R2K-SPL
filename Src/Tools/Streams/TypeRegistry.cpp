@@ -10,6 +10,7 @@
  * @author Thomas Röfer
  */
 
+#include <cstring>
 #include <cctype>
 #ifndef WINDOWS
 #include <cstdlib>
