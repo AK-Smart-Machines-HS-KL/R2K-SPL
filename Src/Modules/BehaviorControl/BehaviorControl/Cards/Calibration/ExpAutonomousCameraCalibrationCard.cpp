@@ -105,10 +105,10 @@ class ExpAutonomousCameraCalibrationCard : public ExpAutonomousCameraCalibration
     COMPLEX_DRAWING("behavior:ExpAutonomousCameraCalibrationCard:position")
     {
       // Draw all calibration poses in orange.
-      for(auto it = sampleConfigurations.begin(); it != sampleConfigurations.end(); it++)
+      for(const auto& config : sampleConfigurations)
       {
-        const auto& position = it->calibrationPose.translation;
-        const auto& target = it->lookTarget;
+        const auto& position = config.calibrationPose.translation;
+        const auto& target = config.lookTarget;
         ARROW("behavior:ExpAutonomousCameraCalibrationCard:position", position.x(), position.y(), target.x(), target.y(), 10, Drawings::PenStyle::solidPen, ColorRGBA::orange);
       }
       // Draw the current calibration pose in blue.
