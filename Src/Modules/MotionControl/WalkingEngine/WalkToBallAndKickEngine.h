@@ -11,6 +11,7 @@
 #include "Representations/Configuration/BallSpecification.h"
 #include "Representations/Configuration/KickInfo.h"
 #include "Representations/Configuration/RobotDimensions.h"
+#include "Representations/Infrastructure/FrameInfo.h"
 #include "Representations/Modeling/ObstacleModel.h"
 #include "Representations/MotionControl/KickGenerator.h"
 #include "Representations/MotionControl/MotionInfo.h"
@@ -28,6 +29,7 @@
 MODULE(WalkToBallAndKickEngine,
 {,
   REQUIRES(BallSpecification),
+  REQUIRES(FrameInfo),
   REQUIRES(GroundContactState),
   REQUIRES(InertialData),
   REQUIRES(JointAngles),
@@ -58,6 +60,7 @@ MODULE(WalkToBallAndKickEngine,
     (Rangef)(Rangef(-80.f, -40.f)) forwardFastYClipRange, /**< For the dynamic points, clip the y position. */
     (float)(0.8f) minBallDistanceForVelocity, /**< Subtract this much time to reach the ball, when propagating the ball position. */
     (Pose2f)(Pose2f(4_deg, 10.f, 10.f)) kickPoseThresholds,
+    (unsigned)(3000) kickPreparationTimeout, /**< Time in ms after which a kick is forced if the robot is in position but struggling to align. */
   }),
 });
 
@@ -68,6 +71,7 @@ class WalkToBallAndKickEngine : public WalkToBallAndKickEngineBase
   bool lastPhaseWasKick = false;
   bool lastPhaseWasKickPossible = false;
   Vector2f lastStableBall = Vector2f(0.f, 0.f);
+  unsigned kickPreparationStartTime = 0; /**< Start time of current kick preparation phase (0 if not preparing). */
   /**
    * Creates the kick phase for the given request.
    * @param motionRequest The name says it all.
