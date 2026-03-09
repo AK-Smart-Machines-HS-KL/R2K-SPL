@@ -1,2 +1,2 @@
 skillName,maxTime,angleParam1,angleParam2,poseParam X,poseParam Y,poseParam R,vector3Param X,vector3Param Y,vector3Param Z,boolParam,floatParam,intParam,stringParam
-KickAtGoal,15000,0,0,3200,0,0,0,0,0,0,0,1,
+WalkToPoint,8000,0,0,3200,0,0,0,0,0,0,1,0,

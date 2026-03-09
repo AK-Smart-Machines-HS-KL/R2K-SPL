@@ -141,6 +141,7 @@ class TIPlaybackCard : public TIPlaybackCardBase
 		{
 			theLookForwardSkill();  // Ensure head motion is set when sequence completes
 			theStandSkill();        // Ensure motion request is set
+      actionIndex=-2;
 			return;
 		}
 
