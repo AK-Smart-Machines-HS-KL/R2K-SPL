@@ -30,7 +30,7 @@
  
  void GameDataProvider::update(RobotInfo& theRobotInfo)
  {
-   if(!(gameCtrlData.gamePhase != GAME_PHASE_PENALTYSHOOT && gameCtrlData.state == STATE_FINISHED))
+   if(!(gameCtrlData.gamePhase != GAME_PHASE_PENALTY_SHOOT_OUT && gameCtrlData.state == STATE_FINISHED))
      whenStateNotFinished = theFrameInfo.time;
  
    ignoreChestButton = false;
@@ -224,7 +224,7 @@
      {
        if(gameCtrlData.gamePhase == GAME_PHASE_NORMAL)
        {
-         gameCtrlData.gamePhase = GAME_PHASE_PENALTYSHOOT;
+         gameCtrlData.gamePhase = GAME_PHASE_PENALTY_SHOOT_OUT;
          gameCtrlData.kickingTeam = team.teamNumber;
          SystemCall::say("Penalty striker");
        }

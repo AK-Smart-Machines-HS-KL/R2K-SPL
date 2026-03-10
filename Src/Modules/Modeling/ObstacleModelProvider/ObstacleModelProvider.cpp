@@ -68,7 +68,7 @@ bool ObstacleModelProvider::clearAndFinish(ObstacleModel& obstacleModel)
      || theFallDownState.state == FallDownState::falling
      || theFallDownState.state == FallDownState::fallen
      || theMotionInfo.executedPhase == MotionPhase::getUp
-     || theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT) // Penalty shootout -> obstacles will be ignored
+     || theGameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT) // Penalty shootout -> obstacles will be ignored
   {
     if(theGameInfo.state != STATE_FINISHED) // If the GameController operator fails epically and resets from finished to playing
     {

@@ -88,7 +88,7 @@ void BallPerceptFilter::update(FilteredBallPercepts& filteredBallPercepts)
 
   // Analyze new percept
   if(theBallPercept.status == BallPercept::seen ||  // The ball was seen and the perceptor seems to be quite sure.
-     (theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber && theBallPercept.status != BallPercept::notSeen) || // A penalty keeper accepts everything ;-)
+     (theGameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber && theBallPercept.status != BallPercept::notSeen) || // A penalty keeper accepts everything ;-)
      currentlyPerceivedGuessedBallIsCloseToPreviouslyPerceivedSeenBalls() || // There have been quite good perceptions close to the currently - not so good - one.
      robotRecentlyKickedAndThereAreGuessedBallsRollingAway() || // After a kick, a sequence of badly perceived balls should be observable
      perceptsAreOnALineThatIsCompatibleToARollingBall()) // We can accept bad percepts if they appear to form a line
@@ -242,7 +242,7 @@ bool BallPerceptFilter::verifySeenBall()
 {
   // Override for keeper in penalty shootout:
   // All balls can be used!
-  if(theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber)
+  if(theGameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber)
     return true;
   // Otherwise check distance to other seen balls:
   float verificationDistance = requiredPerceptionDistanceNear;

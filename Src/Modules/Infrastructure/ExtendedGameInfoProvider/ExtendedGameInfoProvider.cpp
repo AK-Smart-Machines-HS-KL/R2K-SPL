@@ -22,7 +22,7 @@ void ExtendedGameInfoProvider::update(ExtendedGameInfo& extendedGameInfo)
   if(theRawGameInfo.state != rawGameStateLastFrame
      && theRawGameInfo.state == STATE_PLAYING
      && gameStateLastFrame != STATE_PLAYING
-     && theGameInfo.gamePhase != GAME_PHASE_PENALTYSHOOT
+     && theGameInfo.gamePhase != GAME_PHASE_PENALTY_SHOOT_OUT
      && SystemCall::getMode() != SystemCall::simulatedRobot)
   {
     extendedGameInfo.didNotHearWhistleThisTime = true;
@@ -94,7 +94,7 @@ void ExtendedGameInfoProvider::update(ExtendedGameInfo& extendedGameInfo)
 
   if(theGameInfo.state != STATE_SET)
     manuallyPlaced = false;
-  else if(theGameInfo.gamePhase != GAME_PHASE_PENALTYSHOOT && theRobotInfo.penalty == PENALTY_NONE &&
+  else if(theGameInfo.gamePhase != GAME_PHASE_PENALTY_SHOOT_OUT && theRobotInfo.penalty == PENALTY_NONE &&
      theFrameInfo.getTimeSince(timeWhenLastPenaltyEnded) > 5000 && theFallDownState.state == FallDownState::pickedUp)
     manuallyPlaced = true;
   extendedGameInfo.manuallyPlaced = manuallyPlaced;
@@ -112,12 +112,12 @@ void ExtendedGameInfoProvider::update(ExtendedGameInfo& extendedGameInfo)
 
   extendedGameInfo.returnFromGameControllerPenalty = false;
   extendedGameInfo.returnFromManualPenalty = false;
-  if(theGameInfo.gamePhase != GAME_PHASE_PENALTYSHOOT)
+  if(theGameInfo.gamePhase != GAME_PHASE_PENALTY_SHOOT_OUT)
   {
     if(penaltyLastFrame == PENALTY_MANUAL && theRobotInfo.penalty == PENALTY_NONE)
       extendedGameInfo.returnFromManualPenalty = true;
-    else if(penaltyLastFrame != PENALTY_NONE && penaltyLastFrame != PENALTY_SPL_ILLEGAL_MOTION_IN_SET && theRobotInfo.penalty == PENALTY_NONE &&
-            theFrameInfo.getTimeSince(timeWhenPenalized) > (penaltyLastFrame == PENALTY_SPL_ILLEGAL_POSITION_IN_SET ? minPenaltyTimeIP : minPenaltyTime))
+    else if(penaltyLastFrame != PENALTY_NONE && penaltyLastFrame != PENALTY_MOTION_IN_SET && theRobotInfo.penalty == PENALTY_NONE &&
+            theFrameInfo.getTimeSince(timeWhenPenalized) > (penaltyLastFrame == PENALTY_ILLEGAL_POSITIONING ? minPenaltyTimeIP : minPenaltyTime))
       extendedGameInfo.returnFromGameControllerPenalty = true;
   }
 

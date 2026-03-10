@@ -125,7 +125,7 @@ void Logger::execute(const std::string& threadName)
           if(team.number == opponentTeamInfo.teamNumber)
           {
             description = team.name + "_"
-                          + (gameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT ? "ShootOut"
+                          + (gameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT ? "ShootOut"
                              : gameInfo.firstHalf ? "1stHalf" : "2ndHalf");
             break;
           }

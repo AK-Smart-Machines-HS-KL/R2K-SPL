@@ -30,7 +30,7 @@ void WhistleHandler::update(GameInfo& theGameInfo)
     guessedGameState = STATE_PLAYING;
     timeOfLastStateChange = theFrameInfo.time + (theRawGameInfo.setPlay == SET_PLAY_PENALTY_KICK
                             ? ignoreWhistleAfterPenaltyKick : ignoreWhistleAfterKickOff);
-    if(theRawGameInfo.gamePhase != GAME_PHASE_PENALTYSHOOT || theRawGameInfo.setPlay == SET_PLAY_PENALTY_KICK)
+    if(theRawGameInfo.gamePhase != GAME_PHASE_PENALTY_SHOOT_OUT || theRawGameInfo.setPlay == SET_PLAY_PENALTY_KICK)
       SystemCall::say("Kickoff");
     theGameInfo.timeLastStateChange = timeOfLastStateChange;
   }
@@ -38,7 +38,7 @@ void WhistleHandler::update(GameInfo& theGameInfo)
   // Switching to READY (not in penalty shootout):
   // If the GameController sends PLAYING, we are not guessing yet, and we hear a whistle
   // or if the GameController sends SET, we are already guessing, and hear a whistle.
-  if(useWhistleAfterGoal && theRawGameInfo.gamePhase != GAME_PHASE_PENALTYSHOOT
+  if(useWhistleAfterGoal && theRawGameInfo.gamePhase != GAME_PHASE_PENALTY_SHOOT_OUT
      && ((theRawGameInfo.state == STATE_PLAYING && guessedGameState == STATE_INITIAL)
          || (theRawGameInfo.state == STATE_SET && guessedGameState == STATE_PLAYING))
      && checkForBallPosition() && checkForWhistle())
@@ -120,7 +120,7 @@ bool WhistleHandler::checkForIllegalMotionPenalty()
   penaltyTimes.resize(MAX_NUM_PLAYERS, 0);
 
   for(size_t i = 0; i < penaltyTimes.size(); ++i)
-    if(theOwnTeamInfo.players[i].penalty != PENALTY_SPL_ILLEGAL_MOTION_IN_SET)
+    if(theOwnTeamInfo.players[i].penalty != PENALTY_MOTION_IN_SET)
       penaltyTimes[i] = 0;
     else if(penaltyTimes[i] == 0)
       penaltyTimes[i] = theFrameInfo.time;

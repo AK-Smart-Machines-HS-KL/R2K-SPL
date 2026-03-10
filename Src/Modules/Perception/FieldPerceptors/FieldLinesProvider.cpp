@@ -30,7 +30,7 @@ void FieldLinesProvider::update(FieldLines& fieldLines)
 
   for(const SpotLine& line : theLinesPercept.lines)
   {
-    if(theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT)
+    if(theGameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT)
     {
       if(std::abs(std::abs((theRobotPose * line.firstField - theRobotPose * line.lastField).angle()) - 90_deg) > 30_deg
          && (std::abs((theRobotPose * line.firstField).y()) < theFieldDimensions.yPosLeftPenaltyArea - 150

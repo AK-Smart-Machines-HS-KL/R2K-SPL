@@ -28,7 +28,7 @@ void BallDropInLocator::update(BallDropInModel& ballDropInModel)
   ballDropInModel.isValid = false;
   ballDropInModel.dropInPositions.clear();
 
-  if(theGameInfo.state != STATE_PLAYING || theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT)
+  if(theGameInfo.state != STATE_PLAYING || theGameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT)
   {
     for(unsigned int i = 0; i < numOfTouchedBys; ++i)
       lastTouchEvents[i].timestamp = 0;
@@ -70,7 +70,7 @@ void BallDropInLocator::update(BallDropInModel& ballDropInModel)
         clip(useOutPosition ? ballDropInModel.outPosition.x() : predictedOutPosition.x(),
              theFieldDimensions.xPosOwnGroundLine, theFieldDimensions.xPosOpponentGroundLine),
         outLeft ? theFieldDimensions.yPosLeftSideline : theFieldDimensions.yPosRightSideline);
-      ballDropInModel.isValid = useOutPosition || theGameInfo.setPlay == SET_PLAY_KICK_IN;
+      ballDropInModel.isValid = useOutPosition || theGameInfo.setPlay == SET_PLAY_THROW_IN;
       break;
     default:
       break;
@@ -84,7 +84,7 @@ void BallDropInLocator::updateTouchPositions()
   // When entering a ball replacing free kick, nothing should depend on old events anymore.
   if((theExtendedGameInfo.setPlayLastFrame != SET_PLAY_GOAL_KICK && theGameInfo.setPlay == SET_PLAY_GOAL_KICK) ||
      (theExtendedGameInfo.setPlayLastFrame != SET_PLAY_CORNER_KICK && theGameInfo.setPlay == SET_PLAY_CORNER_KICK) ||
-     (theExtendedGameInfo.setPlayLastFrame != SET_PLAY_KICK_IN && theGameInfo.setPlay == SET_PLAY_KICK_IN))
+     (theExtendedGameInfo.setPlayLastFrame != SET_PLAY_THROW_IN && theGameInfo.setPlay == SET_PLAY_THROW_IN))
   {
     for(unsigned int i = 0; i < numOfTouchedBys; ++i)
       lastTouchEvents[i].timestamp = 0;
@@ -103,7 +103,7 @@ void BallDropInLocator::updateTouchPositions()
   for(const auto& teammate : theTeamData.teammates)
   {
     if(teammate.status == Teammate::PENALIZED
-       && theOwnTeamInfo.players[teammate.number - 1].penalty != PENALTY_SPL_ILLEGAL_MOTION_IN_SET
+       && theOwnTeamInfo.players[teammate.number - 1].penalty != PENALTY_MOTION_IN_SET
        && theFrameInfo.getTimeSince(teammate.timeWhenStatusChanged) > timeUntilPenalizedRobotsAreRemoved)
       continue;
     if((teammate.theRobotPose.translation - theTeamBallModel.position).squaredNorm() < ballTouchThresholdSquared)
@@ -197,7 +197,7 @@ void BallDropInLocator::updateGameControllerData(BallDropInModel& ballDropInMode
     ballDropInModel.dropInType = BallDropInModel::cornerKick;
     ballDropInModel.lastTimeWhenBallWentOut = theFrameInfo.time;
   }
-  else if(theExtendedGameInfo.setPlayLastFrame != SET_PLAY_KICK_IN && theGameInfo.setPlay == SET_PLAY_KICK_IN)
+  else if(theExtendedGameInfo.setPlayLastFrame != SET_PLAY_THROW_IN && theGameInfo.setPlay == SET_PLAY_THROW_IN)
   {
     ownTeamTouchedLast = theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber;
     ballDropInModel.dropInType = BallDropInModel::kickIn;

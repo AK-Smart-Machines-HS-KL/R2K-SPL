@@ -270,7 +270,7 @@ bool SideInformationProvider::ballIsCloseToPenaltyMarkOrLine(const Vector2f& b) 
 
 void SideInformationProvider::computeBasicOwnSideInformation(SideInformation& sideInformation)
 {
-  if(theGameInfo.gamePhase != GAME_PHASE_PENALTYSHOOT)
+  if(theGameInfo.gamePhase != GAME_PHASE_PENALTY_SHOOT_OUT)
   {
     if(theExtendedGameInfo.gameStateLastFrame == STATE_INITIAL && theGameInfo.state == STATE_READY)
     {
@@ -313,7 +313,7 @@ void SideInformationProvider::computeBasicOwnSideInformation(SideInformation& si
   }
 
   if(theStaticInitialPose.isActive && theRobotInfo.penalty == PENALTY_NONE
-     && (theExtendedGameInfo.penaltyLastFrame == PENALTY_SPL_PLAYER_PUSHING || theExtendedGameInfo.penaltyLastFrame == PENALTY_MANUAL))
+     && (theExtendedGameInfo.penaltyLastFrame == PENALTY_PUSHING || theExtendedGameInfo.penaltyLastFrame == PENALTY_MANUAL))
     largestXPossibleAtKnownPosition = theStaticInitialPose.staticPoseOnField.translation.x();
 
   sideInformation.largestXCoordinatePossible = largestXPossibleAtKnownPosition + distanceUncertaintyOffset +

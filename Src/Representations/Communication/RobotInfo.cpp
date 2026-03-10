@@ -47,18 +47,18 @@ std::string RobotInfo::getPenaltyAsString() const
 {
   switch(penalty)
   {
-    case PENALTY_SPL_ILLEGAL_BALL_CONTACT: return "Illegal Ball Contact";
-    case PENALTY_SPL_PLAYER_PUSHING: return "Player Pushing";
-    case PENALTY_SPL_ILLEGAL_MOTION_IN_SET: return "Illegal Motion in Set";
-    case PENALTY_SPL_INACTIVE_PLAYER: return "Inactive Player";
-    case PENALTY_SPL_ILLEGAL_POSITION: return "Illegal Position";
-    case PENALTY_SPL_LEAVING_THE_FIELD: return "Leaving the Field";
-    case PENALTY_SPL_REQUEST_FOR_PICKUP: return "Request for Pickup";
-    case PENALTY_SPL_LOCAL_GAME_STUCK: return "Local Game Stuck";
-    case PENALTY_SPL_ILLEGAL_POSITION_IN_SET: return "Illegal Position in Set";
+    case PENALTY_ILLEGAL_POSITIONING: return "Illegal Position";
+    case PENALTY_MOTION_IN_SET: return "Illegal Motion in Set";
+    case PENALTY_LOCAL_GAME_STUCK: return "Local Game Stuck";
+    case PENALTY_INCAPABLE_ROBOT: return "Incapable Robot";
+    case PENALTY_PICK_UP: return "Request for Pickup";
+    case PENALTY_BALL_HOLDING: return "Ball Holding";
+    case PENALTY_LEAVING_THE_FIELD: return "Leaving the Field";
+    case PENALTY_PLAYING_WITH_ARMS_HANDS: return "Playing with Arms/Hands";
+    case PENALTY_PUSHING: return "Player Pushing";
+    case PENALTY_SENT_OFF: return "Sent Off"; 
     case PENALTY_SUBSTITUTE: return "Substitute";
     case PENALTY_MANUAL: return "Manual";
-    case PENALTY_SPL_ILLEGAL_MOTION_IN_STANDBY: return "Thomas";
     default: return "None";
   }
 }

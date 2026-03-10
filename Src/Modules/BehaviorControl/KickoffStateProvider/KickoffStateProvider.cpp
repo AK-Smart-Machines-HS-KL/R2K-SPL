@@ -23,7 +23,7 @@ void KickoffStateProvider::update(KickoffState& kickoffState)
   }
 
   // If certain types of free kicks happen, the ball definitely went out of the center circle
-  if(theGameInfo.setPlay == SET_PLAY_GOAL_KICK || theGameInfo.setPlay == SET_PLAY_CORNER_KICK || theGameInfo.setPlay == SET_PLAY_KICK_IN)
+  if(theGameInfo.setPlay == SET_PLAY_GOAL_KICK || theGameInfo.setPlay == SET_PLAY_CORNER_KICK || theGameInfo.setPlay == SET_PLAY_THROW_IN)
   {
     ballHasMoved = true;
     ballWasOutOfCenterCircle = true;
@@ -121,7 +121,7 @@ bool KickoffStateProvider::allowedToScore()
 {
   if(alwaysAllowToScore && (theRobotPose * theBallModel.estimate.position).x() > -theFieldDimensions.centerCircleRadius)
     return true;
-  if(theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT)
+  if(theGameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT)
     return true;
   if(theGameInfo.state != STATE_PLAYING)  // Should not be relevant, but who knows...
     return false;
@@ -130,7 +130,7 @@ bool KickoffStateProvider::allowedToScore()
 
 bool KickoffStateProvider::allowedToEnterCenterCircle()
 {
-  if(theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT)
+  if(theGameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT)
     return true;
   if(theGameInfo.state == STATE_READY)  // Should not be relevant, but who knows...
     return true;

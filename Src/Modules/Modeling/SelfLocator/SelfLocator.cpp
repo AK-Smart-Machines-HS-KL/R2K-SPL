@@ -127,7 +127,7 @@ void SelfLocator::update(RobotPose& robotPose)
    */
   if(validitiesHaveBeenUpdated &&
      theFrameInfo.getTimeSince(timeOfLastReturnFromPenalty) > 4000 &&
-     theGameInfo.gamePhase != GAME_PHASE_PENALTYSHOOT)
+     theGameInfo.gamePhase != GAME_PHASE_PENALTY_SHOOT_OUT)
     resampling();
 
   /* Fill the RobotPose representation based on the current sample set
@@ -303,7 +303,7 @@ void SelfLocator::sensorUpdate()
   if(currentMotionIsUnsafe())
     return;
   // In the penalty shootout, the goalkeeper should not perform any real localization
-  if(theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber)
+  if(theGameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT && theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber)
     return;
 
   // Perform integration of measurements:
@@ -376,7 +376,7 @@ void SelfLocator::sensorUpdate()
   }
 
   // Apply side information:
-  if(theGameInfo.gamePhase != GAME_PHASE_PENALTYSHOOT)
+  if(theGameInfo.gamePhase != GAME_PHASE_PENALTY_SHOOT_OUT)
   {
     for(int i = 0; i < numberOfSamples; ++i)
     {
@@ -408,7 +408,7 @@ bool SelfLocator::currentMotionIsUnsafe()
 
 bool SelfLocator::sensorResetting(const RobotPose& robotPose)
 {
-  if(theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT) // Don't replace samples in penalty shootout
+  if(theGameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT) // Don't replace samples in penalty shootout
     return false;
   if(theSideInformation.mirror)                          // Don't replace samples in mirror cycle
     return false;
@@ -541,7 +541,7 @@ void SelfLocator::handleSideInformation()
 
 void SelfLocator::handleGameStateChanges()
 {
-  if(theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT)
+  if(theGameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT)
   {
     // penalty shoot: if game state switched to playing reset samples to start position
     if((theExtendedGameInfo.gameStateLastFrame != STATE_PLAYING && theGameInfo.state == STATE_PLAYING) ||
@@ -663,7 +663,7 @@ void SelfLocator::domainSpecificSituationHandling()
   if(!goalieActivateTwistHandling ||
      !theRobotInfo.isGoalkeeper() ||
      theGameInfo.state != STATE_PLAYING ||
-     theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT)
+     theGameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT)
     return;
   // The robot is in its goal area and assumes to look at the opponent half
   // and guards its goal.
@@ -801,7 +801,7 @@ Pose2f SelfLocator::getNewPoseReturnFromPenaltyPosition(bool leftSideOfGoal)
       return demoCustomReturnFromPenaltyPoseFieldPlayer;
   }
   // Testing purposes: Static start position
-  if(theStaticInitialPose.isActive && (theExtendedGameInfo.penaltyLastFrame == PENALTY_MANUAL || theExtendedGameInfo.penaltyLastFrame == PENALTY_SPL_PLAYER_PUSHING))
+  if(theStaticInitialPose.isActive && (theExtendedGameInfo.penaltyLastFrame == PENALTY_MANUAL || theExtendedGameInfo.penaltyLastFrame == PENALTY_PUSHING))
   {
     return theStaticInitialPose.staticPoseOnField;
   }

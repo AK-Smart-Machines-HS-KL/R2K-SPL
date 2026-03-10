@@ -14,7 +14,7 @@ void MidCirclePerceptor::update(MidCircle& midCircle)
 {
   midCircle.clear();
 
-  if(theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT)
+  if(theGameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT)
   {
     midCircle.isValid = false;
     return;

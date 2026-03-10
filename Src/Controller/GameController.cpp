@@ -25,8 +25,7 @@ GameController::GameController()
 {
   gameInfo.packetNumber = 0;
   gameInfo.playersPerTeam = numOfRobots / 2;
-  gameInfo.competitionPhase = COMPETITION_PHASE_ROUNDROBIN;
-  gameInfo.competitionType = COMPETITION_TYPE_NORMAL;
+  gameInfo.competitionType = COMPETITION_TYPE_SMALL;
   gameInfo.gamePhase = GAME_PHASE_NORMAL;
   gameInfo.state = STATE_INITIAL;
   gameInfo.setPlay = SET_PLAY_NONE;
@@ -73,7 +72,7 @@ bool GameController::handleStateCommand(const std::string& command)
   }
   else if(command == "ready")
   {
-    if(gameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT)
+    if(gameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT)
       return false;
     if(gameInfo.state == STATE_READY)
       return true;
@@ -94,10 +93,10 @@ bool GameController::handleStateCommand(const std::string& command)
     if(gameInfo.state == STATE_SET)
       return true;
 
-    if(gameInfo.competitionPhase != COMPETITION_PHASE_PLAYOFF && timeBeforeCurrentState != 0)
+    if(timeBeforeCurrentState != 0)
       addTimeInCurrentState();
     timeWhenStateBegan = Time::getCurrentSystemTime();
-    if(gameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT)
+    if(gameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT)
     {
       timeBeforeCurrentState = 0;
       if(gameInfo.state != STATE_INITIAL)
@@ -120,7 +119,7 @@ bool GameController::handleStateCommand(const std::string& command)
       return true;
     }
 
-    if(gameInfo.competitionPhase != COMPETITION_PHASE_PLAYOFF && timeBeforeCurrentState != 0)
+    if(timeBeforeCurrentState != 0)
       addTimeInCurrentState();
 
     timeWhenStateBegan = Time::getCurrentSystemTime();
@@ -142,30 +141,13 @@ bool GameController::handleStateCommand(const std::string& command)
   return false;
 }
 
-bool GameController::handleCompetitionPhaseCommand(const std::string& command)
-{
-  if(gameInfo.state != STATE_INITIAL)
-    return false;
-  else if(command == "competitionPhasePlayoff")
-  {
-    gameInfo.competitionPhase = COMPETITION_PHASE_PLAYOFF;
-    return true;
-  }
-  else if(command == "competitionPhaseRoundRobin")
-  {
-    gameInfo.competitionPhase = COMPETITION_PHASE_ROUNDROBIN;
-    return true;
-  }
-  return false;
-}
-
 bool GameController::handleCompetitionTypeCommand(const std::string& command)
 {
   if(gameInfo.state != STATE_INITIAL)
     return false;
-  else if(command == "competitionTypeNormal")
+  else if(command == "competitionTypeSmall")
   {
-    gameInfo.competitionType = COMPETITION_TYPE_NORMAL;
+    gameInfo.competitionType = COMPETITION_TYPE_SMALL;
     return true;
   }
   return false;
@@ -177,10 +159,10 @@ bool GameController::handleGoalCommand(const std::string& command)
     return false;
   else if(command == "goalByFirstTeam")
   {
-    if(gameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT && gameInfo.kickingTeam != 1)
+    if(gameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT && gameInfo.kickingTeam != 1)
       return false;
     ++teamInfos[0].score;
-    if(gameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT)
+    if(gameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT)
       VERIFY(handleStateCommand("finished"));
     else
     {
@@ -191,10 +173,10 @@ bool GameController::handleGoalCommand(const std::string& command)
   }
   else if(command == "goalBySecondTeam")
   {
-    if(gameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT && gameInfo.kickingTeam != 2)
+    if(gameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT && gameInfo.kickingTeam != 2)
       return false;
     ++teamInfos[1].score;
-    if(gameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT)
+    if(gameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT)
       VERIFY(handleStateCommand("finished"));
     else
     {
@@ -208,7 +190,7 @@ bool GameController::handleGoalCommand(const std::string& command)
 
 bool GameController::handleFreeKickCommand(const std::string& command)
 {
-  if(!(gameInfo.state == STATE_PLAYING && gameInfo.setPlay == SET_PLAY_NONE && gameInfo.gamePhase != GAME_PHASE_PENALTYSHOOT))
+  if(!(gameInfo.state == STATE_PLAYING && gameInfo.setPlay == SET_PLAY_NONE && gameInfo.gamePhase != GAME_PHASE_PENALTY_SHOOT_OUT))
     return false;
   if(command == "goalKickForFirstTeam")
   {
@@ -227,14 +209,14 @@ bool GameController::handleFreeKickCommand(const std::string& command)
   else if(command == "pushingFreeKickForFirstTeam")
   {
     timeWhenSetPlayBegan = Time::getCurrentSystemTime();
-    gameInfo.setPlay = SET_PLAY_PUSHING_FREE_KICK;
+    gameInfo.setPlay = SET_PLAY_DIRECT_FREE_KICK;
     gameInfo.kickingTeam = 1;
     return true;
   }
   else if(command == "pushingFreeKickForSecondTeam")
   {
     timeWhenSetPlayBegan = Time::getCurrentSystemTime();
-    gameInfo.setPlay = SET_PLAY_PUSHING_FREE_KICK;
+    gameInfo.setPlay = SET_PLAY_DIRECT_FREE_KICK;
     gameInfo.kickingTeam = 2;
     return true;
   }
@@ -255,14 +237,14 @@ bool GameController::handleFreeKickCommand(const std::string& command)
   else if(command == "kickInForFirstTeam")
   {
     timeWhenSetPlayBegan = Time::getCurrentSystemTime();
-    gameInfo.setPlay = SET_PLAY_KICK_IN;
+    gameInfo.setPlay = SET_PLAY_THROW_IN;
     gameInfo.kickingTeam = 1;
     return true;
   }
   else if(command == "kickInForSecondTeam")
   {
     timeWhenSetPlayBegan = Time::getCurrentSystemTime();
-    gameInfo.setPlay = SET_PLAY_KICK_IN;
+    gameInfo.setPlay = SET_PLAY_THROW_IN;
     gameInfo.kickingTeam = 2;
     return true;
   }
@@ -331,8 +313,6 @@ bool GameController::handleGlobalCommand(const std::string& command)
     return true;
   else if(handleCompetitionTypeCommand(command))
     return true;
-  else if(handleCompetitionPhaseCommand(command))
-    return true;
   else if(handleGoalCommand(command))
     return true;
   else if(handleFreeKickCommand(command))
@@ -343,10 +323,10 @@ bool GameController::handleGlobalCommand(const std::string& command)
     return true;
   else if(command == "gamePenaltyShootout")
   {
-    if(gameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT)
+    if(gameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT)
       return true;
 
-    gameInfo.gamePhase = GAME_PHASE_PENALTYSHOOT;
+    gameInfo.gamePhase = GAME_PHASE_PENALTY_SHOOT_OUT;
     gameInfo.state = STATE_INITIAL;
     gameInfo.setPlay = SET_PLAY_NONE;
     gameInfo.kickingTeam = 1;
@@ -575,7 +555,7 @@ void GameController::checkIllegalPositionInSet(int robot)
       inOpponentHalf || (!isKickingTeam && inCenterCircle)))
   {
     RoboCup::RobotInfo& tr = teamInfos[robot * 2 / numOfRobots].players[robot % (numOfRobots / 2)];
-    r.info.penalty = PENALTY_SPL_ILLEGAL_POSITION_IN_SET;
+    r.info.penalty = PENALTY_ILLEGAL_POSITIONING;
     tr.penalty = r.info.penalty;
     r.timeWhenPenalized = Time::getCurrentSystemTime();
   }
@@ -599,13 +579,13 @@ void GameController::referee()
 
   if(lastState != STATE_SET && gameInfo.state == STATE_SET)
   {
-    if(automatic & bit(penalizeIllegalPositionInSet) && gameInfo.gamePhase != GAME_PHASE_PENALTYSHOOT)
+    if(automatic & bit(penalizeIllegalPositionInSet) && gameInfo.gamePhase != GAME_PHASE_PENALTY_SHOOT_OUT)
       for(int i = 0; i < numOfRobots; ++i)
         checkIllegalPositionInSet(i);
 
     if(automatic & bit(placeBall))
     {
-      if(gameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT || gameInfo.setPlay == SET_PLAY_PENALTY_KICK)
+      if(gameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT || gameInfo.setPlay == SET_PLAY_PENALTY_KICK)
         SimulatedRobot::moveBall(Vector3f(gameInfo.kickingTeam == 1 ? fieldDimensions.xPosOwnPenaltyMark : fieldDimensions.xPosOpponentPenaltyMark, 0.f, 50.f), true);
       else
         SimulatedRobot::moveBall(Vector3f(0.f, 0.f, 50.f), true);
@@ -733,7 +713,7 @@ void GameController::referee()
 
     if(r.info.penalty != PENALTY_NONE)
     {
-      r.info.secsTillUnpenalised = static_cast<uint8_t>(std::max<int>((r.info.penalty == PENALTY_SPL_ILLEGAL_POSITION_IN_SET ? 15 : 45) - Time::getTimeSince(r.timeWhenPenalized) / 1000, 0));
+      r.info.secsTillUnpenalised = static_cast<uint8_t>(std::max<int>((r.info.penalty == PENALTY_ILLEGAL_POSITIONING ? 15 : 45) - Time::getTimeSince(r.timeWhenPenalized) / 1000, 0));
       RoboCup::RobotInfo& tr = teamInfos[i * 2 / numOfRobots].players[i % (numOfRobots / 2)];
       tr.secsTillUnpenalised = r.info.secsTillUnpenalised;
 
@@ -746,7 +726,7 @@ void GameController::referee()
 
     if(automatic & bit(placePlayers) && r.info.penalty == PENALTY_NONE && r.lastPenalty != PENALTY_NONE && r.simulatedRobot)
     {
-      if(gameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT)
+      if(gameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT)
       {
         Pose2f newPose((i < numOfRobots / 2) ? pi : 0.f, 0.f, 0.f);
         if(gameInfo.kickingTeam == (i < numOfRobots / 2 ? 1 : 2))
@@ -789,7 +769,7 @@ void GameController::referee()
       break;
 
     case STATE_SET:
-      if(automatic & bit(switchToPlaying) && gameInfo.gamePhase != GAME_PHASE_PENALTYSHOOT && Time::getTimeSince(timeWhenStateBegan) >= 5000)
+      if(automatic & bit(switchToPlaying) && gameInfo.gamePhase != GAME_PHASE_PENALTY_SHOOT_OUT && Time::getTimeSince(timeWhenStateBegan) >= 5000)
         handleGlobalCommand("playing");
       break;
 
@@ -806,7 +786,7 @@ void GameController::referee()
       if(automatic & bit(ballOut))
       {
         const auto ballOutType = updateBall();
-        if(gameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT && ballOutType != (gameInfo.kickingTeam == 1 ? goalByFirstTeam : goalBySecondTeam) && ballOutType != notOut)
+        if(gameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT && ballOutType != (gameInfo.kickingTeam == 1 ? goalByFirstTeam : goalBySecondTeam) && ballOutType != notOut)
           VERIFY(handleGlobalCommand("finished"));
         else if(ballOutType != notOut)
         {
@@ -933,7 +913,7 @@ void GameController::writeGameInfo(Out& stream)
   const int duration = gameInfo.gamePhase == GAME_PHASE_NORMAL ? halfTime : penaltyShotTime;
   const int timePlayed = gameInfo.state == STATE_INITIAL
                          || ((gameInfo.state == STATE_READY || gameInfo.state == STATE_SET)
-                             && (gameInfo.competitionPhase == COMPETITION_PHASE_PLAYOFF || timeBeforeCurrentState == 0))
+                             && timeBeforeCurrentState == 0)
                          || gameInfo.state == STATE_FINISHED
                          ? timeBeforeCurrentState / 1000
                          : Time::getTimeSince(timeWhenStateBegan - timeBeforeCurrentState) / 1000;
@@ -945,7 +925,7 @@ void GameController::writeGameInfo(Out& stream)
     gameInfo.secondaryTime = static_cast<int16_t>(penaltyShotTime - Time::getTimeSince(timeWhenStateBegan) / 1000);
   else if(gameInfo.state == STATE_PLAYING && gameInfo.setPlay != SET_PLAY_NONE)
     gameInfo.secondaryTime = static_cast<int16_t>(freeKickTime - Time::getTimeSince(timeWhenSetPlayBegan) / 1000);
-  else if(gameInfo.state == STATE_PLAYING && gameInfo.gamePhase != GAME_PHASE_PENALTYSHOOT && kickOffTime >= Time::getTimeSince(timeWhenStateBegan) / 1000)
+  else if(gameInfo.state == STATE_PLAYING && gameInfo.gamePhase != GAME_PHASE_PENALTY_SHOOT_OUT && kickOffTime >= Time::getTimeSince(timeWhenStateBegan) / 1000)
     gameInfo.secondaryTime = static_cast<int16_t>(kickOffTime - Time::getTimeSince(timeWhenStateBegan) / 1000);
   else
     gameInfo.secondaryTime = 0;

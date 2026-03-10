@@ -52,7 +52,7 @@ class WalkToPointImpl : public WalkToPointImplBase
 
     theRecordTargetAndSpeedSkill(p.target.translation, p.speed);
 
-    const bool disableObstacleAvoidance = p.disableObstacleAvoidance || (theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT);
+    const bool disableObstacleAvoidance = p.disableObstacleAvoidance || (theGameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT);
 
     common_transition
     {

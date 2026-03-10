@@ -43,7 +43,7 @@ class AfterInterceptBallCard : public AfterInterceptBallCardBase
   void execute() override
   {
     theActivitySkill(BehaviorStatus::afterInterceptBall);
-    theAfterInterceptBallSkill(/* allowGetUp: */ theGameInfo.gamePhase != GAME_PHASE_PENALTYSHOOT || theGameInfo.state != STATE_PLAYING);
+    theAfterInterceptBallSkill(/* allowGetUp: */ theGameInfo.gamePhase != GAME_PHASE_PENALTY_SHOOT_OUT || theGameInfo.state != STATE_PLAYING);
   }
 };
 

@@ -254,11 +254,11 @@ void LEDHandler::setLeftFoot(LEDRequest& ledRequest)
 void LEDHandler::setRightFoot(LEDRequest& ledRequest)
 {
   if(theGameInfo.state == STATE_INITIAL &&
-     theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT &&
+     theGameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT &&
      theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber)
     ledRequest.ledStates[LEDRequest::footRightGreen] = LEDRequest::on;
   else if(theGameInfo.state == STATE_INITIAL &&
-          theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT &&
+          theGameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT &&
           theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber)
   {
     ledRequest.ledStates[LEDRequest::footRightRed] = LEDRequest::on;

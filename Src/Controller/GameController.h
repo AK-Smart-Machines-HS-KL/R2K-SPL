@@ -202,12 +202,6 @@ private:
   bool handleGlobalCommand(const std::string& command);
 
   /**
-   * Handles commands that modify the competition phase.
-   * @param command The second part of the command (without "gc").
-   */
-  bool handleCompetitionPhaseCommand(const std::string& command);
-
-  /**
    * Handles commands that modify the competition type.
    * @param command The second part of the command (without "gc").
    */

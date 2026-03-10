@@ -68,7 +68,7 @@ void BallStateEstimator::update(BallModel& ballModel)
       return;
   }
   // *** Shortcut for a a very fast reaction in a penalty shootout!
-  if((theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT ||
+  if((theGameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT ||
     (theGameInfo.setPlay == SET_PLAY_PENALTY_KICK && theRobotInfo.isGoalkeeper())) &&
     theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber)
   {

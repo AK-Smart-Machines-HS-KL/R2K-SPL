@@ -65,7 +65,7 @@ class OppPushingFreeKickCard : public OppPushingFreeKickCardBase
   bool preconditions() const override
   {
     return theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
-        && theGameInfo.setPlay == SET_PLAY_PUSHING_FREE_KICK;
+        && theGameInfo.setPlay == SET_PLAY_DIRECT_FREE_KICK;
   }
 
   /**

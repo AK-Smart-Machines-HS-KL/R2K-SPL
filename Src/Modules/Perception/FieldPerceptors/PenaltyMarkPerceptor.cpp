@@ -84,7 +84,7 @@ void PenaltyMarkPerceptor::update(PenaltyMarkPercept& thePenaltyMarkPercept)
   detector.setCamera(CNS::toCameraModelOpenCV(theCameraInfo));
 
   // Special handling for penalty shootout: the penalty mark is where the ball is.
-  if(theGameInfo.gamePhase == GAME_PHASE_PENALTYSHOOT)
+  if(theGameInfo.gamePhase == GAME_PHASE_PENALTY_SHOOT_OUT)
   {
     if(theFrameInfo.getTimeSince(theBallModel.timeWhenLastSeen) < 2000
        && theBallModel.estimate.position.squaredNorm() < sqr(700))

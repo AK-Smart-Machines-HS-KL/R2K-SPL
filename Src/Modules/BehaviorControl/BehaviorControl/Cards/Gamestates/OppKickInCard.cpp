@@ -79,7 +79,7 @@ class OppKickInCard : public OppKickInCardBase
   bool preconditions() const override
   {
     return theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
-      && theGameInfo.setPlay == SET_PLAY_KICK_IN
+      && theGameInfo.setPlay == SET_PLAY_THROW_IN
       && !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number);
   }
 

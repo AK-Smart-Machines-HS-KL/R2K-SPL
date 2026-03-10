@@ -64,7 +64,7 @@ class OwnKickInCard : public OwnKickInCardBase
 {
 
   /**
-   * @brief SET_PLAY_KICK_IN: wo is doing the kick in, online/offline differ
+   * @brief SET_PLAY_THROW_IN: wo is doing the kick in, online/offline differ
    */
   bool preconditions() const override
   {
@@ -72,7 +72,7 @@ class OwnKickInCard : public OwnKickInCardBase
     return
       theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive) // I am the striker
       && theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
-      && theGameInfo.setPlay == SET_PLAY_KICK_IN 
+      && theGameInfo.setPlay == SET_PLAY_THROW_IN 
       && !aBuddyIsDoingPenaltyKick()
       //  && theTeammateRoles.isTacticalDefense(theRobotInfo.number) // my recent role
       //  && theTeammateRoles.isTacticalOffense(theRobotInfo.number)
@@ -92,7 +92,7 @@ class OwnKickInCard : public OwnKickInCardBase
     return 
        !theFieldBall.ballWasSeen(ballWasSeenStickyPeriod)
         || theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
-        || theGameInfo.setPlay != SET_PLAY_KICK_IN;
+        || theGameInfo.setPlay != SET_PLAY_THROW_IN;
         */
     // added AM
     return !preconditions();

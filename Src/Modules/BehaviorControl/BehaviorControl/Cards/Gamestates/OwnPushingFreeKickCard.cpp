@@ -64,7 +64,7 @@ class OwnPushingFreeKickCard : public OwnPushingFreeKickCardBase
     
     return 
       theGameInfo.kickingTeam == theOwnTeamInfo.teamNumber
-      && theGameInfo.setPlay == SET_PLAY_PUSHING_FREE_KICK
+      && theGameInfo.setPlay == SET_PLAY_DIRECT_FREE_KICK
       && theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive);  // I am the striker
 
 
@@ -79,7 +79,7 @@ class OwnPushingFreeKickCard : public OwnPushingFreeKickCardBase
       !theFieldBall.ballWasSeen(ballWasSeenStickyPeriod)
       ||
       theGameInfo.kickingTeam != theOwnTeamInfo.teamNumber
-      || theGameInfo.setPlay != SET_PLAY_PUSHING_FREE_KICK;
+      || theGameInfo.setPlay != SET_PLAY_DIRECT_FREE_KICK;
   }
 
   void execute() override

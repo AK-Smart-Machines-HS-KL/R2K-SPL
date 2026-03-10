@@ -195,11 +195,11 @@ std::string GameInfo::getStateAsString() const
           return "Playing";
         case SET_PLAY_GOAL_KICK:
           return "Goal Kick";
-        case SET_PLAY_PUSHING_FREE_KICK:
+        case SET_PLAY_DIRECT_FREE_KICK:
           return "Pushing Free Kick";
         case SET_PLAY_CORNER_KICK:
           return "Corner Kick";
-        case SET_PLAY_KICK_IN:
+        case SET_PLAY_THROW_IN:
           return "Kick In";
         case SET_PLAY_PENALTY_KICK:
           return "Penalty Kick";
@@ -216,9 +216,8 @@ std::string GameInfo::getStateAsString() const
 void GameInfo::read(In& stream)
 {
   STREAM(packetNumber);
-  STREAM(competitionPhase); // phase of the competition (COMPETITION_PHASE_ROUNDROBIN, COMPETITION_PHASE_PLAYOFF)
   STREAM(competitionType);  // type of the competition (COMPETITION_TYPE_NORMAL, COMPETITION_TYPE_GENERAL_PENALTY_KICK)
-  STREAM(gamePhase); // phase of the game (GAME_PHASE_NORMAL, GAME_PHASE_PENALTYSHOOT, etc)
+  STREAM(gamePhase); // phase of the game (GAME_PHASE_NORMAL, GAME_PHASE_PENALTY_SHOOT_OUT, etc)
   STREAM(state); // STATE_READY, STATE_PLAYING, ...
   STREAM(setPlay); // active set play (SET_PLAY_NONE, SET_PLAY_GOAL_KICK, etc)
   STREAM(firstHalf); // 1 = game in first half, 0 otherwise
@@ -232,9 +231,8 @@ void GameInfo::read(In& stream)
 void GameInfo::write(Out& stream) const
 {
   STREAM(packetNumber);
-  STREAM(competitionPhase); // phase of the competition (COMPETITION_PHASE_ROUNDROBIN, COMPETITION_PHASE_PLAYOFF)
   STREAM(competitionType);  // type of the competition (COMPETITION_TYPE_NORMAL, COMPETITION_TYPE_GENERAL_PENALTY_KICK)
-  STREAM(gamePhase); // phase of the game (GAME_PHASE_NORMAL, GAME_PHASE_PENALTYSHOOT, etc)
+  STREAM(gamePhase); // phase of the game (GAME_PHASE_NORMAL, GAME_PHASE_PENALTY_SHOOT_OUT, etc)
   STREAM(state); // STATE_READY, STATE_PLAYING, ...
   STREAM(setPlay); // active set play (SET_PLAY_NONE, SET_PLAY_GOAL_KICK, etc)
   STREAM(firstHalf); // 1 = game in first half, 0 otherwise
@@ -250,7 +248,6 @@ void GameInfo::reg()
   PUBLISH(reg);
   REG_CLASS(GameInfo);
   REG(packetNumber);
-  REG(competitionPhase);
   REG(competitionType);
   REG(gamePhase);
   REG(state);
