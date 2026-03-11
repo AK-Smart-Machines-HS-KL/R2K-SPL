@@ -1,0 +1,5 @@
+skillName,maxTime,angleParam1,angleParam2,poseParam X,poseParam Y,poseParam R,vector3Param X,vector3Param Y,vector3Param Z,boolParam,floatParam,intParam,stringParam
+WalkToBall,15000,0,0,0,0,0,0,0,0,0,0,0,
+Dribble,4000,3.14,0,0,0,0,0,0,0,0,0.5,0,
+Dribble,10000,0,0,0,0,0,0,0,0,0,0.7,0,
+KickAtGoal,25000,0,0,4500,-750,0,0,0,0,0,0,1,
