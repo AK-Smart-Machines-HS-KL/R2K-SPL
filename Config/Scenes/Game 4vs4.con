@@ -1,0 +1,5 @@
+call Includes/Normal
+call Includes/4vs4
+
+dr debugDrawing3d:representation:RobotInfo
+dr debugDrawing3d:representation:RobotPose
