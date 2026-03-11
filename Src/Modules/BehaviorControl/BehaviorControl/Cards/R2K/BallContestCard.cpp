@@ -88,6 +88,10 @@ CARD(BallContestCard,
                 (float)(800.f)  contestRange,
                 // Opponent must be within contestRange for this long before escape triggers [ms].
                 (int)(2000)     contestTimeout,
+                // Aggressive contest range when ball moves toward own goal [mm].
+                (float)(1200.f) aggressiveContestRange,
+                // Aggresssive timeout when ball moves toward own goal [ms] — shorter to react faster.
+                (int)(1000)     aggressiveContestTimeout,
                 // Maximum time spent in the escape (side-kick) state [ms].
                 (int)(4000)     kickTimeout,
                 // Duration of the dribble followthrough after a successful side-kick [ms].
@@ -98,6 +102,10 @@ CARD(BallContestCard,
                 (float)(1000.f) boundaryMargin,
                 // Max time [ms] spent turning toward last ball position in searchForBall.
                 (int)(1500)     turnToBallTimeout,
+                // Maximum distance [mm] from robot to ball; exit if exceeded.
+                (float)(1500.f) maxBallDistance,
+                // Own goal x-position threshold [mm]; exit if ball x < this (moving toward own goal).
+                (float)(-1500.f) ballOwnGoalXThreshold,
              }),
      });
 
@@ -117,12 +125,17 @@ class BallContestCard : public BallContestCardBase
 
   bool preconditions() const override
   {
+    // Determine if ball is moving dangerously toward own goal (threat escalation).
+    const bool ballMovingTowardOwnGoal = isBallMovingTowardOwnGoal();
+    const float activeContestRange = ballMovingTowardOwnGoal ? aggressiveContestRange : contestRange;
+
     return
       theGameInfo.setPlay == SET_PLAY_NONE                                               &&
       theFieldBall.ballWasSeen(ballNotSeenTimeout)                                      &&
       !theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number)                       &&
       theTeammateRoles.playsTheBall(&theRobotInfo, theTeamCommStatus.isWifiCommActive)  &&
-      theObstacleModel.opponentIsClose(contestRange);
+      !aBuddyIsPlayingBallContest()                                                     &&
+      theObstacleModel.opponentIsClose(activeContestRange);
   }
 
   bool postconditions() const override
@@ -130,11 +143,15 @@ class BallContestCard : public BallContestCardBase
     // Do NOT exit on playsTheBall() flicker: during a contest the ball briefly drifts toward
     // the opponent, causing transient striker-role loss. Buddy-checks in the other chase cards
     // already block them from activating while ballContestCard is reported active, so no second
-    // robot rushes in. Exit only on hard game-state changes or prolonged ball disappearance.
+    // robot rushes in. Exit on hard game-state changes, prolonged ball disappearance, and
+    // when the ball moves too far away or especially toward the own goal.
+    const float distanceToBall = (theFieldBall.positionOnField - theRobotPose.translation).norm();
     return
-      theGameInfo.setPlay != SET_PLAY_NONE               ||
-      !theFieldBall.ballWasSeen(ballNotSeenTimeout * 2)  ||
-      theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number);
+      theGameInfo.setPlay != SET_PLAY_NONE                                               ||
+      !theFieldBall.ballWasSeen(ballNotSeenTimeout * 2)                                  ||
+      theTeammateRoles.isTacticalGoalKeeper(theRobotInfo.number)                         ||
+      distanceToBall > maxBallDistance                                                   ||
+      theFieldBall.positionOnField.x() < ballOwnGoalXThreshold;
   }
 
   option
@@ -161,7 +178,9 @@ class BallContestCard : public BallContestCardBase
         {
           if (contestStartTime == 0)
             contestStartTime = theFrameInfo.time;
-          if (theFrameInfo.getTimeSince(contestStartTime) > contestTimeout)
+          // Use aggressive timeout if ball is moving toward own goal, otherwise standard timeout
+          const int activeTimeout = isBallMovingTowardOwnGoal() ? aggressiveContestTimeout : contestTimeout;
+          if (theFrameInfo.getTimeSince(contestStartTime) > activeTimeout)
             goto escape;
         }
         else
@@ -295,6 +314,24 @@ class BallContestCard : public BallContestCardBase
   {
     return (theRobotPose.inversePose *
             Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
+  }
+
+  bool isBallMovingTowardOwnGoal() const
+  {
+    // Check if ball's predicted end position is in own goal area  (x < 0, approaching own goal line).
+    // This indicates opponent is pushing ball toward our goal—warrant aggressive intercept.
+    return theFieldBall.endPositionOnField.x() < 0.f &&
+           theFieldBall.positionOnField.x() > theFieldBall.endPositionOnField.x();  // moving toward own goal line
+  }
+
+  bool aBuddyIsPlayingBallContest() const
+  {
+    for (const auto& buddy : theTeamData.teammates)
+    {
+      if (buddy.theBehaviorStatus.activity == BehaviorStatus::ballContestCard)
+        return true;
+    }
+    return false;
   }
 };
 
