@@ -97,7 +97,8 @@ echo "${playbackVolume}" >"${homeDir}/nao/.config/volume"
 touch "${homeDir}/nao/robocup.conf"
 
 # /home/nao/bin
-cp -r "${installDir}/Files/bin" "${homeDir}/nao"
+cp -r "${ins
+tallDir}/Files/bin" "${homeDir}/nao"
 
 # /home/nao/Profiles
 cp -r "${installDir}/Profiles" "${homeDir}/nao"
