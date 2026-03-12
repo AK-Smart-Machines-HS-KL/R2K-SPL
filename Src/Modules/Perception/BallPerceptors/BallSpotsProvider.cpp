@@ -169,7 +169,7 @@ void BallSpotsProvider::scanBallSpotOneDirection(const Vector2i& spot, int& curr
                                                        unsigned char luminanceRef, unsigned char saturationRef) const
 {
   unsigned currentSkipped = 0;
-  while(checkPixel(theECImage.grayscaled[getY(spot, currentLength)][getX(spot, currentLength)], theECImage.saturated[getY(spot, currentLength)][getX(spot, currentLength)], goodPixelCounter, currentSkipped, luminanceRef, saturationRef)
+  while(checkPixel(theECImage.grayscaled[getY(spot, currentLength)][getX(spot, currentLength)], theECImage.saturated[getY(spot, currentLength)][getX(spot, currentLength)], goodPixelCounter, currentSkipped, luminanceRef, saturationRef, static_cast<unsigned char>(theECImage.hued[getY(spot, currentLength)][getX(spot, currentLength)]))
         && ++currentLength <= maxLength);
   currentLength -= currentSkipped;
 
@@ -179,15 +179,33 @@ void BallSpotsProvider::scanBallSpotOneDirection(const Vector2i& spot, int& curr
        1, Drawings::solidPen, ColorRGBA::red);
 }
 
-bool BallSpotsProvider::checkPixel(unsigned char pixelLuminance, unsigned char pixelSaturation, unsigned& goodPixelCounter, unsigned& currentSkipped, unsigned char luminanceRef, unsigned char saturationRef) const
+bool BallSpotsProvider::checkPixel(unsigned char pixelLuminance, unsigned char pixelSaturation, unsigned& goodPixelCounter, unsigned& currentSkipped, unsigned char luminanceRef, unsigned char saturationRef, unsigned char pixelHue) const
 {
-  if(!theRelativeFieldColors.isFieldNearWhite(pixelLuminance, pixelSaturation, luminanceRef, saturationRef))
+  bool isGoodPixel = false;
+  
+  if(detectColoredBall)
+  {
+    // Check if pixel has one of the target colors (blue, green, or red) with sufficient saturation
+    bool isBlue = blueHueRange.isInside(pixelHue);
+    bool isGreen = greenHueRange.isInside(pixelHue);
+    bool isRed = redHueRange.isInside(pixelHue);
+    
+    isGoodPixel = (isBlue || isGreen || isRed) && pixelSaturation >= minColorSaturation;
+  }
+  else
+  {
+    // Original logic: check if pixel is not field-colored (for white/black ball)
+    isGoodPixel = !theRelativeFieldColors.isFieldNearWhite(pixelLuminance, pixelSaturation, luminanceRef, saturationRef);
+  }
+  
+  if(isGoodPixel)
   {
     currentSkipped = 0;
     ++goodPixelCounter;
   }
   else
     ++currentSkipped;
+    
   return currentSkipped < maxNumberOfSkippablePixel;
 }
 
