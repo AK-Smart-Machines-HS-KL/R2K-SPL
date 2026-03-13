@@ -53,6 +53,12 @@ MODULE(BallSpotsProvider,
 
     (bool) allowScanLineTopSpotFitting, // Is it allowed to find a spot on top of a scanLine?
     (bool) lessStrictChecks, // Allow more Ballspots?
+    
+    (bool) detectColoredBall, //< If true, detect ball with blue/green/red colors. If false, detect white/black ball.
+    (Rangei) blueHueRange, //< Hue range for blue color (0-255 scale, ~170 for blue)
+    (Rangei) greenHueRange, //< Hue range for green color (0-255 scale, ~85 for green)
+    (Rangei) redHueRange, //< Hue range for red color (0-255 scale, ~0-10 for red)
+    (unsigned char) minColorSaturation, //< Minimum saturation for colored ball detection
   }),
 });
 
@@ -115,10 +121,11 @@ class BallSpotsProvider : public BallSpotsProviderBase
    * @param currentSkipped A variable that counts the consecutive skipped pixels
    * @param luminanceRef The luminance of a white reference Pixel
    * @param saturationRef The saturation of a white reference Pixel
+   * @param pixelHue The hue of the pixel (for color detection)
    * @return Is the consecutive skipped pixel (or green pixel) count to high?
    */
   bool checkPixel(unsigned char pixelLuminance, unsigned char pixelSaturation,
-                  unsigned& goodPixelCounter, unsigned& currentSkipped, unsigned char luminanceRef, unsigned char saturationRef) const;
+                  unsigned& goodPixelCounter, unsigned& currentSkipped, unsigned char luminanceRef, unsigned char saturationRef, unsigned char pixelHue) const;
 
   /**
    * The method checks if the last spot is duplicative.
