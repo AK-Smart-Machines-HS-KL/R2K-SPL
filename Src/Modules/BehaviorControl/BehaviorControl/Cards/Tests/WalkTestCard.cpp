@@ -72,7 +72,7 @@ class WalkTestCard : public WalkTestCardBase
   // check whether the robot position is close enough on a target (epsilon-environment), set epsilon within this function
   bool targetCloseEnough(Pose2f target)
   {
-    double eps = 25.f; // epsilon value for self location precision
+    double eps = 50.f; // epsilon value for self location precision
     if(theRobotPose.translation.x() > (target.translation.x() - eps) && 
         theRobotPose.translation.x() < (target.translation.x() + eps) &&
         theRobotPose.translation.y() > (target.translation.y() - eps) &&
