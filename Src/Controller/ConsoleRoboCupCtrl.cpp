@@ -514,7 +514,7 @@ void ConsoleRoboCupCtrl::help(In& stream)
   list("  cls : Clear console window.", pattern, true);
   list("  dt off | on | <fps> : Delay time of a simulation step to real time or a certain number of frames per second.", pattern, true);
   list("  echo <text> : Print text into console window. Useful in console.con.", pattern, true);
-  list("  gc initial | ready | set | playing | finished | goalByFirstTeam | goalBySecondTeam | kickOffFirstTeam | kickOffSecondTeam | manualPlacementFirstTeam | manualPlacementSecondTeam | goalKickForFirstTeam | goalKickForSecondTeam | pushingFreeKickForFirstTeam | pushingFreeKickForSecondTeam | cornerKickForFirstTeam | cornerKickForSecondTeam | kickInForFirstTeam | kickInForSecondTeam | penaltyKickForFirstTeam | penaltyKickForSecondTeam | gameNormal | gamePenaltyShootout | competitionPhasePlayoff | competitionPhaseRoundRobin | competitionTypeNormal : Set GameController state.", pattern, true);
+  list("  gc initial | ready | set | playing | finished | goalByFirstTeam | goalBySecondTeam | kickOffFirstTeam | kickOffSecondTeam | manualPlacementFirstTeam | manualPlacementSecondTeam | goalKickForFirstTeam | goalKickForSecondTeam | pushingFreeKickForFirstTeam | pushingFreeKickForSecondTeam | cornerKickForFirstTeam | cornerKickForSecondTeam | kickInForFirstTeam | kickInForSecondTeam | penaltyKickForFirstTeam | penaltyKickForSecondTeam | gameNormal | gamePenaltyShootout  | competitionTypeNormal : Set GameController state.", pattern, true);
   list("  ( help | ? ) [<pattern>] : Display this text.", pattern, true);
   if(is2D)
     list("  mvo <name> <x> <y> [<rot>] : Move the object with the given name to the given position.", pattern, true);
