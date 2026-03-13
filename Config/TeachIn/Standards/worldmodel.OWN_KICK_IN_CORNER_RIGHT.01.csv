@@ -1,2 +1,2 @@
 gameState,setPlay,timeLeft,robotNumber,robotPose X,robotPose Y,robotPose R,distanceToGoal,ballIsNear,ballPosition X,ballPosition Y,ballDistanceToBot,ballDistanceToGoal,team1 X,team1 Y,team2 X,team2 Y,team3 X,team3 Y,team4 X,team4 Y,team5 X,team5 Y,opponent1 X,opponent1 Y,opponent2 X,opponent2 Y,opponent3 X,opponent3 Y,opponent4 X,opponent4 Y,opponent5 X,opponent5 Y
-3,4,180,0,3750,-3000,0,3092,1,3750,-3000,5000,3092,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+3,4,180,0,3650,-3000,0,3092,1,3650,-3000,5000,3092,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
