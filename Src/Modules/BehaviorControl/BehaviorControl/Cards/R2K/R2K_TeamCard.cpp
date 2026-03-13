@@ -184,15 +184,15 @@ private:
       //      R2K_NORMAL_GAME, R2K_DEFENSIVE_GAME,R2K_OFFENSIVE_GAME, R2K_SPARSE_GAME
 
       // 1 player
-        { {GN,UN,UN,UN,UN}, {GN,UN,UN,UN,UN}, {GN,UN,UN,UN,UN}, {OM,UN,UN,UN,UN} },
+        { {OM,UN,UN,UN,UN}, {OM,UN,UN,UN,UN}, {OM,UN,UN,UN,UN}, {OM,UN,UN,UN,UN} },
         // 2 player
-            { {GN,OM,UN,UN,UN}, {GN,OM,UN,UN,UN}, {GN,OM,UN,UN,UN}, {DM,OM,UN,UN,UN} },
+            { {GN,OM,UN,UN,UN}, {GN,OM,UN,UN,UN}, {DM,OM,UN,UN,UN}, {DM,OM,UN,UN,UN} },
             // 3 player
-                { {GN,DM,OM,UN,UN}, {GN,DR,DM,UN,UN}, {GA,DM,OM,UN,UN}, {GN,OR,OM,UN,UN} },
+                { {GN,DM,OM,UN,UN}, {GN,DR,OM,UN,UN}, {GA,DM,OM,UN,UN}, {GN,OR,OM,UN,UN} },
                 // 4 player
                     { {GN,DM,OR,OM,UN}, {GN,DR,DL,OM,UN}, {GA,DM,DL,OM,UN}, {GN,DM,OL,OM,UN} },
                     // 5 player
-                        { {GN,DR,DL,OR,OL}, {GN,DR,DL,DM,OM}, {GA,DM,DL,OR,OM}, {GN,DM,OL,OR,OM} }
+                        { {GN,DR,DL,OR,OM}, {GN,DR,DL,DM,OM}, {GA,DM,DL,OR,OM}, {GN,DM,OL,OR,OM} }
 
 
     };
@@ -439,7 +439,11 @@ private:
       for (size_t i = 0; i < 5; i++)
       {
         if (theOwnTeamInfo.players[i].penalty == PENALTY_NONE) {
-          teamMateRoles.roles[i] = r2k_tactics[nActive - 1][teamBehaviorStatus - 1][roleIdx];
+          if (nActive >= 1 && teamBehaviorStatus >= 1 && teamBehaviorStatus <= TeamBehaviorStatus::numOfTeamActivities) {
+            teamMateRoles.roles[i] = r2k_tactics[nActive - 1][teamBehaviorStatus - 1][roleIdx];
+          } else {
+            teamMateRoles.roles[i] = TeammateRoles::UNDEFINED;
+          }
           roleIdx++;
         } else {
           teamMateRoles.roles[i] = TeammateRoles::UNDEFINED;
@@ -509,8 +513,13 @@ private:
 
           // looking for rank of bot
           if (bot == sorted_bots[i_pos]) {  // bots count from 1..5
-            found = true; 
-            teamMateRoles.roles[bot - 1] = r2k_tactics[activeBuddies-1][teamBehaviorStatus - 1][i_pos];
+            found = true;
+            // Bounds check to prevent array access with negative index
+            if (activeBuddies >= 1 && teamBehaviorStatus >= 1 && teamBehaviorStatus <= TeamBehaviorStatus::numOfTeamActivities) {
+              teamMateRoles.roles[bot - 1] = r2k_tactics[activeBuddies-1][teamBehaviorStatus - 1][i_pos];
+            } else {
+              teamMateRoles.roles[bot - 1] = TeammateRoles::UNDEFINED;
+            }
             break;
           }
         }
