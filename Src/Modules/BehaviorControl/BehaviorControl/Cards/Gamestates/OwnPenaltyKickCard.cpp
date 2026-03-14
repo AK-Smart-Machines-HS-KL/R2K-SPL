@@ -111,7 +111,7 @@ class OwnPenaltyKickCard : public OwnPenaltyKickCardBase
   {
 
     done = false;
-    Angle angleToGoal = (Vector2f(4500, 0) - theRobotPose.translation).angle() - theRobotPose.rotation;
+    Angle angleToGoal = (Vector2f(4500, 600) - theRobotPose.translation).angle() - theRobotPose.rotation;
     transition
     {
       if (abs(angleToGoal.normalize()) < 10_deg || state_time > 2000) 
@@ -151,7 +151,8 @@ class OwnPenaltyKickCard : public OwnPenaltyKickCardBase
   {
     transition
     {
-      if (theGoToBallAndKickSkill.isDone()) {
+      // if (theGoToBallAndKickSkill.isDone()) {
+      if(state_time > currentShot.kickType.duration + 1000) { // wait for the kick to be executed, then exit the card
          goto done;
       }
     }
