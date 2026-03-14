@@ -35,6 +35,7 @@ set_property(TARGET Tests PROPERTY XCODE_GENERATE_SCHEME ON)
 set_property(TARGET Tests PROPERTY XCODE_PRODUCT_TYPE "com.apple.product-type.bundle.unit-test")
 
 target_include_directories(Tests PRIVATE "${TESTS_ROOT_DIR}")
+target_include_directories(Tests PRIVATE $<$<PLATFORM_ID:Windows>:${BHUMAN_PREFIX}/Util/Buildchain/Windows/include>)
 
 if(APPLE)
   target_include_directories(Tests SYSTEM PRIVATE ${CORE_SERVICES_FRAMEWORK} ${CORE_SERVICES_FRAMEWORK}/Headers)
@@ -46,6 +47,7 @@ target_link_libraries(Tests PRIVATE $<$<PLATFORM_ID:Linux>:flite::flite_cmu_us_s
     $<$<PLATFORM_ID:Linux>:flite::flite_cmulex> $<$<PLATFORM_ID:Linux>:flite::flite>)
 target_link_libraries(Tests PRIVATE $<$<PLATFORM_ID:Linux>:ALSA::ALSA>)
 target_link_libraries(Tests PRIVATE $<$<PLATFORM_ID:Linux>:-lpthread>)
+target_link_libraries(Tests PRIVATE $<$<PLATFORM_ID:Windows>:winmm> $<$<PLATFORM_ID:Windows>:ws2_32>)
 
 target_link_libraries(Tests PRIVATE Eigen::Eigen)
 target_link_libraries(Tests PRIVATE GameController::GameController)
