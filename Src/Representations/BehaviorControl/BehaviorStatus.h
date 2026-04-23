@@ -56,6 +56,7 @@ STREAMABLE(BehaviorStatus, COMMA public BHumanCompressedMessageParticle<Behavior
     ownPenaltyKick,
     oppFreeKick,
 
+    stop,
     ownKickoff,
     oppKickoff,
 
