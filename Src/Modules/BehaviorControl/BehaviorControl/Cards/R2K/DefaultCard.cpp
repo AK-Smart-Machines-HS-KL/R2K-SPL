@@ -19,6 +19,9 @@
 // Representations
 #include "Representations/BehaviorControl/DefaultPose.h"
 #include "Representations/Modeling/RobotPose.h"
+#include "Representations/Configuration/FieldDimensions.h"
+#include "Representations/BehaviorControl/FieldBall.h"
+
 
 //#include <filesystem>
 
@@ -30,9 +33,13 @@ CARD(DefaultCard,
         CALLS(Activity),
         CALLS(LookActive),
         CALLS(WalkToPoint),
+        CALLS(GoToBallAndDribble),
+        CALLS(LookAtBall),
 
         REQUIRES(DefaultPose),
         REQUIRES(RobotPose),
+        REQUIRES(FieldBall),
+        REQUIRES(FieldDimensions),
 
         DEFINES_PARAMETERS(
              {,
@@ -66,6 +73,8 @@ class DefaultCard : public DefaultCardBase
 
   void execute() override
   {
+    /*
+        Previos Default Behavior
 
     theActivitySkill(BehaviorStatus::defaultBehavior);
     
@@ -73,8 +82,25 @@ class DefaultCard : public DefaultCardBase
 
     theLookActiveSkill(); // Head Motion Request
     theWalkToPointSkill(targetRelative, 1.0f, true);     
+    */
 
+    theActivitySkill(BehaviorStatus::defaultBehavior);
+
+    theLookAtBallSkill();
+    theGoToBallAndDribbleSkill(calcAngleToGoal());
+  }
+
+  Angle calcAngleToGoal() const
+  {
+    return (theRobotPose.inversePose * Vector2f(theFieldDimensions.xPosOpponentGroundLine, 0.f)).angle();
+  }
+
+    Angle calcAngleToBall() const
+  {
+    return (theRobotPose.inversePose * Vector2f(theFieldBall.endPositionOnField.x(), theFieldBall.endPositionOnField.y())).angle();
   }
 };
+
+ 
 
 MAKE_CARD(DefaultCard);
