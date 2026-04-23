@@ -29,6 +29,7 @@ GameController::GameController()
   gameInfo.gamePhase = GAME_PHASE_NORMAL;
   gameInfo.state = STATE_INITIAL;
   gameInfo.setPlay = SET_PLAY_NONE;
+  gameInfo.stopped = 0;
   gameInfo.firstHalf = 1;
   gameInfo.kickingTeam = 1;
   gameInfo.secsRemaining = halfTime;
