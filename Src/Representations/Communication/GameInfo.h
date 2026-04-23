@@ -21,6 +21,7 @@ public:
   unsigned timeLastPacketReceived = 0;
   unsigned timeLastStateChange = 0;
 
+  
   GameInfo();
 
   /** Draws the game time in the scene view. */
