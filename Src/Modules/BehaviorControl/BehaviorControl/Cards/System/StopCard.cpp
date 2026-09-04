@@ -1,5 +1,5 @@
 /**
- * @file SetStop.cpp
+ * @file StopCard.cpp
  *
  * This file specifies the behavior for a robot in the Stop game state.
  *

@@ -226,6 +226,7 @@ void GameInfo::read(In& stream)
   STREAM(secondaryTime);
   STREAM(timeLastPacketReceived); // used to decide whether a gameController is running
   STREAM(timeLastStateChange); // used for kickoff
+  STREAM(stopped); // 1 = stopped, game normal otherwise
 }
 
 void GameInfo::write(Out& stream) const
@@ -241,6 +242,8 @@ void GameInfo::write(Out& stream) const
   STREAM(secondaryTime);
   STREAM(timeLastPacketReceived); // used to decide whether a gameController is running
   STREAM(timeLastStateChange); // used for kickoff
+  STREAM(stopped); // 1 = stopped, game normal otherwise
+
 }
 
 void GameInfo::reg()
@@ -258,4 +261,5 @@ void GameInfo::reg()
   REG(secondaryTime);
   REG(timeLastPacketReceived);
   REG(timeLastStateChange);
+  REG(stopped);
 }
